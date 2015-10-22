@@ -1,0 +1,8 @@
+TextContent = 
+{
+	ZilchScriptBuilder = 
+	{
+		string Name = "Z_ChallengeLogic_2",
+		uint64 ResourceId = 55c96f913d2352a3,
+	},
+},

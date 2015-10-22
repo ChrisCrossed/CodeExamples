@@ -1,0 +1,150 @@
+class Z_BackdropLogic : ZilchComponent
+{
+    var CurrentTheme:SpriteSource = null;
+    var NewTheme:SpriteSource = null;
+    
+    var B_GameStart:Boolean = true;
+    
+    function Initialize(init : CogInitializer)
+    {
+        Zero.Connect(this.GameSession, Events.LoadBackdrop_One, this.LoadTheme_One);
+        Zero.Connect(this.GameSession, Events.LoadBackdrop_Two, this.LoadTheme_Two);
+        Zero.Connect(this.GameSession, Events.LoadBackdrop_Three, this.LoadTheme_Three);
+        Zero.Connect(this.GameSession, Events.LoadBackdrop_Four, this.LoadTheme_Four);
+        
+        Zero.Connect(this.Space, Events.LogicUpdate, this.OnLogicUpdate);
+    }
+    
+    function ResetThemes()
+    {
+        var currentBackdrop = this.Space.FindObjectByName("CurrentBackdrop");
+        var newBackdrop = this.Space.FindObjectByName("NewBackdrop");
+        
+        var currentColor = currentBackdrop.Sprite.Color;
+        var newColor = newBackdrop.Sprite.Color;
+        
+        currentBackdrop.Sprite.SpriteSource = this.CurrentTheme;
+        newBackdrop.Sprite.SpriteSource = this.NewTheme;
+        
+        if(!this.B_GameStart)
+        {
+            currentColor.W = 1;
+        }
+        else
+        {
+            currentColor.W = 0;
+            this.B_GameStart = false;
+        }
+        
+        newColor.W = 0;
+        
+        currentBackdrop.Sprite.Color = currentColor;
+        newBackdrop.Sprite.Color = newColor;
+    }
+
+    function LoadTheme_One(event : Event)
+    {
+        Console.WriteLine("Loaded Backdrop One");
+        
+        var currentBackdrop = this.Space.FindObjectByName("CurrentBackdrop");
+        var newBackdrop = this.Space.FindObjectByName("NewBackdrop");
+        
+        if(currentBackdrop.Sprite.SpriteSource != null)
+        {
+            // this.CurrentTheme = currentBackdrop.Sprite.SpriteSource;
+            this.CurrentTheme = newBackdrop.Sprite.SpriteSource;
+        }
+        
+        this.NewTheme = SpriteSource.Find("Backdrop_Glitch");
+        
+        this.ResetThemes();
+    }
+    
+    function LoadTheme_Two(event : Event)
+    {
+        Console.WriteLine("Loaded Backdrop Two");
+        
+        var currentBackdrop = this.Space.FindObjectByName("CurrentBackdrop");
+        var newBackdrop = this.Space.FindObjectByName("NewBackdrop");
+        
+        if(currentBackdrop.Sprite.SpriteSource != null)
+        {
+            // this.CurrentTheme = currentBackdrop.Sprite.SpriteSource;
+            this.CurrentTheme = newBackdrop.Sprite.SpriteSource;
+        }
+        
+        this.NewTheme = SpriteSource.Find("Backdrop_GraveYard");
+        
+        this.ResetThemes();
+    }
+    function LoadTheme_Three(event : Event)
+    {
+        Console.WriteLine("Loaded Backdrop Three");
+        
+        var currentBackdrop = this.Space.FindObjectByName("CurrentBackdrop");
+        var newBackdrop = this.Space.FindObjectByName("NewBackdrop");
+        
+        if(currentBackdrop.Sprite.SpriteSource != null)
+        {
+            // this.CurrentTheme = currentBackdrop.Sprite.SpriteSource;
+            this.CurrentTheme = newBackdrop.Sprite.SpriteSource;
+        }
+        
+        this.NewTheme = SpriteSource.Find("Backdrop_BigRed");
+        
+        this.ResetThemes();
+    }
+    
+    function LoadTheme_Four(event : Event)
+    {
+        Console.WriteLine("Loaded Backdrop Four");
+        
+        var currentBackdrop = this.Space.FindObjectByName("CurrentBackdrop");
+        var newBackdrop = this.Space.FindObjectByName("NewBackdrop");
+        
+        if(currentBackdrop.Sprite.SpriteSource != null)
+        {
+            // this.CurrentTheme = currentBackdrop.Sprite.SpriteSource;
+            this.CurrentTheme = newBackdrop.Sprite.SpriteSource;
+        }
+        
+        this.NewTheme = SpriteSource.Find("Backdrop_Techtragon");
+        
+        this.ResetThemes();
+    }
+    
+    function OnLogicUpdate(event : UpdateEvent)
+    {
+        if(this.Space.TimeSpace.Paused)
+        {
+            return;
+        }
+        
+        var currentBackdrop = this.Space.FindObjectByName("CurrentBackdrop");
+        var newBackdrop = this.Space.FindObjectByName("NewBackdrop");
+        
+        var currentColor = currentBackdrop.Sprite.Color;
+        var newColor = newBackdrop.Sprite.Color;
+        
+        if(currentColor.W > 0)
+        {
+            currentColor.W -= event.Dt / 3;
+        }
+        else
+        {
+            currentColor.W = 0;
+        }
+        
+        if(newColor.W < 1)
+        {
+            newColor.W += event.Dt / 3;
+        }
+        else
+        {
+            newColor.W = 1;
+        }
+        
+        this.Space.FindObjectByName("CurrentBackdrop").Sprite.Color = currentColor;
+        this.Space.FindObjectByName("NewBackdrop").Sprite.Color = newColor;
+    }
+}

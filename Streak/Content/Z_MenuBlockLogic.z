@@ -1,0 +1,48 @@
+class Z_MenuBlockLogic : ZilchComponent
+{
+    var BlockType:Enum_BlockType = Enum_BlockType.None;
+    
+    var Color_One:Real4 = Real4(1,0,0,1); // Red
+    var Color_Two:Real4 = Real4(0,0,1,1); // Blue
+    var Color_None:Real4 = Real4(1,1,1,0); // Clear
+    var Color_GameOver:Real4 = Real4(1, 1, 1, 1); // White
+    
+    var Tile_Brick:SpriteSource = SpriteSource.Find("Tile_Brick");
+    var Tile_Standard:SpriteSource = SpriteSource.Find("Template");
+    
+    var R_Timer:Real = 0;
+    var Rand:Random = new Random();
+    
+    var CurrentColor:Real4 = Real4();
+    
+    function Initialize(init : CogInitializer)
+    {
+        this.Owner.Sprite.SpriteSource = this.Tile_Brick;
+        Zero.Connect(this.Space, Events.LogicUpdate, this.OnLogicUpdate);
+        
+        this.R_Timer = 1.75;
+    }
+
+    function OnLogicUpdate(event : UpdateEvent)
+    {
+        var seq = Action.Sequence(this.Owner.Actions);
+        
+        this.R_Timer += event.Dt;
+        
+        if(this.R_Timer >= 2.0)
+        {
+            var color:Real4 = Real4(1,0,0,1); // Red
+                
+            if(this.Rand.CoinFlip())
+            {
+                color = Real4(0,0,1,1); // Blue
+            }
+            
+            var sprite = this.Owner.Sprite;
+            
+            Action.Property(seq, @sprite.Color, color, 1.5, Ease.Linear);
+                
+            this.R_Timer = 0;
+        } // End For
+    }
+}

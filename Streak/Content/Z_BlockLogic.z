@@ -1,0 +1,72 @@
+enum Enum_BlockType
+{
+    Block_One_Active,
+    Block_One_Static,
+    Block_Two_Active,
+    Block_Two_Static,
+    Wall,
+    GameOver,
+    MainMenu,
+    None,
+}
+
+enum Enum_MoveDirection
+{
+    Down,
+    Left,
+    Right,
+    Up
+}
+
+class Z_BlockLogic : ZilchComponent
+{
+    [Property]
+    var BlockType:Enum_BlockType = Enum_BlockType.None;
+    
+    var Color_One:Real4 = Real4(1,0,0,1); // Red
+    // var Color_Two:Real4 = Real4( 0.266, 0.73, 1, 1); // Blue
+    var Color_Two:Real4 = Real4( 0.25, 0.73, 1, 1); // Blue
+    var Color_None:Real4 = Real4(1,1,1,0); // Clear
+    var Color_Background:Real4 = Real4(1, 1, 1, 0.5); // White
+    var Color_GameOver:Real4 = Real4(1, 1, 1, 1); // White
+    
+    var Tile_Brick:SpriteSource = SpriteSource.Find("Tile_Brick");
+    var Tile_Standard:SpriteSource = SpriteSource.Find("Template");
+    
+    var CurrentColor:Real4 = Real4();
+    
+    function Initialize(init : CogInitializer)
+    {
+        if(this.BlockType != Enum_BlockType.MainMenu)
+        {
+            Zero.Connect(this.Space, Events.LogicUpdate, this.OnLogicUpdate);
+        }
+        this.Owner.Sprite.SpriteSource = this.Tile_Brick;
+    }
+    
+    function OnLogicUpdate(event : UpdateEvent)
+    {
+        if(this.BlockType == Enum_BlockType.Block_One_Active || this.BlockType == Enum_BlockType.Block_One_Static)
+        {
+            this.CurrentColor = this.Color_One;
+        }
+        else if(this.BlockType == Enum_BlockType.Block_Two_Active || this.BlockType == Enum_BlockType.Block_Two_Static)
+        {
+            this.CurrentColor = this.Color_Two;
+        }
+        else if(this.BlockType == Enum_BlockType.None)
+        {
+            this.CurrentColor = this.Color_Background;
+        }
+        else if(this.BlockType == Enum_BlockType.Wall)
+        {
+            this.CurrentColor = this.Color_None;
+        }
+        else if(this.BlockType == Enum_BlockType.GameOver)
+        {
+            this.CurrentColor = this.Color_GameOver;
+        }
+        
+        this.Owner.Sprite.Color = this.CurrentColor;
+    }
+}

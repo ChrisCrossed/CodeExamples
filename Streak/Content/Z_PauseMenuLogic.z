@@ -1,0 +1,171 @@
+class Z_PauseMenuLogic : ZilchComponent
+{
+    sends GameRequestQuit : Event;
+    sends PauseTimer : Event;
+    
+    var MenuButton_Activator:Cog = null;
+    var MenuButton_Play:Cog = null;
+    var MenuButton_Quit:Cog = null;
+    
+    var PauseMenu:Cog = null;
+    var PauseMenu_Background:Cog = null;
+    
+    var Text_Paused:Cog = null;
+    var Text_Unpause:Cog = null;
+    var Text_Quit:Cog = null;
+    
+    var B_IsPaused:Boolean = false;
+    var B_IsPlaySelected:Boolean = true;
+    
+    function Initialize(init : CogInitializer)
+    {
+        this.MenuButton_Activator = this.Space.FindObjectByName("Menu_Selector");
+        this.MenuButton_Play = this.Space.FindObjectByName("Menu_Play");
+        this.MenuButton_Quit = this.Space.FindObjectByName("Menu_Quit");
+        
+        this.PauseMenu = this.Space.FindObjectByName("HUD_PauseMenu");
+        this.PauseMenu_Background = this.Space.FindObjectByName("TransparentOverlay");
+        
+        this.Text_Paused = this.Space.FindObjectByName("Text_Paused");
+        this.Text_Unpause = this.Space.FindObjectByName("Text_Unpause");
+        this.Text_Quit = this.Space.FindObjectByName("Text_Quit");
+        
+        Zero.Connect(this.Space, Events.LogicUpdate, this.OnLogicUpdate);
+    }
+    
+    function ActivateMenu()
+    {
+        var seq = Action.Sequence(this.Owner.Actions);
+        var group = Action.Group(seq);
+        
+        this.MenuButton_Activator.Transform.Translation = Real3(-2, this.MenuButton_Play.Transform.Translation.Y, this.MenuButton_Activator.Transform.Translation.Z);
+        this.B_IsPlaySelected = true;
+        
+        Action.Property(group, @this.PauseMenu_Background.Sprite.Color, Real4(this.PauseMenu_Background.Sprite.Color.X, this.PauseMenu_Background.Sprite.Color.Y, this.PauseMenu_Background.Sprite.Color.Z, 0.5), 0.2, Ease.Linear);
+        
+        Action.Property(group, @this.PauseMenu.Sprite.Color, Real4(this.PauseMenu.Sprite.Color.X, this.PauseMenu.Sprite.Color.Y, this.PauseMenu.Sprite.Color.Z, 1), 0.2, Ease.Linear);
+        
+        Action.Property(group, @this.MenuButton_Activator.Sprite.Color, Real4(this.MenuButton_Activator.Sprite.Color.X, this.MenuButton_Activator.Sprite.Color.Y, this.MenuButton_Activator.Sprite.Color.Z, 1), 0.2, Ease.Linear);
+        Action.Property(group, @this.MenuButton_Play.Sprite.Color, Real4(this.MenuButton_Play.Sprite.Color.X, this.MenuButton_Play.Sprite.Color.Y, this.MenuButton_Play.Sprite.Color.Z, 1), 0.2, Ease.Linear);
+        Action.Property(group, @this.MenuButton_Quit.Sprite.Color, Real4(this.MenuButton_Quit.Sprite.Color.X, this.MenuButton_Quit.Sprite.Color.Y, this.MenuButton_Quit.Sprite.Color.Z, 1), 0.2, Ease.Linear);
+        
+        Action.Property(group, @this.Text_Paused.SpriteText.Color, Real4(this.Text_Paused.SpriteText.Color.X, this.Text_Paused.SpriteText.Color.Y, this.Text_Paused.SpriteText.Color.Z, 1), 0.2, Ease.Linear);
+        Action.Property(group, @this.Text_Unpause.SpriteText.Color, Real4(this.Text_Unpause.SpriteText.Color.X, this.Text_Unpause.SpriteText.Color.Y, this.Text_Unpause.SpriteText.Color.Z, 1), 0.2, Ease.Linear);
+        Action.Property(group, @this.Text_Quit.SpriteText.Color, Real4(this.Text_Quit.SpriteText.Color.X, this.Text_Quit.SpriteText.Color.Y, this.Text_Quit.SpriteText.Color.Z, 1), 0.2, Ease.Linear);
+        
+        this.GameSession.DispatchEvent(Events.ResetButtons, new Event());
+        this.GameSession.FindSpaceByName("ThemeSpace").TimeSpace.TogglePause();
+        this.GameSession.FindSpaceByName("ThemeSpace").LevelSettings.Z_ThemeLogic.TogglePauseMusic();
+        this.GameSession.FindSpaceByName("LevelSpace").TimeSpace.TogglePause();
+        
+        this.GameSession.DispatchEvent(Events.PauseTimer, new Event());
+    }
+    
+    function DeactivateMenu()
+    {
+        var seq = Action.Sequence(this.Owner.Actions);
+        var group = Action.Group(seq);
+        
+        Action.Property(group, @this.PauseMenu_Background.Sprite.Color, Real4(this.PauseMenu_Background.Sprite.Color.X, this.PauseMenu_Background.Sprite.Color.Y, this.PauseMenu_Background.Sprite.Color.Z, 0), 0.1, Ease.Linear);
+        
+        Action.Property(group, @this.PauseMenu.Sprite.Color, Real4(this.PauseMenu.Sprite.Color.X, this.PauseMenu.Sprite.Color.Y, this.PauseMenu.Sprite.Color.Z, 0), 0.1, Ease.Linear);
+        
+        Action.Property(group, @this.MenuButton_Activator.Sprite.Color, Real4(this.MenuButton_Activator.Sprite.Color.X, this.MenuButton_Activator.Sprite.Color.Y, this.MenuButton_Activator.Sprite.Color.Z, 0), 0.1, Ease.Linear);
+        Action.Property(group, @this.MenuButton_Play.Sprite.Color, Real4(this.MenuButton_Play.Sprite.Color.X, this.MenuButton_Play.Sprite.Color.Y, this.MenuButton_Play.Sprite.Color.Z, 0), 0.1, Ease.Linear);
+        Action.Property(group, @this.MenuButton_Quit.Sprite.Color, Real4(this.MenuButton_Quit.Sprite.Color.X, this.MenuButton_Quit.Sprite.Color.Y, this.MenuButton_Quit.Sprite.Color.Z, 0), 0.1, Ease.Linear);
+        
+        Action.Property(group, @this.Text_Paused.SpriteText.Color, Real4(this.Text_Paused.SpriteText.Color.X, this.Text_Paused.SpriteText.Color.Y, this.Text_Paused.SpriteText.Color.Z, 0), 0.1, Ease.Linear);
+        Action.Property(group, @this.Text_Unpause.SpriteText.Color, Real4(this.Text_Unpause.SpriteText.Color.X, this.Text_Unpause.SpriteText.Color.Y, this.Text_Unpause.SpriteText.Color.Z, 0), 0.1, Ease.Linear);
+        Action.Property(group, @this.Text_Quit.SpriteText.Color, Real4(this.Text_Quit.SpriteText.Color.X, this.Text_Quit.SpriteText.Color.Y, this.Text_Quit.SpriteText.Color.Z, 0), 0.1, Ease.Linear);
+        
+        this.GameSession.DispatchEvent(Events.ResetButtons, new Event());
+        this.GameSession.FindSpaceByName("ThemeSpace").TimeSpace.TogglePause();
+        this.GameSession.FindSpaceByName("ThemeSpace").LevelSettings.Z_ThemeLogic.TogglePauseMusic();
+        this.GameSession.FindSpaceByName("LevelSpace").TimeSpace.TogglePause();
+        
+        this.GameSession.DispatchEvent(Events.PauseTimer, new Event());
+    }
+
+    function OnLogicUpdate(event : UpdateEvent)
+    {
+        if(Zero.Keyboard.KeyIsPressed(Keys.Escape))
+        {
+            if(this.B_IsPaused)
+            {
+                this.DeactivateMenu();
+                this.B_IsPaused = false;
+            }
+            else
+            {
+                this.ActivateMenu();
+                this.B_IsPaused = true;
+            }
+        }
+        
+        if(this.B_IsPaused)
+        {
+            var seq = Action.Sequence(this.Owner.Actions);
+            var group = Action.Group(seq);
+            
+            var playPosition = this.MenuButton_Play.Transform.Translation.Y;
+            var quitPosition = this.MenuButton_Quit.Transform.Translation.Y;
+            
+            var buttonPos = this.MenuButton_Activator.Transform.Translation;
+            
+            if(Zero.Keyboard.KeyIsPressed(Keys.Up))
+            {
+                this.B_IsPlaySelected = true;
+                
+                Action.Property(seq, @this.MenuButton_Activator.Transform.Translation, Real3(buttonPos.X, playPosition, buttonPos.Z), 0.3, Ease.SinOut);
+            }
+            if(Zero.Keyboard.KeyIsPressed(Keys.Down))
+            {
+                this.B_IsPlaySelected = false;
+                // Action.Property(seq, @buttonPos.Y, quitPosition, 0.6, Ease.SinOut);
+                Action.Property(seq, @this.MenuButton_Activator.Transform.Translation, Real3(buttonPos.X, quitPosition, buttonPos.Z), 0.3, Ease.SinOut);
+            }
+            
+            if(Zero.Keyboard.KeyIsPressed(Keys.Space) || Zero.Keyboard.KeyIsPressed(Keys.Enter))
+            {
+                var seq2 = Action.Sequence(this.Owner.Actions);
+                Actions.Delay(seq2, event.Dt * 2);
+                Action.Call(seq2, this.ExitPauseMenu);
+            }
+            
+            if(this.MenuButton_Activator.Transform.Translation.X >= -1.6)
+            {
+                // buttonPos.X = -1.5;
+                Action.Property(group, @this.MenuButton_Activator.Transform.Translation, Real3(-2.5, this.MenuButton_Activator.Transform.Translation.Y, this.MenuButton_Activator.Transform.Translation.Z), 0.6, Ease.SinOut);
+            }
+        }
+    } // End OnLogicUpdate
+    
+    function ExitPauseMenu()
+    {
+        if(this.B_IsPlaySelected)
+        {
+            this.DeactivateMenu();
+            this.B_IsPaused = false;
+        }
+        else
+        {
+            while(this.GameSession.FindSpaceByName("LevelSpace") != null)
+            {
+                this.GameSession.FindSpaceByName("LevelSpace").Destroy();
+            }
+            
+            while(this.GameSession.FindSpaceByName("ThemeSpace") != null)
+            {
+                this.GameSession.FindSpaceByName("ThemeSpace").Destroy();
+            }
+            
+            while(this.GameSession.FindSpaceByName("HudSpace") != null)
+            {
+                this.GameSession.FindSpaceByName("HudSpace").Destroy();
+            }
+            
+            this.GameSession.CreateNamedSpace("Main", Archetype.Find("Space"));
+            this.GameSession.FindSpaceByName("Main").LoadLevel(Level.Find("Menu_MainMenu"));
+        }
+    }
+}

@@ -1,0 +1,18 @@
+Cog = 
+{
+	LinkId = 
+	{
+		uint Id = 1,
+	},
+	Named = 
+	{
+		string Name = "SavedData",
+	},
+	Archetyped = 
+	{
+		string Name = "551c7dfc9c8b1921:SavedData",
+	},
+	Z_DataSaver = 
+	{
+	},
+},

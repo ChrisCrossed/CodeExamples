@@ -1,0 +1,114 @@
+class Z_ChallengeMenuLogic : ZilchComponent
+{
+    var DataCog:Cog = null;
+    
+    var StarArray:Array[Boolean] = new Array[Boolean](8);
+    
+    function Initialize(init : CogInitializer)
+    {
+        Zero.Connect(this.Space, Events.LogicUpdate, this.OnLogicUpdate);
+        Zero.Connect(this.GameSession, Events.GameRequestQuit, this.OnGameRequestQuit);
+        
+        this.DataCog = Zero.ObjectStore.RestoreOrArchetype("SaveFile", "SavedData", this.Space);
+        
+        this.LoadStarArray();
+    }
+
+    function OnLogicUpdate(event : UpdateEvent)
+    {
+        
+    }
+    
+    function OnGameRequestQuit(gameEvent : GameEvent)
+    {
+        Console.WriteLine("Challenge Menu: ESC Pressed");
+        // this.GameSession.FindSpaceByName("Main").LoadLevel(Level.Find("Menu_MainMenu"));
+        // this.GameSession.FindSpaceByName("HudSpace").Destroy();
+        // this.Space.Destroy();
+        this.QuitToMainMenu();
+        
+        gameEvent.Handled = true;
+    }
+    
+    function QuitToMainMenu()
+    {
+        //while(this.GameSession.FindSpaceByName("LevelSpace") != null)
+        //{
+        //    this.GameSession.FindSpaceByName("LevelSpace").Destroy();
+        //}
+        
+        //while(this.GameSession.FindSpaceByName("ThemeSpace") != null)
+        //{
+        //    this.GameSession.FindSpaceByName("ThemeSpace").Destroy();
+        //}
+        
+        //while(this.GameSession.FindSpaceByName("HudSpace") != null)
+        //{
+        //    this.GameSession.FindSpaceByName("HudSpace").Destroy();
+        //}
+        
+        this.Space.LoadLevel(Level.Find("Menu_MainMenu"));
+        //var levelSpace = this.GameSession.CreateNamedSpace("LevelSpace", Archetype.Find("Space"));
+        
+        //var gameLevel  = Level.Find("Menu_Challenge");
+        //// Kept this here so only one levelspace is created
+        //levelSpace = this.GameSession.FindSpaceByName("LevelSpace");
+        //levelSpace.LoadLevel(gameLevel);
+        
+        //if(this.GameSession.FindSpaceByName("Main") != null)
+        //{
+        //    this.GameSession.FindSpaceByName("Main").Destroy();
+        //}
+    }
+    
+    function LoadStarArray()
+    {
+        this.StarArray.Set(0, this.DataCog.Z_DataSaver.Challenge_One_Complete);
+        if(this.StarArray.Get(0))
+        {
+            this.Space.FindObjectByName("Star_Heart_Complete").Sprite.SpriteSource = SpriteSource.Find("StarOn");
+        }
+        
+        this.StarArray.Set(1, this.DataCog.Z_DataSaver.Challenge_One_NumTurns);
+        if(this.StarArray.Get(1))
+        {
+            this.Space.FindObjectByName("Star_Heart_NumTries").Sprite.SpriteSource = SpriteSource.Find("StarOn");
+        }
+        
+        this.StarArray.Set(2, this.DataCog.Z_DataSaver.Challenge_Two_Complete);
+        if(this.StarArray.Get(2))
+        {
+            this.Space.FindObjectByName("Star_Circle_Complete").Sprite.SpriteSource = SpriteSource.Find("StarOn");
+        }
+        
+        this.StarArray.Set(3, this.DataCog.Z_DataSaver.Challenge_Two_NumTurns);
+        if(this.StarArray.Get(3))
+        {
+            this.Space.FindObjectByName("Star_Circle_NumTries").Sprite.SpriteSource = SpriteSource.Find("StarOn");
+        }
+        
+        this.StarArray.Set(4, this.DataCog.Z_DataSaver.Challenge_Three_Complete);
+        if(this.StarArray.Get(4))
+        {
+            this.Space.FindObjectByName("Star_Smile_Complete").Sprite.SpriteSource = SpriteSource.Find("StarOn");
+        }
+        
+        this.StarArray.Set(5, this.DataCog.Z_DataSaver.Challenge_Three_NumTurns);
+        if(this.StarArray.Get(5))
+        {
+            this.Space.FindObjectByName("Star_Smile_NumTries").Sprite.SpriteSource = SpriteSource.Find("StarOn");
+        }
+        
+        this.StarArray.Set(6, this.DataCog.Z_DataSaver.Challenge_Four_Complete);
+        if(this.StarArray.Get(6))
+        {
+            this.Space.FindObjectByName("Star_BigHeart_Complete").Sprite.SpriteSource = SpriteSource.Find("StarOn");
+        }
+        
+        this.StarArray.Set(7, this.DataCog.Z_DataSaver.Challenge_Four_NumTurns);
+        if(this.StarArray.Get(7))
+        {
+            this.Space.FindObjectByName("Star_BigHeart_NumTries").Sprite.SpriteSource = SpriteSource.Find("StarOn");
+        }
+    }
+}

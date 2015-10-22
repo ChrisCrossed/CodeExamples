@@ -1,0 +1,291 @@
+enum Enum_BlockPos
+{
+    BottomLeft = 0,
+    BottomRight = 1,
+    TopLeft = 2,
+    TopRight = 3
+}
+
+class Z_HudLogic : ZilchComponent
+{
+    sends IncrementScore : Event;
+    sends IncrementBoosts : Event;
+    sends DecrementBoosts : Event;
+    
+    sends HUDBlock_BottomLeft_BlockOne : Event;
+    sends HUDBlock_BottomLeft_BlockTwo : Event;
+    
+    sends HUDBlock_BottomRight_BlockOne : Event;
+    sends HUDBlock_BottomRight_BlockTwo : Event;
+    
+    sends HUDBlock_TopLeft_BlockOne : Event;
+    sends HUDBlock_TopLeft_BlockTwo : Event;
+    
+    sends HUDBlock_TopRight_BlockOne : Event;
+    sends HUDBlock_TopRight_BlockTwo : Event;
+    
+    sends TimerGameOver : Event;
+    
+    [Property]
+    var ScoreLimitShown:Integer = 750;
+    
+    var I_Score:Integer = 0;
+    var I_PrintScore:Integer = 0;
+    var I_Boosts:Integer = 0;
+    var I_TimeLeft_Seconds:Integer = 0;
+    var B_TimeLeft_Active:Boolean = false;
+    var B_GamePlaying:Boolean = true;
+    var B_IsTimerEvent:Boolean = false;
+    
+    var R_Timer:Real = 0;
+    var R_TimeLeft_Timer:Real = 0;
+    
+    function Initialize(init : CogInitializer)
+    {
+        Zero.Connect(this.GameSession, Events.GameTimeLength, this.ActivateTimer);
+        Zero.Connect(this.GameSession, Events.PauseTimer, this.PauseTimer);
+        
+        Zero.Connect(this.GameSession, Events.IncrementScore, this.IncrementScore);
+        Zero.Connect(this.GameSession, Events.IncrementBoosts, this.IncrementBoosts);
+        Zero.Connect(this.GameSession, Events.DecrementBoosts, this.DecrementBoosts);
+        Zero.Connect(this.GameSession, Events.HUDTimer_GameOver, this.HUDTimer_GameOver);
+        
+        Zero.Connect(this.GameSession, Events.HUDBlock_BottomLeft_BlockOne, this.HUDBlock_BottomLeft_BlockOne);
+        Zero.Connect(this.GameSession, Events.HUDBlock_BottomLeft_BlockTwo, this.HUDBlock_BottomLeft_BlockTwo);
+        Zero.Connect(this.GameSession, Events.HUDBlock_BottomRight_BlockOne, this.HUDBlock_BottomRight_BlockOne);
+        Zero.Connect(this.GameSession, Events.HUDBlock_BottomRight_BlockTwo, this.HUDBlock_BottomRight_BlockTwo);
+        Zero.Connect(this.GameSession, Events.HUDBlock_TopLeft_BlockOne, this.HUDBlock_TopLeft_BlockOne);
+        Zero.Connect(this.GameSession, Events.HUDBlock_TopLeft_BlockTwo, this.HUDBlock_TopLeft_BlockTwo);
+        Zero.Connect(this.GameSession, Events.HUDBlock_TopRight_BlockOne, this.HUDBlock_TopRight_BlockOne);
+        Zero.Connect(this.GameSession, Events.HUDBlock_TopRight_BlockTwo, this.HUDBlock_TopRight_BlockTwo);
+        
+        this.UpdateHUDInformation();
+        
+        Zero.Connect(this.Space, Events.LogicUpdate, this.OnLogicUpdate);
+        
+        if(this.B_TimeLeft_Active)
+        {
+            var seconds = this.I_TimeLeft_Seconds % 60;
+            var minutes = this.I_TimeLeft_Seconds / 60;
+            
+            this.Space.FindObjectByName("Text_TimeRemaining").SpriteText.Text = "Time: `minutes`:`seconds`";
+            this.Space.FindObjectByName("Text_TimeRemaining_Background").Sprite.Color = Real4(this.Space.FindObjectByName("Text_TimeRemaining_Background").Sprite.Color.X, this.Space.FindObjectByName("Text_TimeRemaining_Background").Sprite.Color.Y, this.Space.FindObjectByName("Text_TimeRemaining_Background").Sprite.Color.Z, 1);
+            this.Space.FindObjectByName("Text_TimeRemaining").SpriteText.Color = Real4(this.Space.FindObjectByName("Text_TimeRemaining").SpriteText.Color.X, this.Space.FindObjectByName("Text_TimeRemaining").SpriteText.Color.Y, this.Space.FindObjectByName("Text_TimeRemaining").SpriteText.Color.Z, 1);
+        }
+        
+    }
+
+    function IncrementScore(incrementScore : IncrementScore)
+    {
+        this.I_Score += 1;
+    }
+    
+    function IncrementBoosts(event : Event)
+    {
+        this.I_Boosts += 1;
+        this.UpdateHUDInformation();
+    }
+
+    function DecrementBoosts(event : Event)
+    {
+        this.I_Boosts -= 1;
+        this.UpdateHUDInformation();
+    }
+    
+    function ActivateTimer(event : SendsTimeLength)
+    {
+        this.I_TimeLeft_Seconds = event.TimeLength;
+        
+        this.Space.FindObjectByName("Text_TimeRemaining_Background").Sprite.Color = Real4(this.Space.FindObjectByName("Text_TimeRemaining_Background").Sprite.Color.X, this.Space.FindObjectByName("Text_TimeRemaining_Background").Sprite.Color.Y, this.Space.FindObjectByName("Text_TimeRemaining_Background").Sprite.Color.Z, 1);
+        this.Space.FindObjectByName("Text_TimeRemaining").SpriteText.Color = Real4(this.Space.FindObjectByName("Text_TimeRemaining").SpriteText.Color.X, this.Space.FindObjectByName("Text_TimeRemaining").SpriteText.Color.Y, this.Space.FindObjectByName("Text_TimeRemaining").SpriteText.Color.Z, 1);
+        
+        var seconds = this.I_TimeLeft_Seconds % 60;
+        var minutes = this.I_TimeLeft_Seconds / 60;
+        
+        var displaySeconds = "`seconds`";
+        if(seconds < 10)
+        {
+            displaySeconds = "0`seconds`";
+        }
+        
+        var displayMinutes = "`minutes`";
+        if(minutes == 0)
+        {
+            displayMinutes = "";
+            if(seconds <= 0)
+            {
+                displaySeconds = "00";
+            }
+        }
+        
+        this.Space.FindObjectByName("Text_TimeRemaining").SpriteText.Text = "Time: `displayMinutes`:`displaySeconds`";
+        this.B_TimeLeft_Active = true;
+        this.B_IsTimerEvent = true;
+        
+        Console.WriteLine("Received `event.TimeLength`");
+    }
+    
+    function PauseTimer(event : Event)
+    {
+        if(this.B_GamePlaying)
+        {
+            this.B_GamePlaying = false;
+        }
+        else
+        {
+            this.B_GamePlaying = true;
+        }
+    }
+    
+    function HUDTimer_GameOver(event : Event)
+    {
+        this.B_GamePlaying = false;
+    }
+
+    function OnLogicUpdate(event : UpdateEvent)
+    {
+        this.R_Timer += event.Dt;
+        
+        for(var i = 0; i < this.I_Score; ++i)
+        {
+            if(this.R_Timer >= 0.05 && this.I_Score > 0)
+            {
+                this.I_PrintScore += 1;
+                this.I_Score -= 1;
+                
+                this.R_Timer = 0;
+                
+                this.UpdateHUDInformation();
+            }
+        }
+        
+        if(this.B_TimeLeft_Active && this.B_GamePlaying)
+        {
+            this.R_TimeLeft_Timer += event.Dt;
+            
+            if(this.R_TimeLeft_Timer > 1)
+            {
+                --this.I_TimeLeft_Seconds;
+                var seconds = this.I_TimeLeft_Seconds % 60;
+                var minutes = this.I_TimeLeft_Seconds / 60;
+                
+                var displaySeconds = "`seconds`";
+                if(seconds < 10)
+                {
+                    displaySeconds = "0`seconds`";
+                }
+                
+                var displayMinutes = "`minutes`";
+                if(minutes == 0)
+                {
+                    displayMinutes = "";
+                    
+                    if(seconds == 5)
+                    {
+                        this.Space.FindObjectByName("Text_TimeRemaining").SpriteText.Color = Real4(1,0,0,1);
+                    }
+                    
+                    if(seconds <= 5 && seconds > 0)
+                    {
+                        // Play Warning Sound
+                        var sirenSound = this.Space.Create(Archetype.Find("SFX_Siren"));
+                        sirenSound.SoundEmitter.Play();
+                    }
+                    
+                    if(seconds <= 0)
+                    {
+                        displaySeconds = "00";
+                    }
+                }
+                
+                this.Space.FindObjectByName("Text_TimeRemaining").SpriteText.Text = "Time: `displayMinutes`:`displaySeconds`";
+                
+                this.R_TimeLeft_Timer = 0;
+            }
+        }
+        
+        if(this.B_IsTimerEvent && this.I_TimeLeft_Seconds <= 0)
+        {
+            this.GameSession.DispatchEvent(Events.TimerGameOver, new Event());
+        }
+            
+    }
+    
+    function UpdateHUDInformation()
+    {
+        if(this.ScoreLimitShown > 0)
+        {
+            this.Space.FindObjectByName("Text_Score").SpriteText.Text = "Score: `this.I_PrintScore`";
+        }
+        else
+        {
+            this.Space.FindObjectByName("Text_Score").SpriteText.Text = "";
+        }
+        this.Space.FindObjectByName("Text_Boosts").SpriteText.Text = "Boosts: `this.I_Boosts`";
+    }
+    
+    // ------
+    
+    function HUDBlock_BottomLeft_BlockOne(event : Event)
+    {
+        this.Space.FindObjectByName("Block_0,0").Z_BlockLogic.BlockType = Enum_BlockType.Block_One_Static;
+    }
+    function HUDBlock_BottomLeft_BlockTwo(event : Event)
+    {
+        this.Space.FindObjectByName("Block_0,0").Z_BlockLogic.BlockType = Enum_BlockType.Block_Two_Static;
+    }
+    
+    // ------
+    
+    function HUDBlock_BottomRight_BlockOne(event : Event)
+    {
+        this.Space.FindObjectByName("Block_0,1").Z_BlockLogic.BlockType = Enum_BlockType.Block_One_Static;
+    }
+    function HUDBlock_BottomRight_BlockTwo(event : Event)
+    {
+        this.Space.FindObjectByName("Block_0,1").Z_BlockLogic.BlockType = Enum_BlockType.Block_Two_Static;
+    }
+    
+    // ------
+    
+    function HUDBlock_TopLeft_BlockOne(event : Event)
+    {
+        this.Space.FindObjectByName("Block_1,0").Z_BlockLogic.BlockType = Enum_BlockType.Block_One_Static;
+    }
+    function HUDBlock_TopLeft_BlockTwo(event : Event)
+    {
+        this.Space.FindObjectByName("Block_1,0").Z_BlockLogic.BlockType = Enum_BlockType.Block_Two_Static;
+    }
+    
+    // ------
+    
+    function HUDBlock_TopRight_BlockOne(event : Event)
+    {
+        this.Space.FindObjectByName("Block_1,1").Z_BlockLogic.BlockType = Enum_BlockType.Block_One_Static;
+    }
+    function HUDBlock_TopRight_BlockTwo(event : Event)
+    {
+        this.Space.FindObjectByName("Block_1,1").Z_BlockLogic.BlockType = Enum_BlockType.Block_Two_Static;
+    }
+}
+
+//Sending a custom script
+// Define a custom script event
+class IncrementBoosts : Event
+{
+    // Remember that member variable names MUST be capitalized in Zilch
+    
+    constructor() : base()
+    {
+    }
+}
+
+class IncrementScore : Event
+{
+    //var I_Score : Integer = 0;
+    
+    constructor() : base()
+    {
+        
+    }
+}

@@ -1,0 +1,30 @@
+Cog = 
+{
+	LinkId = 
+	{
+		uint Id = 1,
+	},
+	Named = 
+	{
+		string Name = "Music_InventionForStrings",
+	},
+	Archetyped = 
+	{
+		string Name = "551751a961e98baf:Music_InventionForStrings",
+	},
+	Transform = 
+	{
+		Vec3 Translation = [8.54111, 0, 40],
+		Vec3 Scale = [1, 1, 1],
+		Quat Rotation = [0, 0, 0, 1],
+	},
+	SoundEmitter = 
+	{
+		bool StartPlaying = false,
+		int ExtraPriority = 0,
+		string CueName = "551751b09a43fa45:Music_InventionForStrings",
+		float Volume = 1,
+		float Pitch = 1,
+		bool Positional = true,
+	},
+},

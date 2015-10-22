@@ -1,0 +1,8 @@
+TextContent = 
+{
+	ZilchScriptBuilder = 
+	{
+		string Name = "Z_ScoreboardLogic",
+		uint64 ResourceId = 55a5c3bff9773fb9,
+	},
+},

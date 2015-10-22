@@ -1,0 +1,350 @@
+class Z_ChallengeMenuButton : ZilchComponent
+{
+    [Property]
+    var ButtonType:Enum_MenuButton = Enum_MenuButton.None;
+    
+    var ButtonStillSelected:Boolean = false;
+    
+    var GameLevel:Level = null;
+    var LevelSpace:Space = null;
+    
+    function Initialize(init : CogInitializer)
+    {
+        Zero.Connect(this.Owner, Events.MouseEnter, this.OnMouseEnter);
+        Zero.Connect(this.Owner, Events.MouseExit, this.OnMouseExit);
+        Zero.Connect(this.Owner, Events.MouseDown, this.OnMouseDown);
+        Zero.Connect(this.Owner, Events.MouseUp, this.OnMouseUp);
+        
+        Zero.Connect(this.Space, Events.LogicUpdate, this.OnLogicUpdate);
+        
+        this.Owner.Sprite.Color = Real4(1,0,0,1);
+        this.Owner.Transform.Scale = Real3(0.75, 0.75, 1);
+    }
+
+    function OnLogicUpdate(event : UpdateEvent)
+    {
+    }
+    
+    function OnMouseEnter(event : ViewportMouseEvent)
+    {
+        var seq = Action.Sequence(this.Owner.Actions);
+        var group = Actions.Group(seq);
+        
+        Actions.Property(group, @this.Owner.Sprite.Color, Real4(0,0,1,1), 0.2, Ease.QuadOut);
+        Actions.Property(group, @this.Owner.Transform.Scale, Real3(1, 1, 1), 0.2, Ease.QuadOut);
+        // Actions.Property(group, @this.Owner.FindChildByName("Button_Background").Sprite.Color, this.Button_White, 0.2, Ease.QuadOut);
+        // Actions.Property(group, @this.Owner.Sprite.Color, this.Color_Red, 0.2, Ease.QuadOut);
+    }
+    
+    function OnMouseExit(event : ViewportMouseEvent)
+    {
+        var seq = Action.Sequence(this.Owner.Actions);
+        var group = Actions.Group(seq);
+        
+        Actions.Property(group, @this.Owner.Sprite.Color, Real4(1,0,0,1), 0.2, Ease.QuadOut);
+        Actions.Property(group, @this.Owner.Transform.Scale, Real3(0.75, 0.75, 1), 0.2, Ease.QuadOut);
+        
+        this.ButtonStillSelected = false;
+        
+        //if(!this.ButtonStillSelected)
+        //{
+        //    // State that the button is no longer selected
+        //    this.ButtonStillColored = false;
+            
+        //    // Store the Sequence for quick access
+        //    var seq = Action.Sequence(this.Owner.Actions);
+            
+        //    // When the mouse leaves, fade the button back down
+        //    // Action.Property(seq, @this.Owner.Sprite.Color, this.StartingColor, 0.25, Ease.Linear);
+        //}
+    }
+    
+    function OnMouseDown (event : ViewportMouseEvent)
+    {
+        if(this.Owner.Reactive.Active )
+        {
+            // Set the 'Button Still Selected' state to true
+            this.ButtonStillSelected = true;
+        }
+    }
+    
+    function OnMouseUp (event : ViewportMouseEvent)
+    {
+        if(this.ButtonStillSelected)
+        {
+            if(this.ButtonType == Enum_MenuButton.Challenge_1)
+            {
+                while(this.GameSession.FindSpaceByName("LevelSpace") != null)
+                {
+                    this.GameSession.FindSpaceByName("LevelSpace").Destroy();
+                }
+                
+                while(this.GameSession.FindSpaceByName("ThemeSpace") != null)
+                {
+                    this.GameSession.FindSpaceByName("ThemeSpace").Destroy();
+                }
+                
+                while(this.GameSession.FindSpaceByName("HudSpace") != null)
+                {
+                    this.GameSession.FindSpaceByName("HudSpace").Destroy();
+                }
+                
+                this.LevelSpace = this.GameSession.CreateNamedSpace("LevelSpace", Archetype.Find("Space"));
+                
+                this.GameLevel  = Level.Find("Challenge_Shape1");
+                // Kept this here so only one levelspace is created
+                this.LevelSpace = this.GameSession.FindSpaceByName("LevelSpace");
+                this.LevelSpace.LoadLevel(this.GameLevel);
+                this.LevelSpace.LevelSettings.Z_ChallengeLogic_1.LoadInitialization(13, 10, 1.5, 0, 0, -1);
+                
+                if(this.GameSession.FindSpaceByName("Main") != null)
+                {
+                    this.GameSession.FindSpaceByName("Main").Destroy();
+                }
+            }
+            
+            if(this.ButtonType == Enum_MenuButton.Challenge_2)
+            {
+                while(this.GameSession.FindSpaceByName("LevelSpace") != null)
+                {
+                    this.GameSession.FindSpaceByName("LevelSpace").Destroy();
+                }
+                
+                while(this.GameSession.FindSpaceByName("ThemeSpace") != null)
+                {
+                    this.GameSession.FindSpaceByName("ThemeSpace").Destroy();
+                }
+                
+                while(this.GameSession.FindSpaceByName("HudSpace") != null)
+                {
+                    this.GameSession.FindSpaceByName("HudSpace").Destroy();
+                }
+                
+                this.LevelSpace = this.GameSession.CreateNamedSpace("LevelSpace", Archetype.Find("Space"));
+                
+                this.GameLevel  = Level.Find("Challenge_Shape2");
+                // Kept this here so only one levelspace is created
+                this.LevelSpace = this.GameSession.FindSpaceByName("LevelSpace");
+                this.LevelSpace.LoadLevel(this.GameLevel);
+                this.LevelSpace.LevelSettings.Z_ChallengeLogic_2.LoadInitialization(13, 10, 1.5, 0, 0, -1);
+                
+                if(this.GameSession.FindSpaceByName("Main") != null)
+                {
+                    this.GameSession.FindSpaceByName("Main").Destroy();
+                }
+            }
+            
+            if(this.ButtonType == Enum_MenuButton.Challenge_3)
+            {
+                while(this.GameSession.FindSpaceByName("LevelSpace") != null)
+                {
+                    this.GameSession.FindSpaceByName("LevelSpace").Destroy();
+                }
+                
+                while(this.GameSession.FindSpaceByName("ThemeSpace") != null)
+                {
+                    this.GameSession.FindSpaceByName("ThemeSpace").Destroy();
+                }
+                
+                while(this.GameSession.FindSpaceByName("HudSpace") != null)
+                {
+                    this.GameSession.FindSpaceByName("HudSpace").Destroy();
+                }
+                
+                this.LevelSpace = this.GameSession.CreateNamedSpace("LevelSpace", Archetype.Find("Space"));
+                
+                this.GameLevel  = Level.Find("Challenge_Shape3");
+                // Kept this here so only one levelspace is created
+                this.LevelSpace = this.GameSession.FindSpaceByName("LevelSpace");
+                this.LevelSpace.LoadLevel(this.GameLevel);
+                this.LevelSpace.LevelSettings.Z_ChallengeLogic_3.LoadInitialization(13, 10, 1.5, 0, 0, -1);
+                
+                if(this.GameSession.FindSpaceByName("Main") != null)
+                {
+                    this.GameSession.FindSpaceByName("Main").Destroy();
+                }
+            }
+            
+            if(this.ButtonType == Enum_MenuButton.Challenge_4)
+            {
+                while(this.GameSession.FindSpaceByName("LevelSpace") != null)
+                {
+                    this.GameSession.FindSpaceByName("LevelSpace").Destroy();
+                }
+                
+                while(this.GameSession.FindSpaceByName("ThemeSpace") != null)
+                {
+                    this.GameSession.FindSpaceByName("ThemeSpace").Destroy();
+                }
+                
+                while(this.GameSession.FindSpaceByName("HudSpace") != null)
+                {
+                    this.GameSession.FindSpaceByName("HudSpace").Destroy();
+                }
+                
+                this.LevelSpace = this.GameSession.CreateNamedSpace("LevelSpace", Archetype.Find("Space"));
+                
+                this.GameLevel  = Level.Find("Challenge_Shape4");
+                // Kept this here so only one levelspace is created
+                this.LevelSpace = this.GameSession.FindSpaceByName("LevelSpace");
+                this.LevelSpace.LoadLevel(this.GameLevel);
+                this.LevelSpace.LevelSettings.Z_ChallengeLogic_4.LoadInitialization(13, 10, 1.5, 0, 0, -1);
+                
+                if(this.GameSession.FindSpaceByName("Main") != null)
+                {
+                    this.GameSession.FindSpaceByName("Main").Destroy();
+                }
+            }
+        }
+        //this.InitDetail_Width = this.Space.LevelSettings.Z_MainMenuManager.InitDetail_Width;
+        //this.InitDetail_Height = this.Space.LevelSettings.Z_MainMenuManager.InitDetail_Height;
+        //this.InitDetail_TimeLengthMinutes = this.Space.LevelSettings.Z_MainMenuManager.InitDetail_TimeLengthMinutes;
+        
+        // We only want to run if the button was clicked upon, and then released
+        //if(this.ButtonStillColored && this.Owner.Reactive.Active)
+        //{
+        //    this.ButtonStillSelected = true;
+            
+        //    var seq = Action.Sequence(this.Owner.Actions);
+            
+        //    var sendLevelInfo = new SendLevelInformation();
+            
+        //    // Determine what type of button we are, and go to that appropriate level
+        //    if(this.MenuButton == Enum_MenuButton.PlayGame)
+        //    {
+        //        Console.WriteLine("Dispatched");
+        //        this.Space.DispatchEvent(Events.MenuDown, new Event());
+        //    }
+        //    else if(this.MenuButton == Enum_MenuButton.Credits)
+        //    {
+        //        this.Space.LoadLevel(Level.Find("Menu_Credits"));
+        //    }
+        //    else if(this.MenuButton == Enum_MenuButton.Quit)
+        //    {
+        //        this.GameSession.Quit();
+        //    }
+            
+        //    // Layer 1 Buttons
+        //    else if(this.MenuButton == Enum_MenuButton.HowToPlay1)
+        //    {
+        //        this.Space.LoadLevel(Level.Find("Tutorial_1"));
+        //    }
+        //    else if(this.MenuButton == Enum_MenuButton.PlayStreak)
+        //    {
+        //        Console.WriteLine("Dispatched");
+        //        this.Space.DispatchEvent(Events.MenuDown, new Event());
+        //    }
+        //    else if(this.MenuButton == Enum_MenuButton.Challenge)
+        //    {
+        //        // this.Space.LoadLevel(Level.Find("Menu_Challenge"));
+        //    }
+            
+        //    // Layer 2 Buttons
+        //    else if(this.MenuButton == Enum_MenuButton.PlayStreak_Normal)
+        //    {
+        //        sendLevelInfo.InitDetail_Width = 10;
+        //        sendLevelInfo.InitDetail_Height = 16;
+        //        sendLevelInfo.InitDetail_DropTimer = 1.5;
+        //        sendLevelInfo.InitDetail_NumBoosts = 2;
+        //        sendLevelInfo.InitDetail_Camera = 0;
+        //        sendLevelInfo.InitDetail_TimeLengthMinutes = this.Space.LevelSettings.Z_MainMenuManager.InitDetail_TimeLengthMinutes;
+        //        this.Space.DispatchEvent(Events.LevelInformation, sendLevelInfo);
+        //        Console.WriteLine("Dispatched");
+                
+        //        this.Space.DispatchEvent(Events.MenuDown, new Event());
+        //    }
+        //    else if(this.MenuButton == Enum_MenuButton.PlayStreak_Hard)
+        //    {
+        //        sendLevelInfo.InitDetail_Width = 13;
+        //        sendLevelInfo.InitDetail_Height = 13;
+        //        sendLevelInfo.InitDetail_DropTimer = 1.25;
+        //        sendLevelInfo.InitDetail_NumBoosts = 1;
+        //        sendLevelInfo.InitDetail_Camera = 1.5;
+        //        sendLevelInfo.InitDetail_TimeLengthMinutes = this.Space.LevelSettings.Z_MainMenuManager.InitDetail_TimeLengthMinutes;
+        //        this.Space.DispatchEvent(Events.LevelInformation, sendLevelInfo);
+        //        Console.WriteLine("Dispatched");
+                
+        //        this.Space.DispatchEvent(Events.MenuDown, new Event());
+        //    }
+        //    else if(this.MenuButton == Enum_MenuButton.PlayStreak_Extreme)
+        //    {
+        //        sendLevelInfo.InitDetail_Width = 16;
+        //        sendLevelInfo.InitDetail_Height = 10;
+        //        sendLevelInfo.InitDetail_DropTimer = 1.0;
+        //        sendLevelInfo.InitDetail_NumBoosts = 1;
+        //        sendLevelInfo.InitDetail_Camera = 3;
+        //        sendLevelInfo.InitDetail_TimeLengthMinutes = this.Space.LevelSettings.Z_MainMenuManager.InitDetail_TimeLengthMinutes;
+        //        this.Space.DispatchEvent(Events.LevelInformation, sendLevelInfo);
+        //        Console.WriteLine("Dispatched");
+                
+        //        this.Space.DispatchEvent(Events.MenuDown, new Event());
+        //    }
+            
+        //    // Layer 3 (Time Trial & Unlimited)
+        //    else if(this.MenuButton == Enum_MenuButton.TimeTrial)
+        //    {
+        //        Console.WriteLine("Dispatched");
+        //        this.Space.DispatchEvent(Events.MenuDown, new Event());
+        //    }
+        //    else if(this.MenuButton == Enum_MenuButton.Unlimited)
+        //    {
+        //        sendLevelInfo.InitDetail_Width = this.Space.LevelSettings.Z_MainMenuManager.InitDetail_Width;
+        //        sendLevelInfo.InitDetail_Height = this.Space.LevelSettings.Z_MainMenuManager.InitDetail_Height;
+        //        sendLevelInfo.InitDetail_DropTimer = this.Space.LevelSettings.Z_MainMenuManager.InitDetail_DropTimer;
+        //        sendLevelInfo.InitDetail_NumBoosts = this.Space.LevelSettings.Z_MainMenuManager.InitDetail_NumBoosts;
+        //        sendLevelInfo.InitDetail_Camera = this.Space.LevelSettings.Z_MainMenuManager.InitDetail_Camera;
+        //        sendLevelInfo.InitDetail_TimeLengthMinutes = 0;
+        //        this.Space.DispatchEvent(Events.LevelInformation, sendLevelInfo);
+                
+        //        this.OnGameModeSelected();
+        //    }
+            
+        //    // Layer 4
+        //    else if(this.MenuButton == Enum_MenuButton.Start_TimeTrial_5)
+        //    {
+        //        sendLevelInfo.InitDetail_Width = this.Space.LevelSettings.Z_MainMenuManager.InitDetail_Width;
+        //        sendLevelInfo.InitDetail_Height = this.Space.LevelSettings.Z_MainMenuManager.InitDetail_Height;
+        //        sendLevelInfo.InitDetail_DropTimer = this.Space.LevelSettings.Z_MainMenuManager.InitDetail_DropTimer;
+        //        sendLevelInfo.InitDetail_NumBoosts = this.Space.LevelSettings.Z_MainMenuManager.InitDetail_NumBoosts;
+        //        sendLevelInfo.InitDetail_Camera = this.Space.LevelSettings.Z_MainMenuManager.InitDetail_Camera;
+        //        sendLevelInfo.InitDetail_TimeLengthMinutes = 5;
+        //        this.Space.DispatchEvent(Events.LevelInformation, sendLevelInfo);
+                
+        //        this.OnGameModeSelected();
+        //    }
+        //    else if(this.MenuButton == Enum_MenuButton.Start_TimeTrial_10)
+        //    {
+        //        sendLevelInfo.InitDetail_Width = this.Space.LevelSettings.Z_MainMenuManager.InitDetail_Width;
+        //        sendLevelInfo.InitDetail_Height = this.Space.LevelSettings.Z_MainMenuManager.InitDetail_Height;
+        //        sendLevelInfo.InitDetail_DropTimer = this.Space.LevelSettings.Z_MainMenuManager.InitDetail_DropTimer;
+        //        sendLevelInfo.InitDetail_NumBoosts = this.Space.LevelSettings.Z_MainMenuManager.InitDetail_NumBoosts;
+        //        sendLevelInfo.InitDetail_Camera = this.Space.LevelSettings.Z_MainMenuManager.InitDetail_Camera;
+        //        sendLevelInfo.InitDetail_TimeLengthMinutes = 10;
+        //        this.Space.DispatchEvent(Events.LevelInformation, sendLevelInfo);
+                
+        //        this.OnGameModeSelected();
+        //    }
+        //    else if(this.MenuButton == Enum_MenuButton.Start_TimeTrial_20)
+        //    {
+        //        sendLevelInfo.InitDetail_Width = this.Space.LevelSettings.Z_MainMenuManager.InitDetail_Width;
+        //        sendLevelInfo.InitDetail_Height = this.Space.LevelSettings.Z_MainMenuManager.InitDetail_Height;
+        //        sendLevelInfo.InitDetail_DropTimer = this.Space.LevelSettings.Z_MainMenuManager.InitDetail_DropTimer;
+        //        sendLevelInfo.InitDetail_NumBoosts = this.Space.LevelSettings.Z_MainMenuManager.InitDetail_NumBoosts;
+        //        sendLevelInfo.InitDetail_Camera = this.Space.LevelSettings.Z_MainMenuManager.InitDetail_Camera;
+        //        sendLevelInfo.InitDetail_TimeLengthMinutes = 20;
+        //        this.Space.DispatchEvent(Events.LevelInformation, sendLevelInfo);
+                
+        //        this.OnGameModeSelected();
+        //    }
+            
+        //    else if(this.MenuButton == Enum_MenuButton.MainMenu)
+        //    {
+        //        this.Space.DispatchEvent(Events.LoadTheme_Menu, new Event());
+        //        this.Space.LoadLevel(Level.Find("Menu_MainMenu"));
+        //    }
+        //}
+        
+        // Turn off the button
+        
+    }
+}

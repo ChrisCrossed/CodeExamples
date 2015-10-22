@@ -1,0 +1,641 @@
+class Z_DataSaver : ZilchComponent
+{
+    // Challenges
+    [Serialized]
+    var Challenge_One_Complete:Boolean = false;
+    [Serialized]
+    var Challenge_One_NumTurns:Boolean = false;
+    
+    [Serialized]
+    var Challenge_Two_Complete:Boolean = false;
+    [Serialized]
+    var Challenge_Two_NumTurns:Boolean = false;
+    
+    [Serialized]
+    var Challenge_Three_Complete:Boolean = false;
+    [Serialized]
+    var Challenge_Three_NumTurns:Boolean = false;
+    
+    [Serialized]
+    var Challenge_Four_Complete:Boolean = false;
+    [Serialized]
+    var Challenge_Four_NumTurns:Boolean = false;
+    
+    // Unlimited Normal
+    [Serialized]
+    var Unlimited_Normal_10_PlayerName:String = "Freeman";
+    [Serialized]
+    var Unlimited_Normal_10_Score:Integer = 100;
+    
+    [Serialized]
+    var Unlimited_Normal_9_PlayerName:String = "UUDDLRLR";
+    [Serialized]
+    var Unlimited_Normal_9_Score:Integer = 200;
+    
+    [Serialized]
+    var Unlimited_Normal_8_PlayerName:String = "IDDQD";
+    [Serialized]
+    var Unlimited_Normal_8_Score:Integer = 300;
+    
+    [Serialized]
+    var Unlimited_Normal_7_PlayerName:String = "Nicholas";
+    [Serialized]
+    var Unlimited_Normal_7_Score:Integer = 400;
+    
+    [Serialized]
+    var Unlimited_Normal_6_PlayerName:String = "Aaron";
+    [Serialized]
+    var Unlimited_Normal_6_Score:Integer = 500;
+    
+    [Serialized]
+    var Unlimited_Normal_5_PlayerName:String = "Diana";
+    [Serialized]
+    var Unlimited_Normal_5_Score:Integer = 750;
+    
+    [Serialized]
+    var Unlimited_Normal_4_PlayerName:String = "Paul";
+    [Serialized]
+    var Unlimited_Normal_4_Score:Integer = 1000;
+    
+    [Serialized]
+    var Unlimited_Normal_3_PlayerName:String = "Kellie";
+    [Serialized]
+    var Unlimited_Normal_3_Score:Integer = 1500;
+    
+    [Serialized]
+    var Unlimited_Normal_2_PlayerName:String = "Aimee";
+    [Serialized]
+    var Unlimited_Normal_2_Score:Integer = 2000;
+    
+    [Serialized]
+    var Unlimited_Normal_1_PlayerName:String = "Auston";
+    [Serialized]
+    var Unlimited_Normal_1_Score:Integer = 3000;
+    
+    // Unlimited Hard
+    [Serialized]
+    var Unlimited_Hard_10_PlayerName:String = "Freeman";
+    [Serialized]
+    var Unlimited_Hard_10_Score:Integer = 100;
+    
+    [Serialized]
+    var Unlimited_Hard_9_PlayerName:String = "UUDDLRLR";
+    [Serialized]
+    var Unlimited_Hard_9_Score:Integer = 200;
+    
+    [Serialized]
+    var Unlimited_Hard_8_PlayerName:String = "IDDQD";
+    [Serialized]
+    var Unlimited_Hard_8_Score:Integer = 300;
+    
+    [Serialized]
+    var Unlimited_Hard_7_PlayerName:String = "Nicholas";
+    [Serialized]
+    var Unlimited_Hard_7_Score:Integer = 400;
+    
+    [Serialized]
+    var Unlimited_Hard_6_PlayerName:String = "Aaron";
+    [Serialized]
+    var Unlimited_Hard_6_Score:Integer = 500;
+    
+    [Serialized]
+    var Unlimited_Hard_5_PlayerName:String = "Diana";
+    [Serialized]
+    var Unlimited_Hard_5_Score:Integer = 750;
+    
+    [Serialized]
+    var Unlimited_Hard_4_PlayerName:String = "Paul";
+    [Serialized]
+    var Unlimited_Hard_4_Score:Integer = 1000;
+    
+    [Serialized]
+    var Unlimited_Hard_3_PlayerName:String = "Kellie";
+    [Serialized]
+    var Unlimited_Hard_3_Score:Integer = 1500;
+    
+    [Serialized]
+    var Unlimited_Hard_2_PlayerName:String = "Aimee";
+    [Serialized]
+    var Unlimited_Hard_2_Score:Integer = 2000;
+    
+    [Serialized]
+    var Unlimited_Hard_1_PlayerName:String = "Auston";
+    [Serialized]
+    var Unlimited_Hard_1_Score:Integer = 3000;
+
+    // Unlimited Extreme
+    [Serialized]
+    var Unlimited_Extreme_10_PlayerName:String = "Freeman";
+    [Serialized]
+    var Unlimited_Extreme_10_Score:Integer = 100;
+    
+    [Serialized]
+    var Unlimited_Extreme_9_PlayerName:String = "UUDDLRLR";
+    [Serialized]
+    var Unlimited_Extreme_9_Score:Integer = 200;
+    
+    [Serialized]
+    var Unlimited_Extreme_8_PlayerName:String = "IDDQD";
+    [Serialized]
+    var Unlimited_Extreme_8_Score:Integer = 300;
+    
+    [Serialized]
+    var Unlimited_Extreme_7_PlayerName:String = "Nicholas";
+    [Serialized]
+    var Unlimited_Extreme_7_Score:Integer = 400;
+    
+    [Serialized]
+    var Unlimited_Extreme_6_PlayerName:String = "Aaron";
+    [Serialized]
+    var Unlimited_Extreme_6_Score:Integer = 500;
+    
+    [Serialized]
+    var Unlimited_Extreme_5_PlayerName:String = "Diana";
+    [Serialized]
+    var Unlimited_Extreme_5_Score:Integer = 750;
+    
+    [Serialized]
+    var Unlimited_Extreme_4_PlayerName:String = "Paul";
+    [Serialized]
+    var Unlimited_Extreme_4_Score:Integer = 1000;
+    
+    [Serialized]
+    var Unlimited_Extreme_3_PlayerName:String = "Kellie";
+    [Serialized]
+    var Unlimited_Extreme_3_Score:Integer = 1500;
+    
+    [Serialized]
+    var Unlimited_Extreme_2_PlayerName:String = "Aimee";
+    [Serialized]
+    var Unlimited_Extreme_2_Score:Integer = 2000;
+    
+    [Serialized]
+    var Unlimited_Extreme_1_PlayerName:String = "Auston";
+    [Serialized]
+    var Unlimited_Extreme_1_Score:Integer = 3000;
+
+    ////////////////////////////
+
+    // 5_Minute Normal
+    [Serialized]
+    var Min_5_Normal_10_PlayerName:String = "Freeman";
+    [Serialized]
+    var Min_5_Normal_10_Score:Integer = 50;
+    
+    [Serialized]
+    var Min_5_Normal_9_PlayerName:String = "UUDDLRLR";
+    [Serialized]
+    var Min_5_Normal_9_Score:Integer = 75;
+    
+    [Serialized]
+    var Min_5_Normal_8_PlayerName:String = "IDDQD";
+    [Serialized]
+    var Min_5_Normal_8_Score:Integer = 100;
+    
+    [Serialized]
+    var Min_5_Normal_7_PlayerName:String = "Nicholas";
+    [Serialized]
+    var Min_5_Normal_7_Score:Integer = 125;
+    
+    [Serialized]
+    var Min_5_Normal_6_PlayerName:String = "Aaron";
+    [Serialized]
+    var Min_5_Normal_6_Score:Integer = 150;
+    
+    [Serialized]
+    var Min_5_Normal_5_PlayerName:String = "Diana";
+    [Serialized]
+    var Min_5_Normal_5_Score:Integer = 175;
+    
+    [Serialized]
+    var Min_5_Normal_4_PlayerName:String = "Paul";
+    [Serialized]
+    var Min_5_Normal_4_Score:Integer = 200;
+    
+    [Serialized]
+    var Min_5_Normal_3_PlayerName:String = "Kellie";
+    [Serialized]
+    var Min_5_Normal_3_Score:Integer = 225;
+    
+    [Serialized]
+    var Min_5_Normal_2_PlayerName:String = "Aimee";
+    [Serialized]
+    var Min_5_Normal_2_Score:Integer = 250;
+    
+    [Serialized]
+    var Min_5_Normal_1_PlayerName:String = "Auston";
+    [Serialized]
+    var Min_5_Normal_1_Score:Integer = 300;
+    
+    // Unlimited Hard
+    [Serialized]
+    var Min_5_Hard_10_PlayerName:String = "Freeman";
+    [Serialized]
+    var Min_5_Hard_10_Score:Integer = 50;
+    
+    [Serialized]
+    var Min_5_Hard_9_PlayerName:String = "UUDDLRLR";
+    [Serialized]
+    var Min_5_Hard_9_Score:Integer = 75;
+    
+    [Serialized]
+    var Min_5_Hard_8_PlayerName:String = "IDDQD";
+    [Serialized]
+    var Min_5_Hard_8_Score:Integer = 100;
+    
+    [Serialized]
+    var Min_5_Hard_7_PlayerName:String = "Nicholas";
+    [Serialized]
+    var Min_5_Hard_7_Score:Integer = 125;
+    
+    [Serialized]
+    var Min_5_Hard_6_PlayerName:String = "Aaron";
+    [Serialized]
+    var Min_5_Hard_6_Score:Integer = 150;
+    
+    [Serialized]
+    var Min_5_Hard_5_PlayerName:String = "Diana";
+    [Serialized]
+    var Min_5_Hard_5_Score:Integer = 175;
+    
+    [Serialized]
+    var Min_5_Hard_4_PlayerName:String = "Paul";
+    [Serialized]
+    var Min_5_Hard_4_Score:Integer = 200;
+    
+    [Serialized]
+    var Min_5_Hard_3_PlayerName:String = "Kellie";
+    [Serialized]
+    var Min_5_Hard_3_Score:Integer = 225;
+    
+    [Serialized]
+    var Min_5_Hard_2_PlayerName:String = "Aimee";
+    [Serialized]
+    var Min_5_Hard_2_Score:Integer = 250;
+    
+    [Serialized]
+    var Min_5_Hard_1_PlayerName:String = "Auston";
+    [Serialized]
+    var Min_5_Hard_1_Score:Integer = 300;
+
+    // Unlimited Extreme
+    [Serialized]
+    var Min_5_Extreme_10_PlayerName:String = "Freeman";
+    [Serialized]
+    var Min_5_Extreme_10_Score:Integer = 50;
+    
+    [Serialized]
+    var Min_5_Extreme_9_PlayerName:String = "UUDDLRLR";
+    [Serialized]
+    var Min_5_Extreme_9_Score:Integer = 75;
+    
+    [Serialized]
+    var Min_5_Extreme_8_PlayerName:String = "IDDQD";
+    [Serialized]
+    var Min_5_Extreme_8_Score:Integer = 100;
+    
+    [Serialized]
+    var Min_5_Extreme_7_PlayerName:String = "Nicholas";
+    [Serialized]
+    var Min_5_Extreme_7_Score:Integer = 125;
+    
+    [Serialized]
+    var Min_5_Extreme_6_PlayerName:String = "Aaron";
+    [Serialized]
+    var Min_5_Extreme_6_Score:Integer = 150;
+    
+    [Serialized]
+    var Min_5_Extreme_5_PlayerName:String = "Diana";
+    [Serialized]
+    var Min_5_Extreme_5_Score:Integer = 175;
+    
+    [Serialized]
+    var Min_5_Extreme_4_PlayerName:String = "Paul";
+    [Serialized]
+    var Min_5_Extreme_4_Score:Integer = 200;
+    
+    [Serialized]
+    var Min_5_Extreme_3_PlayerName:String = "Kellie";
+    [Serialized]
+    var Min_5_Extreme_3_Score:Integer = 225;
+    
+    [Serialized]
+    var Min_5_Extreme_2_PlayerName:String = "Aimee";
+    [Serialized]
+    var Min_5_Extreme_2_Score:Integer = 250;
+    
+    [Serialized]
+    var Min_5_Extreme_1_PlayerName:String = "Auston";
+    [Serialized]
+    var Min_5_Extreme_1_Score:Integer = 300;
+
+    /////////////////////
+
+    // Unlimited Normal
+    [Serialized]
+    var Min_10_Normal_10_PlayerName:String = "Freeman";
+    [Serialized]
+    var Min_10_Normal_10_Score:Integer = 100;
+    
+    [Serialized]
+    var Min_10_Normal_9_PlayerName:String = "UUDDLRLR";
+    [Serialized]
+    var Min_10_Normal_9_Score:Integer = 200;
+    
+    [Serialized]
+    var Min_10_Normal_8_PlayerName:String = "IDDQD";
+    [Serialized]
+    var Min_10_Normal_8_Score:Integer = 300;
+    
+    [Serialized]
+    var Min_10_Normal_7_PlayerName:String = "Nicholas";
+    [Serialized]
+    var Min_10_Normal_7_Score:Integer = 400;
+    
+    [Serialized]
+    var Min_10_Normal_6_PlayerName:String = "Aaron";
+    [Serialized]
+    var Min_10_Normal_6_Score:Integer = 500;
+    
+    [Serialized]
+    var Min_10_Normal_5_PlayerName:String = "Diana";
+    [Serialized]
+    var Min_10_Normal_5_Score:Integer = 750;
+    
+    [Serialized]
+    var Min_10_Normal_4_PlayerName:String = "Paul";
+    [Serialized]
+    var Min_10_Normal_4_Score:Integer = 1000;
+    
+    [Serialized]
+    var Min_10_Normal_3_PlayerName:String = "Kellie";
+    [Serialized]
+    var Min_10_Normal_3_Score:Integer = 1500;
+    
+    [Serialized]
+    var Min_10_Normal_2_PlayerName:String = "Aimee";
+    [Serialized]
+    var Min_10_Normal_2_Score:Integer = 2000;
+    
+    [Serialized]
+    var Min_10_Normal_1_PlayerName:String = "Auston";
+    [Serialized]
+    var Min_10_Normal_1_Score:Integer = 3000;
+    
+    // Unlimited Hard
+    [Serialized]
+    var Min_10_Hard_10_PlayerName:String = "Freeman";
+    [Serialized]
+    var Min_10_Hard_10_Score:Integer = 100;
+    
+    [Serialized]
+    var Min_10_Hard_9_PlayerName:String = "UUDDLRLR";
+    [Serialized]
+    var Min_10_Hard_9_Score:Integer = 200;
+    
+    [Serialized]
+    var Min_10_Hard_8_PlayerName:String = "IDDQD";
+    [Serialized]
+    var Min_10_Hard_8_Score:Integer = 300;
+    
+    [Serialized]
+    var Min_10_Hard_7_PlayerName:String = "Nicholas";
+    [Serialized]
+    var Min_10_Hard_7_Score:Integer = 400;
+    
+    [Serialized]
+    var Min_10_Hard_6_PlayerName:String = "Aaron";
+    [Serialized]
+    var Min_10_Hard_6_Score:Integer = 500;
+    
+    [Serialized]
+    var Min_10_Hard_5_PlayerName:String = "Diana";
+    [Serialized]
+    var Min_10_Hard_5_Score:Integer = 750;
+    
+    [Serialized]
+    var Min_10_Hard_4_PlayerName:String = "Paul";
+    [Serialized]
+    var Min_10_Hard_4_Score:Integer = 1000;
+    
+    [Serialized]
+    var Min_10_Hard_3_PlayerName:String = "Kellie";
+    [Serialized]
+    var Min_10_Hard_3_Score:Integer = 1500;
+    
+    [Serialized]
+    var Min_10_Hard_2_PlayerName:String = "Aimee";
+    [Serialized]
+    var Min_10_Hard_2_Score:Integer = 2000;
+    
+    [Serialized]
+    var Min_10_Hard_1_PlayerName:String = "Auston";
+    [Serialized]
+    var Min_10_Hard_1_Score:Integer = 3000;
+
+    // Unlimited Extreme
+    [Serialized]
+    var Min_10_Extreme_10_PlayerName:String = "Freeman";
+    [Serialized]
+    var Min_10_Extreme_10_Score:Integer = 100;
+    
+    [Serialized]
+    var Min_10_Extreme_9_PlayerName:String = "UUDDLRLR";
+    [Serialized]
+    var Min_10_Extreme_9_Score:Integer = 200;
+    
+    [Serialized]
+    var Min_10_Extreme_8_PlayerName:String = "IDDQD";
+    [Serialized]
+    var Min_10_Extreme_8_Score:Integer = 300;
+    
+    [Serialized]
+    var Min_10_Extreme_7_PlayerName:String = "Nicholas";
+    [Serialized]
+    var Min_10_Extreme_7_Score:Integer = 400;
+    
+    [Serialized]
+    var Min_10_Extreme_6_PlayerName:String = "Aaron";
+    [Serialized]
+    var Min_10_Extreme_6_Score:Integer = 500;
+    
+    [Serialized]
+    var Min_10_Extreme_5_PlayerName:String = "Diana";
+    [Serialized]
+    var Min_10_Extreme_5_Score:Integer = 750;
+    
+    [Serialized]
+    var Min_10_Extreme_4_PlayerName:String = "Paul";
+    [Serialized]
+    var Min_10_Extreme_4_Score:Integer = 1000;
+    
+    [Serialized]
+    var Min_10_Extreme_3_PlayerName:String = "Kellie";
+    [Serialized]
+    var Min_10_Extreme_3_Score:Integer = 1500;
+    
+    [Serialized]
+    var Min_10_Extreme_2_PlayerName:String = "Aimee";
+    [Serialized]
+    var Min_10_Extreme_2_Score:Integer = 2000;
+    
+    [Serialized]
+    var Min_10_Extreme_1_PlayerName:String = "Auston";
+    [Serialized]
+    var Min_10_Extreme_1_Score:Integer = 3000;
+
+    /////////////////////
+
+    // Unlimited Normal
+    [Serialized]
+    var Min_20_Normal_10_PlayerName:String = "Freeman";
+    [Serialized]
+    var Min_20_Normal_10_Score:Integer = 100;
+    
+    [Serialized]
+    var Min_20_Normal_9_PlayerName:String = "UUDDLRLR";
+    [Serialized]
+    var Min_20_Normal_9_Score:Integer = 200;
+    
+    [Serialized]
+    var Min_20_Normal_8_PlayerName:String = "IDDQD";
+    [Serialized]
+    var Min_20_Normal_8_Score:Integer = 300;
+    
+    [Serialized]
+    var Min_20_Normal_7_PlayerName:String = "Nicholas";
+    [Serialized]
+    var Min_20_Normal_7_Score:Integer = 400;
+    
+    [Serialized]
+    var Min_20_Normal_6_PlayerName:String = "Aaron";
+    [Serialized]
+    var Min_20_Normal_6_Score:Integer = 500;
+    
+    [Serialized]
+    var Min_20_Normal_5_PlayerName:String = "Diana";
+    [Serialized]
+    var Min_20_Normal_5_Score:Integer = 750;
+    
+    [Serialized]
+    var Min_20_Normal_4_PlayerName:String = "Paul";
+    [Serialized]
+    var Min_20_Normal_4_Score:Integer = 1000;
+    
+    [Serialized]
+    var Min_20_Normal_3_PlayerName:String = "Kellie";
+    [Serialized]
+    var Min_20_Normal_3_Score:Integer = 1500;
+    
+    [Serialized]
+    var Min_20_Normal_2_PlayerName:String = "Aimee";
+    [Serialized]
+    var Min_20_Normal_2_Score:Integer = 2000;
+    
+    [Serialized]
+    var Min_20_Normal_1_PlayerName:String = "Auston";
+    [Serialized]
+    var Min_20_Normal_1_Score:Integer = 3000;
+    
+    // Unlimited Hard
+    [Serialized]
+    var Min_20_Hard_10_PlayerName:String = "Freeman";
+    [Serialized]
+    var Min_20_Hard_10_Score:Integer = 100;
+    
+    [Serialized]
+    var Min_20_Hard_9_PlayerName:String = "UUDDLRLR";
+    [Serialized]
+    var Min_20_Hard_9_Score:Integer = 200;
+    
+    [Serialized]
+    var Min_20_Hard_8_PlayerName:String = "IDDQD";
+    [Serialized]
+    var Min_20_Hard_8_Score:Integer = 300;
+    
+    [Serialized]
+    var Min_20_Hard_7_PlayerName:String = "Nicholas";
+    [Serialized]
+    var Min_20_Hard_7_Score:Integer = 400;
+    
+    [Serialized]
+    var Min_20_Hard_6_PlayerName:String = "Aaron";
+    [Serialized]
+    var Min_20_Hard_6_Score:Integer = 500;
+    
+    [Serialized]
+    var Min_20_Hard_5_PlayerName:String = "Diana";
+    [Serialized]
+    var Min_20_Hard_5_Score:Integer = 750;
+    
+    [Serialized]
+    var Min_20_Hard_4_PlayerName:String = "Paul";
+    [Serialized]
+    var Min_20_Hard_4_Score:Integer = 1000;
+    
+    [Serialized]
+    var Min_20_Hard_3_PlayerName:String = "Kellie";
+    [Serialized]
+    var Min_20_Hard_3_Score:Integer = 1500;
+    
+    [Serialized]
+    var Min_20_Hard_2_PlayerName:String = "Aimee";
+    [Serialized]
+    var Min_20_Hard_2_Score:Integer = 2000;
+    
+    [Serialized]
+    var Min_20_Hard_1_PlayerName:String = "Auston";
+    [Serialized]
+    var Min_20_Hard_1_Score:Integer = 3000;
+
+    // Unlimited Extreme
+    [Serialized]
+    var Min_20_Extreme_10_PlayerName:String = "Freeman";
+    [Serialized]
+    var Min_20_Extreme_10_Score:Integer = 100;
+    
+    [Serialized]
+    var Min_20_Extreme_9_PlayerName:String = "UUDDLRLR";
+    [Serialized]
+    var Min_20_Extreme_9_Score:Integer = 200;
+    
+    [Serialized]
+    var Min_20_Extreme_8_PlayerName:String = "IDDQD";
+    [Serialized]
+    var Min_20_Extreme_8_Score:Integer = 300;
+    
+    [Serialized]
+    var Min_20_Extreme_7_PlayerName:String = "Nicholas";
+    [Serialized]
+    var Min_20_Extreme_7_Score:Integer = 400;
+    
+    [Serialized]
+    var Min_20_Extreme_6_PlayerName:String = "Aaron";
+    [Serialized]
+    var Min_20_Extreme_6_Score:Integer = 500;
+    
+    [Serialized]
+    var Min_20_Extreme_5_PlayerName:String = "Diana";
+    [Serialized]
+    var Min_20_Extreme_5_Score:Integer = 750;
+    
+    [Serialized]
+    var Min_20_Extreme_4_PlayerName:String = "Paul";
+    [Serialized]
+    var Min_20_Extreme_4_Score:Integer = 1000;
+    
+    [Serialized]
+    var Min_20_Extreme_3_PlayerName:String = "Kellie";
+    [Serialized]
+    var Min_20_Extreme_3_Score:Integer = 1500;
+    
+    [Serialized]
+    var Min_20_Extreme_2_PlayerName:String = "Aimee";
+    [Serialized]
+    var Min_20_Extreme_2_Score:Integer = 2000;
+    
+    [Serialized]
+    var Min_20_Extreme_1_PlayerName:String = "Auston";
+    [Serialized]
+    var Min_20_Extreme_1_Score:Integer = 3000;
+}

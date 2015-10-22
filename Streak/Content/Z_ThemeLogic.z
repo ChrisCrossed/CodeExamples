@@ -1,0 +1,257 @@
+enum Enum_Theme
+{
+    MainMenu    = 0,    // Take A Break
+    Theme1      = 1,    // Glitch
+    Theme2      = 2,    // GraveYard
+    Theme3      = 3,    // BigRed
+    Theme4      = 4,    // Techtragon
+    None                //
+    // WHEN ADDING THEMES CHANGE THE 'NumThemes' VARIABLE
+}
+
+class Z_ThemeLogic : ZilchComponent
+{
+    // As assigned by Zero.Digipen.Edu
+    var MusicObject : Cog = null;
+    
+    var IsMenuPlaying:Boolean = true;
+    
+    var R_Timer:Real = 0;
+    
+    var R_SongLength:Real = 0;
+    var B_MusicPaused:Boolean = false;
+    
+    var Rand:Random = new Random();
+    var CurrentTheme:Enum_Theme = Enum_Theme.None;
+    var NumThemes:Integer = 4;
+    var ThemeRolled:Integer = 0;
+    
+    sends LoadTheme_One : Event;
+    sends LoadTheme_Two : Event;
+    sends LoadTheme_Three : Event;
+    sends LoadTheme_Four : Event;
+    sends LoadTheme_Menu : Event;
+    sends LoadRandomThemeNow : Event;
+    
+    sends LoadBackdrop_One : Event;
+    sends LoadBackdrop_Two : Event;
+    sends LoadBackdrop_Three : Event;
+    sends LoadBackdrop_Four : Event;
+    
+    function Initialize(init : CogInitializer)
+    {
+        Zero.Connect(this.GameSession, Events.LoadTheme_One, this.LoadTheme_One);
+        Zero.Connect(this.GameSession, Events.LoadTheme_Two, this.LoadTheme_Two);
+        Zero.Connect(this.GameSession, Events.LoadTheme_Three, this.LoadTheme_Three);
+        Zero.Connect(this.GameSession, Events.LoadTheme_Four, this.LoadTheme_Four);
+        
+        
+        Zero.Connect(this.Space, Events.LoadTheme_Menu, this.LoadTheme_Menu);
+        
+        Zero.Connect(this.Space, Events.LogicUpdate, this.OnLogicUpdate);
+        
+        //// As assigned by Zero.Digipen.edu
+        this.MusicObject = this.Space.FindObjectByName("MusicObj_MainMenu");
+        // If the there is no background music
+        if(this.MusicObject == null)
+        {
+            Console.WriteLine("*** PLAYING NEW MUSIC ***");
+            // Make some and
+            this.MusicObject = this.Space.Create(Archetype.Find("MusicObj_MainMenu"));
+            // Make it persist
+            this.MusicObject.Persistent = true;
+        }
+        // If we are not yet playing the music
+        if (this.MusicObject.SoundEmitter.IsPlaying() == false)
+        {
+            // Get the music playing
+            this.MusicObject.SoundEmitter.Play();
+        } // End music test
+        
+    }
+    
+    function LoadTheme(theme : Enum_Theme)
+    {
+        this.IsMenuPlaying = false;
+        
+        if(this.MusicObject.SoundEmitter.IsPlaying())
+        {
+            this.MusicObject.SoundEmitter.Stop();
+        }
+        
+        this.MusicObject.SoundEmitter.Volume = 1;
+        
+        this.R_Timer = 0;
+        
+        if(theme == Enum_Theme.Theme1) // Glitch
+        {
+            this.MusicObject = this.Space.Create(Archetype.Find("MusicObj_Glitch"));
+            this.R_SongLength = 84;
+            // this.R_SongLength = 10;
+        }
+        else if(theme == Enum_Theme.Theme2) // Graveyard
+        {
+            this.MusicObject = this.Space.Create(Archetype.Find("MusicObj_GraveYard"));
+            this.R_SongLength = 57;
+            // this.R_SongLength = 10;
+        }
+        else if(theme == Enum_Theme.Theme3) // BigRed
+        {
+            this.MusicObject = this.Space.Create(Archetype.Find("MusicObj_BigRed"));
+            this.R_SongLength = 63;
+            // this.R_SongLength = 10;
+        }
+        else if(theme == Enum_Theme.Theme4) // Techtragon
+        {
+            this.MusicObject = this.Space.Create(Archetype.Find("MusicObj_Techtragon"));
+            this.R_SongLength = 57;
+            // this.R_SongLength = 10;
+        }
+        else if(theme == Enum_Theme.MainMenu)
+        {
+            this.IsMenuPlaying = true;
+            
+            this.MusicObject = this.Space.FindObjectByName("MusicObj_MainMenu");
+        }
+        
+        //// Begin playing new music
+        // Find the new song's length
+        this.MusicObject.SoundEmitter.Play();
+        
+        //// Change the backdrop
+        if(this.CurrentTheme == Enum_Theme.Theme1)
+        {
+            this.GameSession.DispatchEvent(Events.LoadBackdrop_One, new Event());
+        }
+        else if(this.CurrentTheme == Enum_Theme.Theme2)
+        {
+            this.GameSession.DispatchEvent(Events.LoadBackdrop_Two, new Event());
+        }
+        else if(this.CurrentTheme == Enum_Theme.Theme3)
+        {
+            this.GameSession.DispatchEvent(Events.LoadBackdrop_Three, new Event());
+        }
+        else if(this.CurrentTheme == Enum_Theme.Theme4)
+        {
+            this.GameSession.DispatchEvent(Events.LoadBackdrop_Four, new Event());
+        }
+        
+        //// Change the blocks
+    }
+    
+    function TogglePauseMusic()
+    {
+        if(this.B_MusicPaused)
+        {
+            this.Space.SoundSpace.Pause = false;
+            
+            this.B_MusicPaused = false;
+        }
+        else
+        {
+            this.Space.SoundSpace.Pause = true;
+           
+            this.B_MusicPaused = true;
+        }
+    }
+    
+    function EndTheme(dt : Real)
+    {
+        //// Game is over and we have been called... Time to fade out the music
+        // Dividing dt / 3 so that we fade out over 3 seconds
+        this.MusicObject.SoundEmitter.Volume -= (dt / 3);
+    }
+
+    function OnLogicUpdate(event : UpdateEvent)
+    {
+        if(this.Space.TimeSpace.Paused)
+        {
+            return;
+        }
+        
+        this.R_Timer += event.Dt;
+        
+        if(Zero.Keyboard.KeyIsPressed(Keys.J))
+        {
+            this.LoadRandomThemeNow();
+        }
+        
+        if(this.R_SongLength - this.R_Timer <= 3 && !this.IsMenuPlaying)
+        {
+            this.EndTheme(event.Dt);
+            
+            if(this.R_SongLength - this.R_Timer <= 0.01)
+            {
+                // Find a new song to pick
+                var rand = this.Rand.DieRoll(this.NumThemes);
+                
+                while(rand as Integer == this.CurrentTheme as Integer)
+                {
+                    rand = this.Rand.DieRoll(4);
+                }
+                
+                if(rand as Integer == 1)
+                {
+                    this.CurrentTheme = Enum_Theme.Theme1;
+                    this.LoadTheme(Enum_Theme.Theme1);
+                }
+                else if(rand == 2)
+                {
+                    this.CurrentTheme = Enum_Theme.Theme2;
+                    this.LoadTheme(Enum_Theme.Theme2);
+                }
+                else if(rand == 3)
+                {
+                    this.CurrentTheme = Enum_Theme.Theme3;
+                    this.LoadTheme(Enum_Theme.Theme3);
+                }
+                else if(rand == 4)
+                {
+                    this.CurrentTheme = Enum_Theme.Theme4;
+                    this.LoadTheme(Enum_Theme.Theme4);
+                }
+                
+                this.R_Timer = 0;
+            }
+        }
+    } // End LogicUpdate
+    
+    function LoadTheme_Menu(event : Event)
+    {
+        this.CurrentTheme = Enum_Theme.MainMenu;
+        
+        this.LoadTheme(Enum_Theme.MainMenu);
+    }
+    
+    function LoadTheme_One(event : Event)
+    {
+        this.CurrentTheme = Enum_Theme.Theme1;
+        
+        this.LoadTheme(Enum_Theme.Theme1);
+    }
+    
+    function LoadTheme_Two(event : Event)
+    {
+        this.CurrentTheme = Enum_Theme.Theme2;
+        
+        this.LoadTheme(Enum_Theme.Theme2);
+    }
+    function LoadTheme_Three(event : Event)
+    {
+        this.CurrentTheme = Enum_Theme.Theme3;
+        
+        this.LoadTheme(Enum_Theme.Theme3);
+    }
+    
+    function LoadTheme_Four(event : Event)
+    {
+        this.CurrentTheme = Enum_Theme.Theme4;
+        
+        this.LoadTheme(Enum_Theme.Theme4);
+    }
+    
+    function LoadRandomThemeNow()
+    {
+        this.R_Timer = this.R_SongLength - 3;
+    }
+}

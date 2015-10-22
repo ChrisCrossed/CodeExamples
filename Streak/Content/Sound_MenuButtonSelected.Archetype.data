@@ -1,0 +1,30 @@
+Cog = 
+{
+	LinkId = 
+	{
+		uint Id = 1,
+	},
+	Named = 
+	{
+		string Name = "Sound_MenuButtonSelected",
+	},
+	Archetyped = 
+	{
+		string Name = "553023af7d503e6a:Sound_MenuButtonSelected",
+	},
+	Transform = 
+	{
+		Vec3 Translation = [0, 0, 0],
+		Vec3 Scale = [1, 1, 1],
+		Quat Rotation = [0, 0, 0, 1],
+	},
+	SoundEmitter = 
+	{
+		bool StartPlaying = false,
+		int ExtraPriority = 0,
+		string CueName = "5530235424d8a3eb:Sound_MenuButtonSelected",
+		float Volume = 1,
+		float Pitch = 1,
+		bool Positional = true,
+	},
+},

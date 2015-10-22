@@ -1,0 +1,8 @@
+TextContent = 
+{
+	ZilchScriptBuilder = 
+	{
+		string Name = "ViewportTest",
+		uint64 ResourceId = 54db8f02e0747ecb,
+	},
+},

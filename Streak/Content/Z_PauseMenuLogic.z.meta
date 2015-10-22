@@ -1,0 +1,8 @@
+TextContent = 
+{
+	ZilchScriptBuilder = 
+	{
+		string Name = "Z_PauseMenuLogic",
+		uint64 ResourceId = 5537b366d495f719,
+	},
+},
