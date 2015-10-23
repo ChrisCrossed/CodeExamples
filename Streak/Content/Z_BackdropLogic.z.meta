@@ -1,8 +1,0 @@
-TextContent = 
-{
-	ZilchScriptBuilder = 
-	{
-		string Name = "Z_BackdropLogic",
-		uint64 ResourceId = 553fbbeb76a0d2bb,
-	},
-},

@@ -1,8 +1,0 @@
-TextContent = 
-{
-	ZilchScriptBuilder = 
-	{
-		string Name = "Z_LevelSettings",
-		uint64 ResourceId = 54dcd40efb6cf450,
-	},
-},

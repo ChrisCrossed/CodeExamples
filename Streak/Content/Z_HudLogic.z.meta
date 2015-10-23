@@ -1,8 +1,0 @@
-TextContent = 
-{
-	ZilchScriptBuilder = 
-	{
-		string Name = "Z_HudLogic",
-		uint64 ResourceId = 54c096a5216a48cf,
-	},
-},

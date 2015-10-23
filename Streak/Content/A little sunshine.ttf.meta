@@ -1,8 +1,0 @@
-FontContent = 
-{
-	FontBuilder = 
-	{
-		string Name = "A little sunshine",
-		uint64 ResourceId = 55ddcb9857d386b9,
-	},
-},

@@ -1,8 +1,0 @@
-TextContent = 
-{
-	ZilchScriptBuilder = 
-	{
-		string Name = "Z_IntroScreenLogic",
-		uint64 ResourceId = 54de15d2d846b67e,
-	},
-},

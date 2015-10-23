@@ -1,2 +1,0 @@
-1.) Should blocks drop down when 'mispositioned' not aligned?
-2.) What about having a 'bonus score' piece on the left/right sides that push for a bonus score?

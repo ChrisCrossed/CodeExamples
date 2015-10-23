@@ -1,7 +1,0 @@
-ContentLibrary = 
-{
-	string Name = "Streak",
-	uint64 LibraryId = 54dcd449c9ca8899,
-	string SourceControlType = "",
-	bool ReadOnly = false,
-},

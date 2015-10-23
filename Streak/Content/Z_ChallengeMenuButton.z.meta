@@ -1,8 +1,0 @@
-TextContent = 
-{
-	ZilchScriptBuilder = 
-	{
-		string Name = "Z_ChallengeMenuButton",
-		uint64 ResourceId = 551290c549a80bbf,
-	},
-},
