@@ -55,7 +55,6 @@ public class Cs_MinionColliderLogic : MonoBehaviour
         }
 
         // Finally, pass the enemy array to the minion
-        
         gameObject.GetComponentInParent<Cs_MinionLogic>().SetEnemyArray(EnemyArray);
 
     }
@@ -63,17 +62,46 @@ public class Cs_MinionColliderLogic : MonoBehaviour
     // Should be triggered when an object's collider touches the minion's collider
     void OnTriggerEnter(Collider collider_)
     {
+        // Check to see if the object has a HealthSystem, which means it's a game object
         if(collider_.GetComponent<HealthSystem>())
         {
+            // Check it's team against this minions team
             if (collider_.GetComponent<HealthSystem>().GetTeamType() != teamType)
             {
+                // MINION GO ATTACK KILL RAWR
                 for (var i = 0; i < EnemyArray.Length; ++i)
                 {
+                    // If we already have this object, break out
                     if (EnemyArray[i] == collider_.gameObject) break;
 
+                    // If we've reached an opening, fill it with this object.
                     if (EnemyArray[i] == null)
                     {
                         EnemyArray[i] = collider_.gameObject;
+                        ArrangeEnemyArray_BubbleSort();
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    // Need to also ensure that if the minion leaves the collider area, remove it and move on with life
+    void OnTriggerExit(Collider collider_)
+    {
+        // Check to see if the object has a HealthSystem, which means it's a game object
+        if (collider_.GetComponent<HealthSystem>())
+        {
+            // Check it's team against this minions team
+            if (collider_.GetComponent<HealthSystem>().GetTeamType() != teamType)
+            {
+                // Remove this object from the Minion's kill array
+                for (var i = 0; i < EnemyArray.Length; ++i)
+                {
+                    // If we already have this object, remove it
+                    if (EnemyArray[i] == collider_.gameObject)
+                    {
+                        EnemyArray[i] = null;
                         ArrangeEnemyArray_BubbleSort();
                         break;
                     }

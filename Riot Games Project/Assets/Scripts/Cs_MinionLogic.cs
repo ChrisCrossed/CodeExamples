@@ -41,8 +41,9 @@ public class Cs_MinionLogic : MonoBehaviour
         i_AttackDamage = 12 + (i_SpawnTime_ / 180); // 12 + 1 dmg every 3 minutes
         i_Health = 450 + (20 * (i_SpawnTime_ / 180)); // 450 HP + 20 dmg every 3 minutes
         gameObject.GetComponent<HealthSystem>().SetHealth(i_Health);
+        b_IsMelee = b_IsMelee_;
 
-        if(minionTeam_ == TeamTypes.BlueTeam)
+        if (minionTeam_ == TeamTypes.BlueTeam)
         {
             GetComponent<Renderer>().material.color = new Color(0.0f, 0.0f, 1.0f, 1.0f);
         }
@@ -51,7 +52,10 @@ public class Cs_MinionLogic : MonoBehaviour
             GetComponent<Renderer>().material.color = new Color(1.0f, 0.0f, 0.0f, 1.0f);
         }
 
-        currCheckpoint = 0;
+        if(!b_IsMelee) GetComponent<Renderer>().material.color += new Color(0.0f, 0.7f, 0.0f, 0.0f);
+
+        // Starts the minion's checkpoint to 1 so they don't go into their fountain
+        currCheckpoint = 1;
     }
 
     // Update is called once per frame
@@ -62,7 +66,7 @@ public class Cs_MinionLogic : MonoBehaviour
             currentSpeed += Time.deltaTime * 5;
         }
 
-        // If there's an enemy within the array, chase them. Otherwise, go to the next checkpoint.
+        // If there's an enemy within the array, attack them. Otherwise, go to the next checkpoint.
         if(b_IsEnemyArrayLoaded)
         {
             if(!b_IsPushed) AttackEnemyInEnemyArray();
@@ -97,7 +101,6 @@ public class Cs_MinionLogic : MonoBehaviour
     {
         // Find the first enemy in the array and attack them.
         int enemyNum = -1;
-
         for(var i = 0; i < enemyArray.Length; ++i)
         {
             if (enemyArray[i] != null)
@@ -126,8 +129,16 @@ public class Cs_MinionLogic : MonoBehaviour
             // Lerp toward the new rotation
             transform.rotation = Quaternion.Lerp(Q_CurrRot, Q_NewRot, 0.1f);
 
-            // Move forward at set pace
-            gameObject.GetComponent<Rigidbody>().velocity = (transform.forward * currentSpeed);
+            // If this minion is melee, move toward it.
+            if(b_IsMelee)
+            {
+                // Move forward at set pace
+                gameObject.GetComponent<Rigidbody>().velocity = (transform.forward * currentSpeed);
+            }
+            else // This minion is ranged and requires different actions to attack.
+            {
+                // NOTE: We don't move the minion while attacking, so no need to change velocity.
+            }
         }
     }
 

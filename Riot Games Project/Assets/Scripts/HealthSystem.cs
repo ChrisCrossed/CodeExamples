@@ -65,7 +65,7 @@ public class HealthSystem : MonoBehaviour
 
     public void ApplyDamage(TeamTypes teamTakenDamageFrom_, ObjectTypes objectTakenDamageFrom_, int damageTaken_)
     {
-        print(teamTakenDamageFrom_ + " hit " + gameObject.name);
+        // print(teamTakenDamageFrom_ + " hit " + gameObject.name);
 
         // Friendly Fire Off
         if (teamTakenDamageFrom_ != teamType)
@@ -78,7 +78,7 @@ public class HealthSystem : MonoBehaviour
                 // Decrease current health by damage taken
                 i_CurrentHealth -= damageTaken_;
 
-                print(gameObject.name + " received " + damageTaken_ + ", new HP: " + i_CurrentHealth);
+                // print(gameObject.name + " received " + damageTaken_ + ", new HP: " + i_CurrentHealth);
 
                 // Kill Minion if under a certain amount of health
                 if(i_CurrentHealth <= 0)
