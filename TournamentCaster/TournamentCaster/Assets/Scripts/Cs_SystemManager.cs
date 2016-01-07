@@ -23,9 +23,11 @@ public class Icon
 public class Cs_SystemManager : MonoBehaviour
 {
     public string TournamentName;
+    public bool SmallText;
     public string TeamName_Left;
     public string TeamName_Right;
     public Sprite TournamentLogo;
+    public bool NoIcon;
 
     GameObject Nametag_Left;
     GameObject Nametag_Right;
@@ -41,6 +43,17 @@ public class Cs_SystemManager : MonoBehaviour
 
     // Use this for initialization
     void Start ()
+    {
+        InitializeIcons();
+        SetTournamentLogo(TournamentLogo, TournamentName);
+
+        // Nametag_Left = GameObject.Find("Nametag_Left");
+        // Nametag_Right = GameObject.Find("Nametag_Right");
+
+        // Nametag_Left.GetComponent<Text>().text = "HH";
+    }
+
+    void InitializeIcons()
     {
         // Set Icons
         Icon_FirstBlood.go_Icon = GameObject.Find("Icon_FirstBlood");
@@ -64,19 +77,36 @@ public class Cs_SystemManager : MonoBehaviour
 
         Icon_Inhib.go_Icon.GetComponent<SpriteRenderer>().enabled = false;
         Icon_Dragon.b_IsActive = false;
-
-        // Nametag_Left = GameObject.Find("Nametag_Left");
-        // Nametag_Right = GameObject.Find("Nametag_Right");
-
-        // Nametag_Left.GetComponent<Text>().text = "HH";
     }
 
     void SetTournamentLogo(Sprite TournamentLogo_, string TournamentText_)
     {
         GameObject tournamentLogo = GameObject.Find("Overlay_Logo");
         GameObject tournamentText = GameObject.Find("Overlay_Text");
+
+        // Reposition text based on bools
+        if (NoIcon)
+        {
+            tournamentText.transform.localPosition = new Vector3(0, 0, 0);
+            tournamentLogo.SetActive(false);
+        }
+
+        if(SmallText)
+        {
+            tournamentText.transform.localScale = new Vector3(0.001f, 0.001f, 1);
+        }
+
+        tournamentLogo.GetComponent<SpriteRenderer>().sprite = TournamentLogo_;
+        
+        if(TournamentText_.Contains("/"))
+        {
+            TournamentText_ = TournamentText_.Replace("/", "\n");
+        }
+
+        tournamentText.GetComponent<TextMesh>().text = TournamentText_;
     }
 
+    // Used by Keyboard Input to apply Icon's to the screen
     void ActivateIcon(Enum_IconTypes iconType_, bool b_IsLeftTeam)
     {
         // Pre-loading generic Icon for manipulation
@@ -150,6 +180,7 @@ public class Cs_SystemManager : MonoBehaviour
             ActivateIcon(Enum_IconTypes.Baron, true);
         }
 
+        // Right Team Input
         if (Input.GetKeyDown(KeyCode.P))
         {
             ActivateIcon(Enum_IconTypes.FirstBlood, false);
