@@ -62,6 +62,7 @@ public class Cs_SystemManager : MonoBehaviour
         Icon_Baron.go_Icon = GameObject.Find("Icon_Baron");
         Icon_Inhib.go_Icon = GameObject.Find("Icon_Inhib");
 
+
         // Turn off Icons
         Icon_FirstBlood.go_Icon.GetComponent<SpriteRenderer>().enabled = false;
         Icon_FirstBlood.b_IsActive = false;
