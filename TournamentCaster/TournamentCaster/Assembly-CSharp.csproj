@@ -45,10 +45,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\Cs_SystemManager.cs" />
-     <Compile Include="Assets\Cs_TextPosition.cs" />
      <Compile Include="Assets\Scripts\CS_CameraController.cs" />
      <Compile Include="Assets\Scripts\CS_ImageParameters.cs" />
+     <Compile Include="Assets\Scripts\Cs_SystemManager.cs" />
+     <Compile Include="Assets\Scripts\Cs_TextPosition.cs" />
  <Reference Include="UnityEngine.UI">
  <HintPath>D:/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>
