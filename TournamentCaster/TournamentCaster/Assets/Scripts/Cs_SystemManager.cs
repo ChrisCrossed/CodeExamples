@@ -10,6 +10,7 @@ enum Enum_IconTypes
     Inhib,
     Baron
 }
+enum Enum_IconOwner { None, Left, Right }
 
 public class Icon
 {
@@ -37,6 +38,11 @@ public class Cs_SystemManager : MonoBehaviour
     Icon Icon_Tower = new Icon();
     Icon Icon_Baron = new Icon();
     Icon Icon_Inhib = new Icon();
+    Enum_IconOwner IO_FirstBlood = Enum_IconOwner.None;
+    Enum_IconOwner IO_Dragon = Enum_IconOwner.None;
+    Enum_IconOwner IO_Tower = Enum_IconOwner.None;
+    Enum_IconOwner IO_Inhib = Enum_IconOwner.None;
+    Enum_IconOwner IO_Baron = Enum_IconOwner.None;
 
     int i_TeamIcons_Left = 0;
     int i_TeamIcons_Right = 0;
@@ -108,7 +114,7 @@ public class Cs_SystemManager : MonoBehaviour
     }
 
     // Used by Keyboard Input to apply Icon's to the screen
-    void ActivateIcon(Enum_IconTypes iconType_, bool b_IsLeftTeam)
+    void ActivateIcon(Enum_IconTypes iconType_, Enum_IconOwner iconOwner_, float f_DT)
     {
         // Pre-loading generic Icon for manipulation
         Icon currentIcon = Icon_FirstBlood;
@@ -123,21 +129,29 @@ public class Cs_SystemManager : MonoBehaviour
         if (!currentIcon.b_IsActive)
         {
             // Figure out which position the icon will go in
-            if(b_IsLeftTeam)
+            if(iconOwner_ == Enum_IconOwner.Left)
             {
                 // Reposition the icon based on the current i_TeamIcons_Left/Right number
                 // 520 - 90 * i_TeamIcons. Right Team *= -1;
+                var finalPos = currentIcon.go_Icon.gameObject.transform.position;
+                finalPos.x = -520 + (90 * i_TeamIcons_Left);
+
                 var currPos = currentIcon.go_Icon.gameObject.transform.position;
-                currPos.x = -520 + (90 * i_TeamIcons_Left);
+                currPos.x = -520 + (90 * i_TeamIcons_Left) + 45;
+
                 currentIcon.go_Icon.gameObject.transform.position = currPos;
 
                 // Increment the i_TeamIcons
                 ++i_TeamIcons_Left;
             }
-            else
+            else if(iconOwner_ == Enum_IconOwner.Right)
             {
+                var finalPos = currentIcon.go_Icon.gameObject.transform.position;
+                finalPos.x = 520 - (90 * i_TeamIcons_Right);
+
                 var currPos = currentIcon.go_Icon.gameObject.transform.position;
-                currPos.x = 520 - (90 * i_TeamIcons_Right);
+                currPos.x = 520 - (90 * i_TeamIcons_Right) - 45;
+
                 currentIcon.go_Icon.gameObject.transform.position = currPos;
 
                 // Increment the i_TeamIcons
@@ -153,54 +167,38 @@ public class Cs_SystemManager : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
     {
-	    // Quit Application (For now)
-        if(Input.GetKeyDown(KeyCode.Escape))
+        // ActivateIcon(Enum_IconTypes.FirstBlood, Enum_IconOwner.Left, Time.deltaTime);
+
+        // Quit Application (For now)
+        if (Input.GetKeyDown(KeyCode.Escape))
         {
             Application.Quit();
         }
 
         // Left Team Input
-        if (Input.GetKeyDown(KeyCode.Q))
+        if (Input.GetKeyDown(KeyCode.Q)) IO_FirstBlood = Enum_IconOwner.Left;
+        if (Input.GetKeyDown(KeyCode.W)) IO_Dragon = Enum_IconOwner.Left;
+        if (Input.GetKeyDown(KeyCode.E)) IO_Tower = Enum_IconOwner.Left;
+        if (Input.GetKeyDown(KeyCode.R)) IO_Inhib = Enum_IconOwner.Left;
+        if (Input.GetKeyDown(KeyCode.T)) IO_Baron = Enum_IconOwner.Left;
+
+        if(IO_FirstBlood != Enum_IconOwner.None)
         {
-            ActivateIcon(Enum_IconTypes.FirstBlood, true);
+            if(IO_FirstBlood == Enum_IconOwner.Left) ActivateIcon(Enum_IconTypes.FirstBlood, Enum_IconOwner.Left, Time.deltaTime);
+            else ActivateIcon(Enum_IconTypes.FirstBlood, Enum_IconOwner.Right, Time.deltaTime);
         }
-        if (Input.GetKeyDown(KeyCode.W))
+        if (IO_Dragon != Enum_IconOwner.None)
         {
-            ActivateIcon(Enum_IconTypes.Dragon, true);
-        }
-        if (Input.GetKeyDown(KeyCode.E))
-        {
-            ActivateIcon(Enum_IconTypes.Tower, true);
-        }
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            ActivateIcon(Enum_IconTypes.Inhib, true);
-        }
-        if (Input.GetKeyDown(KeyCode.T))
-        {
-            ActivateIcon(Enum_IconTypes.Baron, true);
+            if (IO_Dragon == Enum_IconOwner.Left) ActivateIcon(Enum_IconTypes.Dragon, Enum_IconOwner.Left, Time.deltaTime);
+            else ActivateIcon(Enum_IconTypes.Dragon, Enum_IconOwner.Right, Time.deltaTime);
         }
 
         // Right Team Input
-        if (Input.GetKeyDown(KeyCode.P))
-        {
-            ActivateIcon(Enum_IconTypes.FirstBlood, false);
-        }
-        if (Input.GetKeyDown(KeyCode.O))
-        {
-            ActivateIcon(Enum_IconTypes.Dragon, false);
-        }
-        if (Input.GetKeyDown(KeyCode.I))
-        {
-            ActivateIcon(Enum_IconTypes.Tower, false);
-        }
-        if (Input.GetKeyDown(KeyCode.U))
-        {
-            ActivateIcon(Enum_IconTypes.Inhib, false);
-        }
-        if (Input.GetKeyDown(KeyCode.Y))
-        {
-            ActivateIcon(Enum_IconTypes.Baron, false);
-        }
+        if (Input.GetKeyDown(KeyCode.P)) IO_FirstBlood = Enum_IconOwner.Right;
+        if (Input.GetKeyDown(KeyCode.O)) IO_Dragon = Enum_IconOwner.Right;
+        if (Input.GetKeyDown(KeyCode.I)) IO_Tower = Enum_IconOwner.Right;
+        if (Input.GetKeyDown(KeyCode.U)) IO_Inhib = Enum_IconOwner.Right;
+        if (Input.GetKeyDown(KeyCode.Y)) IO_Baron = Enum_IconOwner.Right;
+
     }
 }
