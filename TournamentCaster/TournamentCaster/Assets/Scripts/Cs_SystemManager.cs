@@ -139,7 +139,8 @@ public class Cs_SystemManager : MonoBehaviour
                 var currPos = currentIcon.go_Icon.gameObject.transform.position;
                 currPos.x = -520 + (90 * i_TeamIcons_Left) + 45;
 
-                currentIcon.go_Icon.gameObject.transform.position = currPos;
+                // currentIcon.go_Icon.gameObject.transform.position = currPos;
+                currentIcon.go_Icon.gameObject.transform.position = Vector3.Lerp(finalPos, currPos, 1.0f);
 
                 // Increment the i_TeamIcons
                 ++i_TeamIcons_Left;
@@ -152,7 +153,7 @@ public class Cs_SystemManager : MonoBehaviour
                 var currPos = currentIcon.go_Icon.gameObject.transform.position;
                 currPos.x = 520 - (90 * i_TeamIcons_Right) - 45;
 
-                currentIcon.go_Icon.gameObject.transform.position = currPos;
+                currentIcon.go_Icon.gameObject.transform.position = Vector3.Lerp(finalPos, currPos, 1.0f);
 
                 // Increment the i_TeamIcons
                 ++i_TeamIcons_Right;
