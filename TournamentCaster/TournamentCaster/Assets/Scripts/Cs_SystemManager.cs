@@ -151,11 +151,13 @@ public class Cs_SystemManager : MonoBehaviour
             }
             else if(iconOwner_ == Enum_IconOwner.Right)
             {
+                print("Right");
                 var finalPos = currentIcon.go_Icon.gameObject.transform.position;
                 finalPos.x = 520 - (90 * i_TeamIcons_Right);
                 currentIcon.finalPos_X = finalPos.x;
 
                 currentIcon.currPos_X = currentIcon.finalPos_X - 90;
+                currentIcon.go_Icon.transform.position = new Vector3(currentIcon.currPos_X, currentIcon.go_Icon.transform.position.y, currentIcon.go_Icon.transform.position.z);
 
                 // Allow the icon to move
                 currentIcon.b_CanMove = true;
@@ -176,13 +178,27 @@ public class Cs_SystemManager : MonoBehaviour
             print("Current X: " + currentIcon.go_Icon.transform.position.x);
             print("currPos.X: " + currentIcon.currPos_X);
             print("finalPos.X: " + currentIcon.finalPos_X);
+            print(iconOwner_);
             // var finalPos = new Vector3(currentIcon.finalPos_X, currentIcon.go_Icon.transform.position.y, currentIcon.go_Icon.transform.position.z);
-            if (currentIcon.go_Icon.transform.position.x > currentIcon.finalPos_X)
+            if(iconOwner_ == Enum_IconOwner.Left) // If we're on the left side, move left over time
             {
-                currentIcon.currPos_X = currentIcon.go_Icon.transform.position.x - (f_DT * 250);
-                currentIcon.go_Icon.transform.position = new Vector3(currentIcon.currPos_X, currentIcon.go_Icon.transform.position.y, currentIcon.go_Icon.transform.position.z);
+                if (currentIcon.go_Icon.transform.position.x > currentIcon.finalPos_X)
+                {
+                    currentIcon.currPos_X = currentIcon.go_Icon.transform.position.x - (f_DT * 250);
+                    currentIcon.go_Icon.transform.position = new Vector3(currentIcon.currPos_X, currentIcon.go_Icon.transform.position.y, currentIcon.go_Icon.transform.position.z);
+                }
+                else currentIcon.b_CanMove = false; // When we reached the limit, disable the ability to move (Stops updating the position number each frame)
             }
-            else currentIcon.b_CanMove = false;
+            else if(iconOwner_ == Enum_IconOwner.Right)
+            {
+                if (currentIcon.go_Icon.transform.position.x < currentIcon.finalPos_X)
+                {
+                    currentIcon.currPos_X = currentIcon.go_Icon.transform.position.x + (f_DT * 250);
+                    currentIcon.go_Icon.transform.position = new Vector3(currentIcon.currPos_X, currentIcon.go_Icon.transform.position.y, currentIcon.go_Icon.transform.position.z);
+                }
+                else currentIcon.b_CanMove = false; // When we reached the limit, disable the ability to move (Stops updating the position number each frame)
+            }
+            
             // currentIcon.go_Icon.transform.position = Vector3.Lerp(new Vector3(currentIcon.currPos_X, currentIcon.go_Icon.transform.position.y, currentIcon.go_Icon.transform.position.z), new Vector3(currentIcon.finalPos_X, currentIcon.go_Icon.transform.position.y, currentIcon.go_Icon.transform.position.z), 1.0f);
             
         }
