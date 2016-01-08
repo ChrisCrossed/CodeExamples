@@ -15,10 +15,12 @@ enum Enum_IconOwner { None, Left, Right }
 public class Icon
 {
     public GameObject go_Icon;
-    // public string s_Name;
     public bool b_IsActive;
+    public bool b_CanMove;
     public int i_UIPos;
     public bool b_IsTeamLeft;
+    public float currPos_X;
+    public float finalPos_X;
 }
 
 public class Cs_SystemManager : MonoBehaviour
@@ -125,6 +127,7 @@ public class Cs_SystemManager : MonoBehaviour
         if (iconType_ == Enum_IconTypes.Tower) currentIcon = Icon_Tower;
         if (iconType_ == Enum_IconTypes.Inhib) currentIcon = Icon_Inhib;
 
+        #region Enable the Icon
         // If the icon is still disabled...
         if (!currentIcon.b_IsActive)
         {
@@ -135,12 +138,13 @@ public class Cs_SystemManager : MonoBehaviour
                 // 520 - 90 * i_TeamIcons. Right Team *= -1;
                 var finalPos = currentIcon.go_Icon.gameObject.transform.position;
                 finalPos.x = -520 + (90 * i_TeamIcons_Left);
+                currentIcon.finalPos_X = finalPos.x;
 
-                var currPos = currentIcon.go_Icon.gameObject.transform.position;
-                currPos.x = -520 + (90 * i_TeamIcons_Left) + 45;
+                currentIcon.currPos_X = currentIcon.finalPos_X + 90;
+                currentIcon.go_Icon.transform.position = new Vector3(currentIcon.currPos_X, currentIcon.go_Icon.transform.position.y, currentIcon.go_Icon.transform.position.z);
 
-                // currentIcon.go_Icon.gameObject.transform.position = currPos;
-                currentIcon.go_Icon.gameObject.transform.position = Vector3.Lerp(finalPos, currPos, 1.0f);
+                // Allow the icon to move
+                currentIcon.b_CanMove = true;
 
                 // Increment the i_TeamIcons
                 ++i_TeamIcons_Left;
@@ -149,11 +153,12 @@ public class Cs_SystemManager : MonoBehaviour
             {
                 var finalPos = currentIcon.go_Icon.gameObject.transform.position;
                 finalPos.x = 520 - (90 * i_TeamIcons_Right);
+                currentIcon.finalPos_X = finalPos.x;
 
-                var currPos = currentIcon.go_Icon.gameObject.transform.position;
-                currPos.x = 520 - (90 * i_TeamIcons_Right) - 45;
+                currentIcon.currPos_X = currentIcon.finalPos_X - 90;
 
-                currentIcon.go_Icon.gameObject.transform.position = Vector3.Lerp(finalPos, currPos, 1.0f);
+                // Allow the icon to move
+                currentIcon.b_CanMove = true;
 
                 // Increment the i_TeamIcons
                 ++i_TeamIcons_Right;
@@ -163,10 +168,29 @@ public class Cs_SystemManager : MonoBehaviour
             currentIcon.go_Icon.GetComponent<SpriteRenderer>().enabled = true;
             currentIcon.b_IsActive = true;
         }
+        #endregion
+
+        #region Move the Enabled Icons
+        if(currentIcon.b_CanMove)
+        {
+            print("Current X: " + currentIcon.go_Icon.transform.position.x);
+            print("currPos.X: " + currentIcon.currPos_X);
+            print("finalPos.X: " + currentIcon.finalPos_X);
+            // var finalPos = new Vector3(currentIcon.finalPos_X, currentIcon.go_Icon.transform.position.y, currentIcon.go_Icon.transform.position.z);
+            if (currentIcon.go_Icon.transform.position.x > currentIcon.finalPos_X)
+            {
+                currentIcon.currPos_X = currentIcon.go_Icon.transform.position.x - (f_DT * 250);
+                currentIcon.go_Icon.transform.position = new Vector3(currentIcon.currPos_X, currentIcon.go_Icon.transform.position.y, currentIcon.go_Icon.transform.position.z);
+            }
+            else currentIcon.b_CanMove = false;
+            // currentIcon.go_Icon.transform.position = Vector3.Lerp(new Vector3(currentIcon.currPos_X, currentIcon.go_Icon.transform.position.y, currentIcon.go_Icon.transform.position.z), new Vector3(currentIcon.finalPos_X, currentIcon.go_Icon.transform.position.y, currentIcon.go_Icon.transform.position.z), 1.0f);
+            
+        }
+        #endregion
     }
-	
-	// Update is called once per frame
-	void Update ()
+
+    // Update is called once per frame
+    void Update ()
     {
         // ActivateIcon(Enum_IconTypes.FirstBlood, Enum_IconOwner.Left, Time.deltaTime);
 
