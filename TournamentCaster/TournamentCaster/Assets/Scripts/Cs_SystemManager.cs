@@ -20,6 +20,7 @@ public class Icon
     public int i_UIPos;
     public bool b_IsTeamLeft;
     public float currPos_X;
+    public float startPos_X;
     public float finalPos_X;
 }
 
@@ -54,11 +55,6 @@ public class Cs_SystemManager : MonoBehaviour
     int i_TeamIcons_Left = 0;
     int i_TeamIcons_Right = 0;
 
-    int i_IconSpeedIncrement_FirstBlood = 0;
-    int i_IconSpeedIncrement_Dragon = 0;
-    int i_IconSpeedIncrement_Tower = 0;
-    int i_IconSpeedIncrement_Inhib = 0;
-    int i_IconSpeedIncrement_Baron = 0;
     float f_IconStopTimer_FirstBlood = 0;
     float f_IconStopTimer_Dragon = 0;
     float f_IconStopTimer_Tower = 0;
@@ -157,7 +153,14 @@ public class Cs_SystemManager : MonoBehaviour
                 currentIcon.finalPos_X = finalPos.x;
 
                 currentIcon.currPos_X = currentIcon.finalPos_X + 90;
+                currentIcon.startPos_X = currentIcon.currPos_X;
                 currentIcon.go_Icon.transform.position = new Vector3(currentIcon.currPos_X, currentIcon.go_Icon.transform.position.y, currentIcon.go_Icon.transform.position.z);
+
+                // Scale the current icon to double normal size
+                var currScale = currentIcon.go_Icon.transform.localScale;
+                currScale.x *= 1.4f;
+                currScale.y *= 1.4f;
+                currentIcon.go_Icon.transform.localScale = currScale;
 
                 // Allow the icon to move
                 currentIcon.b_CanMove = true;
@@ -172,7 +175,14 @@ public class Cs_SystemManager : MonoBehaviour
                 currentIcon.finalPos_X = finalPos.x;
 
                 currentIcon.currPos_X = currentIcon.finalPos_X - 90;
+                currentIcon.startPos_X = currentIcon.currPos_X;
                 currentIcon.go_Icon.transform.position = new Vector3(currentIcon.currPos_X, currentIcon.go_Icon.transform.position.y, currentIcon.go_Icon.transform.position.z);
+
+                // Scale the current icon to double normal size
+                var currScale = currentIcon.go_Icon.transform.localScale;
+                currScale.x *= 1.4f;
+                currScale.y *= 1.4f;
+                currentIcon.go_Icon.transform.localScale = currScale;
 
                 // Allow the icon to move
                 currentIcon.b_CanMove = true;
@@ -206,6 +216,21 @@ public class Cs_SystemManager : MonoBehaviour
 
             if (b_IsMoving)
             {
+                // Rescale the icon down to normal size
+                if(currentIcon.go_Icon.transform.localScale.x > 15)
+                {
+                    float currPos = currentIcon.go_Icon.transform.position.x;
+                    float minPos = currentIcon.finalPos_X;
+                    float maxPos = currentIcon.startPos_X;
+
+                    float currPercent = (currPos - minPos) / (maxPos - minPos);
+
+                    var currScale = currentIcon.go_Icon.transform.localScale;
+                    currScale.x = 15 + (15 * currPercent);
+                    currScale.y = 15 + (15 * currPercent);
+                    currentIcon.go_Icon.transform.localScale = currScale;
+                }
+
                 if (iconOwner_ == Enum_IconOwner.Left) // If we're on the left side, move left over time
                 {
                     if (currentIcon.go_Icon.transform.position.x > currentIcon.finalPos_X)
@@ -235,7 +260,12 @@ public class Cs_SystemManager : MonoBehaviour
     // Update is called once per frame
     void Update ()
     {
-        // ActivateIcon(Enum_IconTypes.FirstBlood, Enum_IconOwner.Left, Time.deltaTime);
+        // Future check for visibility.
+        print("First Blood: " + Icon_FirstBlood.b_IsActive);
+        print("Dragon: " + Icon_Dragon.b_IsActive);
+        print("Tower: " + Icon_Tower.b_IsActive);
+        print("Inhib: " + Icon_Inhib.b_IsActive);
+        print("Baron: " + Icon_Baron.b_IsActive);
 
         // Quit Application (For now)
         if (Input.GetKeyDown(KeyCode.Escape))
