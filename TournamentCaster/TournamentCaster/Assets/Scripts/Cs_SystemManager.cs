@@ -45,9 +45,25 @@ public class Cs_SystemManager : MonoBehaviour
     Enum_IconOwner IO_Tower = Enum_IconOwner.None;
     Enum_IconOwner IO_Inhib = Enum_IconOwner.None;
     Enum_IconOwner IO_Baron = Enum_IconOwner.None;
+    bool keyPressed_Dragon;
+    bool keyPressed_Tower;
+    bool keyPressed_FirstBlood;
+    bool keyPressed_Inhib;
+    bool keyPressed_Baron;
 
     int i_TeamIcons_Left = 0;
     int i_TeamIcons_Right = 0;
+
+    int i_IconSpeedIncrement_FirstBlood = 0;
+    int i_IconSpeedIncrement_Dragon = 0;
+    int i_IconSpeedIncrement_Tower = 0;
+    int i_IconSpeedIncrement_Inhib = 0;
+    int i_IconSpeedIncrement_Baron = 0;
+    float f_IconStopTimer_FirstBlood = 0;
+    float f_IconStopTimer_Dragon = 0;
+    float f_IconStopTimer_Tower = 0;
+    float f_IconStopTimer_Inhib = 0;
+    float f_IconStopTimer_Baron = 0;
 
     // Use this for initialization
     void Start ()
@@ -151,7 +167,6 @@ public class Cs_SystemManager : MonoBehaviour
             }
             else if(iconOwner_ == Enum_IconOwner.Right)
             {
-                print("Right");
                 var finalPos = currentIcon.go_Icon.gameObject.transform.position;
                 finalPos.x = 520 - (90 * i_TeamIcons_Right);
                 currentIcon.finalPos_X = finalPos.x;
@@ -173,30 +188,42 @@ public class Cs_SystemManager : MonoBehaviour
         #endregion
 
         #region Move the Enabled Icons
-        if(currentIcon.b_CanMove)
+        if(currentIcon.b_CanMove && currentIcon.b_IsActive)
         {
-            print("Current X: " + currentIcon.go_Icon.transform.position.x);
-            print("currPos.X: " + currentIcon.currPos_X);
-            print("finalPos.X: " + currentIcon.finalPos_X);
-            print(iconOwner_);
-            // var finalPos = new Vector3(currentIcon.finalPos_X, currentIcon.go_Icon.transform.position.y, currentIcon.go_Icon.transform.position.z);
-            if(iconOwner_ == Enum_IconOwner.Left) // If we're on the left side, move left over time
+            bool b_IsMoving = false;
+
+            if (iconType_ == Enum_IconTypes.FirstBlood) if (f_IconStopTimer_FirstBlood < 0.2f) f_IconStopTimer_FirstBlood += f_DT;
+            if (iconType_ == Enum_IconTypes.Dragon) if (f_IconStopTimer_Dragon < 0.2f) f_IconStopTimer_Dragon += f_DT;
+            if (iconType_ == Enum_IconTypes.Tower) if (f_IconStopTimer_Tower < 0.2f) f_IconStopTimer_Tower += f_DT;
+            if (iconType_ == Enum_IconTypes.Inhib) if (f_IconStopTimer_Inhib < 0.2f) f_IconStopTimer_Inhib += f_DT;
+            if (iconType_ == Enum_IconTypes.Baron) if (f_IconStopTimer_Baron < 0.2f) f_IconStopTimer_Baron += f_DT;
+
+            if (f_IconStopTimer_FirstBlood >= 0.2 && iconType_ == Enum_IconTypes.FirstBlood) b_IsMoving = true;
+            if (f_IconStopTimer_Dragon >= 0.2 && iconType_ == Enum_IconTypes.Dragon) b_IsMoving = true;
+            if (f_IconStopTimer_Tower >= 0.2 && iconType_ == Enum_IconTypes.Tower) b_IsMoving = true;
+            if (f_IconStopTimer_Baron >= 0.2 && iconType_ == Enum_IconTypes.Baron) b_IsMoving = true;
+            if (f_IconStopTimer_Inhib >= 0.2 && iconType_ == Enum_IconTypes.Inhib) b_IsMoving = true;
+
+            if (b_IsMoving)
             {
-                if (currentIcon.go_Icon.transform.position.x > currentIcon.finalPos_X)
+                if (iconOwner_ == Enum_IconOwner.Left) // If we're on the left side, move left over time
                 {
-                    currentIcon.currPos_X = currentIcon.go_Icon.transform.position.x - (f_DT * 250);
-                    currentIcon.go_Icon.transform.position = new Vector3(currentIcon.currPos_X, currentIcon.go_Icon.transform.position.y, currentIcon.go_Icon.transform.position.z);
+                    if (currentIcon.go_Icon.transform.position.x > currentIcon.finalPos_X)
+                    {
+                        currentIcon.currPos_X = currentIcon.go_Icon.transform.position.x - (f_DT * 250);
+                        currentIcon.go_Icon.transform.position = new Vector3(currentIcon.currPos_X, currentIcon.go_Icon.transform.position.y, currentIcon.go_Icon.transform.position.z);
+                    }
+                    else currentIcon.b_CanMove = false; // When we reached the limit, disable the ability to move (Stops updating the position number each frame)
                 }
-                else currentIcon.b_CanMove = false; // When we reached the limit, disable the ability to move (Stops updating the position number each frame)
-            }
-            else if(iconOwner_ == Enum_IconOwner.Right)
-            {
-                if (currentIcon.go_Icon.transform.position.x < currentIcon.finalPos_X)
+                else if (iconOwner_ == Enum_IconOwner.Right)
                 {
-                    currentIcon.currPos_X = currentIcon.go_Icon.transform.position.x + (f_DT * 250);
-                    currentIcon.go_Icon.transform.position = new Vector3(currentIcon.currPos_X, currentIcon.go_Icon.transform.position.y, currentIcon.go_Icon.transform.position.z);
+                    if (currentIcon.go_Icon.transform.position.x < currentIcon.finalPos_X)
+                    {
+                        currentIcon.currPos_X = currentIcon.go_Icon.transform.position.x + (f_DT * 250);
+                        currentIcon.go_Icon.transform.position = new Vector3(currentIcon.currPos_X, currentIcon.go_Icon.transform.position.y, currentIcon.go_Icon.transform.position.z);
+                    }
+                    else currentIcon.b_CanMove = false; // When we reached the limit, disable the ability to move (Stops updating the position number each frame)
                 }
-                else currentIcon.b_CanMove = false; // When we reached the limit, disable the ability to move (Stops updating the position number each frame)
             }
             
             // currentIcon.go_Icon.transform.position = Vector3.Lerp(new Vector3(currentIcon.currPos_X, currentIcon.go_Icon.transform.position.y, currentIcon.go_Icon.transform.position.z), new Vector3(currentIcon.finalPos_X, currentIcon.go_Icon.transform.position.y, currentIcon.go_Icon.transform.position.z), 1.0f);
@@ -217,15 +244,23 @@ public class Cs_SystemManager : MonoBehaviour
         }
 
         // Left Team Input
-        if (Input.GetKeyDown(KeyCode.Q)) IO_FirstBlood = Enum_IconOwner.Left;
-        if (Input.GetKeyDown(KeyCode.W)) IO_Dragon = Enum_IconOwner.Left;
-        if (Input.GetKeyDown(KeyCode.E)) IO_Tower = Enum_IconOwner.Left;
-        if (Input.GetKeyDown(KeyCode.R)) IO_Inhib = Enum_IconOwner.Left;
-        if (Input.GetKeyDown(KeyCode.T)) IO_Baron = Enum_IconOwner.Left;
+        if (Input.GetKeyDown(KeyCode.Q) && !keyPressed_FirstBlood) { IO_FirstBlood = Enum_IconOwner.Left; keyPressed_FirstBlood = true; }
+        if (Input.GetKeyDown(KeyCode.W) && !keyPressed_Dragon) { IO_Dragon = Enum_IconOwner.Left; keyPressed_Dragon = true; }
+        if (Input.GetKeyDown(KeyCode.E) && !keyPressed_Tower) { IO_Tower = Enum_IconOwner.Left; keyPressed_Tower = true; }
+        if (Input.GetKeyDown(KeyCode.R) && !keyPressed_Inhib) { IO_Inhib = Enum_IconOwner.Left; keyPressed_Inhib = true; }
+        if (Input.GetKeyDown(KeyCode.T) && !keyPressed_Baron) { IO_Baron = Enum_IconOwner.Left; keyPressed_Baron = true; }
 
-        if(IO_FirstBlood != Enum_IconOwner.None)
+        // Right Team Input
+        if (Input.GetKeyDown(KeyCode.P) && !keyPressed_FirstBlood) { IO_FirstBlood = Enum_IconOwner.Right; keyPressed_FirstBlood = true; }
+        if (Input.GetKeyDown(KeyCode.O) && !keyPressed_Dragon) { IO_Dragon = Enum_IconOwner.Right; keyPressed_Dragon = true; }
+        if (Input.GetKeyDown(KeyCode.I) && !keyPressed_Tower) { IO_Tower = Enum_IconOwner.Right; keyPressed_Tower = true; }
+        if (Input.GetKeyDown(KeyCode.U) && !keyPressed_Inhib) { IO_Inhib = Enum_IconOwner.Right; keyPressed_Inhib = true; }
+        if (Input.GetKeyDown(KeyCode.Y) && !keyPressed_Baron) { IO_Baron = Enum_IconOwner.Right; keyPressed_Baron = true; }
+
+        // Control icons each frame
+        if (IO_FirstBlood != Enum_IconOwner.None)
         {
-            if(IO_FirstBlood == Enum_IconOwner.Left) ActivateIcon(Enum_IconTypes.FirstBlood, Enum_IconOwner.Left, Time.deltaTime);
+            if (IO_FirstBlood == Enum_IconOwner.Left) ActivateIcon(Enum_IconTypes.FirstBlood, Enum_IconOwner.Left, Time.deltaTime);
             else ActivateIcon(Enum_IconTypes.FirstBlood, Enum_IconOwner.Right, Time.deltaTime);
         }
         if (IO_Dragon != Enum_IconOwner.None)
@@ -233,13 +268,21 @@ public class Cs_SystemManager : MonoBehaviour
             if (IO_Dragon == Enum_IconOwner.Left) ActivateIcon(Enum_IconTypes.Dragon, Enum_IconOwner.Left, Time.deltaTime);
             else ActivateIcon(Enum_IconTypes.Dragon, Enum_IconOwner.Right, Time.deltaTime);
         }
-
-        // Right Team Input
-        if (Input.GetKeyDown(KeyCode.P)) IO_FirstBlood = Enum_IconOwner.Right;
-        if (Input.GetKeyDown(KeyCode.O)) IO_Dragon = Enum_IconOwner.Right;
-        if (Input.GetKeyDown(KeyCode.I)) IO_Tower = Enum_IconOwner.Right;
-        if (Input.GetKeyDown(KeyCode.U)) IO_Inhib = Enum_IconOwner.Right;
-        if (Input.GetKeyDown(KeyCode.Y)) IO_Baron = Enum_IconOwner.Right;
+        if (IO_Tower != Enum_IconOwner.None)
+        {
+            if (IO_Tower == Enum_IconOwner.Left) ActivateIcon(Enum_IconTypes.Tower, Enum_IconOwner.Left, Time.deltaTime);
+            else ActivateIcon(Enum_IconTypes.Tower, Enum_IconOwner.Right, Time.deltaTime);
+        }
+        if (IO_Inhib != Enum_IconOwner.None)
+        {
+            if (IO_Inhib == Enum_IconOwner.Left) ActivateIcon(Enum_IconTypes.Inhib, Enum_IconOwner.Left, Time.deltaTime);
+            else ActivateIcon(Enum_IconTypes.Inhib, Enum_IconOwner.Right, Time.deltaTime);
+        }
+        if (IO_Baron != Enum_IconOwner.None)
+        {
+            if (IO_Baron == Enum_IconOwner.Left) ActivateIcon(Enum_IconTypes.Baron, Enum_IconOwner.Left, Time.deltaTime);
+            else ActivateIcon(Enum_IconTypes.Baron, Enum_IconOwner.Right, Time.deltaTime);
+        }
 
     }
 }
