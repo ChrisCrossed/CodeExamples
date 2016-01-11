@@ -45,6 +45,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Cs_TEST.cs" />
+     <Compile Include="Assets\Cs_TransparentWindow.cs" />
      <Compile Include="Assets\Scripts\CS_CameraController.cs" />
      <Compile Include="Assets\Scripts\CS_ImageParameters.cs" />
      <Compile Include="Assets\Scripts\Cs_SystemManager.cs" />
@@ -54,6 +56,9 @@
  </Reference>
  <Reference Include="UnityEngine.Networking">
  <HintPath>D:/Unity/Editor/Data/UnityExtensions/Unity/Networking/UnityEngine.Networking.dll</HintPath>
+ </Reference>
+ <Reference Include="System.Drawing">
+ <HintPath>D:/GIT_CodeExamples/CodeExamples/TournamentCaster/TournamentCaster/Assets/Plugins/System.Drawing.dll</HintPath>
  </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
