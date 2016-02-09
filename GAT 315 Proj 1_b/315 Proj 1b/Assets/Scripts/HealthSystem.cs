@@ -3,7 +3,7 @@ using System.Collections;
 
 public enum CharacterTypes
 {
-    Player, Enemy, Objective
+    Player, Turret, Objective, Boss
 }
 
 public class HealthSystem : MonoBehaviour
@@ -13,20 +13,33 @@ public class HealthSystem : MonoBehaviour
     int i_CurrHealth;
 
     // Store what type of object this is
-    public CharacterTypes charType = CharacterTypes.Enemy;
+    public CharacterTypes charType = CharacterTypes.Turret;
+
+    // Flash timers
+    float f_FlashModelTimer;
+    float f_Timer;
+    float f_Percent;
+    Color startColor;
 
     bool b_IsActive = true;
+    bool b_IsAlive = true;
 
 	// Use this for initialization
 	void Start ()
     {
+        if(gameObject.GetComponent<MeshRenderer>())
+        {
+            startColor = gameObject.GetComponent<MeshRenderer>().material.color;
+        }
+
         i_CurrHealth = i_MaxHealth;
+        f_FlashModelTimer = 1;
     }
 	
 	// Update is called once per frame
 	void Update ()
     {
-	
+        FlashModel();
 	}
 
     // When this object dies
@@ -36,7 +49,7 @@ public class HealthSystem : MonoBehaviour
 
         // If enemy dies...
 
-        GameObject.Destroy(gameObject);
+        // GameObject.Destroy(gameObject);
     }
 
     // Disable the object if it is an Objective
@@ -49,7 +62,7 @@ public class HealthSystem : MonoBehaviour
             if (gameObject.GetComponent<Cs_DoorLogic>()) gameObject.GetComponent<Cs_DoorLogic>().OpenDoor();
         }
 
-        if(charType == CharacterTypes.Enemy)
+        if(charType == CharacterTypes.Turret)
         {
             print("Got Here");
             gameObject.GetComponentInChildren<Cs_TurretAxel>().SetState(b_Status_);
@@ -62,6 +75,81 @@ public class HealthSystem : MonoBehaviour
     {
         i_CurrHealth -= i_DamageReceived_;
 
+        print(charType.ToString() + " has " + i_CurrHealth + " remaining");
+
         if (i_CurrHealth <= 0) OnDeath();
+    }
+
+    void FlashModel()
+    {
+        if (b_IsAlive)
+        {
+            if (i_CurrHealth > 0)
+            {
+                // Keep counting upward to compare against
+                if (f_FlashModelTimer <= 1) f_FlashModelTimer += Time.deltaTime;
+
+                if (f_FlashModelTimer < 0.2f)
+                {
+                    Color currColor = gameObject.GetComponent<MeshRenderer>().material.color;
+                    currColor.g = 1;
+                    currColor.b = 1;
+                    currColor.r = 0;
+                    currColor.a = 1;
+                    gameObject.GetComponent<MeshRenderer>().material.color = currColor;
+                }
+                else
+                {
+                    gameObject.GetComponent<MeshRenderer>().material.color = startColor;
+
+                    f_Timer += Time.deltaTime * 2;
+
+                    // Sin waves between 0 & 1
+                    f_Percent = (Mathf.Sin(f_Timer) / 2f) + 0.5f;
+
+                    var currPos = gameObject.GetComponent<MeshRenderer>().material.color;
+                    currPos.a = f_Percent;
+                    gameObject.GetComponent<MeshRenderer>().material.color = currPos;
+                }
+            }
+            else // Turns off the button
+            {
+                // Kill the boss
+                // TurnBoxOff();
+            }
+        }
+    }
+
+    void HealthCheckpoints()
+    {
+        if (i_CurrHealth > 20) print("Stage One");
+        if(i_CurrHealth == 20)
+        {
+            GameObject.Find("Boss_Wall_1").GetComponent<Cs_BossWallTrigger>().SetState(true);
+            GameObject.Find("Boss_Wall_2").GetComponent<Cs_BossWallTrigger>().SetState(true);
+        }
+        if(i_CurrHealth > 0 && i_CurrHealth <= 10)
+        {
+            print("Stage Three");
+        }
+        if(i_CurrHealth <= 0)
+        {
+            print("Stage Four");
+        }
+    }
+
+    void OnTriggerEnter(Collider collider_)
+    {
+        if(charType == CharacterTypes.Boss)
+        {
+            if (collider_.tag == "Laser")
+            {
+                ApplyDamage(1);
+
+                HealthCheckpoints();
+
+                f_FlashModelTimer = 0;
+            }
+        }
     }
 }

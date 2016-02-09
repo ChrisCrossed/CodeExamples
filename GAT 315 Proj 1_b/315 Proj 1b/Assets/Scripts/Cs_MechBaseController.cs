@@ -171,6 +171,7 @@ public class Cs_MechBaseController : MonoBehaviour
     {
         // Turn off the Toggle Stop if the player presses an acceleration button
         if (state.Triggers.Left >= 0.8f || state.Triggers.Right >= 0.8f) b_ToggleStop = false;
+        if (state.ThumbSticks.Right.Y >= 0.1f || state.ThumbSticks.Right.Y <= -0.1f) b_ToggleStop = false;
 
         // If the player presses 'X', then coast the Mech to a stop   
         if (state.Buttons.X == ButtonState.Pressed && prevState.Buttons.X == ButtonState.Released) b_ToggleStop = true;
@@ -255,8 +256,6 @@ public class Cs_MechBaseController : MonoBehaviour
             {
                 f_CurrSpeed = 0;
             }
-
-            print(gameObject.GetComponent<Rigidbody>().velocity.magnitude);
 
             gameObject.GetComponent<Rigidbody>().velocity = transform.forward * f_CurrSpeed;
             #endregion Toggle Stop
