@@ -19,31 +19,61 @@ enum RegionLocations
     NA, EUW, BR, EUNE, KR, LAN, LAS, OCE, RU, TR
 }
 
-public class Cs_PullRiotAPI : MonoBehaviour
+public class SummonerInfo
+{
+    public int summonerID;
+    public string name;
+    public int profileIconId;
+    public int summonerLevel;
+    public int revisionDate;
+}
+
+public class ShoutcasterInfo
 {
     // Match information (Holds the info to files)
-    int i_MatchID;
-    RegionLocations enum_RegionLocation;
-    string s_SaveAPIInfo;
+    public int i_MatchID;
+    public string s_SaveAPIInfo;
 
     // Caster Information
-    string s_CasterAPIKey;
-    string s_CasterUsername;
-    int i_CasterID;
+    public string s_CasterAPIKey;
+    public string s_CasterUsername;
+    public int summonerID;
+}
 
+public class PlayerData
+{
+    public ShoutcasterInfo shoutcaster = new ShoutcasterInfo();
+
+    // Red Team Information
+    public SummonerInfo player_Red_One   = new SummonerInfo();
+    public SummonerInfo player_Red_Two   = new SummonerInfo();
+    public SummonerInfo player_Red_Three = new SummonerInfo();
+    public SummonerInfo player_Red_Four  = new SummonerInfo();
+    public SummonerInfo player_Red_Five  = new SummonerInfo();
+
+    // Blue Team Information
+    public SummonerInfo player_Blue_One   = new SummonerInfo();
+    public SummonerInfo player_Blue_Two   = new SummonerInfo();
+    public SummonerInfo player_Blue_Three = new SummonerInfo();
+    public SummonerInfo player_Blue_Four  = new SummonerInfo();
+    public SummonerInfo player_Blue_Five  = new SummonerInfo();
+}
+
+public class Cs_PullRiotAPI : MonoBehaviour
+{
     WWW www_ApiRequest;
     bool b_IsDone = false;
 
-    // Red Team Information
+    RegionLocations enum_RegionLocation;
 
-    // Blue Team Information
+    PlayerData playerData = new PlayerData();
 
     // Use this for initialization
     void Start()
     {
         // Forcing in my own key to test. MUST replace later.
-        s_CasterAPIKey = "79ba48bc-e49a-4a64-a3ee-55ac3d012c24";
-        s_CasterUsername = "ChrisCrossed";
+        playerData.shoutcaster.s_CasterAPIKey = "79ba48bc-e49a-4a64-a3ee-55ac3d012c24";
+        playerData.shoutcaster.s_CasterUsername = "ChrisCrossed";
         enum_RegionLocation = RegionLocations.NA;
 
         // Before each match, find my summonerID based off my username.
@@ -74,20 +104,9 @@ public class Cs_PullRiotAPI : MonoBehaviour
                             enum_RegionLocation_.ToString() +
                             "/v1.4/summoner/by-name/" +
                             s_SummonerName_.ToString() + 
-                            "?api_key=" + s_CasterAPIKey;
+                            "?api_key=" + playerData.shoutcaster.s_CasterAPIKey;
 
-        APIRequest(s_LinkURL, true, TEST_GetSummonerID);
-    }
-    
-    void TEST_GetSummonerID(string s_SaveAPIInfo_)
-    {
-        // Store it so I can mess with it
-        string s_SaveAPIInfo = s_SaveAPIInfo_;
-
-        if(s_SaveAPIInfo.Contains("\"ID\":"))
-        {
-            print("True");
-        }
+        APIRequest(s_LinkURL, true);
     }
 
     /*******************************************************************************
@@ -103,7 +122,7 @@ public class Cs_PullRiotAPI : MonoBehaviour
          Outputs:   None
 
     *******************************************************************************/
-    void APIRequest(string s_WebAPILink_, bool b_IsNewRequest_, Action<string> OutputFunction_)
+    void APIRequest(string s_WebAPILink_, bool b_IsNewRequest_)
     {
         if(b_IsNewRequest_)
         {
@@ -117,10 +136,43 @@ public class Cs_PullRiotAPI : MonoBehaviour
         {
             if (www_ApiRequest.isDone && b_IsDone)
             {
-                s_SaveAPIInfo = www_ApiRequest.text;
-                // Doesn't work yet
-                // OutputFunction_(s_SaveAPIInfo);
+                playerData.shoutcaster.s_SaveAPIInfo = www_ApiRequest.text;
                 
+                // Sets the Caster Information (Nasty parsing ahead... had no choice)
+                if(playerData.shoutcaster.s_SaveAPIInfo.Contains("\"id\":"))
+                {
+                    // Start with a fresh string
+                    string testOutput;
+
+                    // Find the location of 'id' within the API string
+                    int startPos = playerData.shoutcaster.s_SaveAPIInfo.IndexOf("\"id\":") + 5;
+                    testOutput = playerData.shoutcaster.s_SaveAPIInfo.Substring(startPos);
+
+                    // Find the end location of the first piece of information
+                    startPos = testOutput.IndexOf(',');
+                    testOutput = testOutput.Substring(0, startPos);
+
+                    // Passes the information along
+                    playerData.shoutcaster.summonerID = int.Parse(testOutput);
+                    print(playerData.shoutcaster.summonerID);
+
+                    // **********************************************************************
+
+                    // Find the location of 'Name' within the API string
+                    print(playerData.shoutcaster.s_SaveAPIInfo);
+                    startPos = playerData.shoutcaster.s_SaveAPIInfo.IndexOf("\"name\":") + 8;
+                    testOutput = playerData.shoutcaster.s_SaveAPIInfo.Substring(startPos);
+
+                    // Cut off the remaining quotation marks
+                    startPos = testOutput.IndexOf("\",");
+                    testOutput = testOutput.Substring(0, startPos);
+
+                    // Store the name of the shoutcaster
+                    playerData.shoutcaster.s_CasterUsername = testOutput;
+                    print(playerData.shoutcaster.s_CasterUsername);
+                }
+                // {"id":35703666,"name":"ChrisCrossed","profileIconId":749,"summonerLevel":30,"revisionDate":1453107512000}
+
                 b_IsDone = false;
             }
         }
@@ -129,6 +181,6 @@ public class Cs_PullRiotAPI : MonoBehaviour
     // Update is called once per frame
     void Update ()
     {
-        APIRequest(null, false, null);
+        APIRequest(null, false);
     }
 }
