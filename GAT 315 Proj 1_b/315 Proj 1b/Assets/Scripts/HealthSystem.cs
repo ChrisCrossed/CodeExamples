@@ -122,13 +122,13 @@ public class HealthSystem : MonoBehaviour
 
     void HealthCheckpoints()
     {
-        if (i_CurrHealth > 20) print("Stage One");
-        if(i_CurrHealth == 20)
+        if (i_CurrHealth > 30) print("Stage One");
+        if(i_CurrHealth == 30)
         {
             GameObject.Find("Boss_Wall_1").GetComponent<Cs_BossWallTrigger>().SetState(true);
             GameObject.Find("Boss_Wall_2").GetComponent<Cs_BossWallTrigger>().SetState(true);
         }
-        if(i_CurrHealth > 0 && i_CurrHealth <= 10)
+        if(i_CurrHealth > 0 && i_CurrHealth <= 15)
         {
             print("Stage Three");
         }

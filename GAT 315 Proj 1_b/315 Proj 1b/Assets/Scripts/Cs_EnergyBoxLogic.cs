@@ -17,11 +17,18 @@ public class Cs_EnergyBoxLogic : MonoBehaviour
     {
         childModel = transform.FindChild("Mod_EnergyBox").gameObject;
         startColor = childModel.GetComponent<MeshRenderer>().material.color;
+
+        f_FlashModelTimer = 1;
     }
 	
 	// Update is called once per frame
 	void Update ()
     {
+        if(Input.GetKeyDown(KeyCode.L))
+        {
+            TurnBoxOn();
+        }
+
         FlashModel();
     }
 
@@ -68,6 +75,17 @@ public class Cs_EnergyBoxLogic : MonoBehaviour
         gameObject.GetComponent<HealthSystem>().SetObjectiveStatus(false);
     }
 
+    public void TurnBoxOn()
+    {
+        childModel.GetComponent<MeshRenderer>().material.color = startColor;
+
+        b_IsAlive = true;
+
+        EnableAllChildObjects();
+
+        gameObject.GetComponent<HealthSystem>().SetObjectiveStatus(true);
+    }
+
     void DisableAllChildObjects()
     {
         for(uint i = 0; i < ConnectedObjects.Length; ++i)
@@ -80,6 +98,22 @@ public class Cs_EnergyBoxLogic : MonoBehaviour
                 }
             }
         }
+    }
+
+    void EnableAllChildObjects()
+    {
+        for (uint i = 0; i < ConnectedObjects.Length; ++i)
+        {
+            if (ConnectedObjects[i] != null)
+            {
+                if (ConnectedObjects[i].GetComponent<HealthSystem>())
+                {
+                    ConnectedObjects[i].GetComponent<HealthSystem>().SetObjectiveStatus(true);
+                }
+            }
+        }
+
+        i_Health = 5;
     }
 
     void OnTriggerEnter(Collider collider_)
