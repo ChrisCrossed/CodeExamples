@@ -30,8 +30,6 @@ public class Cs_TurretAxel : MonoBehaviour
 
     public void SetState(bool b_Status_)
     {
-        print("Axel State: " + b_Status_);
-
         b_IsEnabled = b_Status_;
     }
 }

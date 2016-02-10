@@ -98,8 +98,6 @@ public class Cs_TurretJoint : MonoBehaviour
 
     public void SetTurretState(bool b_TurretState_)
     {
-        print("Turret State: " + b_TurretState_);
-
         // Reset the bullet timer if we're de-activating
         if (!b_TurretState_) f_FireTimer = 0;
 

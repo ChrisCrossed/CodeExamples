@@ -25,6 +25,7 @@ public class HealthSystem : MonoBehaviour
     float f_CountdownClock = 300;
     float f_DamageClock;
     float f_DeathTimer;
+    float f_HealTimer = 30.0f;
 
     bool b_IsActive = true;
     bool b_IsAlive = true;
@@ -41,6 +42,9 @@ public class HealthSystem : MonoBehaviour
         f_FlashModelTimer = 1;
 
         GameObject.Find("Text_Countdown").GetComponent<Text>().text = "";
+
+        // Start the 'bleed' system at 0
+        GameObject.Find("UI_Damage").GetComponent<Image>().color = new Color(1, 0, 0, 0);
     }
 	
 	// Update is called once per frame
@@ -83,6 +87,29 @@ public class HealthSystem : MonoBehaviour
 
         if (charType == CharacterTypes.Player)
         {
+            print(f_HealTimer);
+            // Heal player if enough time has passed
+            if(f_HealTimer > 0) f_HealTimer -= Time.deltaTime;
+
+            if (f_HealTimer <= 0 && i_CurrHealth < 100)
+            {
+                // Only applies healing once per second (60 seconds to full heal)
+                f_HealTimer = 3;
+
+                print("Heal 5 to: " + i_CurrHealth);
+                ApplyDamage(-5);
+            }
+
+            // Lerp the UI_Damage object's visability toward current health amount
+            // Find current alpha
+            float f_CurrVisability = GameObject.Find("UI_Damage").GetComponent<Image>().color.a;
+
+            // Lerp toward the percent of currHealth/maxHealth
+            float newVisability = Mathf.Lerp(f_CurrVisability, 1 - ((float)i_CurrHealth / (float)i_MaxHealth), 0.1f);
+            
+            GameObject.Find("UI_Damage").GetComponent<Image>().color = new Color(1, 0, 0, newVisability);
+
+
             if (i_CurrHealth <= 0) b_IsAlive = false;
 
             if(!b_IsAlive)
@@ -116,7 +143,6 @@ public class HealthSystem : MonoBehaviour
 
         if(charType == CharacterTypes.Turret)
         {
-            print("Got Here");
             gameObject.GetComponentInChildren<Cs_TurretAxel>().SetState(b_Status_);
             gameObject.GetComponentInChildren<Cs_TurretJoint>().SetTurretState(b_Status_);
         }
@@ -128,6 +154,16 @@ public class HealthSystem : MonoBehaviour
         i_CurrHealth -= i_DamageReceived_;
 
         print(charType.ToString() + " has " + i_CurrHealth + " remaining");
+
+        if(charType == CharacterTypes.Player && i_DamageReceived_ > 0)
+        {
+            f_HealTimer = 30f;
+        }
+
+        if(i_CurrHealth > 100)
+        {
+            i_CurrHealth = 100;
+        }
     }
 
     void FlashModel()

@@ -70,7 +70,7 @@ public class Cs_MechBaseController : MonoBehaviour
     public void EndGame()
     {
         b_ToggleStop = true;
-        state = GamePad.GetState(PlayerIndex.Three);
+        // state = GamePad.GetState(PlayerIndex.Three);
     }
 	
 	// Update is called once per frame
