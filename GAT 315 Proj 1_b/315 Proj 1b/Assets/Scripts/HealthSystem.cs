@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public enum CharacterTypes
 {
@@ -20,6 +22,9 @@ public class HealthSystem : MonoBehaviour
     float f_Timer;
     float f_Percent;
     Color startColor;
+    float f_CountdownClock = 300;
+    float f_DamageClock;
+    float f_DeathTimer;
 
     bool b_IsActive = true;
     bool b_IsAlive = true;
@@ -34,23 +39,70 @@ public class HealthSystem : MonoBehaviour
 
         i_CurrHealth = i_MaxHealth;
         f_FlashModelTimer = 1;
+
+        GameObject.Find("Text_Countdown").GetComponent<Text>().text = "";
     }
 	
 	// Update is called once per frame
 	void Update ()
     {
-        FlashModel();
+        if(charType == CharacterTypes.Boss) FlashModel();
+
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            if(charType == CharacterTypes.Boss)
+            {
+                ApplyDamage(10);
+            }
+        }
+
+        if(charType == CharacterTypes.Boss)
+        {
+            if(i_CurrHealth <= 0)
+            {
+                // Run the Countdown Clock
+                f_CountdownClock -= Time.deltaTime;
+
+                if(f_CountdownClock <= 0f)
+                {
+                    f_CountdownClock = 0;
+
+                    f_DamageClock += Time.deltaTime;
+                    if(f_DamageClock >= 0.1f)
+                    {
+                        f_DamageClock = 0;
+
+                        // Damage player by 5 points per second until they die
+                        GameObject.Find("Mech").GetComponent<HealthSystem>().ApplyDamage(5);
+                    }
+                }
+
+                GameObject.Find("Text_Countdown").GetComponent<Text>().text = "Time To Escape: " + f_CountdownClock.ToString("0.0");
+            }
+        }
+
+        if (charType == CharacterTypes.Player)
+        {
+            if (i_CurrHealth <= 0) b_IsAlive = false;
+
+            if(!b_IsAlive)
+            {
+                // GameObject.Find("Canvas").SetActive(false);
+                GameObject.Find("Mech").GetComponent<Cs_MechBaseController>().EndGame();
+
+                // Begin dimming the lights
+                f_DeathTimer += Time.deltaTime;
+                var currColor = GameObject.Find("EndGame").GetComponent<MeshRenderer>().material.color;
+                currColor.a = f_DeathTimer;
+                GameObject.Find("EndGame").GetComponent<MeshRenderer>().material.color = currColor;
+
+                if (f_DeathTimer >= 5.0f)
+                {
+                    SceneManager.LoadScene("Level_MainMenu");
+                }
+            }
+        }
 	}
-
-    // When this object dies
-    void OnDeath()
-    {
-        // If player dies...
-
-        // If enemy dies...
-
-        // GameObject.Destroy(gameObject);
-    }
 
     // Disable the object if it is an Objective
     public void SetObjectiveStatus(bool b_Status_)
@@ -76,8 +128,6 @@ public class HealthSystem : MonoBehaviour
         i_CurrHealth -= i_DamageReceived_;
 
         print(charType.ToString() + " has " + i_CurrHealth + " remaining");
-
-        if (i_CurrHealth <= 0) OnDeath();
     }
 
     void FlashModel()
@@ -100,25 +150,21 @@ public class HealthSystem : MonoBehaviour
                 }
                 else
                 {
-                    gameObject.GetComponent<MeshRenderer>().material.color = startColor;
+                    if(gameObject.GetComponent<MeshRenderer>())
+                    {
+                        gameObject.GetComponent<MeshRenderer>().material.color = startColor;
 
-                    f_Timer += Time.deltaTime * 2;
+                        f_Timer += Time.deltaTime * 2;
 
-                    // Sin waves between 0 & 1
-                    f_Percent = (Mathf.Sin(f_Timer) / 2f) + 0.5f;
+                        // Sin waves between 0 & 1
+                        f_Percent = (Mathf.Sin(f_Timer) / 2f) + 0.5f;
 
-                    var currPos = gameObject.GetComponent<MeshRenderer>().material.color;
-                    currPos.a = f_Percent;
-                    gameObject.GetComponent<MeshRenderer>().material.color = currPos;
+                        var currPos = gameObject.GetComponent<MeshRenderer>().material.color;
+                        currPos.a = f_Percent;
+                        gameObject.GetComponent<MeshRenderer>().material.color = currPos;
+                    }
+
                 }
-            }
-            else // Turns off the button
-            {
-                // Kill the boss
-                
-                // Turn on all turrets (Minus the ones in the boss room)
-
-                // Run the Countdown Clock
             }
         }
     }
@@ -146,6 +192,17 @@ public class HealthSystem : MonoBehaviour
 
             GameObject.Find("Boss_Wall_1").GetComponent<Cs_BossWallTrigger>().EndGame();
             GameObject.Find("Boss_Wall_2").GetComponent<Cs_BossWallTrigger>().EndGame();
+
+            GameObject.Find("Text_Countdown").SetActive(true);
+
+            // Enable Turrets
+            GameObject.Find("EnergyBox_Test_0").GetComponent<Cs_EnergyBoxLogic>().TurnBoxOn();
+            GameObject.Find("EnergyBox_Test_1").GetComponent<Cs_EnergyBoxLogic>().TurnBoxOn();
+            GameObject.Find("EnergyBox_Test_2").GetComponent<Cs_EnergyBoxLogic>().TurnBoxOn();
+            GameObject.Find("EnergyBox_Test_3").GetComponent<Cs_EnergyBoxLogic>().TurnBoxOn();
+            GameObject.Find("EnergyBox_Turret_1").GetComponent<Cs_EnergyBoxLogic>().TurnBoxOn();
+            GameObject.Find("EnergyBox_Inside_1").GetComponent<Cs_EnergyBoxLogic>().TurnBoxOn();
+            GameObject.Find("EnergyBox_Inside_2").GetComponent<Cs_EnergyBoxLogic>().TurnBoxOn();
         }
     }
 
