@@ -12,11 +12,15 @@ public class Cs_EnergyBoxLogic : MonoBehaviour
     public int i_Health = 5;
     bool b_IsAlive = true;
 
+    public bool b_StartDisabled;
+
 	// Use this for initialization
 	void Start ()
     {
         childModel = transform.FindChild("Mod_EnergyBox").gameObject;
         startColor = childModel.GetComponent<MeshRenderer>().material.color;
+
+        if (b_StartDisabled) TurnBoxOff();
 
         f_FlashModelTimer = 1;
     }
@@ -84,6 +88,8 @@ public class Cs_EnergyBoxLogic : MonoBehaviour
         EnableAllChildObjects();
 
         gameObject.GetComponent<HealthSystem>().SetObjectiveStatus(true);
+
+        f_FlashModelTimer = 1;
     }
 
     void DisableAllChildObjects()

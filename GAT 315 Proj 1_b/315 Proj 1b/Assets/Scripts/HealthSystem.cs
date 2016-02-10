@@ -115,7 +115,10 @@ public class HealthSystem : MonoBehaviour
             else // Turns off the button
             {
                 // Kill the boss
-                // TurnBoxOff();
+                
+                // Turn on all turrets (Minus the ones in the boss room)
+
+                // Run the Countdown Clock
             }
         }
     }
@@ -125,16 +128,24 @@ public class HealthSystem : MonoBehaviour
         if (i_CurrHealth > 30) print("Stage One");
         if(i_CurrHealth == 30)
         {
+            print("Stage Two");
             GameObject.Find("Boss_Wall_1").GetComponent<Cs_BossWallTrigger>().SetState(true);
             GameObject.Find("Boss_Wall_2").GetComponent<Cs_BossWallTrigger>().SetState(true);
         }
-        if(i_CurrHealth > 0 && i_CurrHealth <= 15)
+        if(i_CurrHealth == 15 || i_CurrHealth == 5)
         {
             print("Stage Three");
+
+            GameObject.Find("EnergyBox_Boss_2").GetComponent<Cs_EnergyBoxLogic>().TurnBoxOn();
+            GameObject.Find("EnergyBox_Boss_1").GetComponent<Cs_EnergyBoxLogic>().TurnBoxOn();
         }
         if(i_CurrHealth <= 0)
         {
             print("Stage Four");
+            GameObject.Find("EscapeHatch").GetComponent<Cs_DoorLogic>().OpenDoor();
+
+            GameObject.Find("Boss_Wall_1").GetComponent<Cs_BossWallTrigger>().EndGame();
+            GameObject.Find("Boss_Wall_2").GetComponent<Cs_BossWallTrigger>().EndGame();
         }
     }
 
