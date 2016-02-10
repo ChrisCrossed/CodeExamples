@@ -46,9 +46,17 @@ public class Cs_MechTurretController : MonoBehaviour
     // Game Paused State
     bool b_IsPaused;
 
+    // SFX
+    public AudioClip sfx_FireLaser;
+    public AudioClip sfx_LaserHit;
+    public AudioSource audioSource;
+
     // Use this for initialization
     void Start ()
     {
+        // SFX
+        audioSource = GetComponent<AudioSource>();
+
         // Set the Mech
         mechBase = GameObject.Find("Mech");
 
@@ -73,6 +81,8 @@ public class Cs_MechTurretController : MonoBehaviour
 
         // Max out the shoot timer so they can fire right away
         f_FireTimer = f_TimeToFire;
+
+        audioSource.Play();
     }
 	
 	// Update is called once per frame
@@ -197,7 +207,9 @@ public class Cs_MechTurretController : MonoBehaviour
         if (Physics.Raycast(ray, out hit) && hit.transform.tag == "Wall")
         {
             // Play Laser SFX
-            // audioSource.PlayOneShot(sfx_Laser, 0.5f);
+            audioSource.PlayOneShot(sfx_FireLaser, 0.4f);
+            // audioSource.PlayOneShot(sfx_LaserHit, 0.4f);
+            audioSource.PlayDelayed(0.1f);
 
             if (b_FireLeftGun)
             {

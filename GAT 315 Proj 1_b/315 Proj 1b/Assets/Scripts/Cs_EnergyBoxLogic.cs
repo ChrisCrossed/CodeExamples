@@ -5,6 +5,10 @@ public class Cs_EnergyBoxLogic : MonoBehaviour
 {
     public GameObject[] ConnectedObjects = new GameObject[5];
 
+    // SFX
+    public AudioClip sfx_BoxPowerDown;
+    AudioSource audioSource;
+
     GameObject childModel;
     float f_FlashModelTimer = 0.1f;
     Color startColor;
@@ -23,6 +27,8 @@ public class Cs_EnergyBoxLogic : MonoBehaviour
         if (b_StartDisabled) TurnBoxOff();
 
         f_FlashModelTimer = 1;
+
+        audioSource = GameObject.Find("Mech_Turret").GetComponent<Cs_MechTurretController>().audioSource;
     }
 	
 	// Update is called once per frame
@@ -126,10 +132,10 @@ public class Cs_EnergyBoxLogic : MonoBehaviour
     {
         if (collider_.tag == "Laser")
         {
+            audioSource.PlayOneShot(sfx_BoxPowerDown, 0.5f);
+
             i_Health -= 1;
             f_FlashModelTimer = 0;
         }
-
-        // GameObject.Destroy(gameObject);
     }
 }

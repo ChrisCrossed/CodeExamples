@@ -22,16 +22,20 @@ public class HealthSystem : MonoBehaviour
     float f_Timer;
     float f_Percent;
     Color startColor;
-    float f_CountdownClock = 300;
+    float f_CountdownClock = 120;
     float f_DamageClock;
     float f_DeathTimer;
-    float f_HealTimer = 30.0f;
+    float f_HealTimer = 10.0f;
 
     bool b_IsActive = true;
     bool b_IsAlive = true;
 
-	// Use this for initialization
-	void Start ()
+    // SFX
+    public AudioClip sfx_LaserHit;
+    AudioSource audioSource;
+
+    // Use this for initialization
+    void Start ()
     {
         if(gameObject.GetComponent<MeshRenderer>())
         {
@@ -45,6 +49,8 @@ public class HealthSystem : MonoBehaviour
 
         // Start the 'bleed' system at 0
         GameObject.Find("UI_Damage").GetComponent<Image>().color = new Color(1, 0, 0, 0);
+
+        audioSource = GameObject.Find("Mech_Turret").GetComponent<Cs_MechTurretController>().audioSource;
     }
 	
 	// Update is called once per frame
@@ -64,6 +70,11 @@ public class HealthSystem : MonoBehaviour
         {
             if(i_CurrHealth <= 0)
             {
+                if(GameObject.Find("EscapeHatch"))
+                {
+                    GameObject.Find("EscapeHatch").GetComponent<Cs_DoorLogic>().OpenDoor();
+                }
+
                 // Run the Countdown Clock
                 f_CountdownClock -= Time.deltaTime;
 
@@ -87,7 +98,6 @@ public class HealthSystem : MonoBehaviour
 
         if (charType == CharacterTypes.Player)
         {
-            print(f_HealTimer);
             // Heal player if enough time has passed
             if(f_HealTimer > 0) f_HealTimer -= Time.deltaTime;
 
@@ -157,7 +167,7 @@ public class HealthSystem : MonoBehaviour
 
         if(charType == CharacterTypes.Player && i_DamageReceived_ > 0)
         {
-            f_HealTimer = 30f;
+            f_HealTimer = 10f;
         }
 
         if(i_CurrHealth > 100)
@@ -248,6 +258,8 @@ public class HealthSystem : MonoBehaviour
         {
             if (collider_.tag == "Laser")
             {
+                audioSource.PlayOneShot(sfx_LaserHit);
+
                 ApplyDamage(1);
 
                 HealthCheckpoints();

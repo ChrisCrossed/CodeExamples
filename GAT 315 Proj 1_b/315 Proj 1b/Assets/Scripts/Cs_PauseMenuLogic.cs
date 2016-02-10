@@ -21,17 +21,26 @@ public class Cs_PauseMenuLogic : MonoBehaviour
     GameObject mechBase;
     GameObject turretBase;
 
+    // SFX
+    public AudioClip sfx_MenuChoice;
+    public AudioClip sfx_MenuSelect;
+    AudioSource audioSource;
+
     // Use this for initialization
     void Start ()
     {
         mechBase = GameObject.Find("Mech");
         turretBase = GameObject.Find("Mech_Turret");
-	}
+
+        audioSource = turretBase.GetComponent<Cs_MechTurretController>().audioSource;
+    }
 	
 	// Update is called once per frame
 	void Update ()
     {
-        if(!b_QuitConfirm)
+        if(audioSource == null) audioSource = turretBase.GetComponent<Cs_MechTurretController>().audioSource;
+
+        if (!b_QuitConfirm)
         {
             #region Lerp Position
         Vector3 newPos = go_Selector.GetComponent<RectTransform>().transform.position;
@@ -57,6 +66,8 @@ public class Cs_PauseMenuLogic : MonoBehaviour
 
     public void TogglePause()
     {
+        audioSource.PlayOneShot(sfx_MenuChoice);
+
         // Toggle the pause state.
         b_IsPaused = !b_IsPaused;
 
@@ -76,6 +87,8 @@ public class Cs_PauseMenuLogic : MonoBehaviour
 
     public void ChangePauseOption(bool b_GoUp_)
     {
+        audioSource.PlayOneShot(sfx_MenuChoice);
+
         if (b_GoUp_) ui_CurrChoice -= 1;
         if (!b_GoUp_) ui_CurrChoice += 1;
         if (ui_CurrChoice < 1) ui_CurrChoice = 1;
@@ -84,7 +97,9 @@ public class Cs_PauseMenuLogic : MonoBehaviour
 
     public void ConfirmPauseOption(bool b_IsConfirmQuit_)
     {
-        if(!b_QuitConfirm && b_IsConfirmQuit_)
+        audioSource.PlayOneShot(sfx_MenuSelect);
+
+        if (!b_QuitConfirm && b_IsConfirmQuit_)
         {
             if (ui_CurrChoice == 1) TogglePause(); // Play Game
             if (ui_CurrChoice == 2) ; // How To Play
