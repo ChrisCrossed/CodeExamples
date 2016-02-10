@@ -80,6 +80,7 @@
   <ItemGroup>
     <Compile Include="Assets\6by7\ProGrids\Classes\pg_Util.cs" />
     <Compile Include="Assets\Cs_EndGameTrigger.cs" />
+    <Compile Include="Assets\Cs_InfoScreenLogic.cs" />
     <Compile Include="Assets\ProCore\ProBuilder\API Examples\Instantiation\ProBuilderInstantiate.cs" />
     <Compile Include="Assets\ProCore\ProBuilder\API Examples\Misc\HueCube.cs" />
     <Compile Include="Assets\ProCore\ProBuilder\API Examples\Runtime Editing\RuntimeEdit.cs" />

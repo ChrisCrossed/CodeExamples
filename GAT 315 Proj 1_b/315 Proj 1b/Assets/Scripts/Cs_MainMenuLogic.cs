@@ -147,8 +147,8 @@ public class Cs_MainMenuLogic : MonoBehaviour
     void SelectMenuOption()
     {
         if (i_CurrChoice == 1) SceneManager.LoadScene("Level_1"); // Play Game
-        if (i_CurrChoice == 2) ; // How To Play
-        if (i_CurrChoice == 3) ; // Controls
+        if (i_CurrChoice == 2) SceneManager.LoadScene("Info_HowToPlay"); ; // How To Play
+        if (i_CurrChoice == 3) SceneManager.LoadScene("Info_Controls_Driver"); ; // Controls
         if (i_CurrChoice == 4) b_QuitConfirm = true; // Quit Game
     }
 }

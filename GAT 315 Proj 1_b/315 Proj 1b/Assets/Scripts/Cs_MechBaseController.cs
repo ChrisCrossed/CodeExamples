@@ -28,7 +28,7 @@ public class Cs_MechBaseController : MonoBehaviour
     public float f_YPos = 0.5f;
 
     // Boolean States
-    bool b_IsPaused;
+    bool b_IsPaused = false;
     bool b_ToggleStop;
     bool b_DriveMode;
 
@@ -76,6 +76,8 @@ public class Cs_MechBaseController : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
     {
+        print(b_IsPaused);
+
         if(gameObject.GetComponent<Rigidbody>().velocity == Vector3.zero)
         {
             f_CurrSpeed = 0;

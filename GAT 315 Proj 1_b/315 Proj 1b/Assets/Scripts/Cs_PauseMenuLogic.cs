@@ -6,6 +6,7 @@ public class Cs_PauseMenuLogic : MonoBehaviour
 {
     // Current States
     bool b_IsPaused = false;
+    bool b_HowToPlay = false;
     uint ui_CurrChoice = 1;
     bool b_QuitConfirm = false;
 
@@ -16,6 +17,10 @@ public class Cs_PauseMenuLogic : MonoBehaviour
     public GameObject go_HowToPlay;
     public GameObject go_Quit;
     public GameObject go_QuitConfirm;
+    public GameObject ui_HowToPlay1;
+    public GameObject ui_HowToPlay2;
+    public GameObject ui_HowToPlay3;
+    int i_HowToPlay;
 
     // Player Objects
     GameObject mechBase;
@@ -33,40 +38,57 @@ public class Cs_PauseMenuLogic : MonoBehaviour
         turretBase = GameObject.Find("Mech_Turret");
 
         audioSource = turretBase.GetComponent<Cs_MechTurretController>().audioSource;
+
+        TogglePause();
+        TogglePause();
     }
 	
 	// Update is called once per frame
 	void Update ()
     {
-        if(audioSource == null) audioSource = turretBase.GetComponent<Cs_MechTurretController>().audioSource;
+        if (audioSource == null) audioSource = turretBase.GetComponent<Cs_MechTurretController>().audioSource;
 
-        if (!b_QuitConfirm)
+        if (!b_QuitConfirm && !b_HowToPlay)
         {
             #region Lerp Position
-        Vector3 newPos = go_Selector.GetComponent<RectTransform>().transform.position;
+            Vector3 newPos = go_Selector.GetComponent<RectTransform>().transform.position;
 
-        if (ui_CurrChoice == 1)
-        {
-            newPos.y = go_ResumeGame.GetComponent<RectTransform>().transform.position.y;
-        }
-        else if (ui_CurrChoice == 2)
-        {
-            newPos.y = go_HowToPlay.GetComponent<RectTransform>().transform.position.y;
+            if (ui_CurrChoice == 1)
+            {
+                newPos.y = go_ResumeGame.GetComponent<RectTransform>().transform.position.y;
+            }
+            else if (ui_CurrChoice == 2)
+            {
+                newPos.y = go_HowToPlay.GetComponent<RectTransform>().transform.position.y;
+            }
+            else
+            {
+                newPos.y = go_Quit.GetComponent<RectTransform>().transform.position.y;
+            }
+
+            go_Selector.GetComponent<RectTransform>().transform.position = Vector3.Lerp(go_Selector.GetComponent<RectTransform>().transform.position, newPos, 0.1f);
+            #endregion
         }
         else
         {
-            newPos.y = go_Quit.GetComponent<RectTransform>().transform.position.y;
-        }
+            if(b_QuitConfirm) go_QuitConfirm.SetActive(true);
+            else // How To Play
+            {
+                ui_HowToPlay1.SetActive(false);
+                ui_HowToPlay2.SetActive(false);
+                ui_HowToPlay3.SetActive(false);
 
-        go_Selector.GetComponent<RectTransform>().transform.position = Vector3.Lerp(go_Selector.GetComponent<RectTransform>().transform.position, newPos, 0.1f);
-        #endregion
+                if (i_HowToPlay == 0) ui_HowToPlay1.SetActive(true);
+                if (i_HowToPlay == 1) ui_HowToPlay2.SetActive(true);
+                if (i_HowToPlay == 2) ui_HowToPlay3.SetActive(true);
+                if (i_HowToPlay > 2) b_HowToPlay = false;
+            }
         }
-        else go_QuitConfirm.SetActive(true);
     }
 
     public void TogglePause()
     {
-        audioSource.PlayOneShot(sfx_MenuChoice);
+        if(audioSource != null) audioSource.PlayOneShot(sfx_MenuChoice);
 
         // Toggle the pause state.
         b_IsPaused = !b_IsPaused;
@@ -99,11 +121,15 @@ public class Cs_PauseMenuLogic : MonoBehaviour
     {
         audioSource.PlayOneShot(sfx_MenuSelect);
 
-        if (!b_QuitConfirm && b_IsConfirmQuit_)
+        if (!b_QuitConfirm && b_IsConfirmQuit_ && !b_HowToPlay)
         {
             if (ui_CurrChoice == 1) TogglePause(); // Play Game
-            if (ui_CurrChoice == 2) ; // How To Play
+            if (ui_CurrChoice == 2) { b_HowToPlay = true; i_HowToPlay = 0; } // How To Play
             if (ui_CurrChoice == 3) b_QuitConfirm = true; // Quit Confirm
+        }
+        else if(b_HowToPlay)
+        {
+            ++i_HowToPlay;
         }
         else // Quit Confirm up
         {

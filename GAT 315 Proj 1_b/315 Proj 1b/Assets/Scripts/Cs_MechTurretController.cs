@@ -44,7 +44,7 @@ public class Cs_MechTurretController : MonoBehaviour
     bool b_ResetTurretRotation;
 
     // Game Paused State
-    bool b_IsPaused;
+    bool b_IsPaused = false;
 
     // SFX
     public AudioClip sfx_FireLaser;
