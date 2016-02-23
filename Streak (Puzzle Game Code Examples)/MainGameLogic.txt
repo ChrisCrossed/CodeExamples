@@ -1,0 +1,617 @@
+/*******************************************************************************/
+/*
+\file    Main Game Logic (GitHub edit)
+\author  Christopher Christensen (C.Christensen)
+\date    4/27/2015
+
+\ For simpler readability within Sublime or other platform, treat the script as if C#.
+
+\ Table of Contents:
+    \ LoadInitialization (Line 99) - Process that is called from a different script that initializes the game based on different difficulties
+    \ Create2x2 (Line 174) - Populates an array with the 2x2 blocks for the game, passing future block info to the HUD
+    \ DetermineScoreLine (Line 350) - Sets a seed for the ScoreLine iterative pathfinding
+    \ ScoreLine (Line 403) - Contains the entire iterative pathfinding process, determining if a path exists.
+
+\brief   The entire main game logic. Creates block patterns, manage/manipulate them, score accordingly.
+*/  
+/*******************************************************************************/
+
+class Z_LevelSettings : ZilchComponent
+{
+    sends IncrementScore : Event;
+    sends IncrementBoosts : Event;
+    sends DecrementBoosts : Event;
+    sends LoadRandomThemeNow : Event;
+    sends OnGameRequestQuit : GameEvent;
+    sends GameTimeLength : Event;
+    sends CheckTimer : Event;
+    sends HUDTimer_GameOver : Event;
+    
+    // Set the level's height and width
+    [Property]
+    var I_LevelWidth:Integer = 16;
+    [Property]
+    var I_LevelHeight:Integer = 10;
+    
+    [Property]
+    var R_BLOCK_TIMER_SECONDS:Real = 0.75;
+    var B_IsUnlimitedMode:Boolean = false;
+    
+    var R_Timer:Real = 0;
+    var R_ButtonTimer:Real = 0;
+    
+    var Rand:Random = new Random();
+    
+    var ArchBlock:Archetype = Archetype.Find("Block");
+    
+    var BoardGrid:Array[Array[Cog]] = new Array[Array[Cog]]();
+    var PathfindingArray:Array[Real2] = new Array[Real2]();
+    var ScoreArray:Array[Real2] = new Array[Real2]();
+    var B_FoundSolution:Boolean = false;
+    
+    var B_AllowedToCheck:Boolean = true;
+    var B_AllowedToMoveBlocks:Boolean = true;
+    
+    var I_RecCheck:Integer = 0;
+    
+    var I_Score:Integer = 0;
+    var I_SpeedUpBasedOnScore:Integer = 0;
+    
+    [Property]
+    var I_NumBoosts:Integer = 3;
+    var I_TimeLengthMinutes:Integer = 0;
+    var ScoreToAddBoost:Integer = 250;
+    
+    var ScoreCheck:Integer = 0;
+    
+    var PauseReason:Enum_PauseReason = Enum_PauseReason.GameBegin;
+    
+    var B_BoostUsed:Boolean = false;
+    var BoostType:Enum_BlockType = Enum_BlockType.None;
+    var BoostArray:Array[Real2] = new Array[Real2]();
+    
+    var NextBlockArray:Array[Enum_BlockType] = new Array[Enum_BlockType]();
+    var SoundArray:Array[Cog] = new Array[Cog](16);
+    
+    // Game Over block X/Y
+    var I_GO_X:Integer = 1;
+    var I_GO_Y:Integer = 0;
+    
+    var I_PathfindingCheck:Integer = 0;
+    
+    var ScoreboardSpace : Space = null;
+    var ScoreboardLevel : Level = null;
+    
+    var GameModeType : Enum_ScoreboardType = Enum_ScoreboardType.Normal_5;
+    
+    /*******************************************************************************/
+    /*
+        Description:
+            Initializes the level with preset details (for Easy, Medium & Hard mode).
+            This initialization script is called from the Main Menu.
+        
+        Parameters:
+            - levelWidth (Integer): Number of board spaces within the level (Horizontal)
+            - levelHeight (Integer): Number of board spaces within the level (Vertical)
+            - blockDropSpeed (Real): Time (in seconds) to wait until a block drops
+            - startingBoosts (Integer): Number of Boosts the player begins with
+            - scoreUntilBoost (Integer): How many points the player needs to score until they earn another boost
+            
+        Return:
+            - None
+    */
+    /*******************************************************************************/
+    function LoadInitialization(levelWidth : Integer, levelHeight : Integer, blockDropSpeed : Real, startingBoosts : Integer, moveCameraX : Real, timeLengthMinutes : Integer)
+    {
+        this.I_LevelWidth = levelWidth;
+        this.I_LevelHeight = levelHeight;
+        this.R_BLOCK_TIMER_SECONDS = blockDropSpeed;
+        this.I_NumBoosts = startingBoosts;
+        this.ScoreToAddBoost = 250;
+        
+        this.ScoreboardSpace = this.GameSession.CreateNamedSpace("LevelSpace", Archetype.Find("Space"));
+        this.ScoreboardLevel = Level.Find("Game_Scoreboard");
+        this.ScoreboardSpace = this.GameSession.FindSpaceByName("LevelSpace");
+        
+        this.DetermineGamemodeType(levelWidth, levelHeight, timeLengthMinutes);
+        
+        if(timeLengthMinutes > 0)
+        {
+            this.B_IsUnlimitedMode = false;
+        }
+        else
+        {
+            this.B_IsUnlimitedMode = true;
+        }
+        
+        if(!this.B_IsUnlimitedMode)
+        {
+            var dispatchTimeLength = new SendsTimeLength(); ///
+            dispatchTimeLength.TimeLength = timeLengthMinutes * 60;
+            Console.WriteLine("Time Sent: `dispatchTimeLength.TimeLength`");
+            this.GameSession.DispatchEvent(Events.GameTimeLength, dispatchTimeLength);
+        }
+        
+        var newCamPos = this.Space.FindObjectByName("Camera").Transform.Translation;
+        newCamPos.X += moveCameraX;
+        this.Space.FindObjectByName("Camera").Transform.Translation = newCamPos;
+        
+        this.I_LevelWidth += 2;
+        
+        this.CreateWalls();
+        
+        // Generate the board (Y Axis)
+        for(var y = 0; y < this.I_LevelHeight; ++y)
+        {
+            this.BoardGrid.Add(new Array[Cog]());
+        }
+        
+        // Generate the board (X Axis)
+        for(var y = 0; y < this.I_LevelHeight; ++y)
+        {
+            for(var x = 0; x < this.I_LevelWidth; ++x)
+            {
+                // Get the Y first, then set the X
+                var archBlock = this.Space.CreateAtPosition(Archetype.Find("Block"), Real3(x + 0.5, y + 0.5, 0));
+                archBlock.Z_BlockLogic.BlockType = Enum_BlockType.None;
+                this.BoardGrid.Get(y).Push(archBlock);
+            }
+        }
+        
+        Zero.Connect(this.Space, Events.LogicUpdate, this.OnLogicUpdate);
+        Zero.Connect(this.GameSession, Events.GameRequestQuit, this.OnGameRequestQuit);
+        Zero.Connect(this.GameSession, Events.TimerGameOver, this.OnTimerGameOver);
+    }
+    
+	/*******************************************************************************/
+    /*
+        Description:
+            This function creates an array of two 2x2 blocks. The 2nd block's description is pushed out to the HUD to show the future block.
+            Each time a new block is called to be created, the array pushes the blocks through and then creates a new 2x2 block.
+        
+        Parameters:
+            - None
+            
+        Return:
+            - None
+    */
+    /*******************************************************************************/
+    function Create2x2()
+    {
+    	// Creates two 2x2 blocks.
+        if(this.NextBlockArray.Count < 8)
+        {
+            for(var i = this.NextBlockArray.Count; i < 8; ++i)
+            {
+                if(this.Rand.CoinFlip())
+                {
+                    this.NextBlockArray.Push(Enum_BlockType.Block_One_Active);
+                }
+                else
+                {
+                    this.NextBlockArray.Push(Enum_BlockType.Block_Two_Active);
+                }
+            }
+        }
+        
+        // First, check to see any of the dead center top pieces of the grid are empty
+        if( this.BoardGrid.Get(this.I_LevelHeight - 1).Get((this.I_LevelWidth / 2) - 1).Z_BlockLogic.BlockType == Enum_BlockType.None   || 
+            this.BoardGrid.Get(this.I_LevelHeight - 1).Get(this.I_LevelWidth / 2).Z_BlockLogic.BlockType == Enum_BlockType.None         || 
+            this.BoardGrid.Get(this.I_LevelHeight - 2).Get((this.I_LevelWidth / 2) - 1).Z_BlockLogic.BlockType == Enum_BlockType.None   || 
+            this.BoardGrid.Get(this.I_LevelHeight - 2).Get(this.I_LevelWidth / 2).Z_BlockLogic.BlockType == Enum_BlockType.None          )
+            {
+                // If they are empty, randomly set the four positions to be an active piece
+                for(var i = 0; i < this.NextBlockArray.Count; ++i)
+                {
+                    if(i < 4) // because we are checking through 4 blocks
+                    {
+                        // Get an arbitrary block
+                        var testBlock = this.BoardGrid.Get(0).Get(0);
+                        
+                        // Reverted to a hard-coded check due to smoking out a bug. Never switched back.
+                        if(i == 0)
+                        {
+                            testBlock = this.BoardGrid.Get(this.I_LevelHeight - 2).Get((this.I_LevelWidth / 2) - 1);
+                        }
+                        else if(i == 1)
+                        {
+                            testBlock = this.BoardGrid.Get(this.I_LevelHeight - 2).Get(this.I_LevelWidth / 2);
+                        }
+                        else if(i == 2)
+                        {
+                            testBlock = this.BoardGrid.Get(this.I_LevelHeight - 1).Get((this.I_LevelWidth / 2) - 1);
+                        }
+                        else if(i == 3)
+                        {
+                            testBlock = this.BoardGrid.Get(this.I_LevelHeight - 1).Get(this.I_LevelWidth / 2);
+                        }
+                        
+                        testBlock.Z_BlockLogic.BlockType = this.NextBlockArray.Get(i);
+                    }
+                    else
+                    {
+                    	// The following four 'if' statements send events based on what the second block in the array is comprised of.
+                    	// As of this code's creation, the ability to send an event with parameters did not exist, but was added to the engine
+                    	// by the end of the project submission date.
+                        if(i == 4)
+                        {
+                            if(this.NextBlockArray.Get(i) == Enum_BlockType.Block_One_Active)
+                            {
+                                this.GameSession.DispatchEvent(Events.HUDBlock_BottomLeft_BlockOne, new Event());
+                            }
+                            else
+                            {
+                                this.GameSession.DispatchEvent(Events.HUDBlock_BottomLeft_BlockTwo, new Event());
+                            }
+                        }
+                        else if(i == 5)
+                        {
+                            if(this.NextBlockArray.Get(i) == Enum_BlockType.Block_One_Active)
+                            {
+                                this.GameSession.DispatchEvent(Events.HUDBlock_BottomRight_BlockOne, new Event());
+                            }
+                            else
+                            {
+                                this.GameSession.DispatchEvent(Events.HUDBlock_BottomRight_BlockTwo, new Event());
+                            }
+                        }
+                        else if(i == 6)
+                        {
+                            if(this.NextBlockArray.Get(i) == Enum_BlockType.Block_One_Active)
+                            {
+                                this.GameSession.DispatchEvent(Events.HUDBlock_TopLeft_BlockOne, new Event());
+                            }
+                            else
+                            {
+                                this.GameSession.DispatchEvent(Events.HUDBlock_TopLeft_BlockTwo, new Event());
+                            }
+                        }
+                        else if(i == 7)
+                        {
+                            if(this.NextBlockArray.Get(i) == Enum_BlockType.Block_One_Active)
+                            {
+                                this.GameSession.DispatchEvent(Events.HUDBlock_TopRight_BlockOne, new Event());
+                            }
+                            else
+                            {
+                                this.GameSession.DispatchEvent(Events.HUDBlock_TopRight_BlockTwo, new Event());
+                            }
+                        }
+                    }
+                } // End ForLoop
+            } // End If
+        
+            
+        // If not empty, re-populate the top four slots of the array with random static blocks
+        else
+        {
+            // If they are empty, randomly set the four positions to be an active piece
+            for(var i = 0; i <= 4; ++i)
+            {
+                // Get an arbitrary block
+                var testBlock = this.BoardGrid.Get(this.I_LevelHeight - 1).Get((this.I_LevelWidth / 2) - 1);
+                var runTest = false;
+                
+                if(i == 1 && this.BoardGrid.Get(this.I_LevelHeight - 1).Get((this.I_LevelWidth / 2) - 1).Z_BlockLogic.BlockType == Enum_BlockType.None)
+                {
+                    runTest = true;
+                }
+                else if(i == 2 && this.BoardGrid.Get(this.I_LevelHeight - 1).Get(this.I_LevelWidth / 2).Z_BlockLogic.BlockType == Enum_BlockType.None)
+                {
+                    testBlock = this.BoardGrid.Get(this.I_LevelHeight - 1).Get(this.I_LevelWidth / 2);
+                    runTest = true;
+                }
+                else if(i == 3 && this.BoardGrid.Get(this.I_LevelHeight - 2).Get((this.I_LevelWidth / 2) - 1).Z_BlockLogic.BlockType == Enum_BlockType.None)
+                {
+                    testBlock = this.BoardGrid.Get(this.I_LevelHeight - 2).Get((this.I_LevelWidth / 2) - 1);
+                    runTest = true;
+                }
+                else if(i == 4 && this.BoardGrid.Get(this.I_LevelHeight - 2).Get(this.I_LevelWidth / 2).Z_BlockLogic.BlockType == Enum_BlockType.None)
+                {
+                    testBlock = this.BoardGrid.Get(this.I_LevelHeight - 2).Get(this.I_LevelWidth / 2);
+                    runTest = true;
+                }
+                
+                if(runTest)
+                {
+                    if(this.Rand.CoinFlip())
+                    {
+                        testBlock.Z_BlockLogic.BlockType = Enum_BlockType.Block_One_Static;
+                    }
+                    else
+                    {
+                        testBlock.Z_BlockLogic.BlockType = Enum_BlockType.Block_Two_Static;
+                    }
+                } // End 'If'-tests
+            } // End ForLoop
+            
+            // Run EndGame
+            this.PauseReason = Enum_PauseReason.GameOver;
+            this.GameSession.DispatchEvent(Events.HUDTimer_GameOver, new Event());
+        }
+        
+        // Clearing the first four positions of the array
+        for(var j = 0; j < 4; ++j)
+        {
+            this.NextBlockArray.RemoveAt(0);
+        }
+    }
+   
+    /*******************************************************************************/
+    /*
+        Description:
+            This function begins the iterative pathfinding through the grid.
+            Due to the Zero Engine having a recursive limit depth of 30, I was required to switch
+            to an iterative loop as it loops for up to 5 seconds.
+            DetermineScoreLine feeds a starting point into an array before looping through ScoreLine.
+        
+        Parameters:
+            - None
+            
+        Return:
+            - None
+    */
+    /*******************************************************************************/
+    function DetermineScoreLine():Boolean
+    {
+        this.ScoreArray = new Array[Real2]();
+        
+        this.B_FoundSolution = false;
+        
+        // blockCheck is tested to ensure that the new block being the compared is not the same as the previous color
+        // That way, we help the recursion checks not occur for *all* blocks, but only *new* blocks.
+        var blockCheck:Enum_BlockType = Enum_BlockType.None;
+        
+        // Begin checking for a score line only if the left-most column has a block in it.
+        for(var y = 0; y < this.I_LevelHeight; ++y)
+        {
+            if(blockCheck != this.BoardGrid.Get(y).Get(1).Z_BlockLogic.BlockType)
+            {
+                blockCheck = this.BoardGrid.Get(y).Get(1).Z_BlockLogic.BlockType;
+                
+                // Clear the array here since this is a brand new attempt to find a line
+                this.PathfindingArray = new Array[Real2]();
+                
+                if( this.BoardGrid.Get(y).Get(1).Z_BlockLogic.BlockType == Enum_BlockType.Block_One_Static ||
+                    this.BoardGrid.Get(y).Get(1).Z_BlockLogic.BlockType == Enum_BlockType.Block_Two_Static)
+                    {
+                        this.PathfindingArray.Push(Real2(1, y));
+                        
+                        if(this.ScoreLine(Enum_MoveDirection.Right))
+                        {
+                            return true;
+                        }
+                    }
+            }
+        }
+        return false;
+    }
+
+    /*******************************************************************************/
+    /*
+        Description:
+            ScoreLine is the Meat and Potatoes of my game.
+            It runs an iterative loop (previously recursive) searching for a possible end
+            through the 'maze'. This is why an A-star algorithm was not attempted, as I neede
+            to check on whether a solution even existed.
+            The function loops through itself, being passed a seed from DetermineScoreLine.
+        
+        Parameters:
+            - None
+            
+        Return:
+            - None
+    */
+    /*******************************************************************************/
+    function ScoreLine(currDir : Enum_MoveDirection):Boolean
+	{
+		// Simply a hard-coded number since it is impossible to have a line this long.
+		// (Seriously. It is longer than a perfect path for maximum points.)
+	    if(this.PathfindingArray.Count >= 29)
+	    {
+	        return false;
+	    }
+    
+        // We need to initiate a check to ensure every line has at least one block in it first.
+        // This was changed from (this.LevelWidth - 1, i >= 0) into the current form due to the side wall mechanic.
+        for(var i = this.I_LevelWidth - 2; i >= 1; --i)
+        {
+            if(this.BoardGrid.Get(0).Get(i).Z_BlockLogic.BlockType == Enum_BlockType.None)
+            {
+                return false;
+            }
+        }
+    
+        // Start with the last position in the array
+        var currPos:Real2 = this.PathfindingArray.Get(this.PathfindingArray.Count - 1);
+        
+        // Check the x coordinate of the current position to determine if we are done
+        // This was changed from (this.I_LevelWidth as Integer - 1) due to the side wall mechanic
+        if(currPos.X == this.I_LevelWidth as Integer - 2)
+        {
+            for(var i = 0; i < this.PathfindingArray.Count; ++i)
+            {
+                this.ScoreArray.Push(this.PathfindingArray.Get(i));
+            }
+            
+            this.ApplyScore(this.ScoreArray);
+            
+            this.PauseReason = Enum_PauseReason.ScoreLine;
+            
+            this.B_AllowedToCheck = true;
+            
+            return true;
+        }
+        else // We have determined that we need to continue down the line
+        {
+            var blockType = this.BoardGrid.Get(currPos.Y as Integer).Get(currPos.X as Integer).Z_BlockLogic.BlockType;
+            
+            // Begin the check process to determine what locations to check
+            // Now that we have the initial position to check against, we find all touching locations
+            var rightFilled:Boolean = false;
+            var belowFilled:Boolean = false;
+            var aboveFilled:Boolean = false;
+            var leftFilled:Boolean  = false;
+            
+            // If the space to the right exists AND
+            // If the space to the right has the same block type AND
+            // We are searching anywhere but where we came from
+            if( currPos.X as Integer + 1 < this.I_LevelWidth &&
+                this.BoardGrid.Get(currPos.Y as Integer).Get(currPos.X as Integer + 1).Z_BlockLogic.BlockType == blockType &&
+                currDir != Enum_MoveDirection.Left)
+            {
+                rightFilled = true;
+            }
+            
+            // If the space below exists AND
+            // If the space below has the same block type AND
+            // We are searching anywhere but where we came from
+            if( currPos.Y as Integer - 1 >= 0 &&
+                this.BoardGrid.Get(currPos.Y as Integer - 1).Get(currPos.X as Integer).Z_BlockLogic.BlockType == blockType &&
+                currDir != Enum_MoveDirection.Up)
+            {
+                belowFilled = true;
+            }
+            
+            // If the space above exists AND
+            // If the space above has the same block type AND
+            // We are searching anywhere but where we came from
+            if( (currPos.Y as Integer + 1) < this.I_LevelHeight &&
+                this.BoardGrid.Get(currPos.Y as Integer + 1).Get(currPos.X as Integer).Z_BlockLogic.BlockType == blockType &&
+                currDir != Enum_MoveDirection.Down)
+            {
+                aboveFilled = true;
+            }
+            
+            
+            // If the space to the left exists AND
+            // If the space to the left has the same block type AND
+            // We are searching anywhere but where we came from
+            if( currPos.X as Integer - 1 >= 0 &&
+                this.BoardGrid.Get(currPos.Y as Integer).Get(currPos.X as Integer - 1).Z_BlockLogic.BlockType == blockType &&
+                currDir != Enum_MoveDirection.Right)
+                {
+                    leftFilled = true;
+                }
+                
+            var shouldContinue = true;
+                
+            if(rightFilled)
+            {
+                var rightAbove:Real2 = Real2(currPos.X as Integer + 1, currPos.Y as Integer + 1);
+                var rightBelow:Real2 = Real2(currPos.X as Integer + 1, currPos.Y as Integer - 1);
+                
+                // Check to see if the adjacent positions to the above spot are within the array EXCEPT the last position
+                for(var i = 0; i < this.PathfindingArray.Count; ++i)
+                {
+                    if( this.PathfindingArray.Get(i) == rightAbove ||
+                        this.PathfindingArray.Get(i) == rightBelow ) // Spot above and to the left lies within the array
+                    {
+                        // Console.WriteLine("At `currPos`, going `currDir`, problem at `this.PathfindingArray.Get(i)`");
+                        // return false;
+                        shouldContinue = false;
+                    }
+                }
+                
+                if(shouldContinue)
+                {
+                    this.PathfindingArray.Push(Real2(currPos.X as Integer + 1, currPos.Y as Integer));
+                    
+                    if(this.ScoreLine(Enum_MoveDirection.Right))
+                    {
+                        return true;
+                    }
+                }
+            }
+            
+            shouldContinue = true;
+            
+            // Since the space below is populated, we need to check if it is within the array already
+            if(belowFilled)
+            {
+                var belowLeft:Real2  = Real2(currPos.X as Integer - 1, currPos.Y as Integer - 1);
+                var belowRight:Real2 = Real2(currPos.X as Integer + 1, currPos.Y as Integer - 1);
+                
+                // Check to see if the adjacent positions to the above spot are within the array EXCEPT the last position
+                for(var i = 0; i < this.PathfindingArray.Count; ++i)
+                {
+                    if( this.PathfindingArray.Get(i) == belowLeft ||
+                        this.PathfindingArray.Get(i) == belowRight ) // Spot above and to the left lies within the array
+                    {
+                        // Console.WriteLine("At `currPos`, going `currDir`, problem at `this.PathfindingArray.Get(i)`");
+                        // return false;
+                        shouldContinue = false;
+                    }
+                }
+                
+                if(shouldContinue)
+                {
+                    this.PathfindingArray.Push(Real2(currPos.X as Integer, currPos.Y as Integer - 1));
+                    
+                    if(this.ScoreLine(Enum_MoveDirection.Down))
+                    {
+                        return true;
+                    }
+                }
+            }
+            
+            shouldContinue = true;
+            
+            if(aboveFilled)
+            {
+                var aboveLeft:Real2  = Real2(currPos.X as Integer - 1, currPos.Y as Integer + 1);
+                var aboveRight:Real2 = Real2(currPos.X as Integer + 1, currPos.Y as Integer + 1);
+                
+                // Check to see if the adjacent positions to the above spot are within the array EXCEPT the last position
+                for(var i = 0; i < this.PathfindingArray.Count; ++i)
+                {
+                    if( this.PathfindingArray.Get(i) == aboveLeft ||
+                        this.PathfindingArray.Get(i) == aboveRight ) // Spot above and to the left lies within the array
+                    {
+                        shouldContinue = false;
+                    }
+                }
+                
+                if(shouldContinue)
+                {
+                    this.PathfindingArray.Push(Real2(currPos.X as Integer, currPos.Y as Integer + 1));
+                    if(this.ScoreLine(Enum_MoveDirection.Up))
+                    {
+                        return true;
+                    }
+                }
+            }
+            
+            shouldContinue = true;
+            
+            if(leftFilled)
+            {
+                var leftAbove:Real2 = Real2(currPos.X as Integer - 1, currPos.Y as Integer + 1);
+                var leftBelow:Real2 = Real2(currPos.X as Integer - 1, currPos.Y as Integer - 1);
+                
+                // Check to see if the adjacent positions to the above spot are within the array EXCEPT the last position
+                for(var i = 0; i < this.PathfindingArray.Count; ++i)
+                {
+                    if( this.PathfindingArray.Get(i) == leftAbove ||
+                        this.PathfindingArray.Get(i) == leftBelow ) // Spot above and to the left lies within the array
+                    {
+                        // Console.WriteLine("At `currPos`, going `currDir`, problem at `this.PathfindingArray.Get(i)`");
+                        shouldContinue = false;
+                    }
+                }
+                
+                if(shouldContinue)
+                {
+                    this.PathfindingArray.Push(Real2(currPos.X as Integer - 1, currPos.Y as Integer));
+                    
+                    if(this.ScoreLine(Enum_MoveDirection.Left))
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+        this.PathfindingArray.Pop();
+        
+        return false;
+    }
