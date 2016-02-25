@@ -1,11 +1,9 @@
-#define PROTOTYPE
 using UnityEditor;
 using UnityEngine;
 using ProBuilder2.MeshOperations;
 using System.Collections.Generic;
 using System.Linq;
 using ProBuilder2.Common;
-using ProBuilder2.EditorCommon;
 
 namespace ProBuilder2.Actions
 {

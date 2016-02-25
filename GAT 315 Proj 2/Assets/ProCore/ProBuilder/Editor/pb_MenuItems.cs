@@ -1,4 +1,3 @@
-#define PROTOTYPE
 using UnityEngine;
 using UnityEditor;
 using System.Collections;
@@ -17,7 +16,7 @@ public class pb_MenuItems : EditorWindow
 	[MenuItem("Tools/" + pb_Constant.PRODUCT_NAME + "/About", false, 0)]
 	public static void MenuInitAbout()
 	{
-		pb_AboutWindow.Init("Assets/ProCore/ProBuilder/About/pc_AboutEntry_ProBuilder.txt", true);
+		pb_AboutWindow.Init("Assets/ProCore/" + pb_Constant.PRODUCT_NAME + "/About/pc_AboutEntry_ProBuilder.txt", true);
 	}
 
 	[MenuItem("Tools/" + pb_Constant.PRODUCT_NAME + "/Documentation", false, 0)]
@@ -42,7 +41,7 @@ public class pb_MenuItems : EditorWindow
 	public static void InitVertexColorEditor()
 	{
 		// bool openInDockableWindow = !pb_Preferences_Internal.GetBool(pb_Constant.pbDefaultOpenInDockableWindow);
-		EditorWindow.GetWindow<pb_Vertex_Color_Toolbar>(true, "Vertex Colors", true);
+		EditorWindow.GetWindow<pb_VertexColorInterface>(true, "Vertex Colors", true);
 	}
 
 	/**
@@ -55,6 +54,49 @@ public class pb_MenuItems : EditorWindow
 #endregion
 
 #region ProBuilder/Edit
+
+	[MenuItem("Tools/" + pb_Constant.PRODUCT_NAME + "/Editor/Toggle Edit Level", false, pb_Constant.MENU_EDITOR + 0)]
+	public static void ToggleEditLevel()
+	{
+		editor.ToggleEditLevel();
+		switch(editor.editLevel)
+		{
+			case EditLevel.Top:
+				pb_Editor_Utility.ShowNotification("Top Level Editing");
+				break;
+
+			case EditLevel.Geometry:
+				pb_Editor_Utility.ShowNotification("Geometry Editing");
+				break;
+		}
+	}
+
+	[MenuItem("Tools/" + pb_Constant.PRODUCT_NAME + "/Editor/Toggle Selection Mode", false, pb_Constant.MENU_EDITOR + 1)]
+	public static void ToggleSelectMode()
+	{
+		editor.ToggleSelectionMode();
+		switch(editor.selectionMode)
+		{
+			case SelectMode.Face:
+				pb_Editor_Utility.ShowNotification("Editing Faces");
+				break;
+
+			case SelectMode.Vertex:
+				pb_Editor_Utility.ShowNotification("Editing Vertices");
+				break;
+
+			case SelectMode.Edge:
+				pb_Editor_Utility.ShowNotification("Editing Edges\n(Beta!)");
+				break;
+		}
+	}
+
+	[MenuItem("Tools/" + pb_Constant.PRODUCT_NAME + "/Editor/Toggle Handle Coordinates", false, pb_Constant.MENU_EDITOR + 2)]
+	public static void ToggleHandleAlignment()
+	{
+		editor.ToggleHandleAlignment();		
+		pb_Editor_Utility.ShowNotification("Handle Alignment: " + ((HandleAlignment)editor.handleAlignment).ToString());
+	}
 
 	[MenuItem("Tools/" + pb_Constant.PRODUCT_NAME + "/Editor/Lightmap Settings Window", false, pb_Constant.MENU_EDITOR + 3)]
 	public static void LightmapWindowInit()
@@ -82,52 +124,52 @@ public class pb_MenuItems : EditorWindow
 
 	[MenuItem("Tools/" + pb_Constant.PRODUCT_NAME + "/Vertex Colors/Set Selected Faces to Preset 1 &#1", false, pb_Constant.MENU_VERTEX_COLORS)]
 	public static void MenuSetVertexColorPreset1() {
-		pb_Vertex_Color_Toolbar.SetFaceColors(1);
+		pb_VertexColorInterface.SetFaceColors(1);
 	}
 
 	[MenuItem("Tools/" + pb_Constant.PRODUCT_NAME + "/Vertex Colors/Set Selected Faces to Preset 2 &#2", false, pb_Constant.MENU_VERTEX_COLORS)]
 	public static void MenuSetVertexColorPreset2() {
-		pb_Vertex_Color_Toolbar.SetFaceColors(2);
+		pb_VertexColorInterface.SetFaceColors(2);
 	}
 
 	[MenuItem("Tools/" + pb_Constant.PRODUCT_NAME + "/Vertex Colors/Set Selected Faces to Preset 3 &#3", false, pb_Constant.MENU_VERTEX_COLORS)]
 	public static void MenuSetVertexColorPreset3() {
-		pb_Vertex_Color_Toolbar.SetFaceColors(3);
+		pb_VertexColorInterface.SetFaceColors(3);
 	}
 
 	[MenuItem("Tools/" + pb_Constant.PRODUCT_NAME + "/Vertex Colors/Set Selected Faces to Preset 4 &#4", false, pb_Constant.MENU_VERTEX_COLORS)]
 	public static void MenuSetVertexColorPreset4() {
-		pb_Vertex_Color_Toolbar.SetFaceColors(4);
+		pb_VertexColorInterface.SetFaceColors(4);
 	}
 
 	[MenuItem("Tools/" + pb_Constant.PRODUCT_NAME + "/Vertex Colors/Set Selected Faces to Preset 5 &#5", false, pb_Constant.MENU_VERTEX_COLORS)]
 	public static void MenuSetVertexColorPreset5() {
-		pb_Vertex_Color_Toolbar.SetFaceColors(5);
+		pb_VertexColorInterface.SetFaceColors(5);
 	}
 
 	[MenuItem("Tools/" + pb_Constant.PRODUCT_NAME + "/Vertex Colors/Set Selected Faces to Preset 6 &#6", false, pb_Constant.MENU_VERTEX_COLORS)]
 	public static void MenuSetVertexColorPreset6() {
-		pb_Vertex_Color_Toolbar.SetFaceColors(6);
+		pb_VertexColorInterface.SetFaceColors(6);
 	}
 
 	[MenuItem("Tools/" + pb_Constant.PRODUCT_NAME + "/Vertex Colors/Set Selected Faces to Preset 7 &#7", false, pb_Constant.MENU_VERTEX_COLORS)]
 	public static void MenuSetVertexColorPreset7() {
-		pb_Vertex_Color_Toolbar.SetFaceColors(7);
+		pb_VertexColorInterface.SetFaceColors(7);
 	}
 
 	[MenuItem("Tools/" + pb_Constant.PRODUCT_NAME + "/Vertex Colors/Set Selected Faces to Preset 8 &#8", false, pb_Constant.MENU_VERTEX_COLORS)]
 	public static void MenuSetVertexColorPreset8() {
-		pb_Vertex_Color_Toolbar.SetFaceColors(8);
+		pb_VertexColorInterface.SetFaceColors(8);
 	}
 
 	[MenuItem("Tools/" + pb_Constant.PRODUCT_NAME + "/Vertex Colors/Set Selected Faces to Preset 9 &#9", false, pb_Constant.MENU_VERTEX_COLORS)]
 	public static void MenuSetVertexColorPreset9() {
-		pb_Vertex_Color_Toolbar.SetFaceColors(9);
+		pb_VertexColorInterface.SetFaceColors(9);
 	}
 
 	[MenuItem("Tools/" + pb_Constant.PRODUCT_NAME + "/Vertex Colors/Set Selected Faces to Preset 0 &#0", false, pb_Constant.MENU_VERTEX_COLORS)]
 	public static void MenuSetVertexColorPreset0() {
-		pb_Vertex_Color_Toolbar.SetFaceColors(0);
+		pb_VertexColorInterface.SetFaceColors(0);
 	}
 #endregion
 }

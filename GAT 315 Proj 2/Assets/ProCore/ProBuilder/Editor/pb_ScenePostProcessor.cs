@@ -1,74 +1,46 @@
-#define PROTOTYPE
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEditor;
 using UnityEditor.Callbacks;
 using ProBuilder2.Common;
-using ProBuilder2.MeshOperations;
-using System.Linq;
 
-namespace ProBuilder2.EditorCommon
+/**
+ * When building the project, remove all references to pb_Objects.
+ */
+public class pb_ScenePostProcessor
 {
+	[PostProcessScene]
+	public static void OnPostprocessScene()
+	{ 
+		if(EditorApplication.isPlayingOrWillChangePlaymode)
+			return;
 
-	/**
-	 * When building the project, remove all references to pb_Objects.
-	 */
-	public class pb_ScenePostProcessor
-	{
-		[PostProcessScene]
-		public static void OnPostprocessScene()
-		{ 
-			Material invisibleFaceMaterial = (Material)Resources.Load("Materials/InvisibleFace");
+		foreach(pb_Object pb in GameObject.FindObjectsOfType(typeof(pb_Object)))
+		{
+			// /**
+			//  * Hide nodraw faces if present.  Don't call 'ToMesh' on objects that are statically batched since
+			//  * batching runs pre-PostProcessScene and will break the combined mesh.
+			//  */
+			// if(pb.containsNodraw && !pb.GetComponent<MeshRenderer>().isPartOfStaticBatch)
+			// {
+			// 	pb.ToMesh(true);
+			// 	pb.Refresh();
+			// }
 
-			/**
-			 * Hide nodraw faces if present.
-			 */
-			foreach(pb_Object pb in GameObject.FindObjectsOfType(typeof(pb_Object)))
-			{
-				if(pb.GetComponent<MeshRenderer>() == null)
-					continue;
+			GameObject go = pb.gameObject;
 
-				if( pb.GetComponent<MeshRenderer>().sharedMaterials.Any(x => x != null && x.name.Contains("NoDraw")) )
-				{
-					Material[] mats = pb.GetComponent<MeshRenderer>().sharedMaterials;
+			pb_Entity entity = pb.gameObject.GetComponent<pb_Entity>();
 
-					for(int i = 0; i < mats.Length; i++)
-					{
-						if(mats[i].name.Contains("NoDraw"))	
-							mats[i] = invisibleFaceMaterial;
-					}
+			if(entity.entityType == EntityType.Collider || entity.entityType == EntityType.Trigger)	
+				go.GetComponent<MeshRenderer>().enabled = false;
 
-					pb.GetComponent<MeshRenderer>().sharedMaterials = mats;
-				}
-			}
+			if(!pb_Preferences_Internal.GetBool(pb_Constant.pbStripProBuilderOnBuild))
+			   return;
 
-			if(EditorApplication.isPlayingOrWillChangePlaymode)
-				return;
+			pb.dontDestroyMeshOnDelete = true;
+			
+			GameObject.DestroyImmediate( pb );
+			GameObject.DestroyImmediate( go.GetComponent<pb_Entity>() );
 
-			foreach(pb_Object pb in GameObject.FindObjectsOfType(typeof(pb_Object)))
-			{
-				GameObject go = pb.gameObject;
-
-				pb_Entity entity = pb.gameObject.GetComponent<pb_Entity>();
-
-				if( entity == null )
-					continue;
-
-				if(entity.entityType == EntityType.Collider || entity.entityType == EntityType.Trigger)	
-					go.GetComponent<MeshRenderer>().enabled = false;
-
-				// clear hideflags on prefab meshes
-				if(pb.msh != null)
-					pb.msh.hideFlags = HideFlags.None;
-
-				if(!pb_Preferences_Internal.GetBool(pb_Constant.pbStripProBuilderOnBuild))
-				   return;
-
-				pb.dontDestroyMeshOnDelete = true;
-				
-				GameObject.DestroyImmediate( pb );
-				GameObject.DestroyImmediate( go.GetComponent<pb_Entity>() );
-
-			}
 		}
 	}
 }
