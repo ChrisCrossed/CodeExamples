@@ -79,6 +79,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\6by7\ProGrids\Classes\pg_Util.cs" />
+    <Compile Include="Assets\Cs_EnemyController.cs" />
     <Compile Include="Assets\Cs_LightWallLogic.cs" />
     <Compile Include="Assets\ProCore\ProBuilder\API Examples\Instantiation\ProBuilderInstantiate.cs" />
     <Compile Include="Assets\ProCore\ProBuilder\API Examples\Misc\HueCube.cs" />

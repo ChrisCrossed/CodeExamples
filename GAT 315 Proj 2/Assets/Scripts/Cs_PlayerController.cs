@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 using XInputDotNetPure; // Controller input
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 enum CurrentGear
 {
@@ -38,9 +40,19 @@ public class Cs_PlayerController : MonoBehaviour
     int lightWallName = 0;
     float f_NewWallTimer;
 
+    float f_EndGameTimer;
+    bool b_IsGameOver;
+    public GameObject Text_YouLose;
+
+    bool b_Beginning = true;
+    public GameObject Text_Timer;
+    float f_BeginningTimer = 4.5f;
+
     // Use this for initialization
     void Start ()
     {
+        UnityEngine.Cursor.visible = false;
+
         f_CurrSpeed = 0f;
 
         enum_CurrGear = CurrentGear.Off;
@@ -56,32 +68,85 @@ public class Cs_PlayerController : MonoBehaviour
 
         playerLightWall = Instantiate(GO_LightWall, oldWallRef.transform.position, newWallRef.transform.rotation) as GameObject;
         lastWallMade = playerLightWall.name;
+
+        Text_YouLose.SetActive(false);
+        Text_Timer.SetActive(true);
     }
 
 	// Update is called once per frame
 	void Update ()
     {
-        prevState = state;
-        state = GamePad.GetState(playerIndex);
+        if(f_BeginningTimer > -0.1) f_BeginningTimer -= Time.deltaTime;
 
-        if(enum_CurrGear != CurrentGear.Off)
+        if (f_BeginningTimer <= 0.0f)
         {
-            Update_Speed();
-            TurnCycle();
+            Text_Timer.GetComponent<Text>().enabled = false;
         }
 
-        if (state.Buttons.A == ButtonState.Pressed && prevState.Buttons.A == ButtonState.Released && enum_CurrGear == CurrentGear.Off)
+        if(b_Beginning)
         {
-            enum_CurrGear = CurrentGear.Zero;
-            SetGearMinMax(0);
-            ToggleDriveMode();
+            Text_Timer.GetComponent<Text>().text = string.Format("{0:0}", f_BeginningTimer - 1);
 
-            f_CurrSpeed = f_MaxSpeed_GearZero;
+            if (f_BeginningTimer <= 1.5f)
+            {
+                Text_Timer.GetComponent<Text>().text = "Go!";
+
+                enum_CurrGear = CurrentGear.Zero;
+                SetGearMinMax(0);
+                ToggleDriveMode();
+
+                f_CurrSpeed = f_MaxSpeed_GearZero;
+                b_Beginning = false;
+            }
         }
 
-        if(!b_DriveMode)
+        if(!b_IsGameOver)
         {
-            PlaceWall();
+            prevState = state;
+            state = GamePad.GetState(playerIndex);
+
+            if (state.Buttons.Start == ButtonState.Pressed && prevState.Buttons.Start == ButtonState.Released)
+            {
+                b_IsGameOver = true;
+
+                gameObject.GetComponent<Renderer>().enabled = false;
+                gameObject.GetComponent<BoxCollider>().enabled = false;
+                gameObject.GetComponent<Rigidbody>().velocity = gameObject.transform.forward * 0;
+
+                Text_YouLose.GetComponent<Text>().text = "Cheater!";
+                Text_YouLose.SetActive(true);
+            }
+
+            if(enum_CurrGear != CurrentGear.Off)
+            {
+                Update_Speed();
+                TurnCycle();
+            }
+
+            /*
+            if (state.Buttons.A == ButtonState.Pressed && prevState.Buttons.A == ButtonState.Released && enum_CurrGear == CurrentGear.Off)
+            {
+                enum_CurrGear = CurrentGear.Zero;
+                SetGearMinMax(0);
+                ToggleDriveMode();
+
+                f_CurrSpeed = f_MaxSpeed_GearZero;
+            }
+            */
+
+            if(!b_DriveMode)
+            {
+                PlaceWall();
+            }
+        }
+        else
+        {
+            f_EndGameTimer += Time.deltaTime;
+
+            if(f_EndGameTimer >= 5.0f)
+            {
+                SceneManager.LoadScene(0);
+            }
         }
 	}
 
@@ -243,7 +308,14 @@ public class Cs_PlayerController : MonoBehaviour
 
     void Crash()
     {
-        Destroy(gameObject);
+        // Destroy(gameObject);
+        gameObject.GetComponent<Renderer>().enabled = false;
+        gameObject.GetComponent<BoxCollider>().enabled = false;
+        gameObject.GetComponent<Rigidbody>().velocity = gameObject.transform.forward * 0;
+
+        Text_YouLose.SetActive(true);
+
+        b_IsGameOver = true;
     }
 
 	void OnCollisionEnter(Collision collision_)

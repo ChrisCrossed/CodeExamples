@@ -24,6 +24,8 @@ public class Cs_TitleScreenLogic : MonoBehaviour
     // Use this for initialization
     void Start ()
     {
+        UnityEngine.Cursor.visible = false;
+
         // Enable DigiPen Logos
         DigiPenLogo.SetActive(true);
         DigiPenText.SetActive(true);
@@ -83,6 +85,11 @@ public class Cs_TitleScreenLogic : MonoBehaviour
             prevState_two = state_two;
             state_two = GamePad.GetState(playerIndex_Two);
             // If either player presses 'A', start game
+
+            if(state_one.Buttons.Start == ButtonState.Pressed && prevState_one.Buttons.Start == ButtonState.Released)
+            {
+                Application.Quit();
+            }
 
             if(state_one.Buttons.A == ButtonState.Pressed && prevState_one.Buttons.A == ButtonState.Released)
             {
