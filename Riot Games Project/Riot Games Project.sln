@@ -1,7 +1,7 @@
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2008
-
-Project("{B164EAE7-B884-D88F-0795-606D31368D70}") = "Riot Games Project", "Assembly-CSharp.csproj", "{13F57BA7-0088-D465-B85F-C40169284134}"
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2015
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Riot Games Project.CSharp", "Riot Games Project.CSharp.csproj", "{54FFD7C8-6609-F311-6B06-9EE9F62A7724}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -9,15 +9,12 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{13F57BA7-0088-D465-B85F-C40169284134}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{13F57BA7-0088-D465-B85F-C40169284134}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{13F57BA7-0088-D465-B85F-C40169284134}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{13F57BA7-0088-D465-B85F-C40169284134}.Release|Any CPU.Build.0 = Release|Any CPU
+		{54FFD7C8-6609-F311-6B06-9EE9F62A7724}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{54FFD7C8-6609-F311-6B06-9EE9F62A7724}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{54FFD7C8-6609-F311-6B06-9EE9F62A7724}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{54FFD7C8-6609-F311-6B06-9EE9F62A7724}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = Assembly-CSharp.csproj
 	EndGlobalSection
 EndGlobal

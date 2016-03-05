@@ -5,7 +5,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{ADFE0661-9032-F0E8-AC3B-48F174733300}</ProjectGuid>
+    <ProjectGuid>{54FFD7C8-6609-F311-6B06-9EE9F62A7724}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AssemblyName>Assembly-CSharp</AssemblyName>
     <FileAlignment>512</FileAlignment>
@@ -58,23 +58,23 @@
     <Reference Include="UnityEngine.Networking">
       <HintPath>Library\UnityAssemblies\UnityEngine.Networking.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.Networking">
+      <HintPath>Library\UnityAssemblies\UnityEngine.Networking.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>Library\UnityAssemblies\UnityEngine.UI.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEditor">
       <HintPath>Library\UnityAssemblies\UnityEditor.dll</HintPath>
     </Reference>
-    <Reference Include="System.Drawing">
-      <HintPath>Assets\Plugins\System.Drawing.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Cs_MenuManager.cs" />
-    <Compile Include="Assets\Cs_TournamentInfo.cs" />
-    <Compile Include="Assets\Scripts\CS_CameraController.cs" />
-    <Compile Include="Assets\Scripts\CS_ImageParameters.cs" />
-    <Compile Include="Assets\Scripts\Cs_PullRiotAPI.cs" />
-    <Compile Include="Assets\Scripts\Cs_SystemManager.cs" />
-    <Compile Include="Assets\Scripts\Cs_TEST.cs" />
-    <Compile Include="Assets\Scripts\Cs_TextPosition.cs" />
-    <Compile Include="Assets\Scripts\Cs_TransparentWindow.cs" />
+    <Compile Include="Assets\Scripts\Cs_BulletLogic.cs" />
+    <Compile Include="Assets\Scripts\Cs_CheckpointLogic.cs" />
+    <Compile Include="Assets\Scripts\Cs_MinionColliderLogic.cs" />
+    <Compile Include="Assets\Scripts\Cs_MinionLogic.cs" />
+    <Compile Include="Assets\Scripts\Cs_MinionManager.cs" />
+    <Compile Include="Assets\Scripts\HealthSystem.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2015\UnityVS.CSharp.targets" />
 </Project>
