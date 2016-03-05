@@ -31,6 +31,8 @@ public class Cs_SystemManager : MonoBehaviour
     public string TournamentName;
     public string TeamName_Left;
     public string TeamName_Right;
+    int TeamScore_Left;
+    int TeamScore_Right;
     public bool SmallText;
     public bool NoIcon;
     public Sprite TournamentLogo;
@@ -68,7 +70,8 @@ public class Cs_SystemManager : MonoBehaviour
     // Use this for initialization
     void Start ()
     {
-        
+        GameObject.Find("GREEN_SCREEN").SetActive(true);
+        // SetTransparentBackground(true);
     }
 
     public void InitializeGame(TournamentInfo tourneyInfo_)
@@ -77,6 +80,8 @@ public class Cs_SystemManager : MonoBehaviour
 
         TeamName_Left = tourneyInfo_.s_BluTeam;
         TeamName_Right = tourneyInfo_.s_RedTeam;
+        TeamScore_Left = tourneyInfo_.i_BluScore;
+        TeamScore_Right = tourneyInfo_.i_RedScore;
         TournamentName = tourneyInfo_.s_EventName;
         SmallText = !tourneyInfo_.b_EventTwoLines;
         NoIcon = !tourneyInfo_.b_ShowLogo;
@@ -92,6 +97,16 @@ public class Cs_SystemManager : MonoBehaviour
     {
         GameObject.Find("Nametag_Left_Text").GetComponent<TextMesh>().text = TeamName_Left;
         GameObject.Find("Nametag_Right_Text").GetComponent<TextMesh>().text = TeamName_Right;
+        GameObject.Find("Nametag_Left_Score").GetComponent<TextMesh>().text = TeamScore_Left.ToString();
+        GameObject.Find("Nametag_Right_Score").GetComponent<TextMesh>().text = TeamScore_Right.ToString();
+    }
+
+    void SetTransparentBackground(bool b_IsEnabled)
+    {
+        GameObject.Find("GREEN_SCREEN").GetComponent<Cs_TransparentWindow>().enabled = b_IsEnabled;
+
+        if(!b_IsEnabled) GameObject.Find("GREEN_SCREEN").GetComponent<Cs_TransparentWindow>().EndTransparentWindow();
+        if (!b_IsEnabled) GameObject.Find("GREEN_SCREEN").SetActive(false);
     }
 
     void InitializeIcons()
@@ -395,8 +410,9 @@ public class Cs_SystemManager : MonoBehaviour
         // Return to Main Menu
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            SceneManager.LoadScene("MainMenu");
+            SetTransparentBackground(false);
             GameObject.Destroy(GameObject.Find("TournamentOptions"));
+            SceneManager.LoadScene("MainMenu");
         }
 
         // Left Team Input

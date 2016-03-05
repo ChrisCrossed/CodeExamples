@@ -5,7 +5,8 @@ using System.Runtime.InteropServices;
 
 public class Cs_TransparentWindow : MonoBehaviour
 {
-    
+    // http://forum.unity3d.com/threads/solved-windows-transparent-window-with-opaque-contents-lwa_colorkey.323057/
+
     [SerializeField]
     private Material m_Material;
 
@@ -42,7 +43,7 @@ public class Cs_TransparentWindow : MonoBehaviour
 
     void Start()
     {
-        
+
 
         #if !UNITY_EDITOR // You really don't want to enable this in the editor..
 
@@ -60,6 +61,34 @@ public class Cs_TransparentWindow : MonoBehaviour
         DwmExtendFrameIntoClientArea(hwnd, ref margins);
 
         #endif
+    }
+
+    void Update()
+    {
+
+    }
+
+    public void EndTransparentWindow()
+    {
+
+        #if !UNITY_EDITOR // You really don't want to enable this in the editor..
+        int fWidth = Screen.width;
+        int fHeight = Screen.height;
+        var margins = new MARGINS() { cxLeftWidth = -1 };
+        var hwnd = GetActiveWindow();
+
+        SetWindowLong(hwnd, GWL_STYLE, WS_POPUP | WS_VISIBLE);
+
+        // Transparent windows with click through
+        SetWindowLong(hwnd, -20, 524288);//GWL_EXSTYLE=-20; WS_EX_LAYERED=524288=&h80000, WS_EX_TRANSPARENT=32=0x00000020L
+        SetLayeredWindowAttributes(hwnd, 255, 255, 0);// Transparency=51=20%, LWA_ALPHA=2
+        SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, fWidth, fHeight, 32); //SWP_FRAMECHANGED = 0x0020 (32); //SWP_SHOWWINDOW = 0x0040 (64)
+        // DwmExtendFrameIntoClientArea(hwnd, ref margins);
+
+        Screen.SetResolution(1920, 1080, true);
+
+        #endif
+
     }
 
     void OnRenderImage(RenderTexture from, RenderTexture to)
