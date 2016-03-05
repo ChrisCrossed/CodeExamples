@@ -17,6 +17,7 @@ public class Cs_MenuManager : MonoBehaviour
         // Sets defaults
         s_BluTeam = "NAM";
         s_RedTeam = "NAM";
+        s_EventName = "ONE/TWO";
         b_EventTwoLines = true;
         b_ShowLogo = true;
 

@@ -27,12 +27,13 @@ public class Icon
 
 public class Cs_SystemManager : MonoBehaviour
 {
+    TournamentInfo tourneyInfo;
     public string TournamentName;
-    public bool SmallText;
     public string TeamName_Left;
     public string TeamName_Right;
-    public Sprite TournamentLogo;
+    public bool SmallText;
     public bool NoIcon;
+    public Sprite TournamentLogo;
 
     GameObject Nametag_Left;
     GameObject Nametag_Right;
@@ -67,34 +68,12 @@ public class Cs_SystemManager : MonoBehaviour
     // Use this for initialization
     void Start ()
     {
-        // InitializeIcons();
-        // SetTournamentLogo(TournamentLogo, TournamentName);
         
-
-        // NoIcon = !false;
-        // Nametag_Left = GameObject.Find("Nametag_Left");
-        // Nametag_Right = GameObject.Find("Nametag_Right");
-
-        // Nametag_Left.GetComponent<Text>().text = "HH";
     }
-
-    /*public void InitializeGame(string str_BlueTeam_, string str_RedTeam_, string str_EventName_, bool b_IsSmallText_, bool b_ShowLogo_)
-    {
-        print("Red: " + str_RedTeam_ + ", Blue: " + str_BlueTeam_ + ", Event: " + str_EventName_ + ", Three Lines: " + !b_IsSmallText_ + ", Show Logo: " + b_ShowLogo_);
-
-        TournamentName = str_EventName_;
-        TeamName_Left = str_BlueTeam_;
-        TeamName_Right = str_RedTeam_;
-
-        NoIcon = !b_ShowLogo_;
-
-        InitializeIcons();
-        SetTournamentLogo(TournamentLogo, TournamentName);
-    }*/
 
     public void InitializeGame(TournamentInfo tourneyInfo_)
     {
-        print("Red: " + tourneyInfo_.s_BluTeam + ", Blue: " + tourneyInfo_.s_RedTeam + ", Event: " + tourneyInfo_.s_EventName + ", Three Lines: " + !tourneyInfo_.b_EventTwoLines + ", Show Logo: " + tourneyInfo_.b_ShowLogo);
+        tourneyInfo = tourneyInfo_;
 
         TeamName_Left = tourneyInfo_.s_BluTeam;
         TeamName_Right = tourneyInfo_.s_RedTeam;
@@ -102,8 +81,17 @@ public class Cs_SystemManager : MonoBehaviour
         SmallText = !tourneyInfo_.b_EventTwoLines;
         NoIcon = !tourneyInfo_.b_ShowLogo;
 
+        print(TournamentName);
+
         InitializeIcons();
-        SetTournamentLogo(TournamentLogo, TournamentName);
+        InitializeTeamNames();
+        SetTournamentLogo();
+    }
+
+    void InitializeTeamNames()
+    {
+        GameObject.Find("Nametag_Left_Text").GetComponent<TextMesh>().text = TeamName_Left;
+        GameObject.Find("Nametag_Right_Text").GetComponent<TextMesh>().text = TeamName_Right;
     }
 
     void InitializeIcons()
@@ -133,7 +121,7 @@ public class Cs_SystemManager : MonoBehaviour
         Icon_Dragon.b_IsActive = false;
     }
 
-    void SetTournamentLogo(Sprite TournamentLogo_, string TournamentText_)
+    void SetTournamentLogo()
     {
         GameObject tournamentLogo = GameObject.Find("Overlay_Logo");
         GameObject tournamentText = GameObject.Find("Overlay_Text");
@@ -150,14 +138,14 @@ public class Cs_SystemManager : MonoBehaviour
             tournamentText.transform.localScale = new Vector3(0.001f, 0.001f, 1);
         }
 
-        tournamentLogo.GetComponent<SpriteRenderer>().sprite = TournamentLogo_;
+        tournamentLogo.GetComponent<SpriteRenderer>().sprite = TournamentLogo;
         
-        if(TournamentText_.Contains("/"))
+        if(TournamentName.Contains("/"))
         {
-            TournamentText_ = TournamentText_.Replace("/", "\n");
+            TournamentName = TournamentName.Replace("/", "\n");
         }
 
-        tournamentText.GetComponent<TextMesh>().text = TournamentText_;
+        tournamentText.GetComponent<TextMesh>().text = TournamentName;
     }
 
     // Used by Keyboard Input to apply Icon's to the screen
@@ -404,20 +392,11 @@ public class Cs_SystemManager : MonoBehaviour
         }
         #endregion
 
-        // Future check for visibility.
-        /*
-        print("First Blood: " + Icon_FirstBlood.b_IsActive);
-        print("Dragon: " + Icon_Dragon.b_IsActive);
-        print("Tower: " + Icon_Tower.b_IsActive);
-        print("Inhib: " + Icon_Inhib.b_IsActive);
-        print("Baron: " + Icon_Baron.b_IsActive);
-        */
-
-        // Quit Application (For now)
+        // Return to Main Menu
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             SceneManager.LoadScene("MainMenu");
-            
+            GameObject.Destroy(GameObject.Find("TournamentOptions"));
         }
 
         // Left Team Input
