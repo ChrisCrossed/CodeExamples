@@ -322,6 +322,8 @@ public class Cs_PlayerController : MonoBehaviour
     {
         if(collision_.gameObject.tag == "Wall")
         {
+            print("Hit: " + collision_.gameObject.name);
+
             Crash();
         }
     }
@@ -333,8 +335,10 @@ public class Cs_PlayerController : MonoBehaviour
 
         if(collider_.tag == "Wall_Player" || collider_.tag == "Wall_Enemy")
         {
-            if(collider_.name != lastWallMade)
+            if(collider_.name != lastWallMade && collider_.name != "LightWall_Player(Clone)")
             {
+                print("Hit: " + collider_.gameObject.name);
+
                 Crash();
             }
         }
