@@ -24,7 +24,7 @@ public class Cs_TitleScreenLogic : MonoBehaviour
     // Use this for initialization
     void Start ()
     {
-        UnityEngine.Cursor.visible = false;
+        // UnityEngine.Cursor.visible = false;
 
         // Enable DigiPen Logos
         DigiPenLogo.SetActive(true);

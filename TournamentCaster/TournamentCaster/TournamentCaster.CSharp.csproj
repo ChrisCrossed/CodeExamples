@@ -64,6 +64,9 @@
     <Reference Include="System.Drawing">
       <HintPath>Assets\Plugins\System.Drawing.dll</HintPath>
     </Reference>
+    <Reference Include="RawInput">
+      <HintPath>Assets\RawInput.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\CS_CameraController.cs" />

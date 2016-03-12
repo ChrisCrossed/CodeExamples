@@ -51,7 +51,7 @@ public class Cs_PlayerController : MonoBehaviour
     // Use this for initialization
     void Start ()
     {
-        UnityEngine.Cursor.visible = false;
+        // UnityEngine.Cursor.visible = false;
 
         f_CurrSpeed = 0f;
 

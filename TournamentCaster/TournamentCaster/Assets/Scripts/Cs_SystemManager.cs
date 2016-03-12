@@ -2,6 +2,8 @@
 using System.Collections;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using System;
+using System.Runtime.InteropServices;
 
 enum Enum_IconTypes
 {
@@ -67,11 +69,15 @@ public class Cs_SystemManager : MonoBehaviour
 
     float f_TimeSinceLastButtonPress;
 
+    [DllImport("User32.dll")]
+    extern static uint GetRawInputDeviceList(IntPtr pRawInputDeviceList, ref uint uiNumDevices, uint cbSize);
+
     // Use this for initialization
     void Start ()
     {
         GameObject.Find("GREEN_SCREEN").SetActive(true);
         // SetTransparentBackground(true);
+        
     }
 
     public void InitializeGame(TournamentInfo tourneyInfo_)
@@ -416,8 +422,13 @@ public class Cs_SystemManager : MonoBehaviour
         }
 
         // Left Team Input
+        if(Input.GetButtonDown("Fire1"))
+        {
+            print("Pressed");
+            IO_FirstBlood = Enum_IconOwner.Left; keyPressed_FirstBlood = true; f_TimeSinceLastButtonPress = 0.0f;
+        }
         if (Input.GetKeyDown(KeyCode.Q) && !keyPressed_FirstBlood) { IO_FirstBlood = Enum_IconOwner.Left; keyPressed_FirstBlood = true; f_TimeSinceLastButtonPress = 0.0f; }
-        if (Input.GetKeyDown(KeyCode.W) && !keyPressed_Dragon) { IO_Dragon = Enum_IconOwner.Left; keyPressed_Dragon = true; f_TimeSinceLastButtonPress = 0.0f; }
+        // if (Input.GetKeyDown(KeyCode.W) && !keyPressed_Dragon) { IO_Dragon = Enum_IconOwner.Left; keyPressed_Dragon = true; f_TimeSinceLastButtonPress = 0.0f; }
         if (Input.GetKeyDown(KeyCode.E) && !keyPressed_Tower) { IO_Tower = Enum_IconOwner.Left; keyPressed_Tower = true; f_TimeSinceLastButtonPress = 0.0f; }
         if (Input.GetKeyDown(KeyCode.R) && !keyPressed_Inhib) { IO_Inhib = Enum_IconOwner.Left; keyPressed_Inhib = true; f_TimeSinceLastButtonPress = 0.0f; }
         if (Input.GetKeyDown(KeyCode.T) && !keyPressed_Baron) { IO_Baron = Enum_IconOwner.Left; keyPressed_Baron = true; f_TimeSinceLastButtonPress = 0.0f; }

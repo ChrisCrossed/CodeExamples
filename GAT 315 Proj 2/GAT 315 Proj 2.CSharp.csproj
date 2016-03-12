@@ -79,12 +79,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\6by7\ProGrids\Classes\pg_Util.cs" />
-    <Compile Include="Assets\Cs_EnemyController.cs" />
-    <Compile Include="Assets\Cs_LightWallLogic.cs" />
     <Compile Include="Assets\ProCore\ProBuilder\API Examples\Instantiation\ProBuilderInstantiate.cs" />
     <Compile Include="Assets\ProCore\ProBuilder\API Examples\Misc\HueCube.cs" />
     <Compile Include="Assets\ProCore\ProBuilder\API Examples\Runtime Editing\RuntimeEdit.cs" />
     <Compile Include="Assets\Scripts\Cs_CameraController.cs" />
+    <Compile Include="Assets\Scripts\Cs_EnemyController.cs" />
+    <Compile Include="Assets\Scripts\Cs_HUDManager.cs" />
+    <Compile Include="Assets\Scripts\Cs_LevelManager.cs" />
+    <Compile Include="Assets\Scripts\Cs_LightWallLogic.cs" />
     <Compile Include="Assets\Scripts\Cs_PauseMenu.cs" />
     <Compile Include="Assets\Scripts\Cs_PlayerController.cs" />
     <Compile Include="Assets\Scripts\Cs_TitleScreenLogic.cs" />
