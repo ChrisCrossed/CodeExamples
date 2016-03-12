@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using XInputDotNetPure; // Controller input
 
 enum GameState
 {
@@ -11,9 +12,22 @@ enum GameState
 
 public class Cs_LevelManager : MonoBehaviour
 {
-    GameState enum_GameState = GameState.PreGame;
+    GameState enum_GameState = GameState.Tutorial;
+
+    GamePadState state;
+    GamePadState prevState;
+    public PlayerIndex playerIndex = PlayerIndex.One;
 
     int i_PlayerScore;
+
+    int i_TutorialCounter;
+    float f_TutorialTimer;
+    public Camera mainCamera;
+    GameObject camRef_Tut_1;
+    GameObject camRef_Tut_2;
+    GameObject camRef_Tut_3;
+    GameObject camRef_Tut_4;
+    GameObject camRef_Tut_5;
 
     // Level Game Objects
     GameObject Wall_PosX;
@@ -49,12 +63,22 @@ public class Cs_LevelManager : MonoBehaviour
     GameObject ui_LevelInfo;
     public GameObject Text_YouWin;
 
+    // Sound Effects
+    public AudioClip[] soundEffects;
+    public AudioSource audioSource;
+
     // Use this for initialization
     void Start ()
     {
         i_CurrLevel = 1;
 
         i_PlayerScore = 0;
+        
+        camRef_Tut_1 = GameObject.Find("CamReference_Tut_1");
+        camRef_Tut_2 = GameObject.Find("CamReference_Tut_2");
+        camRef_Tut_3 = GameObject.Find("CamReference_Tut_3");
+        camRef_Tut_4 = GameObject.Find("CamReference_Tut_4");
+        camRef_Tut_5 = GameObject.Find("CamReference_Tut_5");
 
         // Level Game Objects
         Wall_PosX = GameObject.Find("Wall_PosX");
@@ -146,6 +170,17 @@ public class Cs_LevelManager : MonoBehaviour
 
     public void StartGame()
     {
+        GameObject.Find("Timer").GetComponent<Text>().text = "";
+        GameObject.Find("CountdownTimer").GetComponent<Text>().text = "Time Remaining:\n";
+        GameObject.Find("PlayerScore").GetComponent<Text>().text = "Score:\n";
+        GameObject.Find("LevelInfo").GetComponent<Text>().text = "Level:\n";
+
+        // Disable Tutorial Gold
+        GameObject.Destroy(GameObject.Find("Gold_Primary_Tutorial"));
+        GameObject.Destroy(GameObject.Find("Gold_Secondary_Tutorial"));
+        GameObject.Destroy(GameObject.Find("UI_Primary_Tutorial"));
+        GameObject.Destroy(GameObject.Find("UI_Secondary_Tutorial"));
+
         // Enable the gold
         Score_Primary.GetComponent<Cs_GoldLogic>().StartGame();
         Score_Secondary.GetComponent<Cs_GoldLogic>().StartGame();
@@ -155,6 +190,8 @@ public class Cs_LevelManager : MonoBehaviour
         ui_TimeRemaining.GetComponent<Text>().text = "Time Remaining:\n" + string.Format("{0}", f_Countdown);
         ui_Score.GetComponent<Text>().text = "Score:\n" + string.Format("{0}", i_PlayerScore);
         ui_LevelInfo.GetComponent<Text>().text = "Level:\n" + i_CurrLevel.ToString() + " of 5";
+
+        audioSource.Play();
 
         enum_GameState = GameState.Playing;
     }
@@ -173,15 +210,22 @@ public class Cs_LevelManager : MonoBehaviour
         {
             ++i_CurrLevel;
 
+            GameObject.Find("Player").GetComponent<Cs_PlayerController>().PlaySFX(3);
+
             Score_Primary.GetComponent<Cs_GoldLogic>().RespawnGold();
             Score_Secondary.GetComponent<Cs_GoldLogic>().RespawnGold();
         }
         else
         {
             // End game - Player Wins
-            GameObject.Find("Player").GetComponent<Cs_PlayerController>().Crash();
             Text_YouWin.GetComponent<Text>().text = "You Win!";
+
+            GameObject.Find("Player").GetComponent<Cs_PlayerController>().PlaySFX(2);
+
+            GameObject.Find("Player").GetComponent<Cs_PlayerController>().Crash();
         }
+
+        ui_LevelInfo.GetComponent<Text>().text = "Level:\n" + i_CurrLevel.ToString() + " of 5";
     }
 	
 	// Update is called once per frame
@@ -190,6 +234,9 @@ public class Cs_LevelManager : MonoBehaviour
         if(enum_GameState == GameState.Playing)
         {
             #region Playing
+
+            // Cheat Codes
+            if (Input.GetKeyDown(KeyCode.P)) { PlayerScoredPrimary(); }
 
             f_Timer += Time.deltaTime;
             if(f_Timer >= 1.0f)
@@ -228,6 +275,129 @@ public class Cs_LevelManager : MonoBehaviour
         {
             #region Tutorial
 
+            f_TutorialTimer += Time.deltaTime;
+
+            prevState = state;
+            state = GamePad.GetState(playerIndex);
+
+            if (state.Buttons.Start == ButtonState.Pressed && prevState.Buttons.Start == ButtonState.Released)
+            {
+                GameObject.Find("Player").GetComponent<Cs_PlayerController>().EndTutorial();
+                StartGame();
+                audioSource.Stop();
+                mainCamera.GetComponent<Cs_CameraController>().SetCameraLock(true);
+
+                GameObject.Find("Timer").GetComponent<Text>().enabled = true;
+                GameObject.Find("CountdownTimer").GetComponent<Text>().enabled = true;
+                GameObject.Find("PlayerScore").GetComponent<Text>().enabled = true;
+                GameObject.Find("LevelInfo").GetComponent<Text>().enabled = true;
+                GameObject.Destroy(GameObject.Find("InfoSkip"));
+            }
+
+            float f_CamMoveTime = 0.05f;
+
+            if (i_TutorialCounter == 0) // Objective of Game
+            {
+                GameObject.Find("Timer").GetComponent<Text>().text = "";
+                GameObject.Find("CountdownTimer").GetComponent<Text>().text = "";
+                GameObject.Find("PlayerScore").GetComponent<Text>().text = "";
+                GameObject.Find("LevelInfo").GetComponent<Text>().text = "";
+
+                GameObject.Find("Gold_Primary_Tutorial").GetComponent<MeshRenderer>().enabled = true;
+                GameObject.Find("Gold_Secondary_Tutorial").GetComponent<MeshRenderer>().enabled = true;
+
+                print(camRef_Tut_1.transform.position);
+
+                mainCamera.transform.position = Vector3.Lerp(mainCamera.transform.position, camRef_Tut_1.transform.position, f_CamMoveTime);
+                mainCamera.transform.rotation = Quaternion.Lerp(mainCamera.transform.rotation, camRef_Tut_1.transform.rotation, f_CamMoveTime);
+
+                if (f_TutorialTimer > 1.0f && f_TutorialTimer < 1.1f)
+                {
+                    audioSource.PlayOneShot(soundEffects[1], 1.0f);
+                    f_TutorialTimer = 1.1f;
+                }
+
+                if (f_TutorialTimer > 7f)
+                {
+                    ++i_TutorialCounter;
+                    f_TutorialTimer = 0f;
+                }
+            }
+            else if (i_TutorialCounter == 1) // Show Objectives
+            {
+                mainCamera.transform.position = Vector3.Lerp(mainCamera.transform.position, camRef_Tut_2.transform.position, f_CamMoveTime);
+                mainCamera.transform.rotation = Quaternion.Lerp(mainCamera.transform.rotation, camRef_Tut_2.transform.rotation, f_CamMoveTime);
+
+                if (f_TutorialTimer > 1.0f && f_TutorialTimer < 1.1f)
+                {
+                    audioSource.PlayOneShot(soundEffects[2], 1.0f);
+                    f_TutorialTimer = 1.1f;
+                }
+
+                if (f_TutorialTimer > 8f)
+                {
+                    ++i_TutorialCounter;
+                    f_TutorialTimer = 0f;
+                }
+            }
+            else if (i_TutorialCounter == 2) // Walls Shrink
+            {
+                mainCamera.transform.position = Vector3.Lerp(mainCamera.transform.position, camRef_Tut_3.transform.position, f_CamMoveTime);
+                mainCamera.transform.rotation = Quaternion.Lerp(mainCamera.transform.rotation, camRef_Tut_3.transform.rotation, f_CamMoveTime);
+
+                if (f_TutorialTimer > 1.0f && f_TutorialTimer < 1.1f)
+                {
+                    audioSource.PlayOneShot(soundEffects[3], 1.0f);
+                    f_TutorialTimer = 1.1f;
+                }
+
+                if (f_TutorialTimer > 8f)
+                {
+                    ++i_TutorialCounter;
+                    f_TutorialTimer = 0f;
+                }
+            }
+            else if (i_TutorialCounter == 3) // Discuss Failure
+            {
+                mainCamera.transform.position = Vector3.Lerp(mainCamera.transform.position, camRef_Tut_4.transform.position, f_CamMoveTime);
+                mainCamera.transform.rotation = Quaternion.Lerp(mainCamera.transform.rotation, camRef_Tut_4.transform.rotation, f_CamMoveTime);
+
+                if (f_TutorialTimer > 1.0f && f_TutorialTimer < 1.1f)
+                {
+                    audioSource.PlayOneShot(soundEffects[4], 1.0f);
+                    f_TutorialTimer = 1.1f;
+                }
+
+                if (f_TutorialTimer > 17f)
+                {
+                    ++i_TutorialCounter;
+                    f_TutorialTimer = 0f;
+                }
+            }
+            else if (i_TutorialCounter == 4) // Controls & Mini-Map
+            {
+                mainCamera.transform.position = Vector3.Lerp(mainCamera.transform.position, camRef_Tut_5.transform.position, f_CamMoveTime);
+                mainCamera.transform.rotation = Quaternion.Lerp(mainCamera.transform.rotation, camRef_Tut_5.transform.rotation, f_CamMoveTime);
+
+                if (f_TutorialTimer > 1.0f && f_TutorialTimer < 1.1f)
+                {
+                    audioSource.PlayOneShot(soundEffects[5], 1.0f);
+                    f_TutorialTimer = 1.1f;
+                }
+
+                if (f_TutorialTimer > 11f)
+                {
+                    GameObject.Find("Player").GetComponent<Cs_PlayerController>().EndTutorial();
+                    StartGame();
+                    audioSource.Stop();
+                    mainCamera.GetComponent<Cs_CameraController>().SetCameraLock(true);
+
+                    GameObject.Find("CountdownTimer").GetComponent<Text>().enabled = true;
+                    GameObject.Find("PlayerScore").GetComponent<Text>().enabled = true;
+                    GameObject.Find("LevelInfo").GetComponent<Text>().enabled = true;
+                    GameObject.Destroy(GameObject.Find("InfoSkip"));
+                }
+            }
             #endregion
         }
     }

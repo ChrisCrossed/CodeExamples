@@ -48,10 +48,17 @@ public class Cs_PlayerController : MonoBehaviour
     public GameObject Text_Timer;
     float f_BeginningTimer = 4.5f;
 
+    public AudioClip[] soundEffects;
+    public AudioSource audioSource;
+
+    bool b_IsTutorial;
+
     // Use this for initialization
     void Start ()
     {
-        // UnityEngine.Cursor.visible = false;
+        UnityEngine.Cursor.visible = false;
+
+        b_IsTutorial = true;
 
         f_CurrSpeed = 0f;
 
@@ -76,81 +83,112 @@ public class Cs_PlayerController : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
     {
-        if(f_BeginningTimer > -0.1) f_BeginningTimer -= Time.deltaTime;
-
-        if (f_BeginningTimer <= 0.0f)
+        if(GameObject.Find("LightWall_Player(Clone)"))
         {
-            Text_Timer.GetComponent<Text>().enabled = false;
+            GameObject.Destroy(GameObject.Find("LightWall_Player(Clone)"));
         }
 
-        if(b_Beginning)
+        if(!b_IsTutorial)
         {
-            Text_Timer.GetComponent<Text>().text = string.Format("{0:0}", f_BeginningTimer - 1);
+            #region Not Tutorial
 
-            if (f_BeginningTimer <= 1.5f)
+            if (f_BeginningTimer > -0.1) f_BeginningTimer -= Time.deltaTime;
+
+            if (f_BeginningTimer <= 0.0f)
             {
-                Text_Timer.GetComponent<Text>().text = "Go!";
-
-                enum_CurrGear = CurrentGear.Zero;
-                SetGearMinMax(0);
-                ToggleDriveMode();
-
-                f_CurrSpeed = f_MaxSpeed_GearZero;
-                b_Beginning = false;
-
-                GameObject.Find("LevelManager").GetComponent<Cs_LevelManager>().StartGame();
-            }
-        }
-
-        if(!b_IsGameOver)
-        {
-            prevState = state;
-            state = GamePad.GetState(playerIndex);
-
-            if (state.Buttons.Start == ButtonState.Pressed && prevState.Buttons.Start == ButtonState.Released)
-            {
-                b_IsGameOver = true;
-
-                gameObject.GetComponent<Renderer>().enabled = false;
-                gameObject.GetComponent<BoxCollider>().enabled = false;
-                gameObject.GetComponent<Rigidbody>().velocity = gameObject.transform.forward * 0;
-
-                Text_YouLose.GetComponent<Text>().text = "Cheater!";
-                Text_YouLose.SetActive(true);
+                Text_Timer.GetComponent<Text>().enabled = false;
             }
 
-            if(enum_CurrGear != CurrentGear.Off)
+            if (b_Beginning)
             {
-                Update_Speed();
-                TurnCycle();
+                Text_Timer.GetComponent<Text>().text = string.Format("{0:0}", f_BeginningTimer - 1);
+                GameObject.Find("CountdownTimer").GetComponent<Text>().text = "Time Remaining:\n";
+                GameObject.Find("PlayerScore").GetComponent<Text>().text = "Score:\n";
+                GameObject.Find("LevelInfo").GetComponent<Text>().text = "Level:\n";
+
+                if (f_BeginningTimer <= 1.5f)
+                {
+                    audioSource.Play();
+                    Text_Timer.GetComponent<Text>().text = "Go!";
+
+                    enum_CurrGear = CurrentGear.Zero;
+                    SetGearMinMax(0);
+                    ToggleDriveMode();
+
+                    f_CurrSpeed = f_MaxSpeed_GearZero;
+                    b_Beginning = false;
+
+                    GameObject.Find("LevelManager").GetComponent<Cs_LevelManager>().StartGame();
+
+                }
             }
 
-            /*
-            if (state.Buttons.A == ButtonState.Pressed && prevState.Buttons.A == ButtonState.Released && enum_CurrGear == CurrentGear.Off)
+            if (!b_IsGameOver)
             {
-                enum_CurrGear = CurrentGear.Zero;
-                SetGearMinMax(0);
-                ToggleDriveMode();
+                prevState = state;
+                state = GamePad.GetState(playerIndex);
 
-                f_CurrSpeed = f_MaxSpeed_GearZero;
+                if (state.Buttons.RightShoulder == ButtonState.Pressed && prevState.Buttons.RightShoulder == ButtonState.Released)
+                {
+                    GameObject.Find("LevelManager").GetComponent<Cs_LevelManager>().PlayerScoredPrimary();
+                    gameObject.GetComponent<Rigidbody>().velocity = gameObject.transform.forward * 0;
+
+                    /*
+                    b_IsGameOver = true;
+
+                    gameObject.GetComponent<Renderer>().enabled = false;
+                    gameObject.GetComponent<BoxCollider>().enabled = false;
+
+                    Text_YouLose.GetComponent<Text>().text = "Cheater!";
+                    Text_YouLose.SetActive(true);
+                    */
+                }
+
+                if (enum_CurrGear != CurrentGear.Off)
+                {
+                    Update_Speed();
+                    TurnCycle();
+                }
+
+                /*
+                if (state.Buttons.A == ButtonState.Pressed && prevState.Buttons.A == ButtonState.Released && enum_CurrGear == CurrentGear.Off)
+                {
+                    enum_CurrGear = CurrentGear.Zero;
+                    SetGearMinMax(0);
+                    ToggleDriveMode();
+
+                    f_CurrSpeed = f_MaxSpeed_GearZero;
+                }
+                */
+
+                if (!b_DriveMode)
+                {
+                    PlaceWall();
+                }
             }
-            */
-
-            if(!b_DriveMode)
+            else
             {
-                PlaceWall();
+                f_EndGameTimer += Time.deltaTime;
+
+                if (f_EndGameTimer >= 5.0f)
+                {
+                    SceneManager.LoadScene(0);
+                }
             }
+
+            #endregion
         }
         else
         {
-            f_EndGameTimer += Time.deltaTime;
+            #region Tutorial
 
-            if(f_EndGameTimer >= 5.0f)
-            {
-                SceneManager.LoadScene(0);
-            }
+
+
+            #endregion
         }
-	}
+    }
+
+    public void EndTutorial() { b_IsTutorial = false; }
 
     string NameLightWall()
     {
@@ -326,8 +364,17 @@ public class Cs_PlayerController : MonoBehaviour
         {
             print("Hit: " + collision_.gameObject.name);
 
+            audioSource.Stop();
+
+            PlaySFX(1);
+
             Crash();
         }
+    }
+
+    public void PlaySFX(int i_)
+    {
+        audioSource.PlayOneShot(soundEffects[i_], 0.6f);
     }
 
     void OnTriggerEnter(Collider collider_)
@@ -340,6 +387,10 @@ public class Cs_PlayerController : MonoBehaviour
             if(collider_.name != lastWallMade && collider_.name != "LightWall_Player(Clone)")
             {
                 print("Hit: " + collider_.gameObject.name);
+
+                audioSource.Stop();
+
+                PlaySFX(1);
 
                 Crash();
             }

@@ -63,7 +63,14 @@ public class Cs_GoldLogic : MonoBehaviour
         if (goldType == GoldType.Secondary) currTimer *= 2;
         GameObject.Find("LevelManager").GetComponent<Cs_LevelManager>().SetPlayerScore(currTimer);
 
-        if(goldType == GoldType.Primary) GameObject.Find("LevelManager").GetComponent<Cs_LevelManager>().PlayerScoredPrimary();
+        // Play sound effects
+        if (goldType == GoldType.Primary)
+        {
+            // Now handled in Level Manager
+        }
+        else GameObject.Find("Player").GetComponent<Cs_PlayerController>().PlaySFX(4);
+
+        if (goldType == GoldType.Primary) GameObject.Find("LevelManager").GetComponent<Cs_LevelManager>().PlayerScoredPrimary();
     }
 
     public void RespawnGold()
