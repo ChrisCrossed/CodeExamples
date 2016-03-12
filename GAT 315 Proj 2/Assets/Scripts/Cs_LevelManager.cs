@@ -1,8 +1,20 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
+
+enum GameState
+{
+    Tutorial,
+    PreGame,
+    Playing
+}
 
 public class Cs_LevelManager : MonoBehaviour
 {
+    GameState enum_GameState = GameState.PreGame;
+
+    int i_PlayerScore;
+
     // Level Game Objects
     GameObject Wall_PosX;
     GameObject Wall_NegX;
@@ -32,11 +44,17 @@ public class Cs_LevelManager : MonoBehaviour
     // Score Game Objects
     GameObject Score_Primary;
     GameObject Score_Secondary;
+    GameObject ui_Score;
+    GameObject ui_TimeRemaining;
+    GameObject ui_LevelInfo;
+    public GameObject Text_YouWin;
 
-	// Use this for initialization
-	void Start ()
+    // Use this for initialization
+    void Start ()
     {
         i_CurrLevel = 1;
+
+        i_PlayerScore = 0;
 
         // Level Game Objects
         Wall_PosX = GameObject.Find("Wall_PosX");
@@ -62,8 +80,11 @@ public class Cs_LevelManager : MonoBehaviour
         f_TimerIncrement = TimeIncreaseOnScore;
 
         // Score Game Objects;
-        Score_Primary = GameObject.Find("");
-        Score_Secondary = GameObject.Find("");
+        Score_Primary = GameObject.Find("Gold_Primary");
+        Score_Secondary = GameObject.Find("Gold_Secondary");
+        ui_Score = GameObject.Find("PlayerScore");
+        ui_TimeRemaining = GameObject.Find("CountdownTimer");
+        ui_LevelInfo = GameObject.Find("LevelInfo");
     }
 
     void UpdateLevelSpecs(int i_LevelWidth_)
@@ -111,34 +132,103 @@ public class Cs_LevelManager : MonoBehaviour
         newCamPos.y = Mathf.Lerp(newCamPos.y, i_LevelWidth_, 0.05f / i_CurrLevel);
         hudCamera.transform.position = newCamPos;
     }
+
+    public int GetFieldSize()
+    {
+        if (i_CurrLevel == 1) return i_Pos_Level1;
+        if (i_CurrLevel == 2) return i_Pos_Level2;
+        if (i_CurrLevel == 3) return i_Pos_Level3;
+        if (i_CurrLevel == 4) return i_Pos_Level4;
+        if (i_CurrLevel == 5) return i_Pos_Level5;
+
+        return i_Pos_Level1;
+    }
+
+    public void StartGame()
+    {
+        // Enable the gold
+        Score_Primary.GetComponent<Cs_GoldLogic>().StartGame();
+        Score_Secondary.GetComponent<Cs_GoldLogic>().StartGame();
+
+        f_Countdown = GameLengthMinutes * 60;
+
+        ui_TimeRemaining.GetComponent<Text>().text = "Time Remaining:\n" + string.Format("{0}", f_Countdown);
+        ui_Score.GetComponent<Text>().text = "Score:\n" + string.Format("{0}", i_PlayerScore);
+        ui_LevelInfo.GetComponent<Text>().text = "Level:\n" + i_CurrLevel.ToString() + " of 5";
+
+        enum_GameState = GameState.Playing;
+    }
+
+    public int GetCountdownTimer() { return (int)f_Countdown; }
+
+    public void SetPlayerScore(int i_PlayerScore_)
+    {
+        i_PlayerScore += i_PlayerScore_;
+        ui_Score.GetComponent<Text>().text = "Score:\n" + string.Format("{0}", i_PlayerScore);
+    }
+
+    public void PlayerScoredPrimary()
+    {
+        if(i_CurrLevel < 5)
+        {
+            ++i_CurrLevel;
+
+            Score_Primary.GetComponent<Cs_GoldLogic>().RespawnGold();
+            Score_Secondary.GetComponent<Cs_GoldLogic>().RespawnGold();
+        }
+        else
+        {
+            // End game - Player Wins
+            GameObject.Find("Player").GetComponent<Cs_PlayerController>().Crash();
+            Text_YouWin.GetComponent<Text>().text = "You Win!";
+        }
+    }
 	
 	// Update is called once per frame
 	void Update ()
     {
-        if(Input.GetKeyDown(KeyCode.P) && i_CurrLevel < 5)
+        if(enum_GameState == GameState.Playing)
         {
-            ++i_CurrLevel;
-        }
+            #region Playing
 
-	    if (i_CurrLevel == 1)
-        {
-            UpdateLevelSpecs(i_Width_Level1);
+            f_Timer += Time.deltaTime;
+            if(f_Timer >= 1.0f)
+            {
+                f_Timer = 0;
+                --f_Countdown;
+                ui_TimeRemaining.GetComponent<Text>().text = "Time Remaining:\n" + string.Format("{0:00}", f_Countdown);
+
+                if (f_Countdown <= 0) GameObject.Find("Player").GetComponent<Cs_PlayerController>().Crash();
+            }
+
+	        if (i_CurrLevel == 1)
+            {
+                UpdateLevelSpecs(i_Width_Level1);
+            }
+            else if (i_CurrLevel == 2)
+            {
+                UpdateLevelSpecs(i_Width_Level2);
+            }
+            else if (i_CurrLevel == 3)
+            {
+                UpdateLevelSpecs(i_Width_Level3);
+            }
+            else if (i_CurrLevel == 4)
+            {
+                UpdateLevelSpecs(i_Width_Level4);
+            }
+            else // i_CurrLevel == 5
+            {
+                UpdateLevelSpecs(i_Width_Level5);
+            }
+
+            #endregion
         }
-        else if (i_CurrLevel == 2)
+        else if(enum_GameState == GameState.Tutorial)
         {
-            UpdateLevelSpecs(i_Width_Level2);
-        }
-        else if (i_CurrLevel == 3)
-        {
-            UpdateLevelSpecs(i_Width_Level3);
-        }
-        else if (i_CurrLevel == 4)
-        {
-            UpdateLevelSpecs(i_Width_Level4);
-        }
-        else // i_CurrLevel == 5
-        {
-            UpdateLevelSpecs(i_Width_Level5);
+            #region Tutorial
+
+            #endregion
         }
     }
 }

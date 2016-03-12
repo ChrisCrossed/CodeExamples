@@ -97,6 +97,8 @@ public class Cs_PlayerController : MonoBehaviour
 
                 f_CurrSpeed = f_MaxSpeed_GearZero;
                 b_Beginning = false;
+
+                GameObject.Find("LevelManager").GetComponent<Cs_LevelManager>().StartGame();
             }
         }
 
@@ -306,7 +308,7 @@ public class Cs_PlayerController : MonoBehaviour
 
     }
 
-    void Crash()
+    public void Crash()
     {
         // Destroy(gameObject);
         gameObject.GetComponent<Renderer>().enabled = false;
