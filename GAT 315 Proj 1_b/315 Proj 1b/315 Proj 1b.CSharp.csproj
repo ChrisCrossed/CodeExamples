@@ -61,13 +61,29 @@
     <Reference Include="UnityEditor">
       <HintPath>Library\UnityAssemblies\UnityEditor.dll</HintPath>
     </Reference>
+    <Reference Include="SixBySeven">
+      <HintPath>Assets\6by7\Shared\Code\SixBySeven.dll</HintPath>
+    </Reference>
     <Reference Include="XInputDotNetPure">
       <HintPath>Assets\Plugins\x86_64\XInputDotNetPure.dll</HintPath>
     </Reference>
+    <Reference Include="ProBuilderCore-Unity4">
+      <HintPath>Assets\ProCore\ProBuilder\Classes\ProBuilderCore-Unity4.dll</HintPath>
+    </Reference>
+    <Reference Include="ProBuilderMeshOps-Unity4">
+      <HintPath>Assets\ProCore\ProBuilder\Classes\ProBuilderMeshOps-Unity4.dll</HintPath>
+    </Reference>
+    <Reference Include="ProCore">
+      <HintPath>Assets\ProCore\Shared\Code\ProCore.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\6by7\ProGrids\Classes\pg_Util.cs" />
     <Compile Include="Assets\Cs_EndGameTrigger.cs" />
     <Compile Include="Assets\Cs_InfoScreenLogic.cs" />
+    <Compile Include="Assets\ProCore\ProBuilder\API Examples\Instantiation\ProBuilderInstantiate.cs" />
+    <Compile Include="Assets\ProCore\ProBuilder\API Examples\Misc\HueCube.cs" />
+    <Compile Include="Assets\ProCore\ProBuilder\API Examples\Runtime Editing\RuntimeEdit.cs" />
     <Compile Include="Assets\Scripts\Cs_BossWallTrigger.cs" />
     <Compile Include="Assets\Scripts\Cs_DoorLogic.cs" />
     <Compile Include="Assets\Scripts\Cs_EnergyBoxLogic.cs" />
@@ -80,6 +96,22 @@
     <Compile Include="Assets\Scripts\Cs_TurretBullet.cs" />
     <Compile Include="Assets\Scripts\Cs_TurretJoint.cs" />
     <Compile Include="Assets\Scripts\HealthSystem.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Assets\6by7\ProGrids\VersionInfo.txt" />
+    <None Include="Assets\ProCore\ProBuilder\About\Credits.txt" />
+    <None Include="Assets\ProCore\ProBuilder\About\changelog.txt" />
+    <None Include="Assets\ProCore\ProBuilder\About\pc_AboutEntry_ProBuilder.txt" />
+    <None Include="Assets\ProCore\ProBuilder\Shader\DiffuseTextureBlend.shader" />
+    <None Include="Assets\ProCore\ProBuilder\Shader\DiffuseVertexColor.shader" />
+    <None Include="Assets\ProCore\ProBuilder\Shader\DiffuseVertexColorEmission.shader" />
+    <None Include="Assets\ProCore\ProBuilder\Shader\DiffuseVertexColorTransparency.shader" />
+    <None Include="Assets\ProCore\ProBuilder\Shader\UnlitSolidColor.shader" />
+    <None Include="Assets\ProCore\ProBuilder\Shader\pb_FaceHighlight.shader" />
+    <None Include="Assets\ProCore\ProBuilder\Shader\pb_UnlitVertexColor.shader" />
+    <None Include="Assets\ProCore\ProBuilder\Shader\pb_VertexShader.shader" />
+    <None Include="Assets\ProCore\Shared\About\README.txt" />
+    <None Include="Assets\ProCore\_README_PROBUILDER.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2015\UnityVS.CSharp.targets" />
 </Project>

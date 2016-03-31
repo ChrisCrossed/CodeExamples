@@ -1,6 +1,26 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+/*******************************************************************************
+filename    Cs_MinionLogic.cs
+author      Christopher Christensen
+DP email    C.Christensen@DigiPen.edu
+
+Brief Description:
+  Creates the basic logic for a minion in a MOBA setting
+  
+*******************************************************************************/
+
+/*******************************************************************************
+   Class: CheckpointObject
+
+Description: Stores checkpoint information for a Minions
+
+     Inputs:
+        checkpointPos (Vector3) - The location in the world the checkpoint exists
+        checkpointName (String) - Name of the checkpoint for reference
+
+*******************************************************************************/
 public class CheckpointObject
 {
     public Vector3 checkpointPos;
@@ -25,12 +45,21 @@ public class Cs_MinionLogic : MonoBehaviour
     int i_AttackDamage;
     int i_Health;
 
-	// Use this for initialization
-	void Start ()
-    {
+    /*******************************************************************************
+       Function: Initialize_Minion
 
-    }
+    Description: Custom initialization for the minion
 
+         Inputs:
+            checkpointList_ - A CheckpointObject array with the list of checkpoints,
+                              in order, to follow. Continues until death.
+            minionTeam_     - The team this minion is on
+            i_SpawnTime_    - The time in the game this minion was spawned. Used
+                              to determine the stats of this minion.
+            b_IsMelee_      - States whether this minion is melee or ranged.
+
+        Outputs: None
+    *******************************************************************************/
     public void Initialize_Minion(CheckpointObject[] checkpointList_, TeamTypes minionTeam_, int i_SpawnTime_, bool b_IsMelee_)
     { 
         checkpoint = checkpointList_;
@@ -45,10 +74,12 @@ public class Cs_MinionLogic : MonoBehaviour
 
         if (minionTeam_ == TeamTypes.BlueTeam)
         {
+            // Minion is visibly blue
             GetComponent<Renderer>().material.color = new Color(0.0f, 0.0f, 1.0f, 1.0f);
         }
         else
         {
+            // Minion is visibly red
             GetComponent<Renderer>().material.color = new Color(1.0f, 0.0f, 0.0f, 1.0f);
         }
 
@@ -85,16 +116,7 @@ public class Cs_MinionLogic : MonoBehaviour
             GoToCurrentCheckpoint();
         }
         // print(checkpoint[currCheckpoint].checkpointName);
-
         
-        /*
-        for(var i = 0; i < enemyArray.Length; ++i)
-        {
-            if(enemyArray[i] != null)
-            {
-                print(gameObject.name + ": " + i + " = " + enemyArray[i].name);
-            }
-        }*/
 	}
 
     void AttackEnemyInEnemyArray()
