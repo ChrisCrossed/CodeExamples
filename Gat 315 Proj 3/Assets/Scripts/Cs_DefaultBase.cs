@@ -93,25 +93,35 @@ public class Cs_DefaultBase : MonoBehaviour
 
     public void SetNewMaterialColor(Colors newColor_)
     {
-        Debug.Log(gameObject.GetComponentInChildren<MeshRenderer>().materials[element_Color].ToString());
+        // gameObject.GetComponentInChildren<MeshRenderer>().sharedMaterial = testMat; -- WORKS
 
-        // gameObject.GetComponentInChildren<MeshRenderer>().materials[0] = testMat;
-        gameObject.GetComponentInChildren<MeshRenderer>().sharedMaterial = testMat;
-
-        /*
-        if(newColor_ == Colors.Default) mat_Color = Resources.Load("DEV_Orange", typeof(Material)) as Material;
+        if (newColor_ == Colors.Default) mat_Color = Resources.Load("Mat_BASE", typeof(Material)) as Material;
         else if (newColor_ == Colors.Blue) mat_Color = Resources.Load("Mat_BLUE", typeof(Material)) as Material;
-        else if (newColor_ == Colors.Green) mat_Color = Resources.Load("DEV_Orange", typeof(Material)) as Material;
-        else if (newColor_ == Colors.Purple) mat_Color = Resources.Load("DEV_Orange", typeof(Material)) as Material;
-        else if (newColor_ == Colors.Red) mat_Color = Resources.Load("DEV_Orange", typeof(Material)) as Material;
-        else if (newColor_ == Colors.SemiTransparent) mat_Color = Resources.Load("DEV_Orange", typeof(Material)) as Material;
+        else if (newColor_ == Colors.Green) mat_Color = Resources.Load("Mat_GREEN", typeof(Material)) as Material;
+        else if (newColor_ == Colors.Purple) mat_Color = Resources.Load("Mat_PURPLE", typeof(Material)) as Material;
+        else if (newColor_ == Colors.Red) mat_Color = Resources.Load("Mat_RED", typeof(Material)) as Material;
+        else if (newColor_ == Colors.SemiTransparent) mat_Color = Resources.Load("Mat_TRANSPARENT", typeof(Material)) as Material;
 
-        mat_Color_Base = Resources.Load("Color_Base", typeof(Material)) as Material;
+        if(newColor_ != Colors.SemiTransparent)
+        {
+            mat_Color_Base = Resources.Load("Color_Base", typeof(Material)) as Material;
 
-        gameObject.GetComponentInChildren<MeshRenderer>().materials[element_Color] = mat_Color;
-        gameObject.GetComponentInChildren<MeshRenderer>().materials[element_Base] = mat_Color_Base;
+            var tempMatList = gameObject.GetComponentInChildren<MeshRenderer>().materials;
+            tempMatList[element_Base] = mat_Color_Base;
+            tempMatList[element_Color] = mat_Color;
+            gameObject.GetComponentInChildren<MeshRenderer>().materials = tempMatList;
 
-        print(gameObject.GetComponentInChildren<MeshRenderer>().name);
-        */
+            print(gameObject.GetComponentInChildren<MeshRenderer>().name);
+        }
+        else
+        {
+            var tempTransList = gameObject.GetComponentInChildren<MeshRenderer>().materials;
+            for(int i = 0; i < tempTransList.Length; ++i)
+            {
+                tempTransList[i] = mat_Color;
+            }
+            gameObject.GetComponentInChildren<MeshRenderer>().materials = tempTransList;
+        }
+        Debug.Log(gameObject.GetComponentInChildren<MeshRenderer>().materials[element_Color].ToString());
     }
 }
