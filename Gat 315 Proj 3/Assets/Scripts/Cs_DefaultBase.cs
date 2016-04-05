@@ -36,8 +36,8 @@ public class Cs_DefaultBase : MonoBehaviour
 
     public Material testMat;
 
-    int element_Color; // Color is the object color (Red, Blue, Green, etc...)
-    int element_Base; // Base is the black backdrop
+    int element_Color = -1; // Color is the object color (Red, Blue, Green, etc...)
+    int element_Base = -1; // Base is the black backdrop
 
     virtual public void Initialize(int i_Health_Max_, float f_FireTimer_Max_, BoxCollider col_BaseCollider_, CapsuleCollider col_RadiusCollider_)
     {
@@ -62,15 +62,15 @@ public class Cs_DefaultBase : MonoBehaviour
     // Gathers the default element positions for the Material backdrops
     void SetMaterialElements()
     {
-        Material matColor = Resources.Load("Mat_BASE", typeof(Material)) as Material; // (Red, Blue, etc...)
-        Material matColorBase = Resources.Load("Color_Base", typeof(Material)) as Material; // Black Backdrop
-
-        for(int i = 0; i < gameObject.GetComponentInChildren<MeshRenderer>().materials.Length; ++i)
+        Material matColor = Resources.Load("Color_Base", typeof(Material)) as Material; // (Red, Blue, etc...)
+        Material matColorBase = Resources.Load("Mat_BASE", typeof(Material)) as Material; // Black Backdrop
+        var tempMatList = gameObject.GetComponentInChildren<MeshRenderer>().sharedMaterials;
+        
+        for (int i = 0; i < tempMatList.Length; ++i)
         {
-            // Set the element for the RGB Color Objects
-            if      (gameObject.GetComponentInChildren<MeshRenderer>().materials[i] == matColor) element_Color = i;
-            // Set the element for the Black Backdrop
-            else if (gameObject.GetComponentInChildren<MeshRenderer>().materials[i] == matColorBase) element_Base = i;
+            // renderer.sharedMaterial
+            if      (tempMatList[i] == matColor)        element_Color = i;
+            else if (tempMatList[i] == matColorBase)    element_Base = i;
         }
     }
 
@@ -93,8 +93,6 @@ public class Cs_DefaultBase : MonoBehaviour
 
     public void SetNewMaterialColor(Colors newColor_)
     {
-        // gameObject.GetComponentInChildren<MeshRenderer>().sharedMaterial = testMat; -- WORKS
-
         if (newColor_ == Colors.Default) mat_Color = Resources.Load("Mat_BASE", typeof(Material)) as Material;
         else if (newColor_ == Colors.Blue) mat_Color = Resources.Load("Mat_BLUE", typeof(Material)) as Material;
         else if (newColor_ == Colors.Green) mat_Color = Resources.Load("Mat_GREEN", typeof(Material)) as Material;
@@ -104,7 +102,7 @@ public class Cs_DefaultBase : MonoBehaviour
 
         if(newColor_ != Colors.SemiTransparent)
         {
-            mat_Color_Base = Resources.Load("Color_Base", typeof(Material)) as Material;
+            mat_Color_Base = Resources.Load("Mat_BASE", typeof(Material)) as Material;
 
             var tempMatList = gameObject.GetComponentInChildren<MeshRenderer>().materials;
             tempMatList[element_Base] = mat_Color_Base;
@@ -113,7 +111,7 @@ public class Cs_DefaultBase : MonoBehaviour
 
             print(gameObject.GetComponentInChildren<MeshRenderer>().name);
         }
-        else
+        else // Turn semi-transparent for a short while
         {
             var tempTransList = gameObject.GetComponentInChildren<MeshRenderer>().materials;
             for(int i = 0; i < tempTransList.Length; ++i)

@@ -422,23 +422,18 @@ public class Cs_SystemManager : MonoBehaviour
         }
 
         // Left Team Input
-        if(Input.GetButtonDown("Fire1"))
-        {
-            print("Pressed");
-            IO_FirstBlood = Enum_IconOwner.Left; keyPressed_FirstBlood = true; f_TimeSinceLastButtonPress = 0.0f;
-        }
         if (Input.GetKeyDown(KeyCode.Q) && !keyPressed_FirstBlood) { IO_FirstBlood = Enum_IconOwner.Left; keyPressed_FirstBlood = true; f_TimeSinceLastButtonPress = 0.0f; }
-        // if (Input.GetKeyDown(KeyCode.W) && !keyPressed_Dragon) { IO_Dragon = Enum_IconOwner.Left; keyPressed_Dragon = true; f_TimeSinceLastButtonPress = 0.0f; }
-        if (Input.GetKeyDown(KeyCode.E) && !keyPressed_Tower) { IO_Tower = Enum_IconOwner.Left; keyPressed_Tower = true; f_TimeSinceLastButtonPress = 0.0f; }
-        if (Input.GetKeyDown(KeyCode.R) && !keyPressed_Inhib) { IO_Inhib = Enum_IconOwner.Left; keyPressed_Inhib = true; f_TimeSinceLastButtonPress = 0.0f; }
-        if (Input.GetKeyDown(KeyCode.T) && !keyPressed_Baron) { IO_Baron = Enum_IconOwner.Left; keyPressed_Baron = true; f_TimeSinceLastButtonPress = 0.0f; }
+        if (Input.GetKeyDown(KeyCode.E) && !keyPressed_Dragon) { IO_Dragon = Enum_IconOwner.Left; keyPressed_Dragon = true; f_TimeSinceLastButtonPress = 0.0f; }
+        if (Input.GetKeyDown(KeyCode.W) && !keyPressed_Tower) { IO_Tower = Enum_IconOwner.Left; keyPressed_Tower = true; f_TimeSinceLastButtonPress = 0.0f; }
+        if (Input.GetKeyDown(KeyCode.T) && !keyPressed_Inhib) { IO_Inhib = Enum_IconOwner.Left; keyPressed_Inhib = true; f_TimeSinceLastButtonPress = 0.0f; }
+        if (Input.GetKeyDown(KeyCode.R) && !keyPressed_Baron) { IO_Baron = Enum_IconOwner.Left; keyPressed_Baron = true; f_TimeSinceLastButtonPress = 0.0f; }
 
         // Right Team Input
         if (Input.GetKeyDown(KeyCode.P) && !keyPressed_FirstBlood) { IO_FirstBlood = Enum_IconOwner.Right; keyPressed_FirstBlood = true; f_TimeSinceLastButtonPress = 0.0f; }
-        if (Input.GetKeyDown(KeyCode.O) && !keyPressed_Dragon) { IO_Dragon = Enum_IconOwner.Right; keyPressed_Dragon = true; f_TimeSinceLastButtonPress = 0.0f; }
-        if (Input.GetKeyDown(KeyCode.I) && !keyPressed_Tower) { IO_Tower = Enum_IconOwner.Right; keyPressed_Tower = true; f_TimeSinceLastButtonPress = 0.0f; }
-        if (Input.GetKeyDown(KeyCode.U) && !keyPressed_Inhib) { IO_Inhib = Enum_IconOwner.Right; keyPressed_Inhib = true; f_TimeSinceLastButtonPress = 0.0f; }
-        if (Input.GetKeyDown(KeyCode.Y) && !keyPressed_Baron) { IO_Baron = Enum_IconOwner.Right; keyPressed_Baron = true; f_TimeSinceLastButtonPress = 0.0f; }
+        if (Input.GetKeyDown(KeyCode.I) && !keyPressed_Dragon) { IO_Dragon = Enum_IconOwner.Right; keyPressed_Dragon = true; f_TimeSinceLastButtonPress = 0.0f; }
+        if (Input.GetKeyDown(KeyCode.O) && !keyPressed_Tower) { IO_Tower = Enum_IconOwner.Right; keyPressed_Tower = true; f_TimeSinceLastButtonPress = 0.0f; }
+        if (Input.GetKeyDown(KeyCode.Y) && !keyPressed_Inhib) { IO_Inhib = Enum_IconOwner.Right; keyPressed_Inhib = true; f_TimeSinceLastButtonPress = 0.0f; }
+        if (Input.GetKeyDown(KeyCode.U) && !keyPressed_Baron) { IO_Baron = Enum_IconOwner.Right; keyPressed_Baron = true; f_TimeSinceLastButtonPress = 0.0f; }
 
         // Control icons each frame
         if (IO_FirstBlood != Enum_IconOwner.None)
