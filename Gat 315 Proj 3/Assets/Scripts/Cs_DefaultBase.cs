@@ -39,7 +39,7 @@ public class Cs_DefaultBase : MonoBehaviour
     int element_Color = -1; // Color is the object color (Red, Blue, Green, etc...)
     int element_Base = -1; // Base is the black backdrop
 
-    virtual public void Initialize(int i_Health_Max_, float f_FireTimer_Max_, BoxCollider col_BaseCollider_, CapsuleCollider col_RadiusCollider_)
+    virtual public void Initialize(int i_Health_Max_, float f_FireTimer_Max_, BoxCollider col_BaseCollider_ = null, CapsuleCollider col_RadiusCollider_ = null)
     {
         i_Health = i_Health_Max_;
         i_Health_Max = i_Health_Max_;
@@ -53,8 +53,15 @@ public class Cs_DefaultBase : MonoBehaviour
         f_FireTimer = 0;
         f_FireTimer_Max = f_FireTimer_Max_;
 
-        col_BaseCollider = col_BaseCollider_;
-        col_RadiusCollider = col_RadiusCollider_;
+        if (col_BaseCollider_ != null) col_BaseCollider = col_BaseCollider_; else
+        {
+            if (gameObject.transform.Find("Col_BaseCollider")) col_BaseCollider = gameObject.transform.Find("Col_BaseCollider").GetComponent<BoxCollider>();
+        }
+
+        if(col_RadiusCollider_ != null) col_RadiusCollider = col_RadiusCollider_; else
+        {
+            if (gameObject.transform.Find("Col_Radius")) col_RadiusCollider = gameObject.transform.Find("Col_Radius").GetComponent<CapsuleCollider>();
+        }
 
         EnemyList = new List<GameObject>();
     }
@@ -108,8 +115,6 @@ public class Cs_DefaultBase : MonoBehaviour
             tempMatList[element_Base] = mat_Color_Base;
             tempMatList[element_Color] = mat_Color;
             gameObject.GetComponentInChildren<MeshRenderer>().materials = tempMatList;
-
-            print(gameObject.GetComponentInChildren<MeshRenderer>().name);
         }
         else // Turn semi-transparent for a short while
         {
@@ -120,6 +125,5 @@ public class Cs_DefaultBase : MonoBehaviour
             }
             gameObject.GetComponentInChildren<MeshRenderer>().materials = tempTransList;
         }
-        Debug.Log(gameObject.GetComponentInChildren<MeshRenderer>().materials[element_Color].ToString());
     }
 }

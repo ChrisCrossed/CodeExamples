@@ -11,6 +11,7 @@ public class Cs_WallTowerLogic : Cs_DefaultBase
         BoxCollider boxCollider = gameObject.transform.Find("Col_BaseCollider").GetComponent<BoxCollider>();
         CapsuleCollider radiusCollider = gameObject.transform.Find("Col_Radius").GetComponent<CapsuleCollider>();
         Initialize(10, 10, boxCollider, radiusCollider);
+        SetMat
 	}
 	
 	// Update is called once per frame
