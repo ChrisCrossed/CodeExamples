@@ -20,6 +20,10 @@ public class Cs_GridObjectLogic : MonoBehaviour
     // GridPosition testGridObject = new GridPosition { x = 0, y = 0, gridQuadrant = GridPosition.GridQuadrant.Center };
     GameObject go_CurrentGameObject;
 
+    // State of the GridObject
+    bool b_IsEnabled;
+
+    // Prototype information. Remove later.
     int i_CurrTestPos;
 
     // Changes through the colors of the walls when clicked on
@@ -70,6 +74,17 @@ public class Cs_GridObjectLogic : MonoBehaviour
 
         // Set/Reset Counter
         if(++i_CurrTestPos > 5) i_CurrTestPos = 0;
+    }
+
+    public void SetGridObjectState(bool b_IsEnabled_)
+    {
+        b_IsEnabled = b_IsEnabled_;
+
+        // Set the Mouse Collider
+        gameObject.GetComponent<BoxCollider>().enabled = b_IsEnabled;
+
+        // Set the Mesh Renderer
+        gameObject.GetComponentInChildren<MeshRenderer>().enabled = b_IsEnabled;
     }
 
     // Use this for initialization
