@@ -117,7 +117,7 @@ public class Cs_CameraLogic : MonoBehaviour
             if (b_Backward)
             {
                 // > -3
-                if (Cam_Regular.transform.position.z > -6f)
+                if (Cam_Regular.transform.position.z > -7f)
                 {
                     newPos.z -= Time.deltaTime * 2;
                 }
@@ -145,7 +145,7 @@ public class Cs_CameraLogic : MonoBehaviour
             else if(mouseState == MouseState.ScrollDown)
             {
                 // Work with a counter for how far in/out the camera can move
-                if (i_MouseScrollPos < 10)
+                if (i_MouseScrollPos < 7)
                 {
                     Cam_Regular.transform.position -= Cam_Regular.transform.forward * 1.0f;
                     ++i_MouseScrollPos;
