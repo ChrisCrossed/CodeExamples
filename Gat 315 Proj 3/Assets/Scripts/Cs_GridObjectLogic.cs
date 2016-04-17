@@ -22,6 +22,7 @@ public class Cs_GridObjectLogic : MonoBehaviour
 
     int i_CurrTestPos;
 
+    // Changes through the colors of the walls when clicked on
     public void ToggleGameObjects()
     {
         // No Game Object, Instantiate it

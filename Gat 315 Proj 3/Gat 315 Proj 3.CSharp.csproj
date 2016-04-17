@@ -67,11 +67,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\6by7\ProGrids\Classes\pg_Util.cs" />
-    <Compile Include="Assets\Cs_MenuLogic.cs" />
     <Compile Include="Assets\Scripts\Cs_BaseColliderLogic.cs" />
     <Compile Include="Assets\Scripts\Cs_CameraLogic.cs" />
     <Compile Include="Assets\Scripts\Cs_DefaultBase.cs" />
+    <Compile Include="Assets\Scripts\Cs_GridLogic.cs" />
     <Compile Include="Assets\Scripts\Cs_GridObjectLogic.cs" />
+    <Compile Include="Assets\Scripts\Cs_MenuLogic.cs" />
     <Compile Include="Assets\Scripts\Cs_RadiusColliderLogic.cs" />
     <Compile Include="Assets\Scripts\Cs_WallLogic.cs" />
     <Compile Include="Assets\Scripts\Cs_WallTowerLogic.cs" />
