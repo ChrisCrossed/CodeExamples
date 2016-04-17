@@ -8,7 +8,9 @@ enum MouseState
     Off, // Default position. Set to Off the 1st frame after 'Released'
     Pressed, // Mouse is pressed
     Released, // Mouse is Released
-    Held // If Mouse is still held after 0.3f, becomes Held
+    Held, // If Mouse is still held after 0.3f, becomes Held
+    ScrollUp, // Scroll Wheel Up was performed
+    ScrollDown // Scroll Wheel Down was performed
 }
 
 public class Cs_CameraLogic : MonoBehaviour
@@ -29,6 +31,9 @@ public class Cs_CameraLogic : MonoBehaviour
     public GameObject Cam_Regular;
     public GameObject Cam_TopDown;
 
+    // Mouse scroll objects
+    int i_MouseScrollPos;
+
     // Use this for initialization
     void Start ()
     {
@@ -37,10 +42,18 @@ public class Cs_CameraLogic : MonoBehaviour
         b_GameRunning = true;
         SetPauseMenu(false);
         b_Camera_AttachedToMain = true;
+        i_MouseScrollPos = 4;
     }
 
     void SetMouseState()
     {
+        if(Input.GetAxis("Mouse ScrollWheel") != 0.0f)
+        {
+            // If the Mouse scroll axis is > 0, the mouse scroll wheel is 'Up', otherwise it is down.
+            if (Input.GetAxis("Mouse ScrollWheel") > 0.0f) mouseState = MouseState.ScrollUp; else mouseState = MouseState.ScrollDown;
+            return;
+        }
+
         // Search for an excuse for the mouse to be considered off
         if(Input.GetMouseButtonUp(0) || mouseState == MouseState.Released)
         {
@@ -62,7 +75,11 @@ public class Cs_CameraLogic : MonoBehaviour
         if (Input.GetMouseButtonDown(0))
         {
             mouseState = MouseState.Pressed;
+            return;
         }
+
+        // Default
+        mouseState = MouseState.Off;
     }
 
     void MoveCamera()
@@ -114,6 +131,27 @@ public class Cs_CameraLogic : MonoBehaviour
             }
 
             Cam_Regular.transform.position = newPos;
+
+            // Move camera in/out when scrolling the mouse
+            if(mouseState == MouseState.ScrollUp)
+            {
+                // Work with a counter for how far in/out the camera can move
+                if(i_MouseScrollPos > 0)
+                {
+                    Cam_Regular.transform.position += Cam_Regular.transform.forward * 1.0f;
+                    --i_MouseScrollPos;
+                }
+            }
+            else if(mouseState == MouseState.ScrollDown)
+            {
+                // Work with a counter for how far in/out the camera can move
+                if (i_MouseScrollPos < 10)
+                {
+                    Cam_Regular.transform.position -= Cam_Regular.transform.forward * 1.0f;
+                    ++i_MouseScrollPos;
+                }
+            }
+
         }
     }
 	
