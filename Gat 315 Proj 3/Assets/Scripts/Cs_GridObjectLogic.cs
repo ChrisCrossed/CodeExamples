@@ -15,6 +15,13 @@ class GridPosition
     }    
 }
 
+public enum GridObjectState
+{
+    Off,
+    On,
+    Active
+}
+
 public class Cs_GridObjectLogic : MonoBehaviour
 {
     // GridPosition testGridObject = new GridPosition { x = 0, y = 0, gridQuadrant = GridPosition.GridQuadrant.Center };
@@ -22,6 +29,7 @@ public class Cs_GridObjectLogic : MonoBehaviour
 
     // State of the GridObject
     bool b_IsEnabled;
+    GridObjectState gridObjectState;
 
     // Prototype information. Remove later.
     int i_CurrTestPos;
@@ -33,6 +41,7 @@ public class Cs_GridObjectLogic : MonoBehaviour
         if(i_CurrTestPos == 0)
         {
             print("Initializing the Tower");
+            gridObjectState = GridObjectState.Active;
 
             go_CurrentGameObject = Instantiate(Resources.Load("GO_Wall")) as GameObject;
             go_CurrentGameObject.GetComponent<Cs_WallTowerLogic>().Initialize(10, 10);
@@ -68,6 +77,8 @@ public class Cs_GridObjectLogic : MonoBehaviour
         // Destroy the Tower
         else if (i_CurrTestPos == 5)
         {
+            gridObjectState = GridObjectState.Off;
+
             // Destroy tower
             GameObject.Destroy(go_CurrentGameObject);
         }
@@ -85,12 +96,20 @@ public class Cs_GridObjectLogic : MonoBehaviour
 
         // Set the Mesh Renderer
         gameObject.GetComponentInChildren<MeshRenderer>().enabled = b_IsEnabled;
+
+        // Set the state of the GridObject
+        if(b_IsEnabled_) gridObjectState = GridObjectState.On; else gridObjectState = GridObjectState.Off;
+    }
+
+    public GridObjectState GetGridObjectState()
+    {
+        return gridObjectState;
     }
 
     // Use this for initialization
     void Start ()
     {
-        
+        gridObjectState = GridObjectState.Off;
     }
 	
 	// Update is called once per frame

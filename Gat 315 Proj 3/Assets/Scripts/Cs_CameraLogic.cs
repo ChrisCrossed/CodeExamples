@@ -34,6 +34,8 @@ public class Cs_CameraLogic : MonoBehaviour
     // Mouse scroll objects
     int i_MouseScrollPos;
 
+    GameObject go_GridObjectList;
+
     // Use this for initialization
     void Start ()
     {
@@ -43,6 +45,7 @@ public class Cs_CameraLogic : MonoBehaviour
         SetPauseMenu(false);
         b_Camera_AttachedToMain = true;
         i_MouseScrollPos = 4;
+        go_GridObjectList = GameObject.Find("GridObject List");
     }
 
     void SetMouseState()
@@ -213,6 +216,8 @@ public class Cs_CameraLogic : MonoBehaviour
                     if(objectHit.GetComponent<Cs_GridObjectLogic>())
                     {
                         objectHit.GetComponent<Cs_GridObjectLogic>().ToggleGameObjects();
+
+                        go_GridObjectList.GetComponent<Cs_GridLogic>().CheckGridForNewArray();
                     }
                 }
             }
