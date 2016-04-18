@@ -217,7 +217,7 @@ public class Cs_CameraLogic : MonoBehaviour
                     {
                         objectHit.GetComponent<Cs_GridObjectLogic>().ToggleGameObjects();
 
-                        go_GridObjectList.GetComponent<Cs_GridLogic>().CheckGridForNewArray();
+                        // go_GridObjectList.GetComponent<Cs_GridLogic>().IncrementNumberOfTowers();
                     }
                 }
             }

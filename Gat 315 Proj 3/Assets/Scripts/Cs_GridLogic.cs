@@ -8,6 +8,9 @@ public class Cs_GridLogic : MonoBehaviour
 
     bool b_Test = true;
 
+    int i_CurrNumTowers;
+    int i_CurrSideLength = 1;
+
     // Use this for initialization
     void Start()
     {
@@ -44,58 +47,35 @@ public class Cs_GridLogic : MonoBehaviour
         }
     }
 
-    public void CheckGridForNewArray()
+    public void IncrementNumberOfTowers(bool b_Incremented = true)
     {
-        // Store the center X & Y position
-        int centerXY = sizeOfGrid / 2; // Yes, 5/2 = 2. But 0 through 4 = 2, so it works for now.
-        bool b_LeftWallChecked = false;
-        bool b_RighttWallChecked = false;
-        bool b_TopWallChecked = false;
-        bool b_BottomWallChecked = false;
+        if (b_Incremented) ++i_CurrNumTowers; else --i_CurrNumTowers;
 
-        // Check left wall for appropriate circumstances.
-        for (int x = 0; x < sizeOfGrid / 2; ++x)
+        print("Num Towers: " + i_CurrNumTowers + ", length: " + i_CurrSideLength);
+
+        if((float)i_CurrNumTowers / (float)(i_CurrSideLength * i_CurrSideLength) > 0.75f)
         {
-            // Run from left toward the center, searching for the first active
-            GameObject tempObj = gridList[(centerXY * sizeOfGrid) + x] as GameObject;
-            if (tempObj.GetComponent<Cs_GridObjectLogic>().GetGridObjectState() != GridObjectState.Off)
-            {
-                // Run through the center X coordinate from left to 'grid center' for the first non-'Off' GridObject.
-                int centerY = ((centerXY * sizeOfGrid) + x) % sizeOfGrid;
+            IncrementWidthOfTowerArray();
+        }
+    }
 
-                for(int y = 0; y < sizeOfGrid; ++y)
-                {
-                    GameObject newTempObj = gridList[(y * sizeOfGrid) + x] as GameObject;
+    void IncrementWidthOfTowerArray()
+    {
+        // i_CurrSideLength += 2;
+        ++i_CurrSideLength;
 
-                    // Run through that new Y position in the array. If we find any 'On' GridObject, continue. (Means it is empty)
-                    if(newTempObj.GetComponent<Cs_GridObjectLogic>().GetGridObjectState() == GridObjectState.On)
-                    {
-                        b_LeftWallChecked = true;
+        // Find the X/Y pos of the center
+        int i_Center = sizeOfGrid / 2;
 
-                        // Kick out because this column wont get anything new
-                        continue;
-                    }
+        // yPos = center - i_CurrSideLength
+        int y_ = i_Center - i_CurrSideLength;
 
+        // x runs from center - currsidelength through center + currsidelength.
+        for(int x = y_ - i_CurrSideLength; x < y_ + i_CurrSideLength; ++x)
+        {
+            var tower = gridList[(y_ * sizeOfGrid) + x] as GameObject;
 
-                }
-                // Continues kicking out of the for-loop (We don't want to continue moving inward, since those columns are already checked)
-                if (b_LeftWallChecked) continue;
-
-                // We've determined all spots in this column either are 'off' or 'Active'. Set the left column to active (if possible)
-                if(centerY > 0)
-                {
-                    /*
-                    for(int y = 0; )
-                    GameObject newTempObj = gridList[]
-                    if()
-                    */
-                }
-
-                // Loop again. If a gridobject spot is 'Active', then make it's y-1 position On.
-                // We've finished this column. Since we made a change to the array, return (kick out)
-
-            }
-            // Otherwise, all of the GridObjects are either Off or Active, then we can expand outward (y - 1)
+            tower.GetComponent<Cs_GridObjectLogic>().SetGridObjectState(true);
         }
     }
 
@@ -103,7 +83,7 @@ public class Cs_GridLogic : MonoBehaviour
     void Update()
     {
 
-#if UNITY_EDITOR
+        #if UNITY_EDITOR
         if (Input.GetKeyDown(KeyCode.P))
         {
             b_Test = !b_Test;
@@ -115,7 +95,7 @@ public class Cs_GridLogic : MonoBehaviour
                 tower.GetComponent<Cs_GridObjectLogic>().SetGridObjectState(b_Test);
             }
         }
-#endif
+        #endif
 
     }
 }

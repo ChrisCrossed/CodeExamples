@@ -42,6 +42,7 @@ public class Cs_GridObjectLogic : MonoBehaviour
         {
             print("Initializing the Tower");
             gridObjectState = GridObjectState.Active;
+            GameObject.Find("GridObject List").GetComponent<Cs_GridLogic>().IncrementNumberOfTowers();
 
             go_CurrentGameObject = Instantiate(Resources.Load("GO_Wall")) as GameObject;
             go_CurrentGameObject.GetComponent<Cs_WallTowerLogic>().Initialize(10, 10);
@@ -78,6 +79,8 @@ public class Cs_GridObjectLogic : MonoBehaviour
         else if (i_CurrTestPos == 5)
         {
             gridObjectState = GridObjectState.Off;
+
+            GameObject.Find("GridObject List").GetComponent<Cs_GridLogic>().IncrementNumberOfTowers(false);
 
             // Destroy tower
             GameObject.Destroy(go_CurrentGameObject);
