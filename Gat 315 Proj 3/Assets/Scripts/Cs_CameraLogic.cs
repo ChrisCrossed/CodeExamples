@@ -30,6 +30,7 @@ public class Cs_CameraLogic : MonoBehaviour
     bool b_Camera_AttachedToMain;
     public GameObject Cam_Regular;
     public GameObject Cam_TopDown;
+    GameObject LevelController;
 
     // Mouse scroll objects
     int i_MouseScrollPos;
@@ -46,6 +47,7 @@ public class Cs_CameraLogic : MonoBehaviour
         b_Camera_AttachedToMain = true;
         i_MouseScrollPos = 4;
         go_GridObjectList = GameObject.Find("GridObject List");
+        LevelController = GameObject.Find("LevelController");
     }
 
     void SetMouseState()
@@ -219,7 +221,32 @@ public class Cs_CameraLogic : MonoBehaviour
                     // Check to see if the object, when clicked, has an appropriate collider. If it does, attempt to create a wall.
                     if(objectHit.GetComponent<Cs_GridObjectLogic>())
                     {
-                        objectHit.GetComponent<Cs_GridObjectLogic>().ToggleGameObjects();
+                        // If the player clicks to want a wall
+                        if(objectHit.GetComponent<Cs_GridObjectLogic>().Get_GridObjectState() == GridObjectState.On)
+                        {
+                            // Check if we can purchase a wall
+                            if (LevelController.GetComponent<Cs_LevelController>().CheckToBuy(PurchaseObjects.Wall))
+                            {
+                                // We can, so buy a wall
+                                objectHit.GetComponent<Cs_GridObjectLogic>().Set_GridObjectType(PurchaseObjects.Wall);
+                            }
+                            else
+                            {
+                                print("Not enough money");
+                            }
+                        }
+                        else if(objectHit.GetComponent<Cs_GridObjectLogic>().Get_GridObjectState() == GridObjectState.Active)
+                        {
+                            if (LevelController.GetComponent<Cs_LevelController>().CheckToBuy(PurchaseObjects.Wall))
+                            {
+                                objectHit.GetComponent<Cs_GridObjectLogic>().ToggleGameObjects();
+                            }
+                            else
+                            {
+                                print("Not enough money");
+                            }
+                        }
+                        
 
                         // go_GridObjectList.GetComponent<Cs_GridLogic>().IncrementNumberOfTowers();
                     }

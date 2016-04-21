@@ -14,6 +14,15 @@ public class Cs_EnemyLogic : MonoBehaviour
         f_Speed = 3.0f;
         f_DisabledTimer = 0.0f;
 	}
+
+    void KillEnemy()
+    {
+        // Give money
+        GameObject.Find("LevelController").GetComponent<Cs_LevelController>().ReceiveCurrency(100);
+
+        // Destroy Object
+        GameObject.Destroy(gameObject);
+    }
 	
 	// Update is called once per frame
 	void Update ()
@@ -33,7 +42,7 @@ public class Cs_EnemyLogic : MonoBehaviour
         {
             f_DisabledTimer -= Time.deltaTime;
 
-            if(f_DisabledTimer <= 0)
+            if (f_DisabledTimer <= 0)
             {
                 f_DisabledTimer = 0f;
             }
@@ -45,11 +54,18 @@ public class Cs_EnemyLogic : MonoBehaviour
         // If collide with tower, apply damage
         if(collider_.gameObject.tag == "Tower")
         {
+            --i_Health;
+
             f_DisabledTimer = 1.0f;
 
-            gameObject.GetComponent<Rigidbody>().AddForce(transform.forward * -50f);
+            gameObject.GetComponent<Rigidbody>().AddForce(transform.forward * -75f);
 
             collider_.gameObject.GetComponent<Cs_BaseColliderLogic>().ApplyDamage(1);
+
+            if(i_Health <= 0)
+            {
+                KillEnemy();
+            }
         }
         
         // If collide with bullet, take damage

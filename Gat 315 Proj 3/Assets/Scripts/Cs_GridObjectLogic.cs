@@ -30,9 +30,30 @@ public class Cs_GridObjectLogic : MonoBehaviour
     // State of the GridObject
     bool b_IsEnabled;
     GridObjectState gridObjectState;
+    PurchaseObjects gridObjectType;
 
     // Prototype information. Remove later.
     int i_CurrTestPos;
+
+    public GridObjectState Get_GridObjectState()
+    {
+        return gridObjectState;
+    }
+
+    public PurchaseObjects Get_GridObjectType()
+    {
+        return gridObjectType;
+    }
+
+    public void Set_GridObjectType(PurchaseObjects purchaseObjects_)
+    {
+        gridObjectType = purchaseObjects_;
+
+        if(gridObjectType == PurchaseObjects.Wall)
+        {
+            ToggleGameObjects(0);
+        }
+    }
 
     public void KillTower()
     {
@@ -48,13 +69,12 @@ public class Cs_GridObjectLogic : MonoBehaviour
         // No Game Object, Instantiate it
         if(i_CurrTestPos == 0)
         {
-            print("Initializing the Tower");
-
             gridObjectState = GridObjectState.Active;
+
             GameObject.Find("GridObject List").GetComponent<Cs_GridLogic>().IncrementNumberOfTowers();
 
             go_CurrentGameObject = Instantiate(Resources.Load("GO_Wall")) as GameObject;
-            go_CurrentGameObject.GetComponent<Cs_WallTowerLogic>().Initialize(3, 10, gameObject);
+            go_CurrentGameObject.GetComponent<Cs_WallTowerLogic>().Initialize(4, 10, gameObject);
 
             Vector3 newPos = gameObject.transform.position;
             newPos.y = 0.5f;
@@ -63,18 +83,24 @@ public class Cs_GridObjectLogic : MonoBehaviour
         // Run through three colors on the tower (Blue)
         else if(i_CurrTestPos == 1)
         {
+            go_CurrentGameObject.GetComponent<Cs_WallTowerLogic>().ApplyDamage(-1);
+
             go_CurrentGameObject.GetComponent<Cs_WallTowerLogic>().SetNewMaterialColor(Colors.Blue);
         }
 
         // Run through three colors on the tower (Red)
         else if (i_CurrTestPos == 2)
         {
+            go_CurrentGameObject.GetComponent<Cs_WallTowerLogic>().ApplyDamage(-1);
+
             go_CurrentGameObject.GetComponent<Cs_WallTowerLogic>().SetNewMaterialColor(Colors.Red);
         }
 
         // Run through three colors on the tower (Green)
         else if (i_CurrTestPos == 3)
         {
+            go_CurrentGameObject.GetComponent<Cs_WallTowerLogic>().ApplyDamage(-1);
+
             go_CurrentGameObject.GetComponent<Cs_WallTowerLogic>().SetNewMaterialColor(Colors.Green);
         }
 
@@ -95,8 +121,10 @@ public class Cs_GridObjectLogic : MonoBehaviour
             GameObject.Destroy(go_CurrentGameObject);
         }
 
+        if (i_CurrTestPos < 3) ++i_CurrTestPos;
+
         // Set/Reset Counter
-        if(++i_CurrTestPos > 5) i_CurrTestPos = 0;
+        if(i_CurrTestPos > 5) i_CurrTestPos = 0;
     }
 
     public void SetGridObjectState(bool b_IsEnabled_)
@@ -113,15 +141,10 @@ public class Cs_GridObjectLogic : MonoBehaviour
         if(b_IsEnabled_) gridObjectState = GridObjectState.On; else gridObjectState = GridObjectState.Off;
     }
 
-    public GridObjectState GetGridObjectState()
-    {
-        return gridObjectState;
-    }
-
     // Use this for initialization
     void Start ()
     {
-        gridObjectState = GridObjectState.Off;
+        // gridObjectState = GridObjectState.Off;
     }
 	
 	// Update is called once per frame
