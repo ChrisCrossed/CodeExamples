@@ -33,16 +33,18 @@ public class Cs_DefaultBase : MonoBehaviour
     BoxCollider col_BaseCollider;
     CapsuleCollider col_RadiusCollider;
     List<GameObject> EnemyList;
+    GameObject go_GridObject_Parent;
 
     public Material testMat;
 
     int element_Color = -1; // Color is the object color (Red, Blue, Green, etc...)
     int element_Base = -1; // Base is the black backdrop
 
-    virtual public void Initialize(int i_Health_Max_, float f_FireTimer_Max_, BoxCollider col_BaseCollider_ = null, CapsuleCollider col_RadiusCollider_ = null)
+    virtual public void Initialize(int i_Health_Max_, float f_FireTimer_Max_, GameObject go_ParentBoxCollider_, BoxCollider col_BaseCollider_ = null, CapsuleCollider col_RadiusCollider_ = null)
     {
         i_Health = i_Health_Max_;
         i_Health_Max = i_Health_Max_;
+        go_GridObject_Parent = go_ParentBoxCollider_;
 
         b_IsDead = false;
 
@@ -90,11 +92,14 @@ public class Cs_DefaultBase : MonoBehaviour
 
     virtual public void ApplyDamage(int i_Damage)
     {
+        print("Received Damage: " + i_Damage);
+
         i_Health -= i_Damage;
 
-        if(i_Damage <= 0)
+        if(i_Health <= 0)
         {
             // Destroy GameObject
+            go_GridObject_Parent.GetComponent<Cs_GridObjectLogic>().KillTower();
         }
     }
 

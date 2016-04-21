@@ -34,18 +34,27 @@ public class Cs_GridObjectLogic : MonoBehaviour
     // Prototype information. Remove later.
     int i_CurrTestPos;
 
-    // Changes through the colors of the walls when clicked on
-    public void ToggleGameObjects()
+    public void KillTower()
     {
+        // Kills the tower
+        ToggleGameObjects(5);
+    }
+
+    // Changes through the colors of the walls when clicked on
+    public void ToggleGameObjects(int i_NewTowerPos_ = -1)
+    {
+        if (i_NewTowerPos_ != -1) i_CurrTestPos = i_NewTowerPos_;
+
         // No Game Object, Instantiate it
         if(i_CurrTestPos == 0)
         {
             print("Initializing the Tower");
+
             gridObjectState = GridObjectState.Active;
             GameObject.Find("GridObject List").GetComponent<Cs_GridLogic>().IncrementNumberOfTowers();
 
             go_CurrentGameObject = Instantiate(Resources.Load("GO_Wall")) as GameObject;
-            go_CurrentGameObject.GetComponent<Cs_WallTowerLogic>().Initialize(10, 10);
+            go_CurrentGameObject.GetComponent<Cs_WallTowerLogic>().Initialize(3, 10, gameObject);
 
             Vector3 newPos = gameObject.transform.position;
             newPos.y = 0.5f;

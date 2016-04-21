@@ -70,6 +70,7 @@
     <Compile Include="Assets\Scripts\Cs_BaseColliderLogic.cs" />
     <Compile Include="Assets\Scripts\Cs_CameraLogic.cs" />
     <Compile Include="Assets\Scripts\Cs_DefaultBase.cs" />
+    <Compile Include="Assets\Scripts\Cs_EnemyLogic.cs" />
     <Compile Include="Assets\Scripts\Cs_GridLogic.cs" />
     <Compile Include="Assets\Scripts\Cs_GridObjectLogic.cs" />
     <Compile Include="Assets\Scripts\Cs_MenuLogic.cs" />

@@ -101,35 +101,39 @@ public class Cs_CameraLogic : MonoBehaviour
 
             var newPos = Cam_Regular.transform.position;
 
+            int i_MoveSpeed = 2;
+
+            if (Input.GetKey(KeyCode.LeftShift)) i_MoveSpeed = 6;
+
             if (b_Left)
             {
                 // > -3
                 if (Cam_Regular.transform.position.x > -3f)
                 {
-                    newPos.x -= Time.deltaTime * 2;
+                    newPos.x -= Time.deltaTime * i_MoveSpeed;
                 }
             }
             if(b_Right)
             {
                 if (Cam_Regular.transform.position.x < 3f)
                 {
-                    newPos.x += Time.deltaTime * 2;
+                    newPos.x += Time.deltaTime * i_MoveSpeed;
                 }
             }
 
             if (b_Backward)
             {
                 // > -3
-                if (Cam_Regular.transform.position.z > -7f)
+                if (Cam_Regular.transform.position.z > -9f)
                 {
-                    newPos.z -= Time.deltaTime * 2;
+                    newPos.z -= Time.deltaTime * i_MoveSpeed;
                 }
             }
             if (b_Forward)
             {
                 if (Cam_Regular.transform.position.z < 0f)
                 {
-                    newPos.z += Time.deltaTime * 2;
+                    newPos.z += Time.deltaTime * i_MoveSpeed;
                 }
             }
 
@@ -139,7 +143,7 @@ public class Cs_CameraLogic : MonoBehaviour
             if(mouseState == MouseState.ScrollUp)
             {
                 // Work with a counter for how far in/out the camera can move
-                if(i_MouseScrollPos > 0)
+                if(i_MouseScrollPos > 2)
                 {
                     Cam_Regular.transform.position += Cam_Regular.transform.forward * 1.0f;
                     --i_MouseScrollPos;
@@ -148,7 +152,7 @@ public class Cs_CameraLogic : MonoBehaviour
             else if(mouseState == MouseState.ScrollDown)
             {
                 // Work with a counter for how far in/out the camera can move
-                if (i_MouseScrollPos < 7)
+                if (i_MouseScrollPos < 9)
                 {
                     Cam_Regular.transform.position -= Cam_Regular.transform.forward * 1.0f;
                     ++i_MouseScrollPos;

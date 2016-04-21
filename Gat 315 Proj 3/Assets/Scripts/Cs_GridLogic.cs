@@ -63,6 +63,7 @@ public class Cs_GridLogic : MonoBehaviour
     {
         i_TowerLevel += 2; // Brings the tower level to 5x5, 7x7, etc...
 
+        #region Tower Levels
         if(i_TowerLevel == 5)
         {
             // Top Row
@@ -416,6 +417,7 @@ public class Cs_GridLogic : MonoBehaviour
             temp.GetComponent<Cs_GridObjectLogic>().SetGridObjectState(true);
             #endregion
         }
+        #endregion
     }
 
     // Update is called once per frame
