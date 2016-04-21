@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public enum PurchaseObjects
 {
@@ -23,6 +24,8 @@ public class Cs_LevelController : MonoBehaviour
     int i_CurrEnemies = 1;
     int i_CurrLevel = 0;
     bool b_GameOver = false;
+    float f_GameOverTimer;
+    public GameObject go_GameOver;
 
     public GameObject GUI;
 
@@ -112,6 +115,8 @@ public class Cs_LevelController : MonoBehaviour
     {
         print("GAME OVER");
         b_GameOver = true;
+
+        go_GameOver.SetActive(true);
     }
 	
 	// Update is called once per frame
@@ -119,6 +124,9 @@ public class Cs_LevelController : MonoBehaviour
     {
         if(!b_GameOver)
         {
+            // Cheat Code
+            if (Input.GetKeyDown(KeyCode.P)) ReceiveCurrency(1000);
+
             GoldTimerBullshit();
 
             f_EnemyTimer -= Time.deltaTime;
@@ -140,6 +148,15 @@ public class Cs_LevelController : MonoBehaviour
                     f_EnemyTimer = 10.0f;
                     i_CurrEnemies = i_CurrLevel;
                 }
+            }
+        }
+        else
+        {
+            f_GameOverTimer += Time.deltaTime;
+
+            if(f_GameOverTimer >= 10.0f)
+            {
+                SceneManager.LoadScene("Menu_2");
             }
         }
 	}

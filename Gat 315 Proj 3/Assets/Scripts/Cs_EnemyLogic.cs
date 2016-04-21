@@ -7,6 +7,7 @@ public class Cs_EnemyLogic : MonoBehaviour
     float f_Speed = 3.0f;
     float f_DisabledTimer = 0f;
     int i_ColliderTimer;
+    float f_LifeTimer;
 
 	// Use this for initialization
 	void Start ()
@@ -47,6 +48,12 @@ public class Cs_EnemyLogic : MonoBehaviour
             {
                 f_DisabledTimer = 0f;
             }
+        }
+
+        f_LifeTimer += Time.deltaTime;
+        if(f_LifeTimer >= 20f)
+        {
+            KillEnemy();
         }
     }
 

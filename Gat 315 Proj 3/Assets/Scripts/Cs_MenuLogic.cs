@@ -6,6 +6,7 @@ public class Cs_MenuLogic : MonoBehaviour
 {
     public string goToScene;
     float f_Timer;
+    public float f_MaxTime = 5.0f;
 
 	// Use this for initialization
 	void Start ()
@@ -19,9 +20,12 @@ public class Cs_MenuLogic : MonoBehaviour
     {
         f_Timer += Time.deltaTime;
 
-        print(f_Timer);
+        if(Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Escape))
+        {
+            f_Timer = f_MaxTime;
+        }
 
-        if (f_Timer >= 5.0f)
+        if (f_Timer >= f_MaxTime)
         {
             SceneManager.LoadScene(goToScene);
         }
