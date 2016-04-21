@@ -6,6 +6,7 @@ public class Cs_EnemyLogic : MonoBehaviour
     int i_Health = 3;
     float f_Speed = 3.0f;
     float f_DisabledTimer = 0f;
+    int i_ColliderTimer;
 
 	// Use this for initialization
 	void Start ()
@@ -18,7 +19,7 @@ public class Cs_EnemyLogic : MonoBehaviour
     void KillEnemy()
     {
         // Give money
-        GameObject.Find("LevelController").GetComponent<Cs_LevelController>().ReceiveCurrency(100);
+        GameObject.Find("LevelController").GetComponent<Cs_LevelController>().ReceiveCurrency(150);
 
         // Destroy Object
         GameObject.Destroy(gameObject);
@@ -67,7 +68,20 @@ public class Cs_EnemyLogic : MonoBehaviour
                 KillEnemy();
             }
         }
-        
         // If collide with bullet, take damage
+    }
+
+    void OnTriggerStay(Collider collider_)
+    {
+        if(collider_.gameObject.tag == "Tower")
+        {
+            ++i_ColliderTimer;
+
+            if(i_ColliderTimer >= 10)
+            {
+                Vector3 newPos = gameObject.transform.position + (transform.forward * -5);
+                gameObject.transform.position = newPos;
+            }
+        }
     }
 }

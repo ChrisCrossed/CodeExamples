@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
 
 public enum PurchaseObjects
 {
@@ -20,13 +21,18 @@ public class Cs_LevelController : MonoBehaviour
     public GameObject[] SpawnLocations = new GameObject[4];
     float f_EnemyTimer;
     int i_CurrEnemies = 1;
-    int i_CurrLevel = 1;
+    int i_CurrLevel = 0;
+    bool b_GameOver = false;
 
     public GameObject GUI;
 
 	// Use this for initialization
 	void Start ()
     {
+        GameObject.Find("Resources").GetComponent<Text>().text = "Resources: " + i_Currency;
+        GameObject.Find("TowerCost").GetComponent<Text>().text = "Tower Cost: " + i_Cost_Wall;
+        GameObject.Find("UpgradeCost").GetComponent<Text>().text = "Upgrade Cost: " + i_Cost_Upgrade;
+
         f_EnemyTimer = 5;
 	}
 
@@ -46,6 +52,7 @@ public class Cs_LevelController : MonoBehaviour
                 i_Currency -= i_Cost_Wall;
 
                 // Update UI if necessary
+                GameObject.Find("Resources").GetComponent<Text>().text = "Resources: " + i_Currency;
 
                 return true;
             }
@@ -57,6 +64,7 @@ public class Cs_LevelController : MonoBehaviour
                 i_Currency -= i_Cost_Turret;
 
                 // Update UI if necessary
+                GameObject.Find("Resources").GetComponent<Text>().text = "Resources: " + i_Currency;
 
                 return true;
             }
@@ -68,6 +76,7 @@ public class Cs_LevelController : MonoBehaviour
                 i_Currency -= i_Cost_Upgrade;
 
                 // Update UI if necessary
+                GameObject.Find("Resources").GetComponent<Text>().text = "Resources: " + i_Currency;
 
                 return true;
             }
@@ -87,6 +96,7 @@ public class Cs_LevelController : MonoBehaviour
             ReceiveCurrency(i_GoldPerSecond);
 
             // Update UI if necessary
+            GameObject.Find("Resources").GetComponent<Text>().text = "Resources: " + i_Currency;
         }
     }
 
@@ -97,28 +107,39 @@ public class Cs_LevelController : MonoBehaviour
 
         SpawnLocations[location].GetComponent<Cs_EnemySpawnLogic>().SpawnEnemy();
     }
+
+    public void EndGame()
+    {
+        print("GAME OVER");
+        b_GameOver = true;
+    }
 	
 	// Update is called once per frame
 	void Update ()
     {
-        GoldTimerBullshit();
-
-        f_EnemyTimer -= Time.deltaTime;
-
-        if(f_EnemyTimer <= 0.0f)
+        if(!b_GameOver)
         {
-            f_EnemyTimer = 1.0f;
+            GoldTimerBullshit();
 
-            SpawnEnemies();
+            f_EnemyTimer -= Time.deltaTime;
 
-            --i_CurrEnemies;
-
-            if(i_CurrEnemies <= 0)
+            if(f_EnemyTimer <= 0.0f)
             {
-                ++i_CurrLevel;
+                f_EnemyTimer = 1.0f;
 
-                f_EnemyTimer = 10.0f;
-                i_CurrEnemies = i_CurrLevel;
+                SpawnEnemies();
+
+                --i_CurrEnemies;
+
+                if(i_CurrEnemies <= 0)
+                {
+                    ++i_CurrLevel;
+
+                    GameObject.Find("CurrentLevel").GetComponent<Text>().text = "Current Level: " + i_CurrLevel;
+
+                    f_EnemyTimer = 10.0f;
+                    i_CurrEnemies = i_CurrLevel;
+                }
             }
         }
 	}

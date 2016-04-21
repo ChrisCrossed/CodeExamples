@@ -67,6 +67,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\6by7\ProGrids\Classes\pg_Util.cs" />
+    <Compile Include="Assets\Cs_CenterObjective.cs" />
     <Compile Include="Assets\Cs_EnemySpawnLogic.cs" />
     <Compile Include="Assets\Scripts\Cs_BaseColliderLogic.cs" />
     <Compile Include="Assets\Scripts\Cs_CameraLogic.cs" />

@@ -18,10 +18,9 @@ public class Cs_EnemySpawnLogic : MonoBehaviour
         Vector3 pos = gameObject.transform.position;
         Quaternion quat = gameObject.transform.rotation;
 
-        GameObject temp = Instantiate(Resources.Load("Enemy", typeof(GameObject)), pos, quat) as GameObject;
+        Instantiate(Resources.Load("Enemy", typeof(GameObject)), pos, quat);
 
         Vector3 newPos = gameObject.transform.position;
-
         if (enemySpawnLocation == EnemySpawnLocation.North || enemySpawnLocation == EnemySpawnLocation.South)
         {
             newPos.x = Random.Range(-10, 11);
