@@ -237,7 +237,7 @@ public class Cs_CameraLogic : MonoBehaviour
                         }
                         else if(objectHit.GetComponent<Cs_GridObjectLogic>().Get_GridObjectState() == GridObjectState.Active)
                         {
-                            if (LevelController.GetComponent<Cs_LevelController>().CheckToBuy(PurchaseObjects.Wall))
+                            if (LevelController.GetComponent<Cs_LevelController>().CheckToBuy(PurchaseObjects.Upgrade))
                             {
                                 objectHit.GetComponent<Cs_GridObjectLogic>().ToggleGameObjects();
                             }
