@@ -145,29 +145,29 @@ public class Cs_LevelManager : MonoBehaviour
             floorWidth.z = i_LevelWidth_ / 10;
         }
 
-        Floor.transform.localScale = floorWidth;
+        //Floor.transform.localScale = floorWidth;
 
         // Update current wall positions
         float wallPos = Floor.transform.localScale.x * 10 / 2;
 
-        Wall_PosX.transform.position = new Vector3(wallPos, Wall_PosX.transform.position.y, Wall_PosX.transform.position.z);
+        //Wall_PosX.transform.position = new Vector3(wallPos, Wall_PosX.transform.position.y, Wall_PosX.transform.position.z);
 
-        Wall_NegX.transform.position = new Vector3(-wallPos, Wall_NegX.transform.position.y, Wall_NegX.transform.position.z);
+        //Wall_NegX.transform.position = new Vector3(-wallPos, Wall_NegX.transform.position.y, Wall_NegX.transform.position.z);
 
-        Wall_PosY.transform.position = new Vector3(Wall_PosY.transform.position.x, Wall_PosY.transform.position.y, wallPos);
+        //Wall_PosY.transform.position = new Vector3(Wall_PosY.transform.position.x, Wall_PosY.transform.position.y, wallPos);
 
-        Wall_NegY.transform.position = new Vector3(Wall_NegY.transform.position.x, Wall_NegY.transform.position.y, -wallPos);
+        //Wall_NegY.transform.position = new Vector3(Wall_NegY.transform.position.x, Wall_NegY.transform.position.y, -wallPos);
 
         // Update current wall lengths
         float wallLength = Floor.transform.localScale.x * 10;
 
-        Wall_PosX.transform.localScale = new Vector3(Wall_PosX.transform.localScale.x, Wall_PosX.transform.localScale.y, wallLength);
+        //Wall_PosX.transform.localScale = new Vector3(Wall_PosX.transform.localScale.x, Wall_PosX.transform.localScale.y, wallLength);
 
-        Wall_NegX.transform.localScale = new Vector3(Wall_NegX.transform.localScale.x, Wall_NegX.transform.localScale.y, wallLength);
+        //Wall_NegX.transform.localScale = new Vector3(Wall_NegX.transform.localScale.x, Wall_NegX.transform.localScale.y, wallLength);
 
-        Wall_PosY.transform.localScale = new Vector3(wallLength, Wall_PosY.transform.localScale.y, Wall_PosY.transform.localScale.z);
+        //Wall_PosY.transform.localScale = new Vector3(wallLength, Wall_PosY.transform.localScale.y, Wall_PosY.transform.localScale.z);
 
-        Wall_NegY.transform.localScale = new Vector3(wallLength, Wall_NegY.transform.localScale.y, Wall_NegY.transform.localScale.z);
+        //Wall_NegY.transform.localScale = new Vector3(wallLength, Wall_NegY.transform.localScale.y, Wall_NegY.transform.localScale.z);
 
         // Lerp camera's height
         Vector3 newCamPos = hudCamera.transform.position;
