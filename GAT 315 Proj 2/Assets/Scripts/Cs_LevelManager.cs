@@ -86,16 +86,34 @@ public class Cs_LevelManager : MonoBehaviour
         Wall_PosY = GameObject.Find("Wall_PosY");
         Wall_NegY = GameObject.Find("Wall_NegY");
         Floor = GameObject.Find("Floor");
+
+        /* Version 1.0
         i_Pos_Level1 = 325;
         i_Pos_Level2 = 275;
         i_Pos_Level3 = 225;
         i_Pos_Level4 = 175;
         i_Pos_Level5 = 125;
+
         i_Width_Level1 = 650;
         i_Width_Level2 = 550;
         i_Width_Level3 = 450;
         i_Width_Level4 = 350;
         i_Width_Level5 = 250;
+        */
+
+        // Version 2.0
+        i_Width_Level1 = 350;
+        i_Width_Level2 = 350;
+        i_Width_Level3 = 350;
+        i_Width_Level4 = 350;
+        i_Width_Level5 = 350;
+
+        i_Pos_Level1 = 175;
+        i_Pos_Level2 = 175;
+        i_Pos_Level3 = 175;
+        i_Pos_Level4 = 175;
+        i_Pos_Level5 = 175;
+
         hudCamera = GameObject.Find("HUD_Camera");
 
         // Timer Objects
@@ -305,8 +323,6 @@ public class Cs_LevelManager : MonoBehaviour
 
                 GameObject.Find("Gold_Primary_Tutorial").GetComponent<MeshRenderer>().enabled = true;
                 GameObject.Find("Gold_Secondary_Tutorial").GetComponent<MeshRenderer>().enabled = true;
-
-                print(camRef_Tut_1.transform.position);
 
                 mainCamera.transform.position = Vector3.Lerp(mainCamera.transform.position, camRef_Tut_1.transform.position, f_CamMoveTime);
                 mainCamera.transform.rotation = Quaternion.Lerp(mainCamera.transform.rotation, camRef_Tut_1.transform.rotation, f_CamMoveTime);

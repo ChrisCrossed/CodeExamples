@@ -23,7 +23,7 @@ public class Cs_PlayerController : MonoBehaviour
     bool b_DriveMode = true;
 
     float f_CurrSpeed;
-    public float f_MaxSpeed_GearZero = 10f;
+    public float f_MaxSpeed_GearZero = 50f;
     public float f_Acceleration = 5f;
     float f_CurrSpeed_Min;
     float f_CurrSpeed_Max;
@@ -56,7 +56,9 @@ public class Cs_PlayerController : MonoBehaviour
     // Use this for initialization
     void Start ()
     {
+        #if !UNITY_EDITOR
         UnityEngine.Cursor.visible = false;
+        #endif
 
         b_IsTutorial = true;
 
@@ -90,7 +92,7 @@ public class Cs_PlayerController : MonoBehaviour
 
         if(!b_IsTutorial)
         {
-            #region Not Tutorial
+#region Not Tutorial
 
             if (f_BeginningTimer > -0.1) f_BeginningTimer -= Time.deltaTime;
 
@@ -176,15 +178,15 @@ public class Cs_PlayerController : MonoBehaviour
                 }
             }
 
-            #endregion
+        #endregion
         }
         else
         {
-            #region Tutorial
+        #region Tutorial
 
 
 
-            #endregion
+        #endregion
         }
     }
 
@@ -240,7 +242,7 @@ public class Cs_PlayerController : MonoBehaviour
 
     void Update_Speed()
     {
-        #region Cap player speed
+#region Cap player speed
         if (f_CurrSpeed < f_CurrSpeed_Min) f_CurrSpeed += f_Acceleration * Time.deltaTime;
         if (f_CurrSpeed > f_CurrSpeed_Max) f_CurrSpeed -= f_Acceleration * Time.deltaTime;
 
@@ -253,7 +255,7 @@ public class Cs_PlayerController : MonoBehaviour
         {
             f_CurrSpeed = f_CurrSpeed_Max;
         }*/
-        #endregion
+#endregion
 
         bool b_RightTrigger = (state.Triggers.Right >= 0.5f);
         bool b_LeftTrigger = (state.Triggers.Left >= 0.5f) && !b_RightTrigger;
