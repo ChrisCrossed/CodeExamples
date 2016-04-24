@@ -18,10 +18,16 @@ public class Cs_CameraController : MonoBehaviour
     // Raycast Objects
     public GameObject rayCastObj;
 
+    // Used for creating linear equation
+    float scale_;
+    float yInt_;
+
     // Use this for initialization
     void Start ()
     {
         newPos = go_CamReference.transform.position;
+
+        CreateLinearEquation(30, 40, 50, 80);
 	}
 	
 	// Update is called once per frame
@@ -63,7 +69,7 @@ public class Cs_CameraController : MonoBehaviour
         {
             // Slope equation: Y = 2(X) - 20; (x 50 = y 80, x 30 = y 40)
             float y_;
-            if (hit.distance > 30f) y_ = 2f * (hit.distance) - 20f;
+            if (hit.distance > 30f) y_ = scale_ * (hit.distance) - yInt_;
             else y_ = 40;
 
             // Pull in the camera FOV based on distance
@@ -87,6 +93,17 @@ public class Cs_CameraController : MonoBehaviour
             GameObject.Find("LevelManager").GetComponent<AudioSource>().pitch = 1.0f;
         }
     }
+
+    void CreateLinearEquation(int x1_, int y1_, int x2_, int y2_)
+    {
+        scale_ = (y2_ - y1_) / (x2_ - x1_);
+        yInt_ = -(scale_ * x1_) + y1_;
+
+        print("Scale: " + scale_);
+        print("yInt: " + yInt_);
+    }
+
+    
 
     void RotateCameraPosition()
     {
