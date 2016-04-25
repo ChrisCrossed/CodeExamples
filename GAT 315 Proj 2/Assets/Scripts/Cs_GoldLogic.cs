@@ -51,6 +51,7 @@ public class Cs_GoldLogic : MonoBehaviour
     {
         // Turn off material
         gameObject.GetComponent<MeshRenderer>().enabled = false;
+        gameObject.GetComponentInChildren<MeshRenderer>().enabled = false;
 
         // Turn off collider
         gameObject.GetComponent<Collider>().enabled = false;
@@ -84,6 +85,7 @@ public class Cs_GoldLogic : MonoBehaviour
 
         // Turn on material
         gameObject.GetComponent<MeshRenderer>().enabled = true;
+        gameObject.GetComponentInChildren<MeshRenderer>().enabled = true;
 
         // Turn on collider
         gameObject.GetComponent<Collider>().enabled = true;
