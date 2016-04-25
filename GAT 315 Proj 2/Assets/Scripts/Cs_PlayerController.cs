@@ -104,7 +104,6 @@ public class Cs_PlayerController : MonoBehaviour
             if (b_Beginning)
             {
                 Text_Timer.GetComponent<Text>().text = string.Format("{0:0}", f_BeginningTimer - 1);
-                GameObject.Find("CountdownTimer").GetComponent<Text>().text = "Time Remaining:\n";
                 GameObject.Find("PlayerScore").GetComponent<Text>().text = "Score:\n";
                 GameObject.Find("LevelInfo").GetComponent<Text>().text = "Level:\n";
 

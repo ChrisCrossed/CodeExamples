@@ -59,7 +59,6 @@ public class Cs_LevelManager : MonoBehaviour
     GameObject Score_Primary;
     GameObject Score_Secondary;
     GameObject ui_Score;
-    GameObject ui_TimeRemaining;
     GameObject ui_LevelInfo;
     public GameObject Text_YouWin;
 
@@ -125,7 +124,6 @@ public class Cs_LevelManager : MonoBehaviour
         Score_Primary = GameObject.Find("Gold_Primary");
         Score_Secondary = GameObject.Find("Gold_Secondary");
         ui_Score = GameObject.Find("PlayerScore");
-        ui_TimeRemaining = GameObject.Find("CountdownTimer");
         ui_LevelInfo = GameObject.Find("LevelInfo");
     }
 
@@ -189,7 +187,6 @@ public class Cs_LevelManager : MonoBehaviour
     public void StartGame()
     {
         GameObject.Find("Timer").GetComponent<Text>().text = "";
-        GameObject.Find("CountdownTimer").GetComponent<Text>().text = "Time Remaining:\n";
         GameObject.Find("PlayerScore").GetComponent<Text>().text = "Score:\n";
         GameObject.Find("LevelInfo").GetComponent<Text>().text = "Level:\n";
 
@@ -204,8 +201,7 @@ public class Cs_LevelManager : MonoBehaviour
         Score_Secondary.GetComponent<Cs_GoldLogic>().StartGame();
 
         f_Countdown = GameLengthMinutes * 60;
-
-        ui_TimeRemaining.GetComponent<Text>().text = "Time Remaining:\n" + string.Format("{0}", f_Countdown);
+        
         ui_Score.GetComponent<Text>().text = "Score:\n" + string.Format("{0}", i_PlayerScore);
         ui_LevelInfo.GetComponent<Text>().text = "Level:\n" + i_CurrLevel.ToString() + " of 5";
 
@@ -261,9 +257,8 @@ public class Cs_LevelManager : MonoBehaviour
             {
                 f_Timer = 0;
                 --f_Countdown;
-                ui_TimeRemaining.GetComponent<Text>().text = "Time Remaining:\n" + string.Format("{0:00}", f_Countdown);
 
-                if (f_Countdown <= 0) GameObject.Find("Player").GetComponent<Cs_PlayerController>().Crash();
+                // if (f_Countdown <= 0) GameObject.Find("Player").GetComponent<Cs_PlayerController>().Crash();
             }
 
 	        if (i_CurrLevel == 1)
@@ -306,7 +301,6 @@ public class Cs_LevelManager : MonoBehaviour
                 mainCamera.GetComponent<Cs_CameraController>().SetCameraLock(true);
 
                 GameObject.Find("Timer").GetComponent<Text>().enabled = true;
-                GameObject.Find("CountdownTimer").GetComponent<Text>().enabled = true;
                 GameObject.Find("PlayerScore").GetComponent<Text>().enabled = true;
                 GameObject.Find("LevelInfo").GetComponent<Text>().enabled = true;
                 GameObject.Destroy(GameObject.Find("InfoSkip"));
@@ -317,7 +311,6 @@ public class Cs_LevelManager : MonoBehaviour
             if (i_TutorialCounter == 0) // Objective of Game
             {
                 GameObject.Find("Timer").GetComponent<Text>().text = "";
-                GameObject.Find("CountdownTimer").GetComponent<Text>().text = "";
                 GameObject.Find("PlayerScore").GetComponent<Text>().text = "";
                 GameObject.Find("LevelInfo").GetComponent<Text>().text = "";
 
@@ -407,8 +400,7 @@ public class Cs_LevelManager : MonoBehaviour
                     StartGame();
                     audioSource.Stop();
                     mainCamera.GetComponent<Cs_CameraController>().SetCameraLock(true);
-
-                    GameObject.Find("CountdownTimer").GetComponent<Text>().enabled = true;
+                    
                     GameObject.Find("PlayerScore").GetComponent<Text>().enabled = true;
                     GameObject.Find("LevelInfo").GetComponent<Text>().enabled = true;
                     GameObject.Destroy(GameObject.Find("InfoSkip"));

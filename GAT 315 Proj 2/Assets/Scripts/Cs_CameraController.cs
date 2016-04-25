@@ -27,7 +27,7 @@ public class Cs_CameraController : MonoBehaviour
     {
         newPos = go_CamReference.transform.position;
 
-        CreateLinearEquation(30, 40, 50, 80);
+        CreateLinearEquation(30, 30, 50, 80);
 	}
 	
 	// Update is called once per frame
@@ -82,7 +82,7 @@ public class Cs_CameraController : MonoBehaviour
         else // Otherwise, pull back the camera FOV
         {
             // Lerp out the Camera FOV
-            gameObject.GetComponent<Camera>().fieldOfView = Mathf.Lerp(gameObject.GetComponent<Camera>().fieldOfView, 80f, 0.1f);
+            gameObject.GetComponent<Camera>().fieldOfView = Mathf.Lerp(gameObject.GetComponent<Camera>().fieldOfView, 100f, 0.1f);
 
             // Lerp the speed of the game back toward normal
             if(Time.timeScale <= 1.0f)
