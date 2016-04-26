@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 
 public enum PurchaseObjects
 {
-    Turret,
+    Tree,
     Wall,
     Upgrade
 }
@@ -41,9 +41,8 @@ public class Cs_LevelController : MonoBehaviour
 
     public void ReceiveCurrency(int i_CurrToReceive_)
     {
-        i_Currency += i_CurrToReceive_;
-
-        print(i_Currency);
+        // i_Currency += i_CurrToReceive_;
+        i_Currency = 10000;
     }
 
     public bool CheckToBuy(PurchaseObjects purchaseObj_)
@@ -60,7 +59,7 @@ public class Cs_LevelController : MonoBehaviour
                 return true;
             }
         }
-        else if (purchaseObj_ == PurchaseObjects.Turret)
+        else if (purchaseObj_ == PurchaseObjects.Tree)
         {
             if (i_Currency >= i_Cost_Turret)
             {

@@ -160,7 +160,6 @@ public class Cs_CameraLogic : MonoBehaviour
                     ++i_MouseScrollPos;
                 }
             }
-
         }
     }
 	
@@ -228,7 +227,8 @@ public class Cs_CameraLogic : MonoBehaviour
                             if (LevelController.GetComponent<Cs_LevelController>().CheckToBuy(PurchaseObjects.Wall))
                             {
                                 // We can, so buy a wall
-                                objectHit.GetComponent<Cs_GridObjectLogic>().Set_GridObjectType(PurchaseObjects.Wall);
+                                // objectHit.GetComponent<Cs_GridObjectLogic>().Set_GridObjectType(PurchaseObjects.Wall);
+                                objectHit.GetComponent<Cs_GridObjectLogic>().Set_GridObjectType(PurchaseObjects.Tree);
                             }
                             else
                             {

@@ -53,6 +53,10 @@ public class Cs_GridObjectLogic : MonoBehaviour
         {
             ToggleGameObjects(0);
         }
+        else if(gridObjectType == PurchaseObjects.Tree)
+        {
+            ToggleGameObjects(0);
+        }
     }
 
     public void KillTower()
@@ -73,7 +77,10 @@ public class Cs_GridObjectLogic : MonoBehaviour
 
             GameObject.Find("GridObject List").GetComponent<Cs_GridLogic>().IncrementNumberOfTowers();
 
-            go_CurrentGameObject = Instantiate(Resources.Load("GO_Wall")) as GameObject;
+            // go_CurrentGameObject = Instantiate(Resources.Load("GO_Wall")) as GameObject;
+            go_CurrentGameObject = Instantiate(Resources.Load("GO_Tree")) as GameObject;
+
+
             go_CurrentGameObject.GetComponent<Cs_WallTowerLogic>().Initialize(4, 10, gameObject);
 
             Vector3 newPos = gameObject.transform.position;
