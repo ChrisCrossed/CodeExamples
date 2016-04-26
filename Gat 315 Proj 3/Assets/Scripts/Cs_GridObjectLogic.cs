@@ -55,7 +55,7 @@ public class Cs_GridObjectLogic : MonoBehaviour
     public void KillTower()
     {
         // Kills the tower
-        ToggleGameObjects(5);
+        ToggleGameObjects(8);
     }
 
     // Changes through the colors of the walls when clicked on
@@ -73,6 +73,9 @@ public class Cs_GridObjectLogic : MonoBehaviour
             if(purchaseObjects_ == PurchaseObjects.Wall) go_CurrentGameObject = Instantiate(Resources.Load("GO_Wall")) as GameObject;
             else if(purchaseObjects_ == PurchaseObjects.Tree) go_CurrentGameObject = Instantiate(Resources.Load("GO_Tree")) as GameObject;
             else if(purchaseObjects_ == PurchaseObjects.Bush) go_CurrentGameObject = Instantiate(Resources.Load("GO_Bush")) as GameObject;
+            else if (purchaseObjects_ == PurchaseObjects.Halfwall) go_CurrentGameObject = Instantiate(Resources.Load("GO_Halfwall")) as GameObject;
+            else if (purchaseObjects_ == PurchaseObjects.Halfwall_90) go_CurrentGameObject = Instantiate(Resources.Load("GO_Halfwall_90")) as GameObject;
+            else if (purchaseObjects_ == PurchaseObjects.Corner) go_CurrentGameObject = Instantiate(Resources.Load("GO_Corner")) as GameObject;
 
 
             go_CurrentGameObject.GetComponent<Cs_WallTowerLogic>().Initialize(4, 10, gameObject);
@@ -105,14 +108,38 @@ public class Cs_GridObjectLogic : MonoBehaviour
             go_CurrentGameObject.GetComponent<Cs_WallTowerLogic>().SetNewMaterialColor(Colors.Green);
         }
 
-        // Turn Tower Semi-transparent
+        // Run through three colors on the tower (Yellow)
         else if (i_CurrTestPos == 4)
+        {
+            go_CurrentGameObject.GetComponent<Cs_WallTowerLogic>().ApplyDamage(-1);
+
+            go_CurrentGameObject.GetComponent<Cs_WallTowerLogic>().SetNewMaterialColor(Colors.Yellow);
+        }
+
+        // Run through three colors on the tower (Purple)
+        else if (i_CurrTestPos == 5)
+        {
+            go_CurrentGameObject.GetComponent<Cs_WallTowerLogic>().ApplyDamage(-1);
+
+            go_CurrentGameObject.GetComponent<Cs_WallTowerLogic>().SetNewMaterialColor(Colors.Purple);
+        }
+
+        // Run through three colors on the tower (Green)
+        else if (i_CurrTestPos == 6)
+        {
+            go_CurrentGameObject.GetComponent<Cs_WallTowerLogic>().ApplyDamage(-1);
+
+            go_CurrentGameObject.GetComponent<Cs_WallTowerLogic>().SetNewMaterialColor(Colors.Orange);
+        }
+
+        // Turn Tower Semi-transparent
+        else if (i_CurrTestPos == 7)
         {
             go_CurrentGameObject.GetComponent<Cs_WallTowerLogic>().SetNewMaterialColor(Colors.SemiTransparent);
         }
 
         // Destroy the Tower
-        else if (i_CurrTestPos == 5)
+        else if (i_CurrTestPos == 8)
         {
             gridObjectState = GridObjectState.On;
             
@@ -122,10 +149,10 @@ public class Cs_GridObjectLogic : MonoBehaviour
             GameObject.Destroy(go_CurrentGameObject);
         }
 
-        if (i_CurrTestPos < 5) ++i_CurrTestPos;
+        if (i_CurrTestPos < 8) ++i_CurrTestPos;
 
         // Set/Reset Counter
-        if(i_CurrTestPos > 5) i_CurrTestPos = 0;
+        if(i_CurrTestPos > 8) i_CurrTestPos = 0;
     }
 
     public void SetGridObjectState(bool b_IsEnabled_)

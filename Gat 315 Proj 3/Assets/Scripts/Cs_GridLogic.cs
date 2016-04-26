@@ -33,7 +33,8 @@ public class Cs_GridLogic : MonoBehaviour
                 GameObject temp = Instantiate(Resources.Load("GridObject", typeof(GameObject)), pos, quat) as GameObject;
 
                 // Only activate the middle points
-                if (y >= (midPoint - 1) && y <= (midPoint + 1) && x >= (midPoint - 1) && x <= (midPoint + 1))
+                int i_Size = 2;
+                if (y >= (midPoint - i_Size) && y <= (midPoint + i_Size) && x >= (midPoint - i_Size) && x <= (midPoint + i_Size))
                 {
                     temp.GetComponent<Cs_GridObjectLogic>().SetGridObjectState(true);
                 }

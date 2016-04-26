@@ -9,6 +9,9 @@ public enum PurchaseObjects
     Tree,
     Wall,
     Bush,
+    Halfwall,
+    Halfwall_90,
+    Corner,
     Upgrade
 }
 
@@ -109,7 +112,7 @@ public class Cs_LevelController : MonoBehaviour
     void SpawnEnemies()
     {
         // Randomly pick one of the four locations
-        int location = Random.Range(0, 4);
+        // int location = Random.Range(0, 4);
 
         // SpawnLocations[location].GetComponent<Cs_EnemySpawnLogic>().SpawnEnemy();
     }

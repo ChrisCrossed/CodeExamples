@@ -113,32 +113,60 @@ public class Cs_CameraLogic : MonoBehaviour
             if (b_Left)
             {
                 // > -3
+                /*
                 if (Cam_Regular.transform.position.x > -3f)
                 {
                     newPos.x -= Time.deltaTime * i_MoveSpeed;
                 }
+                */
+                if(GameObject.Find("DeadCenter").transform.position.x > -3f)
+                {
+                    GameObject.Find("DeadCenter").transform.position -= GameObject.Find("DeadCenter").transform.right * i_MoveSpeed * Time.deltaTime;
+                    newPos -= GameObject.Find("DeadCenter").transform.right * i_MoveSpeed * Time.deltaTime;
+                }
             }
             if(b_Right)
             {
+                /*
                 if (Cam_Regular.transform.position.x < 3f)
                 {
                     newPos.x += Time.deltaTime * i_MoveSpeed;
+                }
+                */
+                if (GameObject.Find("DeadCenter").transform.position.x < 3f)
+                {
+                    GameObject.Find("DeadCenter").transform.position += GameObject.Find("DeadCenter").transform.right * i_MoveSpeed * Time.deltaTime;
+                    newPos += GameObject.Find("DeadCenter").transform.right * i_MoveSpeed * Time.deltaTime;
                 }
             }
 
             if (b_Backward)
             {
                 // > -3
+                /*
                 if (Cam_Regular.transform.position.z > -9f)
                 {
                     newPos.z -= Time.deltaTime * i_MoveSpeed;
                 }
+                */
+                if (GameObject.Find("DeadCenter").transform.position.x > -3f)
+                {
+                    GameObject.Find("DeadCenter").transform.position -= GameObject.Find("DeadCenter").transform.forward * i_MoveSpeed * Time.deltaTime;
+                    newPos -= GameObject.Find("DeadCenter").transform.forward * i_MoveSpeed * Time.deltaTime;
+                }
             }
             if (b_Forward)
             {
+                /*
                 if (Cam_Regular.transform.position.z < 0f)
                 {
                     newPos.z += Time.deltaTime * i_MoveSpeed;
+                }
+                */
+                if (GameObject.Find("DeadCenter").transform.position.x < 3f)
+                {
+                    GameObject.Find("DeadCenter").transform.position += GameObject.Find("DeadCenter").transform.forward * i_MoveSpeed * Time.deltaTime;
+                    newPos += GameObject.Find("DeadCenter").transform.forward * i_MoveSpeed * Time.deltaTime;
                 }
             }
 
@@ -163,25 +191,108 @@ public class Cs_CameraLogic : MonoBehaviour
                     ++i_MouseScrollPos;
                 }
             }
+
+            
+            if(Input.GetMouseButton(1))
+            {
+                Cursor.lockState = CursorLockMode.Locked;
+                Cursor.visible = false;
+                mouseState = MouseState.Off;
+
+                float MouseX = Input.GetAxis("Mouse X");
+                Vector3 newRot = GameObject.Find("DeadCenter").transform.eulerAngles;
+                newRot.y += MouseX;
+                GameObject.Find("DeadCenter").transform.eulerAngles = newRot;
+            }
+            else
+            {
+                Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = true;
+            }
         }
     }
 
     public void SetNextTowerObject_Wall()
     {
-        if (nextTowerObject != PurchaseObjects.Wall) nextTowerObject = PurchaseObjects.Wall;
+        GameObject.Find("Toggle_Bush").GetComponent<Toggle>().isOn = false;
+        GameObject.Find("Toggle_Corner").GetComponent<Toggle>().isOn = false;
+        GameObject.Find("Toggle_Halfwall").GetComponent<Toggle>().isOn = false;
+        GameObject.Find("Toggle_Halfwall_90").GetComponent<Toggle>().isOn = false;
+        GameObject.Find("Toggle_Tree").GetComponent<Toggle>().isOn = false;
+
+        if (GameObject.Find("Toggle_Wall").GetComponent<Toggle>().isOn) nextTowerObject = PurchaseObjects.Wall;
         else nextTowerObject = PurchaseObjects.None;
     }
 
     public void SetNextTowerObject_Tree()
     {
-        if (nextTowerObject != PurchaseObjects.Tree) nextTowerObject = PurchaseObjects.Tree;
+        GameObject.Find("Toggle_Bush").GetComponent<Toggle>().isOn = false;
+        GameObject.Find("Toggle_Corner").GetComponent<Toggle>().isOn = false;
+        GameObject.Find("Toggle_Halfwall").GetComponent<Toggle>().isOn = false;
+        GameObject.Find("Toggle_Halfwall_90").GetComponent<Toggle>().isOn = false;
+        GameObject.Find("Toggle_Wall").GetComponent<Toggle>().isOn = false;
+
+        if (GameObject.Find("Toggle_Tree").GetComponent<Toggle>().isOn) nextTowerObject = PurchaseObjects.Tree;
         else nextTowerObject = PurchaseObjects.None;
     }
 
     public void SetNextTowerObject_Bush()
     {
-        if (nextTowerObject != PurchaseObjects.Bush) nextTowerObject = PurchaseObjects.Bush;
+        GameObject.Find("Toggle_Corner").GetComponent<Toggle>().isOn = false;
+        GameObject.Find("Toggle_Halfwall").GetComponent<Toggle>().isOn = false;
+        GameObject.Find("Toggle_Halfwall_90").GetComponent<Toggle>().isOn = false;
+        GameObject.Find("Toggle_Wall").GetComponent<Toggle>().isOn = false;
+        GameObject.Find("Toggle_Tree").GetComponent<Toggle>().isOn = false;
+
+        if (GameObject.Find("Toggle_Bush").GetComponent<Toggle>().isOn) nextTowerObject = PurchaseObjects.Bush;
         else nextTowerObject = PurchaseObjects.None;
+    }
+
+    public void SetNextTowerObject_Halfwall()
+    {
+        GameObject.Find("Toggle_Bush").GetComponent<Toggle>().isOn = false;
+        GameObject.Find("Toggle_Corner").GetComponent<Toggle>().isOn = false;
+        GameObject.Find("Toggle_Halfwall_90").GetComponent<Toggle>().isOn = false;
+        GameObject.Find("Toggle_Wall").GetComponent<Toggle>().isOn = false;
+        GameObject.Find("Toggle_Tree").GetComponent<Toggle>().isOn = false;
+
+        if(GameObject.Find("Toggle_Halfwall").GetComponent<Toggle>().isOn) nextTowerObject = PurchaseObjects.Halfwall;
+        else nextTowerObject = PurchaseObjects.None;
+    }
+
+    public void SetNextTowerObject_Halfwall_90()
+    {
+        GameObject.Find("Toggle_Bush").GetComponent<Toggle>().isOn = false;
+        GameObject.Find("Toggle_Corner").GetComponent<Toggle>().isOn = false;
+        GameObject.Find("Toggle_Halfwall").GetComponent<Toggle>().isOn = false;
+        GameObject.Find("Toggle_Wall").GetComponent<Toggle>().isOn = false;
+        GameObject.Find("Toggle_Tree").GetComponent<Toggle>().isOn = false;
+
+        if(GameObject.Find("Toggle_Halfwall_90").GetComponent<Toggle>().isOn) nextTowerObject = PurchaseObjects.Halfwall_90;
+        else nextTowerObject = PurchaseObjects.None;
+    }
+
+    public void SetNextTowerObject_Corner()
+    {
+        // DisableOtherButtons(PurchaseObjects.Corner);
+        GameObject.Find("Toggle_Bush").GetComponent<Toggle>().isOn = false;
+        GameObject.Find("Toggle_Halfwall").GetComponent<Toggle>().isOn = false;
+        GameObject.Find("Toggle_Halfwall_90").GetComponent<Toggle>().isOn = false;
+        GameObject.Find("Toggle_Wall").GetComponent<Toggle>().isOn = false;
+        GameObject.Find("Toggle_Tree").GetComponent<Toggle>().isOn = false;
+
+        if (GameObject.Find("Toggle_Corner").GetComponent<Toggle>().isOn) nextTowerObject = PurchaseObjects.Corner;
+        else nextTowerObject = PurchaseObjects.None;
+    }
+
+    void DisableOtherButtons(PurchaseObjects buttonType_)
+    {
+        GameObject.Find("Toggle_Bush").GetComponent<Toggle>().isOn = false;
+        GameObject.Find("Toggle_Corner").GetComponent<Toggle>().isOn = false;
+        GameObject.Find("Toggle_Halfwall").GetComponent<Toggle>().isOn = false;
+        GameObject.Find("Toggle_Halfwall_90").GetComponent<Toggle>().isOn = false;
+        GameObject.Find("Toggle_Wall").GetComponent<Toggle>().isOn = false;
+        GameObject.Find("Toggle_Tree").GetComponent<Toggle>().isOn = false;
     }
 
     // Update is called once per frame
