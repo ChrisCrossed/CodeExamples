@@ -114,15 +114,15 @@ public class Cs_GridObjectLogic : MonoBehaviour
         // Destroy the Tower
         else if (i_CurrTestPos == 5)
         {
-            gridObjectState = GridObjectState.Off;
-
+            gridObjectState = GridObjectState.On;
+            
             GameObject.Find("GridObject List").GetComponent<Cs_GridLogic>().IncrementNumberOfTowers(false);
 
             // Destroy tower
             GameObject.Destroy(go_CurrentGameObject);
         }
 
-        if (i_CurrTestPos < 3) ++i_CurrTestPos;
+        if (i_CurrTestPos < 5) ++i_CurrTestPos;
 
         // Set/Reset Counter
         if(i_CurrTestPos > 5) i_CurrTestPos = 0;

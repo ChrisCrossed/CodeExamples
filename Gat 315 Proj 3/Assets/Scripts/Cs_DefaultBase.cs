@@ -105,7 +105,7 @@ public class Cs_DefaultBase : MonoBehaviour
 
     public void SetNewMaterialColor(Colors newColor_)
     {
-        if (newColor_ == Colors.Default) mat_Color = Resources.Load("Color_Base", typeof(Material)) as Material;
+        if (newColor_ == Colors.Default) mat_Color = Resources.Load("Color_Base", typeof(Material)) as Material; // Black
         else if (newColor_ == Colors.Blue) mat_Color = Resources.Load("Mat_BLUE", typeof(Material)) as Material;
         else if (newColor_ == Colors.Green) mat_Color = Resources.Load("Mat_GREEN", typeof(Material)) as Material;
         else if (newColor_ == Colors.Purple) mat_Color = Resources.Load("Mat_PURPLE", typeof(Material)) as Material;
