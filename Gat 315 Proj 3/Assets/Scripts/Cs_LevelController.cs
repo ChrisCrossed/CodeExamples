@@ -32,9 +32,11 @@ public class Cs_LevelController : MonoBehaviour
 	// Use this for initialization
 	void Start ()
     {
+        /*
         GameObject.Find("Resources").GetComponent<Text>().text = "Resources: " + i_Currency;
         GameObject.Find("TowerCost").GetComponent<Text>().text = "Tower Cost: " + i_Cost_Wall;
         GameObject.Find("UpgradeCost").GetComponent<Text>().text = "Upgrade Cost: " + i_Cost_Upgrade;
+        */
 
         f_EnemyTimer = 5;
 	}
@@ -54,7 +56,7 @@ public class Cs_LevelController : MonoBehaviour
                 i_Currency -= i_Cost_Wall;
 
                 // Update UI if necessary
-                GameObject.Find("Resources").GetComponent<Text>().text = "Resources: " + i_Currency;
+                // GameObject.Find("Resources").GetComponent<Text>().text = "Resources: " + i_Currency;
 
                 return true;
             }
@@ -66,7 +68,7 @@ public class Cs_LevelController : MonoBehaviour
                 i_Currency -= i_Cost_Turret;
 
                 // Update UI if necessary
-                GameObject.Find("Resources").GetComponent<Text>().text = "Resources: " + i_Currency;
+                // GameObject.Find("Resources").GetComponent<Text>().text = "Resources: " + i_Currency;
 
                 return true;
             }
@@ -107,7 +109,7 @@ public class Cs_LevelController : MonoBehaviour
         // Randomly pick one of the four locations
         int location = Random.Range(0, 4);
 
-        SpawnLocations[location].GetComponent<Cs_EnemySpawnLogic>().SpawnEnemy();
+        // SpawnLocations[location].GetComponent<Cs_EnemySpawnLogic>().SpawnEnemy();
     }
 
     public void EndGame()
@@ -129,25 +131,6 @@ public class Cs_LevelController : MonoBehaviour
             GoldTimerBullshit();
 
             f_EnemyTimer -= Time.deltaTime;
-
-            if(f_EnemyTimer <= 0.0f)
-            {
-                f_EnemyTimer = 1.0f;
-
-                SpawnEnemies();
-
-                --i_CurrEnemies;
-
-                if(i_CurrEnemies <= 0)
-                {
-                    ++i_CurrLevel;
-
-                    GameObject.Find("CurrentLevel").GetComponent<Text>().text = "Current Level: " + i_CurrLevel;
-
-                    f_EnemyTimer = 10.0f;
-                    i_CurrEnemies = i_CurrLevel;
-                }
-            }
         }
         else
         {

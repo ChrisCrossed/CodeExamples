@@ -49,14 +49,7 @@ public class Cs_GridObjectLogic : MonoBehaviour
     {
         gridObjectType = purchaseObjects_;
 
-        if(gridObjectType == PurchaseObjects.Wall)
-        {
-            ToggleGameObjects(0);
-        }
-        else if(gridObjectType == PurchaseObjects.Tree)
-        {
-            ToggleGameObjects(0);
-        }
+        ToggleGameObjects(0, gridObjectType);
     }
 
     public void KillTower()
@@ -66,7 +59,7 @@ public class Cs_GridObjectLogic : MonoBehaviour
     }
 
     // Changes through the colors of the walls when clicked on
-    public void ToggleGameObjects(int i_NewTowerPos_ = -1)
+    public void ToggleGameObjects(int i_NewTowerPos_ = -1, PurchaseObjects purchaseObjects_ = PurchaseObjects.Wall)
     {
         if (i_NewTowerPos_ != -1) i_CurrTestPos = i_NewTowerPos_;
 
@@ -77,8 +70,8 @@ public class Cs_GridObjectLogic : MonoBehaviour
 
             GameObject.Find("GridObject List").GetComponent<Cs_GridLogic>().IncrementNumberOfTowers();
 
-            // go_CurrentGameObject = Instantiate(Resources.Load("GO_Wall")) as GameObject;
-            go_CurrentGameObject = Instantiate(Resources.Load("GO_Tree")) as GameObject;
+            if(purchaseObjects_ == PurchaseObjects.Wall) go_CurrentGameObject = Instantiate(Resources.Load("GO_Wall")) as GameObject;
+            else if(purchaseObjects_ == PurchaseObjects.Tree) go_CurrentGameObject = Instantiate(Resources.Load("GO_Tree")) as GameObject;
 
 
             go_CurrentGameObject.GetComponent<Cs_WallTowerLogic>().Initialize(4, 10, gameObject);
