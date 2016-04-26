@@ -7,6 +7,7 @@ public enum PurchaseObjects
 {
     Tree,
     Wall,
+    Bush,
     Upgrade
 }
 

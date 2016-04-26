@@ -72,6 +72,7 @@ public class Cs_GridObjectLogic : MonoBehaviour
 
             if(purchaseObjects_ == PurchaseObjects.Wall) go_CurrentGameObject = Instantiate(Resources.Load("GO_Wall")) as GameObject;
             else if(purchaseObjects_ == PurchaseObjects.Tree) go_CurrentGameObject = Instantiate(Resources.Load("GO_Tree")) as GameObject;
+            else if(purchaseObjects_ == PurchaseObjects.Bush) go_CurrentGameObject = Instantiate(Resources.Load("GO_Bush")) as GameObject;
 
 
             go_CurrentGameObject.GetComponent<Cs_WallTowerLogic>().Initialize(4, 10, gameObject);

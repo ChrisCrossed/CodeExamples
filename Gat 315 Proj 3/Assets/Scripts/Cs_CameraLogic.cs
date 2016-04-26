@@ -37,6 +37,8 @@ public class Cs_CameraLogic : MonoBehaviour
 
     GameObject go_GridObjectList;
 
+    bool b_test;
+
     // Use this for initialization
     void Start ()
     {
@@ -223,17 +225,18 @@ public class Cs_CameraLogic : MonoBehaviour
                         // If the player clicks to want a wall
                         if(objectHit.GetComponent<Cs_GridObjectLogic>().Get_GridObjectState() == GridObjectState.On)
                         {
-                            // Check if we can purchase a wall
-                            if (LevelController.GetComponent<Cs_LevelController>().CheckToBuy(PurchaseObjects.Wall))
+                            // We can, so buy a wall
+                            if(b_test)
                             {
-                                // We can, so buy a wall
-                                objectHit.GetComponent<Cs_GridObjectLogic>().Set_GridObjectType(PurchaseObjects.Wall);
-                                // objectHit.GetComponent<Cs_GridObjectLogic>().Set_GridObjectType(PurchaseObjects.Tree);
+                                // objectHit.GetComponent<Cs_GridObjectLogic>().Set_GridObjectType(PurchaseObjects.Wall);
+                                objectHit.GetComponent<Cs_GridObjectLogic>().Set_GridObjectType(PurchaseObjects.Bush);
                             }
                             else
                             {
-                                print("Not enough money");
+                                objectHit.GetComponent<Cs_GridObjectLogic>().Set_GridObjectType(PurchaseObjects.Tree);
                             }
+
+                            b_test = !b_test;
                         }
                         else if(objectHit.GetComponent<Cs_GridObjectLogic>().Get_GridObjectState() == GridObjectState.Active)
                         {
