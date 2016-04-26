@@ -130,7 +130,10 @@ public class Cs_DefaultBase : MonoBehaviour
             var tempTransList = gameObject.GetComponentInChildren<MeshRenderer>().materials;
             for(int i = 0; i < tempTransList.Length; ++i)
             {
-                tempTransList[i] = mat_Color;
+                // tempTransList[i] = mat_Color;
+                var tempMatList = gameObject.GetComponentInChildren<MeshRenderer>().materials;
+                tempTransList[element_Base] = Resources.Load("Color_Base", typeof(Material)) as Material;
+                tempTransList[element_Color] = mat_Color;
             }
             gameObject.GetComponentInChildren<MeshRenderer>().materials = tempTransList;
         }

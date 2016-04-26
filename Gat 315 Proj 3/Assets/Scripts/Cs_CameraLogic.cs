@@ -36,8 +36,13 @@ public class Cs_CameraLogic : MonoBehaviour
     int i_MouseScrollPos;
 
     GameObject go_GridObjectList;
-
     PurchaseObjects nextTowerObject;
+
+    AudioSource audioSource;
+    public AudioClip sfx_MenuSelect;
+    public AudioClip sfx_PlaceTerrain;
+    public AudioClip sfx_DestroyObject;
+    public AudioClip sfx_ChangePaintColor;
 
     // Use this for initialization
     void Start ()
@@ -55,7 +60,7 @@ public class Cs_CameraLogic : MonoBehaviour
 
     void SetMouseState()
     {
-        if(Input.GetAxis("Mouse ScrollWheel") != 0.0f)
+        if (Input.GetAxis("Mouse ScrollWheel") != 0.0f)
         {
             // If the Mouse scroll axis is > 0, the mouse scroll wheel is 'Up', otherwise it is down.
             if (Input.GetAxis("Mouse ScrollWheel") > 0.0f) mouseState = MouseState.ScrollUp; else mouseState = MouseState.ScrollDown;
@@ -185,7 +190,7 @@ public class Cs_CameraLogic : MonoBehaviour
             else if(mouseState == MouseState.ScrollDown)
             {
                 // Work with a counter for how far in/out the camera can move
-                if (i_MouseScrollPos < 9)
+                if (i_MouseScrollPos < 11)
                 {
                     Cam_Regular.transform.position -= Cam_Regular.transform.forward * 1.0f;
                     ++i_MouseScrollPos;
@@ -214,11 +219,8 @@ public class Cs_CameraLogic : MonoBehaviour
 
     public void SetNextTowerObject_Wall()
     {
-        GameObject.Find("Toggle_Bush").GetComponent<Toggle>().isOn = false;
-        GameObject.Find("Toggle_Corner").GetComponent<Toggle>().isOn = false;
-        GameObject.Find("Toggle_Halfwall").GetComponent<Toggle>().isOn = false;
-        GameObject.Find("Toggle_Halfwall_90").GetComponent<Toggle>().isOn = false;
-        GameObject.Find("Toggle_Tree").GetComponent<Toggle>().isOn = false;
+        audioSource = gameObject.GetComponent<AudioSource>();
+        audioSource.PlayOneShot(sfx_MenuSelect);
 
         if (GameObject.Find("Toggle_Wall").GetComponent<Toggle>().isOn) nextTowerObject = PurchaseObjects.Wall;
         else nextTowerObject = PurchaseObjects.None;
@@ -226,11 +228,8 @@ public class Cs_CameraLogic : MonoBehaviour
 
     public void SetNextTowerObject_Tree()
     {
-        GameObject.Find("Toggle_Bush").GetComponent<Toggle>().isOn = false;
-        GameObject.Find("Toggle_Corner").GetComponent<Toggle>().isOn = false;
-        GameObject.Find("Toggle_Halfwall").GetComponent<Toggle>().isOn = false;
-        GameObject.Find("Toggle_Halfwall_90").GetComponent<Toggle>().isOn = false;
-        GameObject.Find("Toggle_Wall").GetComponent<Toggle>().isOn = false;
+        audioSource = gameObject.GetComponent<AudioSource>();
+        audioSource.PlayOneShot(sfx_MenuSelect);
 
         if (GameObject.Find("Toggle_Tree").GetComponent<Toggle>().isOn) nextTowerObject = PurchaseObjects.Tree;
         else nextTowerObject = PurchaseObjects.None;
@@ -238,11 +237,8 @@ public class Cs_CameraLogic : MonoBehaviour
 
     public void SetNextTowerObject_Bush()
     {
-        GameObject.Find("Toggle_Corner").GetComponent<Toggle>().isOn = false;
-        GameObject.Find("Toggle_Halfwall").GetComponent<Toggle>().isOn = false;
-        GameObject.Find("Toggle_Halfwall_90").GetComponent<Toggle>().isOn = false;
-        GameObject.Find("Toggle_Wall").GetComponent<Toggle>().isOn = false;
-        GameObject.Find("Toggle_Tree").GetComponent<Toggle>().isOn = false;
+        audioSource = gameObject.GetComponent<AudioSource>(); 
+        audioSource.PlayOneShot(sfx_MenuSelect);
 
         if (GameObject.Find("Toggle_Bush").GetComponent<Toggle>().isOn) nextTowerObject = PurchaseObjects.Bush;
         else nextTowerObject = PurchaseObjects.None;
@@ -250,11 +246,8 @@ public class Cs_CameraLogic : MonoBehaviour
 
     public void SetNextTowerObject_Halfwall()
     {
-        GameObject.Find("Toggle_Bush").GetComponent<Toggle>().isOn = false;
-        GameObject.Find("Toggle_Corner").GetComponent<Toggle>().isOn = false;
-        GameObject.Find("Toggle_Halfwall_90").GetComponent<Toggle>().isOn = false;
-        GameObject.Find("Toggle_Wall").GetComponent<Toggle>().isOn = false;
-        GameObject.Find("Toggle_Tree").GetComponent<Toggle>().isOn = false;
+        audioSource = gameObject.GetComponent<AudioSource>();
+        audioSource.PlayOneShot(sfx_MenuSelect);
 
         if(GameObject.Find("Toggle_Halfwall").GetComponent<Toggle>().isOn) nextTowerObject = PurchaseObjects.Halfwall;
         else nextTowerObject = PurchaseObjects.None;
@@ -262,11 +255,8 @@ public class Cs_CameraLogic : MonoBehaviour
 
     public void SetNextTowerObject_Halfwall_90()
     {
-        GameObject.Find("Toggle_Bush").GetComponent<Toggle>().isOn = false;
-        GameObject.Find("Toggle_Corner").GetComponent<Toggle>().isOn = false;
-        GameObject.Find("Toggle_Halfwall").GetComponent<Toggle>().isOn = false;
-        GameObject.Find("Toggle_Wall").GetComponent<Toggle>().isOn = false;
-        GameObject.Find("Toggle_Tree").GetComponent<Toggle>().isOn = false;
+        audioSource = gameObject.GetComponent<AudioSource>();
+        audioSource.PlayOneShot(sfx_MenuSelect);
 
         if(GameObject.Find("Toggle_Halfwall_90").GetComponent<Toggle>().isOn) nextTowerObject = PurchaseObjects.Halfwall_90;
         else nextTowerObject = PurchaseObjects.None;
@@ -274,12 +264,8 @@ public class Cs_CameraLogic : MonoBehaviour
 
     public void SetNextTowerObject_Corner()
     {
-        // DisableOtherButtons(PurchaseObjects.Corner);
-        GameObject.Find("Toggle_Bush").GetComponent<Toggle>().isOn = false;
-        GameObject.Find("Toggle_Halfwall").GetComponent<Toggle>().isOn = false;
-        GameObject.Find("Toggle_Halfwall_90").GetComponent<Toggle>().isOn = false;
-        GameObject.Find("Toggle_Wall").GetComponent<Toggle>().isOn = false;
-        GameObject.Find("Toggle_Tree").GetComponent<Toggle>().isOn = false;
+        audioSource = gameObject.GetComponent<AudioSource>();
+        audioSource.PlayOneShot(sfx_MenuSelect);
 
         if (GameObject.Find("Toggle_Corner").GetComponent<Toggle>().isOn) nextTowerObject = PurchaseObjects.Corner;
         else nextTowerObject = PurchaseObjects.None;
@@ -293,6 +279,20 @@ public class Cs_CameraLogic : MonoBehaviour
         GameObject.Find("Toggle_Halfwall_90").GetComponent<Toggle>().isOn = false;
         GameObject.Find("Toggle_Wall").GetComponent<Toggle>().isOn = false;
         GameObject.Find("Toggle_Tree").GetComponent<Toggle>().isOn = false;
+    }
+
+    public void PlaySFX(bool b_True = true)
+    {
+        if(b_True)
+        {
+            audioSource = gameObject.GetComponent<AudioSource>();
+            audioSource.PlayOneShot(sfx_ChangePaintColor);
+        }
+        else
+        {
+            audioSource = gameObject.GetComponent<AudioSource>();
+            audioSource.PlayOneShot(sfx_DestroyObject);
+        }
     }
 
     // Update is called once per frame
@@ -359,6 +359,8 @@ public class Cs_CameraLogic : MonoBehaviour
                             // If NOT 'none'
                             if(nextTowerObject != PurchaseObjects.None)
                             {
+                                audioSource.PlayOneShot(sfx_PlaceTerrain);
+
                                 objectHit.GetComponent<Cs_GridObjectLogic>().Set_GridObjectType(nextTowerObject);
                             }
                         }

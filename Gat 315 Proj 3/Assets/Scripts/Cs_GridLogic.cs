@@ -3,7 +3,7 @@ using System.Collections;
 
 public class Cs_GridLogic : MonoBehaviour
 {
-    int i_sizeOfGrid = 9;
+    int i_sizeOfGrid = 9; // STARTING size of grid
     Object[] gridList;
 
     bool b_Test = true;

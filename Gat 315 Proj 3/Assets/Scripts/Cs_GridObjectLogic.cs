@@ -87,6 +87,8 @@ public class Cs_GridObjectLogic : MonoBehaviour
         // Run through three colors on the tower (Blue)
         else if(i_CurrTestPos == 1)
         {
+            GameObject.Find("Main Camera").GetComponent<Cs_CameraLogic>().PlaySFX();
+
             go_CurrentGameObject.GetComponent<Cs_WallTowerLogic>().ApplyDamage(-1);
 
             go_CurrentGameObject.GetComponent<Cs_WallTowerLogic>().SetNewMaterialColor(Colors.Blue);
@@ -95,6 +97,8 @@ public class Cs_GridObjectLogic : MonoBehaviour
         // Run through three colors on the tower (Red)
         else if (i_CurrTestPos == 2)
         {
+            GameObject.Find("Main Camera").GetComponent<Cs_CameraLogic>().PlaySFX();
+
             go_CurrentGameObject.GetComponent<Cs_WallTowerLogic>().ApplyDamage(-1);
 
             go_CurrentGameObject.GetComponent<Cs_WallTowerLogic>().SetNewMaterialColor(Colors.Red);
@@ -103,6 +107,8 @@ public class Cs_GridObjectLogic : MonoBehaviour
         // Run through three colors on the tower (Green)
         else if (i_CurrTestPos == 3)
         {
+            GameObject.Find("Main Camera").GetComponent<Cs_CameraLogic>().PlaySFX();
+
             go_CurrentGameObject.GetComponent<Cs_WallTowerLogic>().ApplyDamage(-1);
 
             go_CurrentGameObject.GetComponent<Cs_WallTowerLogic>().SetNewMaterialColor(Colors.Green);
@@ -111,6 +117,8 @@ public class Cs_GridObjectLogic : MonoBehaviour
         // Run through three colors on the tower (Yellow)
         else if (i_CurrTestPos == 4)
         {
+            GameObject.Find("Main Camera").GetComponent<Cs_CameraLogic>().PlaySFX();
+
             go_CurrentGameObject.GetComponent<Cs_WallTowerLogic>().ApplyDamage(-1);
 
             go_CurrentGameObject.GetComponent<Cs_WallTowerLogic>().SetNewMaterialColor(Colors.Yellow);
@@ -119,6 +127,8 @@ public class Cs_GridObjectLogic : MonoBehaviour
         // Run through three colors on the tower (Purple)
         else if (i_CurrTestPos == 5)
         {
+            GameObject.Find("Main Camera").GetComponent<Cs_CameraLogic>().PlaySFX();
+
             go_CurrentGameObject.GetComponent<Cs_WallTowerLogic>().ApplyDamage(-1);
 
             go_CurrentGameObject.GetComponent<Cs_WallTowerLogic>().SetNewMaterialColor(Colors.Purple);
@@ -127,6 +137,8 @@ public class Cs_GridObjectLogic : MonoBehaviour
         // Run through three colors on the tower (Green)
         else if (i_CurrTestPos == 6)
         {
+            GameObject.Find("Main Camera").GetComponent<Cs_CameraLogic>().PlaySFX();
+
             go_CurrentGameObject.GetComponent<Cs_WallTowerLogic>().ApplyDamage(-1);
 
             go_CurrentGameObject.GetComponent<Cs_WallTowerLogic>().SetNewMaterialColor(Colors.Orange);
@@ -135,12 +147,16 @@ public class Cs_GridObjectLogic : MonoBehaviour
         // Turn Tower Semi-transparent
         else if (i_CurrTestPos == 7)
         {
+            GameObject.Find("Main Camera").GetComponent<Cs_CameraLogic>().PlaySFX();
+
             go_CurrentGameObject.GetComponent<Cs_WallTowerLogic>().SetNewMaterialColor(Colors.SemiTransparent);
         }
 
         // Destroy the Tower
         else if (i_CurrTestPos == 8)
         {
+            GameObject.Find("Main Camera").GetComponent<Cs_CameraLogic>().PlaySFX(false);
+
             gridObjectState = GridObjectState.On;
             
             GameObject.Find("GridObject List").GetComponent<Cs_GridLogic>().IncrementNumberOfTowers(false);
