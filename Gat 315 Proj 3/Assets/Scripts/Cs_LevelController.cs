@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 
 public enum PurchaseObjects
 {
+    None,
     Tree,
     Wall,
     Bush,
@@ -81,7 +82,7 @@ public class Cs_LevelController : MonoBehaviour
                 i_Currency -= i_Cost_Upgrade;
 
                 // Update UI if necessary
-                GameObject.Find("Resources").GetComponent<Text>().text = "Resources: " + i_Currency;
+                // GameObject.Find("Resources").GetComponent<Text>().text = "Resources: " + i_Currency;
 
                 return true;
             }
@@ -101,7 +102,7 @@ public class Cs_LevelController : MonoBehaviour
             ReceiveCurrency(i_GoldPerSecond);
 
             // Update UI if necessary
-            GameObject.Find("Resources").GetComponent<Text>().text = "Resources: " + i_Currency;
+            // GameObject.Find("Resources").GetComponent<Text>().text = "Resources: " + i_Currency;
         }
     }
 

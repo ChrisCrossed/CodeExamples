@@ -37,7 +37,7 @@ public class Cs_CameraLogic : MonoBehaviour
 
     GameObject go_GridObjectList;
 
-    bool b_test;
+    PurchaseObjects nextTowerObject;
 
     // Use this for initialization
     void Start ()
@@ -50,6 +50,7 @@ public class Cs_CameraLogic : MonoBehaviour
         i_MouseScrollPos = 4;
         go_GridObjectList = GameObject.Find("GridObject List");
         LevelController = GameObject.Find("LevelController");
+        nextTowerObject = PurchaseObjects.None;
     }
 
     void SetMouseState()
@@ -164,9 +165,27 @@ public class Cs_CameraLogic : MonoBehaviour
             }
         }
     }
-	
-	// Update is called once per frame
-	void Update ()
+
+    public void SetNextTowerObject_Wall()
+    {
+        if (nextTowerObject != PurchaseObjects.Wall) nextTowerObject = PurchaseObjects.Wall;
+        else nextTowerObject = PurchaseObjects.None;
+    }
+
+    public void SetNextTowerObject_Tree()
+    {
+        if (nextTowerObject != PurchaseObjects.Tree) nextTowerObject = PurchaseObjects.Tree;
+        else nextTowerObject = PurchaseObjects.None;
+    }
+
+    public void SetNextTowerObject_Bush()
+    {
+        if (nextTowerObject != PurchaseObjects.Bush) nextTowerObject = PurchaseObjects.Bush;
+        else nextTowerObject = PurchaseObjects.None;
+    }
+
+    // Update is called once per frame
+    void Update ()
     {
         // Update mouse information
         SetMouseState();
@@ -226,28 +245,15 @@ public class Cs_CameraLogic : MonoBehaviour
                         if(objectHit.GetComponent<Cs_GridObjectLogic>().Get_GridObjectState() == GridObjectState.On)
                         {
                             // We can, so buy a wall
-                            if(b_test)
+                            // If NOT 'none'
+                            if(nextTowerObject != PurchaseObjects.None)
                             {
-                                // objectHit.GetComponent<Cs_GridObjectLogic>().Set_GridObjectType(PurchaseObjects.Wall);
-                                objectHit.GetComponent<Cs_GridObjectLogic>().Set_GridObjectType(PurchaseObjects.Bush);
+                                objectHit.GetComponent<Cs_GridObjectLogic>().Set_GridObjectType(nextTowerObject);
                             }
-                            else
-                            {
-                                objectHit.GetComponent<Cs_GridObjectLogic>().Set_GridObjectType(PurchaseObjects.Tree);
-                            }
-
-                            b_test = !b_test;
                         }
                         else if(objectHit.GetComponent<Cs_GridObjectLogic>().Get_GridObjectState() == GridObjectState.Active)
                         {
-                            if (LevelController.GetComponent<Cs_LevelController>().CheckToBuy(PurchaseObjects.Upgrade))
-                            {
-                                objectHit.GetComponent<Cs_GridObjectLogic>().ToggleGameObjects();
-                            }
-                            else
-                            {
-                                print("Not enough money");
-                            }
+                            objectHit.GetComponent<Cs_GridObjectLogic>().ToggleGameObjects();
                         }
                         
 
