@@ -39,7 +39,7 @@ public class Cs_DefaultBase : MonoBehaviour
 
     public Material testMat;
 
-    // Just a test comment. Means nothing.
+    // Just a test comment. Means nothing
     int element_Color = -1; // Color is the object color (Red, Blue, Green, etc...)
     int element_Base = -1; // Base is the black backdrop
 
