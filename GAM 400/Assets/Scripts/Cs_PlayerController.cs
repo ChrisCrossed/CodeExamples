@@ -7,6 +7,8 @@ public class Cs_PlayerController : MonoBehaviour
     public float MaxRunSpeed;
     public float MAX_ACCELERATION = 0.5f;
 
+    public float f_MouseScalar = 1.0f;
+
     #region Mouse input
     MouseState mouseState_Left;
     float f_MouseTimer_Left;
@@ -32,35 +34,94 @@ public class Cs_PlayerController : MonoBehaviour
     {
         UpdateInput();
 
-        if (Input.GetKey(KeyCode.W)) WalkForward();
-        else if (Input.GetKey(KeyCode.S)) WalkForward(MoveDirection.Backward);
-        else WalkForward(MoveDirection.Stop);
+        #region Directional Move
+        bool b_CanMove = false;
+
+        if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D)) b_CanMove = true;
+
+        if(b_CanMove)
+        {
+            if (Input.GetKey(KeyCode.W)) WalkForward();
+            else if (Input.GetKey(KeyCode.S)) WalkForward(MoveDirection.Backward);
+
+            if (Input.GetKey(KeyCode.A)) WalkStrafe(MoveDirection.StrafeLeft);
+            else if (Input.GetKey(KeyCode.D)) WalkStrafe(MoveDirection.StrafeRight);
+        }
+        else
+        {
+            gameObject.GetComponent<Rigidbody>().drag = 15;
+        }
+        #endregion
+
+        #region Mouse Look
+        UpdateMouseLook();
+        #endregion
+    }
+
+    void UpdateMouseLook()
+    {
+        float mouseX = Input.GetAxis("Mouse X");
+        float mouseY = Input.GetAxis("Mouse Y");
+
+        // Rotate the character with mouseX
+        Vector3 playerRot = gameObject.transform.eulerAngles;
+        playerRot.y += mouseX * f_MouseScalar;
+        playerRot.y = Mathf.LerpAngle(gameObject.transform.eulerAngles.y, playerRot.y, 0.5f);
+        gameObject.transform.eulerAngles = playerRot;
+
+        // Rotate the camera with mouseY
+        var camera = gameObject.GetComponentInChildren<Camera>().gameObject;
+        Vector3 cameraRot = camera.transform.eulerAngles;
+        cameraRot.x += -mouseY * f_MouseScalar;
+        cameraRot.x = Mathf.LerpAngle(camera.transform.eulerAngles.x, cameraRot.x, 0.5f);
+        camera.transform.eulerAngles = cameraRot;
     }
 
     void WalkForward(MoveDirection moveDir_ = MoveDirection.Forward)
     {
+        // Get the current movespeed to compare against
         float currVelocity = gameObject.GetComponent<Rigidbody>().velocity.magnitude;
-        print(currVelocity);
 
-        if(moveDir_ == MoveDirection.Forward)
+        // Reset drag to a low amount so we can move
+        gameObject.GetComponent<Rigidbody>().drag = 1;
+
+        // If our total velocity is less than our max walkspeed, continue
+        if (currVelocity < MaxWalkSpeed)
         {
-            if(currVelocity < MaxWalkSpeed)
+            // Forward
+            if(moveDir_ == MoveDirection.Forward)
             {
-                gameObject.GetComponent<Rigidbody>().drag = 1;
                 gameObject.GetComponent<Rigidbody>().AddForce(transform.forward * gameObject.GetComponent<Rigidbody>().mass * MAX_ACCELERATION * 100);
             }
-        }
-        else if(moveDir_ == MoveDirection.Backward)
-        {
-            if(currVelocity < MaxWalkSpeed)
+            // Backward
+            else if(moveDir_ == MoveDirection.Backward)
             {
-                gameObject.GetComponent<Rigidbody>().drag = 1;
                 gameObject.GetComponent<Rigidbody>().AddForce(-transform.forward * gameObject.GetComponent<Rigidbody>().mass * MAX_ACCELERATION * 100);
             }
         }
-        else
+    }
+    void WalkStrafe(MoveDirection moveDir_ = MoveDirection.StrafeLeft)
+    {
+        // Get the current movespeed to compare against
+        float currVelocity = gameObject.GetComponent<Rigidbody>().velocity.magnitude;
+        print(currVelocity);
+
+        // Reset drag to a low amount so we can move
+        gameObject.GetComponent<Rigidbody>().drag = 1;
+
+        // If our total velocity is less than our max walkspeed, continue
+        if(currVelocity < MaxWalkSpeed)
         {
-            gameObject.GetComponent<Rigidbody>().drag = 10;
+            // Move left
+            if(moveDir_ == MoveDirection.StrafeLeft)
+            {
+                gameObject.GetComponent<Rigidbody>().AddForce(-transform.right * gameObject.GetComponent<Rigidbody>().mass * MAX_ACCELERATION * 100);
+            }
+            // Move right
+            else if(moveDir_ == MoveDirection.StrafeRight)
+            {
+                gameObject.GetComponent<Rigidbody>().AddForce(transform.right * gameObject.GetComponent<Rigidbody>().mass * MAX_ACCELERATION * 100);
+            }
         }
     }
 
