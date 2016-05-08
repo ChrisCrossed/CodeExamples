@@ -21,36 +21,38 @@ public class Cs_PlayerController : MonoBehaviour
     const float MAX_MOUSE_HELD = 1.0f;
     #endregion
     #region Keyboard input
-    
     #endregion
 
     void Start()
     {
-        
+
     }
     
     // Update is called once per frame
     void Update()
     {
+        // Update mouse input
         UpdateInput();
 
         #region Directional Move
-        bool b_CanMove = false;
 
-        if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D)) b_CanMove = true;
+        // Move forward
+        MoveDirection moveDir = MoveDirection.Stop;
 
-        if(b_CanMove)
-        {
-            if (Input.GetKey(KeyCode.W)) WalkForward();
-            else if (Input.GetKey(KeyCode.S)) WalkForward(MoveDirection.Backward);
+        // Cardinal directions (If one button but not the other)
+        if (Input.GetKey(KeyCode.W) && !Input.GetKey(KeyCode.S)) moveDir = MoveDirection.Forward;
+        else if (!Input.GetKey(KeyCode.W) && Input.GetKey(KeyCode.S)) moveDir = MoveDirection.Backward;
+        else if(Input.GetKey(KeyCode.A) && !Input.GetKey(KeyCode.D)) moveDir = MoveDirection.StrafeLeft;
+        else if (!Input.GetKey(KeyCode.A) && Input.GetKey(KeyCode.D)) moveDir = MoveDirection.StrafeRight;
 
-            if (Input.GetKey(KeyCode.A)) WalkStrafe(MoveDirection.StrafeLeft);
-            else if (Input.GetKey(KeyCode.D)) WalkStrafe(MoveDirection.StrafeRight);
-        }
-        else
-        {
-            gameObject.GetComponent<Rigidbody>().drag = 15;
-        }
+        // Diagonal directions (If forward/backward with one strafe but not the other)
+        if (moveDir == MoveDirection.Forward && Input.GetKey(KeyCode.A) && !Input.GetKey(KeyCode.D)) moveDir = MoveDirection.ForwardLeft;
+        else if (moveDir == MoveDirection.Forward && !Input.GetKey(KeyCode.A) && Input.GetKey(KeyCode.D)) moveDir = MoveDirection.ForwardRight;
+        else if (moveDir == MoveDirection.Backward && Input.GetKey(KeyCode.A) && !Input.GetKey(KeyCode.D)) moveDir = MoveDirection.BackwardLeft;
+        else if (moveDir == MoveDirection.Backward && !Input.GetKey(KeyCode.A) && Input.GetKey(KeyCode.D)) moveDir = MoveDirection.BackwardRight;
+        
+        MovePlayer(moveDir);
+
         #endregion
 
         #region Mouse Look
@@ -77,10 +79,11 @@ public class Cs_PlayerController : MonoBehaviour
         camera.transform.eulerAngles = cameraRot;
     }
 
-    void WalkForward(MoveDirection moveDir_ = MoveDirection.Forward)
+    void MovePlayer(MoveDirection moveDir_ = MoveDirection.Forward)
     {
         // Get the current movespeed to compare against
         float currVelocity = gameObject.GetComponent<Rigidbody>().velocity.magnitude;
+        if (currVelocity <= 0.01) currVelocity = 0f;
 
         // Reset drag to a low amount so we can move
         gameObject.GetComponent<Rigidbody>().drag = 1;
@@ -88,40 +91,41 @@ public class Cs_PlayerController : MonoBehaviour
         // If our total velocity is less than our max walkspeed, continue
         if (currVelocity < MaxWalkSpeed)
         {
-            // Forward
-            if(moveDir_ == MoveDirection.Forward)
+            // Forward (Default)
+            Vector3 newVelocity = new Vector3();
+
+            if(moveDir_ == MoveDirection.Forward || moveDir_ == MoveDirection.ForwardLeft || moveDir_ == MoveDirection.ForwardRight)
             {
-                gameObject.GetComponent<Rigidbody>().AddForce(transform.forward * gameObject.GetComponent<Rigidbody>().mass * MAX_ACCELERATION * 100);
+                newVelocity = gameObject.transform.forward * MAX_ACCELERATION;
             }
+
             // Backward
-            else if(moveDir_ == MoveDirection.Backward)
+            if (moveDir_ == MoveDirection.Backward || moveDir_ == MoveDirection.BackwardLeft || moveDir_ ==  MoveDirection.BackwardRight)
             {
-                gameObject.GetComponent<Rigidbody>().AddForce(-transform.forward * gameObject.GetComponent<Rigidbody>().mass * MAX_ACCELERATION * 100);
+                newVelocity = -gameObject.transform.forward * MAX_ACCELERATION;
             }
-        }
-    }
-    void WalkStrafe(MoveDirection moveDir_ = MoveDirection.StrafeLeft)
-    {
-        // Get the current movespeed to compare against
-        float currVelocity = gameObject.GetComponent<Rigidbody>().velocity.magnitude;
-        print(currVelocity);
 
-        // Reset drag to a low amount so we can move
-        gameObject.GetComponent<Rigidbody>().drag = 1;
+            // Left
+            if(moveDir_ == MoveDirection.StrafeLeft || moveDir_ == MoveDirection.ForwardLeft || moveDir_ == MoveDirection.BackwardLeft)
+            {
+                newVelocity += -gameObject.transform.right * MAX_ACCELERATION;
+            }
 
-        // If our total velocity is less than our max walkspeed, continue
-        if(currVelocity < MaxWalkSpeed)
-        {
-            // Move left
-            if(moveDir_ == MoveDirection.StrafeLeft)
+            // Right
+            if(moveDir_ == MoveDirection.StrafeRight || moveDir_ == MoveDirection.ForwardRight || moveDir_ == MoveDirection.BackwardRight)
             {
-                gameObject.GetComponent<Rigidbody>().AddForce(-transform.right * gameObject.GetComponent<Rigidbody>().mass * MAX_ACCELERATION * 100);
+                newVelocity += gameObject.transform.right * MAX_ACCELERATION;
             }
-            // Move right
-            else if(moveDir_ == MoveDirection.StrafeRight)
+
+            // Stop instead
+            if (moveDir_ == MoveDirection.Stop)
             {
-                gameObject.GetComponent<Rigidbody>().AddForce(transform.right * gameObject.GetComponent<Rigidbody>().mass * MAX_ACCELERATION * 100);
+                newVelocity = new Vector3();
+                gameObject.GetComponent<Rigidbody>().drag = 15;
             }
+
+            newVelocity.y = gameObject.GetComponent<Rigidbody>().velocity.y;
+            gameObject.GetComponent<Rigidbody>().velocity += newVelocity;
         }
     }
 
@@ -213,5 +217,62 @@ public enum MoveDirection
     Backward,
     StrafeLeft,
     StrafeRight,
+
+    ForwardLeft,
+    ForwardRight,
+    BackwardLeft,
+    BackwardRight,
+
     Stop
+}
+
+
+// Doesn't work. Saving to ask about later.
+public class InputManager : MonoBehaviour
+{
+    public enum KeyboardInput
+    {
+        Forward,
+        Backward,
+        StrafeLeft,
+        StrafeRight,
+        Jump
+    }
+
+    public enum ButtonState
+    {
+        Pressed,
+        Released
+    }
+
+    class InputInformation
+    {
+        public KeyCode keyCode;
+        public KeyboardInput keyboardInput;
+        public ButtonState buttonState;
+
+        public InputInformation(KeyCode keyCode_ = KeyCode.W, KeyboardInput keyboardInput = KeyboardInput.Forward)
+        {
+            keyCode = keyCode_;
+            keyboardInput = KeyboardInput.Forward;
+            buttonState = ButtonState.Released;
+        }
+    }
+
+    InputInformation input_Forward = new InputInformation(KeyCode.W, KeyboardInput.Forward);
+    InputInformation input_Backward = new InputInformation(KeyCode.S, KeyboardInput.Backward);
+
+    public ButtonState GetButtonState(KeyboardInput keyboardInput_)
+    {
+        if (keyboardInput_ == KeyboardInput.Forward) return input_Forward.buttonState;
+        else if (keyboardInput_ == KeyboardInput.Backward) return input_Backward.buttonState;
+
+        return ButtonState.Released;
+    }
+
+    public void Update()
+    {
+        if (Input.GetKey(input_Forward.keyCode)) input_Forward.buttonState = ButtonState.Pressed; else input_Forward.buttonState = ButtonState.Released;
+        if (Input.GetKey(input_Backward.keyCode)) input_Backward.buttonState = ButtonState.Pressed; else input_Backward.buttonState = ButtonState.Released;
+    }
 }
