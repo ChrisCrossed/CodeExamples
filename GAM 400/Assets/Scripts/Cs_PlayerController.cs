@@ -27,8 +27,15 @@ public class Cs_PlayerController : Cs_InputManager
         // Update the camera rotation based on mouse input (Uses InputManager)
         gameObject.transform.rotation = GetRotation(gameObject.transform.eulerAngles);
 
+        // Set the player object to match that of the camera.
         Vector3 newRot = go_Player.transform.eulerAngles;
         newRot.y = gameObject.transform.eulerAngles.y;
         go_Player.transform.eulerAngles = newRot;
-	}
+
+        // Update walk movement
+        float f_WalkAcceleration = GetWalkAcceleration();
+        go_Player.GetComponent<Rigidbody>().AddRelativeForce(f_WalkAcceleration * Input.GetAxis("Horizontal"), 0, f_WalkAcceleration * Input.GetAxis("Vertical"));
+
+        // Continue with tutorial 1.4
+    }
 }

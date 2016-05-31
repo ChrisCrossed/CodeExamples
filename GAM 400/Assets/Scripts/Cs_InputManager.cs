@@ -14,7 +14,7 @@ public class Cs_InputManager : MonoBehaviour
     float f_lookSmoothDamp = 0.1f;
 
     // Movement Input
-    float f_WalkAccelerate;
+    public float f_WalkAcceleration = 3f;
     
 
     Quaternion quat_CurrRot;
@@ -61,5 +61,10 @@ public class Cs_InputManager : MonoBehaviour
     public Quaternion GetRotation(Vector3 currRot_)
     {
         return quat_CurrRot;
+    }
+
+    public float GetWalkAcceleration()
+    {
+        return f_WalkAcceleration;
     }
 }
