@@ -13,6 +13,10 @@ public class Cs_InputManager : MonoBehaviour
     float f_yRot_Vel;
     float f_lookSmoothDamp = 0.1f;
 
+    // Movement Input
+    float f_WalkAccelerate;
+    
+
     Quaternion quat_CurrRot;
 
 	// Use this for initialization
@@ -46,7 +50,7 @@ public class Cs_InputManager : MonoBehaviour
     public void SetMouseSmoothing(bool b_IsMouseSmooth_, float f_lookSmoothDamp_ = 0.1f)
     {
         // If Mouse isn't smooth, turn off the smoothing. Otherwise, set to default.
-        if (!b_IsMouseSmooth_) f_lookSmoothDamp = 0.0f; else f_lookSmoothDamp = f_lookSmoothDamp_;
+        if (!b_IsMouseSmooth_) f_lookSmoothDamp = 0.05f; else f_lookSmoothDamp = f_lookSmoothDamp_;
     }
 
     public void SetLookSensitivity(float f_LookSensitivity_)
