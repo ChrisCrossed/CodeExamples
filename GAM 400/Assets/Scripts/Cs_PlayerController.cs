@@ -3,12 +3,14 @@ using System.Collections;
 
 public class Cs_PlayerController : Cs_InputManager
 {
-    float f_MouseSensitivity = 3f;
+    public float f_MouseSensitivity = 3f;
+    public bool b_MouseSmoothing = true;
 
 	// Use this for initialization
 	void Start ()
     {
         SetLookSensitivity(f_MouseSensitivity);
+        SetMouseSmoothing(b_MouseSmoothing, 0.001f);
 	}
 	
 	// Update is called once per frame
