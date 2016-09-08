@@ -1,1 +1,4 @@
-sceneSetups: []
+sceneSetups:
+- path: Assets/Lvl_Island.unity
+  isLoaded: 1
+  isActive: 1
