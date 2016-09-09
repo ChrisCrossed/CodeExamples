@@ -20,134 +20,59 @@ public class Cs_FPSController : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
     {
-        PlayerMovement();
+        Input_Keyboard();
+        Input_Controller();
     }
 
-    void PlayerMovement()
+    void PlayerMovement(Vector3 v3_Direction)
     {
-        // Capture the current y velocity for ease
-        float f_yVelocity = gameObject.GetComponent<Rigidbody>().velocity.y;
+        // Old velocity
+        Vector3 v3_oldVelocity = gameObject.GetComponent<Rigidbody>().velocity;
 
-        // Create a new temporary velocity
-        Vector3 v3_newVelocity = new Vector3();
+        Vector3 v3_newVelocity = Vector3.Lerp(v3_oldVelocity, v3_Direction * MAX_MOVESPEED_FORWARD, 1 / ACCELERATION );
 
-        // Reset Angular drag
-        gameObject.GetComponent<Rigidbody>().drag = 0f;
+        gameObject.GetComponent<Rigidbody>().velocity = v3_newVelocity;
+    }
 
-        // Set Buttons Pressed
-        bool b_Forward = Input.GetKey(KeyCode.W);
-        bool b_Backward = Input.GetKey(KeyCode.S);
-        bool b_StrafeLeft = Input.GetKey(KeyCode.A);
-        bool b_StrafeRight = Input.GetKey(KeyCode.D);
+    void Input_Keyboard()
+    {
+        // Create a new Vector3
+        Vector3 v3_PlayerInput = new Vector3();
 
-        print( b_Forward );
-        print( b_Backward );
-
-        #region Forward & Backward
-        // When the player presses forward, push forward
-        if ( b_Forward && !b_Backward)
+        // Determine movement vector based on player input
+        if( Input.GetKey( KeyCode.W ) && !Input.GetKey( KeyCode.S ))
         {
-            // Increase player speed
-            if( f_playerSpeed_Vert < MAX_MOVESPEED_FORWARD)
-            {
-                // Negate player speed before continuing
-                if( f_playerSpeed_Vert < 0 )
-                {
-                    gameObject.GetComponent<Rigidbody>().drag = 5f;
-                }
-
-                f_playerSpeed_Vert += Time.deltaTime * ACCELERATION;
-            }
+            v3_PlayerInput.z = 1;
         }
-        else if( b_Backward && !b_Forward )
+        else if( Input.GetKey( KeyCode.S ) && !Input.GetKey( KeyCode.W ))
         {
-            if( f_playerSpeed_Vert > -MAX_MOVESPEED_REVERSE )
-            {
-                // Negate player speed before continuing
-                if ( f_playerSpeed_Vert > 0 )
-                {
-                    gameObject.GetComponent<Rigidbody>().drag = 5f;
-                }
-
-                f_playerSpeed_Vert -= Time.deltaTime * ACCELERATION;
-            }   
-        }
-        else if( !b_Forward && !b_Backward )
-        {
-            gameObject.GetComponent<Rigidbody>().drag = 5f;
-
-            if ( f_playerSpeed_Vert != 0 )
-            {
-                f_playerSpeed_Vert /= 4;
-            }
-
-            if( f_playerSpeed_Vert >= -0.5 && f_playerSpeed_Vert <= 0.5 )
-            {
-                f_playerSpeed_Vert = 0;
-            }
+            v3_PlayerInput.z = -1;
         }
 
-        v3_newVelocity += transform.forward * f_playerSpeed_Vert;
-        #endregion
-
-        #region Strafing
-        
-        // When the player presses forward, push forward
-        if (Input.GetKey(KeyCode.D) && !Input.GetKey(KeyCode.A))
+        if( Input.GetKey( KeyCode.A ) && !Input.GetKey( KeyCode.D ))
         {
-            // Increase player speed
-            if (f_playerSpeed_Horiz < MAX_MOVESPEED_FORWARD)
-            {
-                // Negate player speed before continuing
-                if (f_playerSpeed_Horiz < 0)
-                {
-                    gameObject.GetComponent<Rigidbody>().drag = 5f;
-                }
-
-                f_playerSpeed_Horiz += Time.deltaTime * ACCELERATION;
-            }
+            v3_PlayerInput.x = -1;
         }
-        else if (Input.GetKey(KeyCode.A) && !Input.GetKey(KeyCode.D))
+        else if( Input.GetKey( KeyCode.D ) && !Input.GetKey( KeyCode.A ))
         {
-            if (f_playerSpeed_Horiz > -MAX_MOVESPEED_REVERSE)
-            {
-                // Negate player speed before continuing
-                if (f_playerSpeed_Horiz > 0)
-                {
-                    gameObject.GetComponent<Rigidbody>().drag = 5f;
-                }
-
-                f_playerSpeed_Horiz -= Time.deltaTime * ACCELERATION;
-            }
-        }
-        else if (!Input.GetKey(KeyCode.A) && !Input.GetKey(KeyCode.D))
-        {
-            gameObject.GetComponent<Rigidbody>().drag = 5f;
-
-            if (f_playerSpeed_Horiz != 0)
-            {
-                f_playerSpeed_Horiz /= 4;
-            }
-
-            if (f_playerSpeed_Horiz >= -0.5 && f_playerSpeed_Horiz <= 0.5)
-            {
-                f_playerSpeed_Horiz = 0;
-            }
+            v3_PlayerInput.x = 1;
         }
 
-        v3_newVelocity += transform.right * f_playerSpeed_Horiz;
-        #endregion
+        // Normalize vector
+        v3_PlayerInput.Normalize();
 
-        // Return gravity effects to the player
-        v3_newVelocity.y += f_yVelocity;
+        // Pass into PlayerMovement
+        PlayerMovement( v3_PlayerInput );
+    }
 
-        // Apply the new velocity to the player
-        // gameObject.GetComponent<Rigidbody>().velocity = v3_newVelocity;
-        if( gameObject.GetComponent<Rigidbody>().velocity.magnitude < MAX_MOVESPEED_FORWARD )
-        {
-            gameObject.GetComponent<Rigidbody>().AddForce(v3_newVelocity);
-        }
+    void Input_Controller()
+    {
+        // Create a new Vector3
 
-        print(gameObject.GetComponent<Rigidbody>().velocity.magnitude);
+        // Determine movement vector based on player input
+
+        // Normalize vector
+
+        // Pass into PlayerMovement
     }
 }
