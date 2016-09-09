@@ -9,32 +9,58 @@ public class Cs_FPSController : MonoBehaviour
     float f_MoveSpeedMultiplier;
     public float ACCELERATION;
     public float JUMP_HEIGHT;
-
+    
     GamePadState state;
     GamePadState prevState;
     public PlayerIndex playerIndex = PlayerIndex.One;
+    bool b_Keyboard;
 
     bool b_CanJump;
     int i_GravityVelocityMultiplier;
-    
+    bool b_Sprinting;
+
+    Camera[] playerCam;
+    float f_FOV;
+    public float f_NORMAL_FOV;
+    public float F_SPRINTING_FOV;
+
     // Use this for initialization
     void Start ()
     {
+        b_Keyboard = false;
         b_CanJump = true;
 
         i_GravityVelocityMultiplier = 1;
         f_MoveSpeedMultiplier = 1;
+
+        playerCam = gameObject.GetComponentsInChildren<Camera>();
     }
 	
 	// Update is called once per frame
 	void Update ()
     {
-        Input_Keyboard();
-        Input_Controller();
+        b_Keyboard = KeyboardCheck(b_Keyboard);
+
+        if (b_Keyboard) Input_Keyboard(); else Input_Controller();
+        // Input_Controller();
 
         // Check if the player's allowed to jump again
         UpdateJump();
+    }
 
+    bool KeyboardCheck( bool b_KeyboardPressed )
+    {
+        if (Input.GetKey(KeyCode.W) ||
+            Input.GetKey(KeyCode.S) ||
+            Input.GetKey(KeyCode.A) ||
+            Input.GetKey(KeyCode.D) ||
+            Input.GetKey(KeyCode.LeftControl) ||
+            Input.GetKey(KeyCode.Space))
+        {
+            return true;
+        }
+
+        return false;
     }
 
     void PlayerMovement(Vector3 v3_Direction_, bool b_Jump_, float f_Magnitude_ = 1)
@@ -102,13 +128,19 @@ public class Cs_FPSController : MonoBehaviour
         {
             if(b_CanJump)
             {
-                f_MoveSpeedMultiplier = Mathf.Lerp(f_MoveSpeedMultiplier, 2, 0.5f);
+                f_MoveSpeedMultiplier = Mathf.Lerp(f_MoveSpeedMultiplier, 1.5f, 0.5f);
+
+                b_Sprinting = true;
             }
         }
         else
         {
             f_MoveSpeedMultiplier = Mathf.Lerp(f_MoveSpeedMultiplier, 1, 0.5f);
+
+            b_Sprinting = false;
         }
+        
+        TEMPORARY_CAMERA_SYSTEM();
         #endregion
 
         // Normalize vector
@@ -149,6 +181,37 @@ public class Cs_FPSController : MonoBehaviour
         #endregion
 
         #region Sprint
+        if(state.Buttons.LeftStick == ButtonState.Pressed)
+        {
+            b_Sprinting = true;
+        }
+
+        Vector2 MagnitudeTest = new Vector2();
+        MagnitudeTest.x = state.ThumbSticks.Left.X;
+        MagnitudeTest.y = state.ThumbSticks.Left.Y;
+
+        if ( MagnitudeTest.magnitude < 0.5f )
+        {
+            b_Sprinting = false;
+        }
+
+        print(MagnitudeTest.magnitude);
+
+        if( b_Sprinting )
+        {
+            if (b_CanJump)
+            {
+                f_MoveSpeedMultiplier = Mathf.Lerp(f_MoveSpeedMultiplier, 2, 0.5f);
+            }
+        }
+        else
+        {
+            f_MoveSpeedMultiplier = Mathf.Lerp(f_MoveSpeedMultiplier, 1, 0.5f);
+        }
+
+        TEMPORARY_CAMERA_SYSTEM();
+
+        /* Tank Style/Gears of War
         if (state.Buttons.LeftStick == ButtonState.Pressed)
         {
             if (b_CanJump)
@@ -160,6 +223,7 @@ public class Cs_FPSController : MonoBehaviour
         {
             f_MoveSpeedMultiplier = Mathf.Lerp(f_MoveSpeedMultiplier, 1, 0.5f);
         }
+        */
         #endregion
 
         // Normalize vector
@@ -184,8 +248,21 @@ public class Cs_FPSController : MonoBehaviour
                 b_CanJump = false;
             }
         }
+    }
 
-        print("Distance: " + hit.distance);
+    void TEMPORARY_CAMERA_SYSTEM()
+    {
+        float f_LerpTime = 0.1f;
 
+        if( b_Sprinting )
+        {
+            f_FOV = Mathf.Lerp(playerCam[0].fieldOfView, F_SPRINTING_FOV, f_LerpTime);
+        }
+        else
+        {
+            f_FOV = Mathf.Lerp(playerCam[0].fieldOfView, f_NORMAL_FOV, f_LerpTime);
+        }
+
+        playerCam[0].fieldOfView = f_FOV;
     }
 }
