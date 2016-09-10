@@ -42,7 +42,6 @@ public class Cs_FPSController : MonoBehaviour
         b_Keyboard = KeyboardCheck(b_Keyboard);
 
         if (b_Keyboard) Input_Keyboard(); else Input_Controller();
-        // Input_Controller();
 
         // Check if the player's allowed to jump again
         UpdateJump();
@@ -68,16 +67,21 @@ public class Cs_FPSController : MonoBehaviour
         // Old velocity
         Vector3 v3_oldVelocity = gameObject.GetComponent<Rigidbody>().velocity;
 
+        // Combine (not multiply) the player's current rotation (Quat) into the input vector (Vec3)
+        Vector3 v3_FinalRotation = gameObject.transform.rotation * v3_Direction_;
+
         // Lerp prior velocity into new velocity
-        Vector3 v3_newVelocity = Vector3.Lerp(v3_oldVelocity, v3_Direction_ * MAX_MOVESPEED_FORWARD * f_MoveSpeedMultiplier * f_Magnitude_, 1 / ACCELERATION );
+        Vector3 v3_newVelocity = Vector3.Lerp(v3_oldVelocity, v3_FinalRotation * MAX_MOVESPEED_FORWARD * f_MoveSpeedMultiplier * f_Magnitude_ , 1 / ACCELERATION );
 
         // Return gravity
-        if(!b_Jump_)
+        if (!b_Jump_)
         {
-            v3_newVelocity.y = v3_oldVelocity.y;
+            // Synthetic terminal velocity
+            v3_newVelocity.y = v3_oldVelocity.y - (Time.deltaTime * 10);
         }
         else
         {
+            // Apply a jump
             v3_newVelocity.y = ( v3_oldVelocity.y * i_GravityVelocityMultiplier ) + JUMP_HEIGHT;
         }
 
@@ -195,8 +199,6 @@ public class Cs_FPSController : MonoBehaviour
             b_Sprinting = false;
         }
 
-        print(MagnitudeTest.magnitude);
-
         if( b_Sprinting )
         {
             if (b_CanJump)
@@ -211,19 +213,6 @@ public class Cs_FPSController : MonoBehaviour
 
         TEMPORARY_CAMERA_SYSTEM();
 
-        /* Tank Style/Gears of War
-        if (state.Buttons.LeftStick == ButtonState.Pressed)
-        {
-            if (b_CanJump)
-            {
-                f_MoveSpeedMultiplier = Mathf.Lerp(f_MoveSpeedMultiplier, 2, 0.5f);
-            }
-        }
-        else
-        {
-            f_MoveSpeedMultiplier = Mathf.Lerp(f_MoveSpeedMultiplier, 1, 0.5f);
-        }
-        */
         #endregion
 
         // Normalize vector
