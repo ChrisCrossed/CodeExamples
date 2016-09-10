@@ -13,13 +13,22 @@ public class Cs_FPSController : MonoBehaviour
     GamePadState state;
     GamePadState prevState;
     public PlayerIndex playerIndex = PlayerIndex.One;
+
     bool b_Keyboard;
+    public bool b_MouseSmoothing = true;
+    float f_LookSensitivity = 5f;
+    float f_lookSmoothDamp = 0.1f;
+    float f_yRot_Previous;
+    float f_yRot;
+    float f_yRot_Curr;
+    float f_yRot_Vel;
 
     bool b_CanJump;
     GameObject go_RaycastObj;
     float f_JumpTimer;
     int i_GravityVelocityMultiplier;
     bool b_Sprinting;
+    float f_RayCast_DownwardDistance;
 
     Camera[] playerCam;
     float f_FOV;
@@ -29,9 +38,12 @@ public class Cs_FPSController : MonoBehaviour
     // Use this for initialization
     void Start ()
     {
+        SetMouseSmoothing(b_MouseSmoothing, 0.1f);
+
         b_Keyboard = false;
         b_CanJump = true;
         go_RaycastObj = gameObject.transform.Find("JumpRaycast").gameObject;
+        f_RayCast_DownwardDistance = 0.25f;
 
         i_GravityVelocityMultiplier = 1;
         f_MoveSpeedMultiplier = 1;
@@ -52,12 +64,17 @@ public class Cs_FPSController : MonoBehaviour
 
     bool KeyboardCheck( bool b_KeyboardPressed )
     {
+        // Update Mouse State
+        f_yRot_Previous = f_yRot;
+        f_yRot += Input.GetAxis("Mouse Y") * f_LookSensitivity;
+
         if (Input.GetKey(KeyCode.W) ||
             Input.GetKey(KeyCode.S) ||
             Input.GetKey(KeyCode.A) ||
             Input.GetKey(KeyCode.D) ||
             Input.GetKey(KeyCode.LeftControl) ||
-            Input.GetKey(KeyCode.Space))
+            Input.GetKey(KeyCode.Space) ||
+            f_yRot_Previous != f_yRot)
         {
             return true;
         }
@@ -80,7 +97,13 @@ public class Cs_FPSController : MonoBehaviour
         if (!b_Jump_)
         {
             // Synthetic terminal velocity
-            v3_newVelocity.y = v3_oldVelocity.y - (Time.deltaTime * 10);
+            RaycastHit hit;
+
+            // Raycast straight down 
+            Physics.Raycast(go_RaycastObj.transform.position, -transform.up, out hit);
+
+            // Apply fake gravity (synthetic Terminal Velocity) - Note: RigidBody gravity is OFF
+            if( hit.distance > f_RayCast_DownwardDistance) v3_newVelocity.y = v3_oldVelocity.y - (Time.deltaTime * 20);
         }
         else
         {
@@ -90,13 +113,15 @@ public class Cs_FPSController : MonoBehaviour
             ResetJump();
         }
 
-        // Apply velocity to player
-        gameObject.GetComponent<Rigidbody>().velocity = v3_newVelocity;
-
         // Determine direction to push against ramp
         Vector3 v3_PushDirection = RampDirection();
 
-        gameObject.GetComponent<Rigidbody>().AddForce(v3_PushDirection);
+        // Apply velocity to player
+        v3_newVelocity = Vector3.ProjectOnPlane(v3_newVelocity, v3_PushDirection);
+
+        gameObject.GetComponent<Rigidbody>().velocity = v3_newVelocity;
+
+        // gameObject.GetComponent<Rigidbody>().AddForce(v3_PushDirection);
     }
 
     Vector3 RampDirection()
@@ -105,7 +130,7 @@ public class Cs_FPSController : MonoBehaviour
         RaycastHit hit;
 
         // Raycast straight down 
-        Physics.Raycast(gameObject.transform.position, -transform.up, out hit, 2f);
+        Physics.Raycast(gameObject.transform.position, -transform.up, out hit, f_RayCast_DownwardDistance);
 
         // Return the opposite direction against the ramp
         return -hit.normal;
@@ -167,6 +192,16 @@ public class Cs_FPSController : MonoBehaviour
         }
         
         TEMPORARY_CAMERA_SYSTEM();
+        #endregion
+
+        #region Rotation/Looking (Mouse)
+
+        f_yRot = Mathf.Clamp( f_yRot, -90, 90 );
+
+        f_yRot_Curr = Mathf.SmoothDamp( f_yRot_Curr, f_yRot, ref f_yRot_Vel, f_lookSmoothDamp );
+
+        Quaternion quat_CurrRot = Quaternion.Euler(0, f_yRot_Curr, 0);
+
         #endregion
 
         // Normalize vector
@@ -271,6 +306,11 @@ public class Cs_FPSController : MonoBehaviour
         b_CanJump = false;
     }
 
+    void Look( Quaternion q_CameraVertRot_ )
+    {
+        playerCam[0].transform.rotation = q_CameraVertRot_;
+    }
+
     void TEMPORARY_CAMERA_SYSTEM()
     {
         float f_LerpTime = 0.1f;
@@ -285,5 +325,11 @@ public class Cs_FPSController : MonoBehaviour
         }
 
         playerCam[0].fieldOfView = f_FOV;
+    }
+
+    void SetMouseSmoothing(bool b_IsMouseSmooth_, float f_lookSmoothDamp_ = 0.1f)
+    {
+        // If Mouse isn't smooth, turn off the smoothing. Otherwise, set to default.
+        if (!b_IsMouseSmooth_) f_lookSmoothDamp = 0.05f; else f_lookSmoothDamp = f_lookSmoothDamp_;
     }
 }
