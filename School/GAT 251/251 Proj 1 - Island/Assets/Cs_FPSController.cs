@@ -16,6 +16,8 @@ public class Cs_FPSController : MonoBehaviour
     bool b_Keyboard;
 
     bool b_CanJump;
+    GameObject go_RaycastObj;
+    float f_JumpTimer;
     int i_GravityVelocityMultiplier;
     bool b_Sprinting;
 
@@ -29,6 +31,7 @@ public class Cs_FPSController : MonoBehaviour
     {
         b_Keyboard = false;
         b_CanJump = true;
+        go_RaycastObj = gameObject.transform.Find("JumpRaycast").gameObject;
 
         i_GravityVelocityMultiplier = 1;
         f_MoveSpeedMultiplier = 1;
@@ -82,11 +85,30 @@ public class Cs_FPSController : MonoBehaviour
         else
         {
             // Apply a jump
-            v3_newVelocity.y = ( v3_oldVelocity.y * i_GravityVelocityMultiplier ) + JUMP_HEIGHT;
+            v3_newVelocity.y = JUMP_HEIGHT;
+
+            ResetJump();
         }
 
         // Apply velocity to player
         gameObject.GetComponent<Rigidbody>().velocity = v3_newVelocity;
+
+        // Determine direction to push against ramp
+        Vector3 v3_PushDirection = RampDirection();
+
+        gameObject.GetComponent<Rigidbody>().AddForce(v3_PushDirection);
+    }
+
+    Vector3 RampDirection()
+    {
+        // Stop player from sliding
+        RaycastHit hit;
+
+        // Raycast straight down 
+        Physics.Raycast(gameObject.transform.position, -transform.up, out hit, 2f);
+
+        // Return the opposite direction against the ramp
+        return -hit.normal;
     }
 
     void Input_Keyboard()
@@ -119,7 +141,7 @@ public class Cs_FPSController : MonoBehaviour
         bool b_Jump = false;
         if( b_CanJump )
         {
-            if( Input.GetKeyDown( KeyCode.Space ))
+            if( Input.GetKey( KeyCode.Space ))
             {
                 b_Jump = true;
                 b_CanJump = false;
@@ -224,19 +246,29 @@ public class Cs_FPSController : MonoBehaviour
 
     void UpdateJump()
     {
+        // Raycast Out object
         RaycastHit hit;
 
-        if( Physics.Raycast( gameObject.transform.position, -transform.up, out hit, 1.5f))
+        if( f_JumpTimer < 0.2f )
         {
-            if( hit.distance < 1.01f )
+            f_JumpTimer += Time.deltaTime;
+
+            if (f_JumpTimer > 0.2f) f_JumpTimer = 0.2f;
+        }
+        else
+        {
+            if( Physics.Raycast( go_RaycastObj.transform.position, -transform.up, out hit, 0.3f ))
             {
                 b_CanJump = true;
             }
-            else
-            {
-                b_CanJump = false;
-            }
         }
+    }
+
+    void ResetJump()
+    {
+        f_JumpTimer = 0.0f;
+
+        b_CanJump = false;
     }
 
     void TEMPORARY_CAMERA_SYSTEM()
