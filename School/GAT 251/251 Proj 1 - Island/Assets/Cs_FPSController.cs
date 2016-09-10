@@ -18,15 +18,16 @@ public class Cs_FPSController : MonoBehaviour
     public bool b_MouseSmoothing = true;
     float f_LookSensitivity = 5f;
     float f_lookSmoothDamp = 0.1f;
-    float f_yRot_Previous;
     float f_yRot;
     float f_yRot_Curr;
     float f_yRot_Vel;
+    float f_xRot;
+    float f_xRot_Curr;
+    float f_xRot_Vel;
 
     bool b_CanJump;
     GameObject go_RaycastObj;
     float f_JumpTimer;
-    int i_GravityVelocityMultiplier;
     bool b_Sprinting;
     float f_RayCast_DownwardDistance;
 
@@ -34,21 +35,26 @@ public class Cs_FPSController : MonoBehaviour
     float f_FOV;
     public float f_NORMAL_FOV;
     public float F_SPRINTING_FOV;
+    public bool Xbox_Camera_Inverted = false;
+    float INVERTED_CAMERA_MULTIPLIER;
 
     // Use this for initialization
     void Start ()
     {
+        // Set the Camera on the controller to be 'Standard' viewing (Default: Up is Up)
+        if (Xbox_Camera_Inverted) INVERTED_CAMERA_MULTIPLIER = -1; else INVERTED_CAMERA_MULTIPLIER = 1;
+
         SetMouseSmoothing(b_MouseSmoothing, 0.1f);
 
         b_Keyboard = false;
         b_CanJump = true;
         go_RaycastObj = gameObject.transform.Find("JumpRaycast").gameObject;
         f_RayCast_DownwardDistance = 0.25f;
-
-        i_GravityVelocityMultiplier = 1;
         f_MoveSpeedMultiplier = 1;
 
         playerCam = gameObject.GetComponentsInChildren<Camera>();
+
+        playerCam[0].fieldOfView = f_NORMAL_FOV;
     }
 	
 	// Update is called once per frame
@@ -56,7 +62,12 @@ public class Cs_FPSController : MonoBehaviour
     {
         b_Keyboard = KeyboardCheck(b_Keyboard);
 
-        if (b_Keyboard) Input_Keyboard(); else Input_Controller();
+        // These need to run every frame due to Lerping
+        Look_Controller();
+        Look_Mouse();
+
+        // However, we want to restrict movement conflictions as much as possible.
+        if (b_Keyboard) { Input_Keyboard(); } else { Input_Controller(); }
 
         // Check if the player's allowed to jump again
         UpdateJump();
@@ -64,17 +75,25 @@ public class Cs_FPSController : MonoBehaviour
 
     bool KeyboardCheck( bool b_KeyboardPressed )
     {
-        // Update Mouse State
-        f_yRot_Previous = f_yRot;
-        f_yRot += Input.GetAxis("Mouse Y") * f_LookSensitivity;
+        if (Input.GetKeyDown(KeyCode.O))
+        {
+            print("Changed: Mouse Smoothing");
+            b_MouseSmoothing = !b_MouseSmoothing;
+            SetMouseSmoothing(b_MouseSmoothing);
+        }
+
+        if( Input.GetKeyDown(KeyCode.P))
+        {
+            print("Changed: Inverted Viewstyle");
+            INVERTED_CAMERA_MULTIPLIER *= -1;
+        }
 
         if (Input.GetKey(KeyCode.W) ||
             Input.GetKey(KeyCode.S) ||
             Input.GetKey(KeyCode.A) ||
             Input.GetKey(KeyCode.D) ||
             Input.GetKey(KeyCode.LeftControl) ||
-            Input.GetKey(KeyCode.Space) ||
-            f_yRot_Previous != f_yRot)
+            Input.GetKey(KeyCode.Space))
         {
             return true;
         }
@@ -194,16 +213,6 @@ public class Cs_FPSController : MonoBehaviour
         TEMPORARY_CAMERA_SYSTEM();
         #endregion
 
-        #region Rotation/Looking (Mouse)
-
-        f_yRot = Mathf.Clamp( f_yRot, -90, 90 );
-
-        f_yRot_Curr = Mathf.SmoothDamp( f_yRot_Curr, f_yRot, ref f_yRot_Vel, f_lookSmoothDamp );
-
-        Quaternion quat_CurrRot = Quaternion.Euler(0, f_yRot_Curr, 0);
-
-        #endregion
-
         // Normalize vector
         v3_PlayerInput.Normalize();
 
@@ -306,22 +315,75 @@ public class Cs_FPSController : MonoBehaviour
         b_CanJump = false;
     }
 
-    void Look( Quaternion q_CameraVertRot_ )
+    void Look_Mouse()
     {
-        playerCam[0].transform.rotation = q_CameraVertRot_;
+        #region Mouse Vertical
+
+        // Update Mouse State
+        f_yRot += Input.GetAxis("Mouse Y") * f_LookSensitivity;
+
+        // Clamp the angles (Vertical only)
+        f_yRot = Mathf.Clamp(f_yRot, -90, 90);
+
+        // Smooth it out
+        f_yRot_Curr = Mathf.SmoothDamp( f_yRot_Curr, f_yRot, ref f_yRot_Vel, f_lookSmoothDamp );
+        #endregion
+
+        #region Mouse Horizontal
+
+        // Update Mouse State
+        f_xRot += Input.GetAxis("Mouse X") * f_LookSensitivity;
+
+        // Smooth it out
+        f_xRot_Curr = Mathf.SmoothDamp( f_xRot_Curr, f_xRot, ref f_xRot_Vel, f_lookSmoothDamp );
+        
+        #endregion
+        
+        // The camera, although a child, is treated separately by Unity. Give it the X and Y.
+        playerCam[0].transform.rotation = Quaternion.Euler(-f_yRot_Curr, f_xRot_Curr, 0);
+
+        // However, the player object does not look up/down, but *does* rotate around 360 degrees.
+        gameObject.transform.rotation = Quaternion.Euler( 0, f_xRot_Curr, 0 );
+    }
+
+    void Look_Controller()
+    {
+        #region Vertical (Right Analog Stick)
+
+        // 
+        f_yRot += state.ThumbSticks.Right.Y * f_LookSensitivity * INVERTED_CAMERA_MULTIPLIER;
+
+        f_yRot = Mathf.Clamp(f_yRot, -90, 90);
+
+        f_yRot_Curr = Mathf.SmoothDamp(f_yRot_Curr, f_yRot, ref f_yRot_Vel, f_lookSmoothDamp);
+
+        #endregion
+
+        #region Horizontal (Right Analog Stick)
+
+        f_xRot += state.ThumbSticks.Right.X * f_LookSensitivity;
+
+        f_xRot_Curr = Mathf.SmoothDamp(f_xRot_Curr, f_xRot, ref f_xRot_Vel, f_lookSmoothDamp);
+        #endregion
+
+        playerCam[0].transform.rotation = Quaternion.Euler(f_yRot_Curr, f_xRot_Curr, 0);
+        gameObject.transform.rotation = Quaternion.Euler(0, f_xRot_Curr, 0);
     }
 
     void TEMPORARY_CAMERA_SYSTEM()
     {
         float f_LerpTime = 0.1f;
 
-        if( b_Sprinting )
+        if (gameObject.GetComponent<Rigidbody>().velocity.magnitude > 0.1f)
         {
-            f_FOV = Mathf.Lerp(playerCam[0].fieldOfView, F_SPRINTING_FOV, f_LerpTime);
-        }
-        else
-        {
-            f_FOV = Mathf.Lerp(playerCam[0].fieldOfView, f_NORMAL_FOV, f_LerpTime);
+            if (b_Sprinting)
+            {
+                f_FOV = Mathf.Lerp(playerCam[0].fieldOfView, F_SPRINTING_FOV, f_LerpTime);
+            }
+            else
+            {
+                f_FOV = Mathf.Lerp(playerCam[0].fieldOfView, f_NORMAL_FOV, f_LerpTime);
+            }
         }
 
         playerCam[0].fieldOfView = f_FOV;
