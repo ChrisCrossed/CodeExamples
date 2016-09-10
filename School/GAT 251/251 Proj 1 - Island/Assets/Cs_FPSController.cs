@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
 using XInputDotNetPure;
 
 public class Cs_FPSController : MonoBehaviour
@@ -9,7 +10,7 @@ public class Cs_FPSController : MonoBehaviour
     float f_MoveSpeedMultiplier;
     public float ACCELERATION;
     public float JUMP_HEIGHT;
-    
+
     GamePadState state;
     GamePadState prevState;
     public PlayerIndex playerIndex = PlayerIndex.One;
@@ -38,9 +39,15 @@ public class Cs_FPSController : MonoBehaviour
     public bool Xbox_Camera_Inverted = false;
     float INVERTED_CAMERA_MULTIPLIER;
 
+    float f_UITimer = 3.0f;
+    string s_Text;
+
     // Use this for initialization
-    void Start ()
+    void Start()
     {
+        // Disable mouse cursor
+        Cursor.visible = false;
+
         // Set the Camera on the controller to be 'Standard' viewing (Default: Up is Up)
         if (Xbox_Camera_Inverted) INVERTED_CAMERA_MULTIPLIER = -1; else INVERTED_CAMERA_MULTIPLIER = 1;
 
@@ -53,12 +60,10 @@ public class Cs_FPSController : MonoBehaviour
         f_MoveSpeedMultiplier = 1;
 
         playerCam = gameObject.GetComponentsInChildren<Camera>();
-
-        playerCam[0].fieldOfView = f_NORMAL_FOV;
     }
-	
-	// Update is called once per frame
-	void Update ()
+
+    // Update is called once per frame
+    void Update()
     {
         b_Keyboard = KeyboardCheck(b_Keyboard);
 
@@ -71,21 +76,36 @@ public class Cs_FPSController : MonoBehaviour
 
         // Check if the player's allowed to jump again
         UpdateJump();
+
+        f_UITimer += Time.deltaTime;
+
+        TEMPORARY_UI_SYSTEM();
+
+        if (Input.GetKeyDown(KeyCode.Escape)) Application.Quit();
     }
 
-    bool KeyboardCheck( bool b_KeyboardPressed )
+    bool KeyboardCheck(bool b_KeyboardPressed)
     {
         if (Input.GetKeyDown(KeyCode.O))
         {
-            print("Changed: Mouse Smoothing");
             b_MouseSmoothing = !b_MouseSmoothing;
             SetMouseSmoothing(b_MouseSmoothing);
+
+            if (b_MouseSmoothing) TEMPORARY_UI_SYSTEM("Smooth Look: Enabled", true); else TEMPORARY_UI_SYSTEM("Smooth Look: Disabled", true);
         }
 
-        if( Input.GetKeyDown(KeyCode.P))
+        if (Input.GetKeyDown(KeyCode.P))
         {
-            print("Changed: Inverted Viewstyle");
             INVERTED_CAMERA_MULTIPLIER *= -1;
+
+            if (INVERTED_CAMERA_MULTIPLIER == -1)
+            {
+                TEMPORARY_UI_SYSTEM("Controller: Inverted", true);
+            }
+            else
+            {
+                TEMPORARY_UI_SYSTEM("Controller: Standard", true);
+            }
         }
 
         if (Input.GetKey(KeyCode.W) ||
@@ -110,7 +130,7 @@ public class Cs_FPSController : MonoBehaviour
         Vector3 v3_FinalRotation = gameObject.transform.rotation * v3_Direction_;
 
         // Lerp prior velocity into new velocity
-        Vector3 v3_newVelocity = Vector3.Lerp(v3_oldVelocity, v3_FinalRotation * MAX_MOVESPEED_FORWARD * f_MoveSpeedMultiplier * f_Magnitude_ , 1 / ACCELERATION );
+        Vector3 v3_newVelocity = Vector3.Lerp(v3_oldVelocity, v3_FinalRotation * MAX_MOVESPEED_FORWARD * f_MoveSpeedMultiplier * f_Magnitude_, 1 / ACCELERATION);
 
         // Return gravity
         if (!b_Jump_)
@@ -122,7 +142,7 @@ public class Cs_FPSController : MonoBehaviour
             Physics.Raycast(go_RaycastObj.transform.position, -transform.up, out hit);
 
             // Apply fake gravity (synthetic Terminal Velocity) - Note: RigidBody gravity is OFF
-            if( hit.distance > f_RayCast_DownwardDistance) v3_newVelocity.y = v3_oldVelocity.y - (Time.deltaTime * 20);
+            if (hit.distance > f_RayCast_DownwardDistance) v3_newVelocity.y = v3_oldVelocity.y - (Time.deltaTime * 20);
         }
         else
         {
@@ -139,8 +159,7 @@ public class Cs_FPSController : MonoBehaviour
         v3_newVelocity = Vector3.ProjectOnPlane(v3_newVelocity, v3_PushDirection);
 
         gameObject.GetComponent<Rigidbody>().velocity = v3_newVelocity;
-
-        // gameObject.GetComponent<Rigidbody>().AddForce(v3_PushDirection);
+        gameObject.GetComponent<Rigidbody>().AddForce(v3_PushDirection);
     }
 
     Vector3 RampDirection()
@@ -162,20 +181,20 @@ public class Cs_FPSController : MonoBehaviour
 
         #region Input
         // Determine movement vector based on player input
-        if( Input.GetKey( KeyCode.W ) && !Input.GetKey( KeyCode.S ))
+        if (Input.GetKey(KeyCode.W) && !Input.GetKey(KeyCode.S))
         {
             v3_PlayerInput.z = 1;
         }
-        else if( Input.GetKey( KeyCode.S ) && !Input.GetKey( KeyCode.W ))
+        else if (Input.GetKey(KeyCode.S) && !Input.GetKey(KeyCode.W))
         {
             v3_PlayerInput.z = -1;
         }
 
-        if( Input.GetKey( KeyCode.A ) && !Input.GetKey( KeyCode.D ))
+        if (Input.GetKey(KeyCode.A) && !Input.GetKey(KeyCode.D))
         {
             v3_PlayerInput.x = -1;
         }
-        else if( Input.GetKey( KeyCode.D ) && !Input.GetKey( KeyCode.A ))
+        else if (Input.GetKey(KeyCode.D) && !Input.GetKey(KeyCode.A))
         {
             v3_PlayerInput.x = 1;
         }
@@ -183,9 +202,9 @@ public class Cs_FPSController : MonoBehaviour
 
         #region Jump
         bool b_Jump = false;
-        if( b_CanJump )
+        if (b_CanJump)
         {
-            if( Input.GetKey( KeyCode.Space ))
+            if (Input.GetKey(KeyCode.Space))
             {
                 b_Jump = true;
                 b_CanJump = false;
@@ -194,9 +213,9 @@ public class Cs_FPSController : MonoBehaviour
         #endregion
 
         #region Sprint
-        if( Input.GetKey( KeyCode.LeftControl ))
+        if (Input.GetKey(KeyCode.LeftControl))
         {
-            if(b_CanJump)
+            if (b_CanJump)
             {
                 f_MoveSpeedMultiplier = Mathf.Lerp(f_MoveSpeedMultiplier, 1.5f, 0.5f);
 
@@ -209,7 +228,7 @@ public class Cs_FPSController : MonoBehaviour
 
             b_Sprinting = false;
         }
-        
+
         TEMPORARY_CAMERA_SYSTEM();
         #endregion
 
@@ -217,14 +236,14 @@ public class Cs_FPSController : MonoBehaviour
         v3_PlayerInput.Normalize();
 
         // Pass into PlayerMovement
-        PlayerMovement( v3_PlayerInput, b_Jump );
+        PlayerMovement(v3_PlayerInput, b_Jump);
     }
 
     void Input_Controller()
     {
         // Update controller information
         prevState = state;
-        state = GamePad.GetState( playerIndex );
+        state = GamePad.GetState(playerIndex);
 
         #region Input
         // Create a new Vector3
@@ -240,7 +259,7 @@ public class Cs_FPSController : MonoBehaviour
 
         #region Jump
         bool b_Jump = false;
-        if( b_CanJump )
+        if (b_CanJump)
         {
             if (state.Buttons.A == ButtonState.Pressed && prevState.Buttons.A == ButtonState.Released)
             {
@@ -251,7 +270,7 @@ public class Cs_FPSController : MonoBehaviour
         #endregion
 
         #region Sprint
-        if(state.Buttons.LeftStick == ButtonState.Pressed)
+        if (state.Buttons.LeftStick == ButtonState.Pressed)
         {
             b_Sprinting = true;
         }
@@ -260,12 +279,12 @@ public class Cs_FPSController : MonoBehaviour
         MagnitudeTest.x = state.ThumbSticks.Left.X;
         MagnitudeTest.y = state.ThumbSticks.Left.Y;
 
-        if ( MagnitudeTest.magnitude < 0.5f )
+        if (MagnitudeTest.magnitude < 0.5f)
         {
             b_Sprinting = false;
         }
 
-        if( b_Sprinting )
+        if (b_Sprinting)
         {
             if (b_CanJump)
             {
@@ -285,7 +304,7 @@ public class Cs_FPSController : MonoBehaviour
         v3_PlayerInput.Normalize();
 
         // Pass into PlayerMovement
-        PlayerMovement( v3_PlayerInput, b_Jump, f_Magnitude );
+        PlayerMovement(v3_PlayerInput, b_Jump, f_Magnitude);
     }
 
     void UpdateJump()
@@ -293,19 +312,28 @@ public class Cs_FPSController : MonoBehaviour
         // Raycast Out object
         RaycastHit hit;
 
-        if( f_JumpTimer < 0.2f )
+        b_CanJump = true;
+
+        if (f_JumpTimer < 0.2f)
         {
             f_JumpTimer += Time.deltaTime;
 
             if (f_JumpTimer > 0.2f) f_JumpTimer = 0.2f;
+
+            // Disable the ability to jump during this initial window
+            b_CanJump = false;
         }
         else
         {
-            if( Physics.Raycast( go_RaycastObj.transform.position, -transform.up, out hit, 0.3f ))
+            // If the player isn't touching the ground, disable the ability to jump.
+            if (!Physics.Raycast(go_RaycastObj.transform.position, -transform.up, out hit, 0.3f))
             {
-                b_CanJump = true;
+                b_CanJump = false;
             }
         }
+
+        // Check if the player's in the air.
+        // Physics.Raycast( go_RaycastObj.transform.position, -transform.up, out hit
     }
 
     void ResetJump()
@@ -326,7 +354,7 @@ public class Cs_FPSController : MonoBehaviour
         f_yRot = Mathf.Clamp(f_yRot, -90, 90);
 
         // Smooth it out
-        f_yRot_Curr = Mathf.SmoothDamp( f_yRot_Curr, f_yRot, ref f_yRot_Vel, f_lookSmoothDamp );
+        f_yRot_Curr = Mathf.SmoothDamp(f_yRot_Curr, f_yRot, ref f_yRot_Vel, f_lookSmoothDamp);
         #endregion
 
         #region Mouse Horizontal
@@ -335,15 +363,15 @@ public class Cs_FPSController : MonoBehaviour
         f_xRot += Input.GetAxis("Mouse X") * f_LookSensitivity;
 
         // Smooth it out
-        f_xRot_Curr = Mathf.SmoothDamp( f_xRot_Curr, f_xRot, ref f_xRot_Vel, f_lookSmoothDamp );
-        
+        f_xRot_Curr = Mathf.SmoothDamp(f_xRot_Curr, f_xRot, ref f_xRot_Vel, f_lookSmoothDamp);
+
         #endregion
-        
+
         // The camera, although a child, is treated separately by Unity. Give it the X and Y.
         playerCam[0].transform.rotation = Quaternion.Euler(-f_yRot_Curr, f_xRot_Curr, 0);
 
         // However, the player object does not look up/down, but *does* rotate around 360 degrees.
-        gameObject.transform.rotation = Quaternion.Euler( 0, f_xRot_Curr, 0 );
+        gameObject.transform.rotation = Quaternion.Euler(0, f_xRot_Curr, 0);
     }
 
     void Look_Controller()
@@ -374,19 +402,37 @@ public class Cs_FPSController : MonoBehaviour
     {
         float f_LerpTime = 0.1f;
 
-        if (gameObject.GetComponent<Rigidbody>().velocity.magnitude > 0.1f)
+        if (b_Sprinting)
         {
-            if (b_Sprinting)
+            if (gameObject.GetComponent<Rigidbody>().velocity.magnitude > 0.1f)
             {
                 f_FOV = Mathf.Lerp(playerCam[0].fieldOfView, F_SPRINTING_FOV, f_LerpTime);
             }
-            else
-            {
-                f_FOV = Mathf.Lerp(playerCam[0].fieldOfView, f_NORMAL_FOV, f_LerpTime);
-            }
+        }
+        else
+        {
+            f_FOV = Mathf.Lerp(playerCam[0].fieldOfView, f_NORMAL_FOV, f_LerpTime);
         }
 
         playerCam[0].fieldOfView = f_FOV;
+    }
+
+    void TEMPORARY_UI_SYSTEM(string s_Info_ = null, bool b_ResetTimer = false)
+    {
+        if (b_ResetTimer) f_UITimer = 0.0f;
+
+        if (s_Info_ != null) { s_Text = s_Info_; }
+
+        if (f_UITimer < 3.0f)
+        {
+            f_UITimer += Time.deltaTime;
+        }
+        else
+        {
+            s_Text = " ";
+        }
+
+        GameObject.Find("Text").gameObject.GetComponent<Text>().text = s_Text;
     }
 
     void SetMouseSmoothing(bool b_IsMouseSmooth_, float f_lookSmoothDamp_ = 0.1f)
