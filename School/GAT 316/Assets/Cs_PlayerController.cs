@@ -7,9 +7,16 @@ public class Cs_PlayerController : MonoBehaviour
     // PLAYER STATS & INFORMATION
     public float MAX_PLAYER_SPEED;
     public float ACCELERATION;
-
+    [Range( 0, 1 )]
+    public float f_Magnitude_Sneak;
+    [Range(0, 1)]
+    public float f_Magnitude_Brisk;
+    [Range(0, 2)]
+    public float f_Magnitude_Sprint;
+    
     // Player variables
     Vector3 v3_CurrentVelocity;
+    bool b_IsSprinting = false;
 
     // Controller vs. Keyboard - Last Used
     bool b_ControllerUsedLast;
@@ -17,13 +24,12 @@ public class Cs_PlayerController : MonoBehaviour
     // Controller Input
     GamePadState state;
     GamePadState prevState;
-    GamePadState CONTROLLER_START_STATE;
     public PlayerIndex playerOne = PlayerIndex.One;
 
     // Use this for initialization
     void Start ()
     {
-        CONTROLLER_START_STATE = GamePad.GetState(playerOne);
+        
     }
 	
 	// Update is called once per frame
@@ -60,23 +66,29 @@ public class Cs_PlayerController : MonoBehaviour
         v3_InputVector.x = state.ThumbSticks.Left.X;
         v3_InputVector.z = state.ThumbSticks.Left.Y;
 
-        float f_Magnitude = v3_InputVector.magnitude;
+        float f_Magnitude = 0f;
+
+        if( !b_IsSprinting)
+        {
+            if (state.Buttons.LeftStick == ButtonState.Pressed && prevState.Buttons.LeftStick == ButtonState.Released) b_IsSprinting = true;
+        }
+        else
+        {
+            if (v3_InputVector.magnitude < 0.1f) b_IsSprinting = false;
+        }
         
         // If the player speed isn't 0, apply preset speeds
-        if ( f_Magnitude != 0f)
+        if (v3_InputVector.magnitude != 0f)
         {
-            if      (f_Magnitude < 0.15f)   f_Magnitude = 0f;
-            else if (f_Magnitude < 0.35f)   f_Magnitude = 0.35f;
-            else if (f_Magnitude < 0.7f)    f_Magnitude = 0.7f;
-            else    f_Magnitude = 1.0f;
+            if      (v3_InputVector.magnitude < 0.15f)   f_Magnitude = 0;
+            else if (v3_InputVector.magnitude < 0.4f)   f_Magnitude = f_Magnitude_Sneak;
+            else if (v3_InputVector.magnitude <= 1.0f)    f_Magnitude = f_Magnitude_Brisk;
+
+            if (b_IsSprinting)   f_Magnitude = f_Magnitude_Sprint;
         }
 
         // Normalize
         v3_InputVector.Normalize();
-        #endregion
-
-        #region Magnitude
-
         #endregion
 
         // Pass information into PlayerMovement()
