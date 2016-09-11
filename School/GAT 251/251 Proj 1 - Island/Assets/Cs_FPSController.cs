@@ -142,7 +142,7 @@ public class Cs_FPSController : MonoBehaviour
             Physics.Raycast(go_RaycastObj.transform.position, -transform.up, out hit);
 
             // Apply fake gravity (synthetic Terminal Velocity) - Note: RigidBody gravity is OFF
-            if (hit.distance > f_RayCast_DownwardDistance) v3_newVelocity.y = v3_oldVelocity.y - (Time.deltaTime * 20);
+            if (hit.distance > f_RayCast_DownwardDistance) v3_newVelocity.y = v3_oldVelocity.y - (Time.deltaTime * 50);
         }
         else
         {
@@ -217,7 +217,7 @@ public class Cs_FPSController : MonoBehaviour
         {
             if (b_CanJump)
             {
-                f_MoveSpeedMultiplier = Mathf.Lerp(f_MoveSpeedMultiplier, 1.5f, 0.5f);
+                f_MoveSpeedMultiplier = Mathf.Lerp(f_MoveSpeedMultiplier, 1.25f, 0.5f);
 
                 b_Sprinting = true;
             }
@@ -244,6 +244,12 @@ public class Cs_FPSController : MonoBehaviour
         // Update controller information
         prevState = state;
         state = GamePad.GetState(playerIndex);
+        
+        // Quit if 'Start' is pressed
+        if(state.Buttons.Start == ButtonState.Pressed)
+        {
+            Application.Quit();
+        }
 
         #region Input
         // Create a new Vector3
@@ -423,14 +429,18 @@ public class Cs_FPSController : MonoBehaviour
 
         if (s_Info_ != null) { s_Text = s_Info_; }
 
-        if (f_UITimer < 3.0f)
-        {
-            f_UITimer += Time.deltaTime;
-        }
-        else
+        f_UITimer += Time.deltaTime;
+        print(f_UITimer);
+
+        if( f_UITimer > 5.0f) 
         {
             s_Text = " ";
         }
+        if( f_UITimer >= 30.0f)
+        {
+            s_Text = "Press (Letter) 'O' to make the camera glide. I'd love feedback on that!\nPressing 'P' inverts your controller's camera.";
+        }
+        if (f_UITimer > 60f) s_Text = " ";
 
         GameObject.Find("Text").gameObject.GetComponent<Text>().text = s_Text;
     }
