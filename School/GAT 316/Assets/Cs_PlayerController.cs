@@ -13,6 +13,9 @@ public class Cs_PlayerController : MonoBehaviour
     public float f_Magnitude_Brisk;
     [Range(0, 2)]
     public float f_Magnitude_Sprint;
+
+    [SerializeField]
+    public float currSpeedReadOnly;
     
     // Player variables
     Vector3 v3_CurrentVelocity;
@@ -20,7 +23,7 @@ public class Cs_PlayerController : MonoBehaviour
     bool b_IsSprinting = false;
 
     // Controller vs. Keyboard - Last Used
-    bool b_ControllerUsedLast;
+    bool b_KeyboardUsedLast;
     float f_DoubleTapForSprintTimer;
 
     // Controller Input
@@ -40,11 +43,52 @@ public class Cs_PlayerController : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
     {
-        
+        b_KeyboardUsedLast = KeyboardCheck(b_KeyboardUsedLast);
 
-        Input_Keyboard();
-        // Input_Controller();
+        if(b_KeyboardUsedLast) Input_Keyboard(); else Input_Controller();
+
+        currSpeedReadOnly = gameObject.GetComponent<Rigidbody>().velocity.magnitude;
 	}
+
+    bool KeyboardCheck(bool b_KeyboardPressed_)
+    {
+        /*
+        if (Input.GetKeyDown(KeyCode.O))
+        {
+            b_MouseSmoothing = !b_MouseSmoothing;
+            SetMouseSmoothing(b_MouseSmoothing);
+
+            if (b_MouseSmoothing) TEMPORARY_UI_SYSTEM("Smooth Look: Enabled", true); else TEMPORARY_UI_SYSTEM("Smooth Look: Disabled", true);
+        }
+
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            INVERTED_CAMERA_MULTIPLIER *= -1;
+
+            if (INVERTED_CAMERA_MULTIPLIER == -1)
+            {
+                TEMPORARY_UI_SYSTEM("Controller: Inverted", true);
+            }
+            else
+            {
+                TEMPORARY_UI_SYSTEM("Controller: Standard", true);
+            }
+        }*/
+
+        print(b_KeyboardPressed_);
+
+        if (Input.GetKey(KeyCode.W) ||
+            Input.GetKey(KeyCode.S) ||
+            Input.GetKey(KeyCode.A) ||
+            Input.GetKey(KeyCode.D) ||
+            Input.GetKey(KeyCode.LeftControl) ||
+            Input.GetKey(KeyCode.Space))
+        {
+            return true;
+        }
+
+        return false;
+    }
 
     void PlayerMovement( Vector3 v3_InputVector_, float f_Magnitude_ )
     {
@@ -97,10 +141,8 @@ public class Cs_PlayerController : MonoBehaviour
         // If the player speed isn't 0, apply preset speeds
         if (v3_InputVector.magnitude != float.Epsilon)
         {
-            print(v3_InputVector.magnitude);
-
             if      (v3_InputVector.magnitude < 0.15f)   f_Magnitude = 0;
-            else if (v3_InputVector.magnitude < 0.5f)   f_Magnitude = f_Magnitude_Sneak;
+            else if (v3_InputVector.magnitude < 0.95f)   f_Magnitude = f_Magnitude_Sneak;
             else    f_Magnitude = f_Magnitude_Brisk;
 
             if (b_IsSprinting)   f_Magnitude = f_Magnitude_Sprint;

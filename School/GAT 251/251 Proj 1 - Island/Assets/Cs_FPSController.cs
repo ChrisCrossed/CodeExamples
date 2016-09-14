@@ -385,7 +385,7 @@ public class Cs_FPSController : MonoBehaviour
         #region Vertical (Right Analog Stick)
 
         // 
-        f_yRot += state.ThumbSticks.Right.Y * f_LookSensitivity * INVERTED_CAMERA_MULTIPLIER;
+        f_yRot += state.ThumbSticks.Right.Y * f_LookSensitivity * INVERTED_CAMERA_MULTIPLIER / 2.75f;
 
         f_yRot = Mathf.Clamp(f_yRot, -90, 90);
 
@@ -395,7 +395,7 @@ public class Cs_FPSController : MonoBehaviour
 
         #region Horizontal (Right Analog Stick)
 
-        f_xRot += state.ThumbSticks.Right.X * f_LookSensitivity;
+        f_xRot += state.ThumbSticks.Right.X * f_LookSensitivity / 2.75f;
 
         f_xRot_Curr = Mathf.SmoothDamp(f_xRot_Curr, f_xRot, ref f_xRot_Vel, f_lookSmoothDamp);
         #endregion
