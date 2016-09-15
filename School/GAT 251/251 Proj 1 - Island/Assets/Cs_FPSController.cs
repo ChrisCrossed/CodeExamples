@@ -66,11 +66,7 @@ public class Cs_FPSController : MonoBehaviour
     void Update()
     {
         b_Keyboard = KeyboardCheck(b_Keyboard);
-
-        // These need to run every frame due to Lerping
-        Look_Controller();
-        Look_Mouse();
-
+        
         // However, we want to restrict movement conflictions as much as possible.
         if (b_Keyboard) { Input_Keyboard(); } else { Input_Controller(); }
 
@@ -78,10 +74,17 @@ public class Cs_FPSController : MonoBehaviour
         UpdateJump();
 
         f_UITimer += Time.deltaTime;
+        
+        if (Input.GetKeyDown(KeyCode.Escape)) Application.Quit();
+    }
+
+    void LateUpdate()
+    {
+        // These need to run every frame due to Lerping
+        Look_Controller();
+        Look_Mouse();
 
         TEMPORARY_UI_SYSTEM();
-
-        if (Input.GetKeyDown(KeyCode.Escape)) Application.Quit();
     }
 
     bool KeyboardCheck(bool b_KeyboardPressed)
@@ -430,7 +433,6 @@ public class Cs_FPSController : MonoBehaviour
         if (s_Info_ != null) { s_Text = s_Info_; }
 
         f_UITimer += Time.deltaTime;
-        print(f_UITimer);
 
         if( f_UITimer > 5.0f) 
         {
