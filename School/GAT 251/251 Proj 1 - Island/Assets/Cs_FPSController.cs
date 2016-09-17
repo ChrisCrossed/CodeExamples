@@ -57,6 +57,7 @@ public class Cs_FPSController : MonoBehaviour
         b_CanJump = true;
         go_RaycastObj = gameObject.transform.Find("JumpRaycast").gameObject;
         f_RayCast_DownwardDistance = 0.25f;
+        // f_RayCast_DownwardDistance = 1f;
         f_MoveSpeedMultiplier = 1;
 
         playerCam = gameObject.GetComponentsInChildren<Camera>();
@@ -171,7 +172,7 @@ public class Cs_FPSController : MonoBehaviour
         RaycastHit hit;
 
         // Raycast straight down 
-        Physics.Raycast(gameObject.transform.position, -transform.up, out hit, f_RayCast_DownwardDistance);
+        Physics.Raycast(go_RaycastObj.transform.position, -transform.up, out hit, f_RayCast_DownwardDistance);
 
         // Return the opposite direction against the ramp
         return -hit.normal;
