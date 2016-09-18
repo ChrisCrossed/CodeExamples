@@ -33,10 +33,15 @@ public class Cs_BoardLogic : MonoBehaviour
 
         Initialize_BlockArray();
 
-        SetBlock(1, 1, Enum_BlockType.Block_2_Static);
-        SetBlock(2, 1, Enum_BlockType.Block_1_Static);
-        SetBlock(1, 2, Enum_BlockType.Block_2_Static);
-        SetBlock(2, 2, Enum_BlockType.Block_1_Static);
+        SetBlock(1, 1, Enum_BlockType.Block_2_Active);
+        SetBlock(2, 1, Enum_BlockType.Block_1_Active);
+        SetBlock(3, 1, Enum_BlockType.Block_1_Active);
+        SetBlock(1, 2, Enum_BlockType.Block_2_Active);
+        SetBlock(2, 2, Enum_BlockType.Block_1_Active);
+        SetBlock(3, 2, Enum_BlockType.Block_2_Active);
+        SetBlock(1, 3, Enum_BlockType.Block_1_Active);
+        SetBlock(2, 3, Enum_BlockType.Block_3_Static);
+        SetBlock(3, 3, Enum_BlockType.Block_3_Active);
 
         PrintArrayToConsole();
     }
@@ -72,7 +77,17 @@ public class Cs_BoardLogic : MonoBehaviour
     #region Block Position Manipulation
     void MoveActiveBlocks_Down(Vector2 v2_BottomLeft, Enum_BlockSize BlockSize_)
     {
-        if (v2_BottomLeft.y - 1 < 0) return;
+        #region Ensure appropriate spaces below are empty. Otherwise, convert all blocks to static.
+        if (v2_BottomLeft.y - 1 < 0) { AllBlocksStatic(); return; }
+
+        if (GetBlock((int)v2_BottomLeft.x, (int)v2_BottomLeft.y - 1) != Enum_BlockType.Empty) { AllBlocksStatic(); return; }
+        if (GetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y - 1) != Enum_BlockType.Empty) { AllBlocksStatic(); return; }
+
+        if (BlockSize_ == Enum_BlockSize.size_3x2 || BlockSize_ == Enum_BlockSize.size_3x3)
+        {
+            if (GetBlock((int)v2_BottomLeft.x + 2, (int)v2_BottomLeft.y - 1) != Enum_BlockType.Empty) { AllBlocksStatic(); return; }
+        }
+        #endregion
 
         #region Default 2x2
         // (0,0) -> (0, -1)
@@ -104,10 +119,20 @@ public class Cs_BoardLogic : MonoBehaviour
             SetBlock((int)v2_BottomLeft.x + 2, (int)v2_BottomLeft.y - 1, GetBlock((int)v2_BottomLeft.x + 2, (int)v2_BottomLeft.y));
 
             // (2, 1) -> (2, 0)
-            SetBlock((int)v2_BottomLeft.x + 2, (int)v2_BottomLeft.y, GetBlock((int)v2_BottomLeft.x + 2, (int)v2_BottomLeft.y + 1));
+            SetBlock((int)v2_BottomLeft.x + 2, (int)v2_BottomLeft.y    , GetBlock((int)v2_BottomLeft.x + 2, (int)v2_BottomLeft.y + 1));
 
-            // If 3x2: (2,1) -> CLEAR
-            if (BlockSize_ == Enum_BlockSize.size_3x2) SetBlock((int)v2_BottomLeft.x + 2, (int)v2_BottomLeft.y + 1, Enum_BlockType.Empty);
+            // If 3x2:
+            if (BlockSize_ == Enum_BlockSize.size_3x2)
+            {
+                // (0,1) -> CLEAR
+                SetBlock((int)v2_BottomLeft.x    , (int)v2_BottomLeft.y + 1, Enum_BlockType.Empty);
+
+                // (1,1) -> CLEAR
+                SetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y + 1, Enum_BlockType.Empty);
+
+                // (2,1) -> CLEAR
+                SetBlock((int)v2_BottomLeft.x + 2, (int)v2_BottomLeft.y + 1, Enum_BlockType.Empty);
+            }
         }
         #endregion
 
@@ -140,12 +165,253 @@ public class Cs_BoardLogic : MonoBehaviour
         #endregion
     }
 
+    void MoveActiveBlocks_Left(Vector2 v2_BottomLeft, Enum_BlockSize BlockSize_)
+    {
+        #region Ensure appropriate spaces below are empty. Otherwise, convert all blocks to static.
+        if (v2_BottomLeft.x - 1 < 0) { AllBlocksStatic(); return; }
+
+        // As for block repositioning, I do not want blocks to be pushed around if another block exists.
+        if (GetBlock((int)v2_BottomLeft.x - 1, (int)v2_BottomLeft.y) != Enum_BlockType.Empty) { return; }
+        if (GetBlock((int)v2_BottomLeft.x - 1, (int)v2_BottomLeft.y + 1) != Enum_BlockType.Empty) { return; }
+
+        // Check in case the active blocks we have are 3 high
+        if(BlockSize_ == Enum_BlockSize.size_2x3 || BlockSize_ == Enum_BlockSize.size_3x3)
+        {
+            if (GetBlock((int)v2_BottomLeft.x - 1, (int)v2_BottomLeft.y + 2) != Enum_BlockType.Empty) { return; }
+        }
+        #endregion
+
+        #region Default 2x2
+        // (0,0) -> (-1, 0)
+        SetBlock((int)v2_BottomLeft.x - 1, (int)v2_BottomLeft.y, GetBlock((int)v2_BottomLeft.x, (int)v2_BottomLeft.y));
+
+        // (1, 0) -> (0, 0)
+        SetBlock((int)v2_BottomLeft.x, (int)v2_BottomLeft.y, GetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y));
+
+        // (0, 1) -> (-1, 1)
+        SetBlock((int)v2_BottomLeft.x - 1, (int)v2_BottomLeft.y + 1, GetBlock((int)v2_BottomLeft.x, (int)v2_BottomLeft.y + 1));
+
+        // (1, 1) -> (0, 1)
+        SetBlock((int)v2_BottomLeft.x, (int)v2_BottomLeft.y + 1, GetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y + 1));
+
+        if (BlockSize_ == Enum_BlockSize.size_2x2)
+        {
+            // (1,0) -> CLEAR
+            SetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y, Enum_BlockType.Empty);
+
+            // (1,1) -> CLEAR
+            SetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y + 1, Enum_BlockType.Empty);
+        }
+        #endregion
+
+        #region 3 wide by 2 tall
+        if (BlockSize_ == Enum_BlockSize.size_3x2 || BlockSize_ == Enum_BlockSize.size_3x3)
+        {
+            // (2, 0) -> (1, 0)
+            SetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y, GetBlock((int)v2_BottomLeft.x + 2, (int)v2_BottomLeft.y));
+
+            // (2, 1) -> (1, 1)
+            SetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y + 1, GetBlock((int)v2_BottomLeft.x + 2, (int)v2_BottomLeft.y + 1));
+            
+            // (2,0) -> CLEAR
+            SetBlock((int)v2_BottomLeft.x + 2, (int)v2_BottomLeft.y, Enum_BlockType.Empty);
+
+            // (2,1) -> CLEAR
+            SetBlock((int)v2_BottomLeft.x + 2, (int)v2_BottomLeft.y + 1, Enum_BlockType.Empty);
+        }
+        #endregion
+
+        #region 2 wide by 3 tall
+        if (BlockSize_ == Enum_BlockSize.size_2x3 || BlockSize_ == Enum_BlockSize.size_3x3)
+        {
+            // (0,2) -> (-1, 2) 
+            SetBlock((int)v2_BottomLeft.x - 1, (int)v2_BottomLeft.y + 2, GetBlock((int)v2_BottomLeft.x, (int)v2_BottomLeft.y + 2));
+
+            // (1,2) -> (0, 2)
+            SetBlock((int)v2_BottomLeft.x, (int)v2_BottomLeft.y + 2, GetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y + 2));
+
+            // If 2x3: 
+            if(BlockSize_ == Enum_BlockSize.size_2x3)
+            {
+                // (1,0) -> CLEAR
+                SetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y, Enum_BlockType.Empty);
+
+                // (1,1) -> CLEAR
+                SetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y + 1, Enum_BlockType.Empty);
+
+                // (1,2) -> CLEAR
+                SetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y + 2, Enum_BlockType.Empty);
+            }
+        }
+        #endregion
+
+        #region 3 wide by 3 tall
+        if (BlockSize_ == Enum_BlockSize.size_3x3)
+        {
+            // (2,2) -> (1,2)
+            SetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y + 2, GetBlock((int)v2_BottomLeft.x + 2, (int)v2_BottomLeft.y + 2));
+
+            // (2,2) -> CLEAR
+            SetBlock((int)v2_BottomLeft.x + 2, (int)v2_BottomLeft.y + 2, Enum_BlockType.Empty);
+        }
+        #endregion
+    }
+
+    void MoveActiveBlocks_Right(Vector2 v2_BottomLeft, Enum_BlockSize BlockSize_)
+    {
+        #region Ensure appropriate spaces below are empty. Otherwise, convert all blocks to static.
+        if (v2_BottomLeft.x - 1 < 0) { AllBlocksStatic(); return; }
+
+        // As for block repositioning, I do not want blocks to be pushed around if another block exists.
+        if (GetBlock((int)v2_BottomLeft.x - 1, (int)v2_BottomLeft.y) != Enum_BlockType.Empty) { return; }
+        if (GetBlock((int)v2_BottomLeft.x - 1, (int)v2_BottomLeft.y + 1) != Enum_BlockType.Empty) { return; }
+
+        // Check in case the active blocks we have are 3 high
+        if (BlockSize_ == Enum_BlockSize.size_2x3 || BlockSize_ == Enum_BlockSize.size_3x3)
+        {
+            if (GetBlock((int)v2_BottomLeft.x - 1, (int)v2_BottomLeft.y + 2) != Enum_BlockType.Empty) { return; }
+        }
+        #endregion
+
+        #region Default 2x2
+        // (0,0) -> (-1, 0)
+        SetBlock((int)v2_BottomLeft.x - 1, (int)v2_BottomLeft.y, GetBlock((int)v2_BottomLeft.x, (int)v2_BottomLeft.y));
+
+        // (1, 0) -> (0, 0)
+        SetBlock((int)v2_BottomLeft.x, (int)v2_BottomLeft.y, GetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y));
+
+        // (0, 1) -> (-1, 1)
+        SetBlock((int)v2_BottomLeft.x - 1, (int)v2_BottomLeft.y + 1, GetBlock((int)v2_BottomLeft.x, (int)v2_BottomLeft.y + 1));
+
+        // (1, 1) -> (0, 1)
+        SetBlock((int)v2_BottomLeft.x, (int)v2_BottomLeft.y + 1, GetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y + 1));
+
+        if (BlockSize_ == Enum_BlockSize.size_2x2)
+        {
+            // (1,0) -> CLEAR
+            SetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y, Enum_BlockType.Empty);
+
+            // (1,1) -> CLEAR
+            SetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y + 1, Enum_BlockType.Empty);
+        }
+        #endregion
+
+        #region 3 wide by 2 tall
+        if (BlockSize_ == Enum_BlockSize.size_3x2 || BlockSize_ == Enum_BlockSize.size_3x3)
+        {
+            // (2, 0) -> (1, 0)
+            SetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y, GetBlock((int)v2_BottomLeft.x + 2, (int)v2_BottomLeft.y));
+
+            // (2, 1) -> (1, 1)
+            SetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y + 1, GetBlock((int)v2_BottomLeft.x + 2, (int)v2_BottomLeft.y + 1));
+
+            // (2,0) -> CLEAR
+            SetBlock((int)v2_BottomLeft.x + 2, (int)v2_BottomLeft.y, Enum_BlockType.Empty);
+
+            // (2,1) -> CLEAR
+            SetBlock((int)v2_BottomLeft.x + 2, (int)v2_BottomLeft.y + 1, Enum_BlockType.Empty);
+        }
+        #endregion
+
+        #region 2 wide by 3 tall
+        if (BlockSize_ == Enum_BlockSize.size_2x3 || BlockSize_ == Enum_BlockSize.size_3x3)
+        {
+            // (0,2) -> (-1, 2) 
+            SetBlock((int)v2_BottomLeft.x - 1, (int)v2_BottomLeft.y + 2, GetBlock((int)v2_BottomLeft.x, (int)v2_BottomLeft.y + 2));
+
+            // (1,2) -> (0, 2)
+            SetBlock((int)v2_BottomLeft.x, (int)v2_BottomLeft.y + 2, GetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y + 2));
+
+            // If 2x3: 
+            if (BlockSize_ == Enum_BlockSize.size_2x3)
+            {
+                // (1,0) -> CLEAR
+                SetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y, Enum_BlockType.Empty);
+
+                // (1,1) -> CLEAR
+                SetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y + 1, Enum_BlockType.Empty);
+
+                // (1,2) -> CLEAR
+                SetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y + 2, Enum_BlockType.Empty);
+            }
+        }
+        #endregion
+
+        #region 3 wide by 3 tall
+        if (BlockSize_ == Enum_BlockSize.size_3x3)
+        {
+            // (2,2) -> (1,2)
+            SetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y + 2, GetBlock((int)v2_BottomLeft.x + 2, (int)v2_BottomLeft.y + 2));
+
+            // (2,2) -> CLEAR
+            SetBlock((int)v2_BottomLeft.x + 2, (int)v2_BottomLeft.y + 2, Enum_BlockType.Empty);
+        }
+        #endregion
+    }
+
     void SetBlock(int x_Pos_, int y_Pos_, Enum_BlockType blockType_)
     {
         if (x_Pos_ < 0 || x_Pos_ >= i_ArrayWidth)  return;
         if (y_Pos_ < 0 || y_Pos_ >= i_ArrayHeight) return;
 
         BlockArray[y_Pos_, x_Pos_] = blockType_;
+    }
+
+    void AllBlocksStatic()
+    {
+        #region Convert All to Static
+        // Run through the array and convert all blocks into their static counterpart. Run bottom to top, left to right.
+        for (int x_ = 0; x_ < i_ArrayWidth; ++x_)
+        {
+            for (int y_ = 0; y_ < i_ArrayHeight; ++y_)
+            {
+                Enum_BlockType tempBlock = GetBlock(x_, y_);
+
+                if (tempBlock == Enum_BlockType.Block_1_Active)
+                {
+                    SetBlock(x_, y_, Enum_BlockType.Block_1_Static);
+                }
+                else if (tempBlock == Enum_BlockType.Block_2_Active)
+                {
+                    SetBlock(x_, y_, Enum_BlockType.Block_2_Static);
+                }
+                else if (tempBlock == Enum_BlockType.Block_3_Active)
+                {
+                    SetBlock(x_, y_, Enum_BlockType.Block_3_Static);
+                }
+            }
+        }
+        #endregion
+
+        #region Pull Blocks Down
+        // Run through the array and pull blocks down to their lowest point
+        for (int x_ = 0; x_ < i_ArrayWidth; ++x_)
+        {
+            // The y begins at 1 since we can't move a block down at y = 0
+            for (int y_ = 1; y_ < i_ArrayHeight; ++y_)
+            {
+                // Get the current block type
+                Enum_BlockType thisBlock = GetBlock(x_, y_);
+
+                // Get the current block type beneath us
+                Enum_BlockType lowerBlock = GetBlock(x_, y_ - 1);
+
+                if(thisBlock != Enum_BlockType.Empty && lowerBlock == Enum_BlockType.Empty)
+                {
+                    // If a static block is found with an open spot beneath it, shift it down one spot
+                    SetBlock(x_, y_ - 1, thisBlock);
+
+                    // Set the previous block position to empty
+                    SetBlock(x_, y_, Enum_BlockType.Empty);
+
+                    // Reset and re-loop
+                    y_ = 0;
+
+                    continue;
+                }
+            }
+        }
+        #endregion
     }
 
     Enum_BlockType GetBlock(int x_Pos_, int y_Pos_)
@@ -157,16 +423,30 @@ public class Cs_BoardLogic : MonoBehaviour
     // Update is called once per frame
     void Update ()
     {
-	    if(Input.GetKeyDown(KeyCode.O))
+	    if(Input.GetKeyDown(KeyCode.S))
         {
-            MoveActiveBlocks_Down(new Vector2( 1, 1 ), Enum_BlockSize.size_2x2);
+            MoveActiveBlocks_Down(new Vector2( 1, 1 ), Enum_BlockSize.size_3x3);
 
             PrintArrayToConsole();
         }
 
-        if (Input.GetKeyDown(KeyCode.P))
+        if (Input.GetKeyDown(KeyCode.A))
         {
-            MoveActiveBlocks_Down(new Vector2(1, 0), Enum_BlockSize.size_2x2);
+            MoveActiveBlocks_Left(new Vector2(1, 1), Enum_BlockSize.size_3x3);
+
+            PrintArrayToConsole();
+        }
+
+        if (Input.GetKeyDown(KeyCode.D))
+        {
+            MoveActiveBlocks_Right(new Vector2(1, 1), Enum_BlockSize.size_3x3);
+
+            PrintArrayToConsole();
+        }
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            AllBlocksStatic();
 
             PrintArrayToConsole();
         }
