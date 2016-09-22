@@ -32,40 +32,21 @@ public class Cs_Elevator : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
     {
-        print(elevatorStatus);
-
         // 0.025f
         float f_SnapDistance = 0.025f;
 
         if(elevatorStatus == Enum_ElevatorStatus.GoTo_Bottom)
         {
-            /*
-            // Lerp from the bottom position toward the top position
-            v3_newPos = Vector3.SmoothDamp(gameObject.transform.position, go_BottomPosition.transform.position, ref v3_RefVelocity, f_Speed);
-
-            // Apply the new position
-            gameObject.transform.position = v3_newPos;
-
-            // Move on to next position within the State Machine
-            if (gameObject.transform.position.y <= (go_BottomPosition.transform.position.y + f_SnapDistance))
-            {
-                gameObject.transform.position = go_BottomPosition.transform.position;
-
-                elevatorStatus = Enum_ElevatorStatus.Bottom_Stall;
-            }
-            */
-
             // v3_newPos = Vector3.SmoothDamp(gameObject.transform.position, go_BottomPosition.transform.position, ref v3_RefVelocity, f_Speed);
-            v3_newPos = Vector3.Lerp(gameObject.transform.position, go_BottomPosition.transform.position, f_Speed * Time.deltaTime);
+            v3_newPos = Vector3.SmoothDamp(gameObject.transform.position, go_BottomPosition.transform.position, ref v3_RefVelocity, 2 / f_Speed);
 
             if (gameObject.transform.position.y <= (go_BottomPosition.transform.position.y + f_SnapDistance))
             {
-                gameObject.transform.position = go_BottomPosition.transform.position;
+                gameObject.GetComponent<Rigidbody>().MovePosition(go_BottomPosition.transform.position);
 
                 elevatorStatus = Enum_ElevatorStatus.Bottom_Stall;
             }
-
-            gameObject.GetComponent<Rigidbody>().MovePosition(v3_newPos);
+            else gameObject.GetComponent<Rigidbody>().MovePosition(v3_newPos);
         }
 
         if (elevatorStatus == Enum_ElevatorStatus.Bottom_Stall)
@@ -82,33 +63,16 @@ public class Cs_Elevator : MonoBehaviour
 
         if (elevatorStatus == Enum_ElevatorStatus.GoTo_Top)
         {
-            /*
-            // Lerp from the bottom position toward the top position
-            v3_newPos = Vector3.SmoothDamp(gameObject.transform.position, go_TopPosition.transform.position, ref v3_RefVelocity, f_Speed);
-            
-            // Apply the new position
-            gameObject.transform.position = v3_newPos;
-
-            // Move on to next position within the State Machine
-            if (gameObject.transform.position.y >= (go_TopPosition.transform.position.y - f_SnapDistance))
-            {
-                gameObject.transform.position = go_TopPosition.transform.position;
-
-                elevatorStatus = Enum_ElevatorStatus.Top_Stall;
-            }
-            */
             // v3_newPos = Vector3.SmoothDamp(gameObject.transform.position, go_TopPosition.transform.position, ref v3_RefVelocity, f_Speed);
-            v3_newPos = Vector3.Lerp(gameObject.transform.position, go_TopPosition.transform.position, f_Speed * Time.deltaTime);
-
+            v3_newPos = Vector3.SmoothDamp(gameObject.transform.position, go_TopPosition.transform.position, ref v3_RefVelocity, 1 / f_Speed);
 
             if (gameObject.transform.position.y >= (go_TopPosition.transform.position.y - f_SnapDistance))
             {
-                gameObject.transform.position = go_TopPosition.transform.position;
+                gameObject.GetComponent<Rigidbody>().MovePosition(go_TopPosition.transform.position);
 
                 elevatorStatus = Enum_ElevatorStatus.Top_Stall;
             }
-
-            gameObject.GetComponent<Rigidbody>().MovePosition(v3_newPos);
+            else gameObject.GetComponent<Rigidbody>().MovePosition(v3_newPos);
         }
 
         if (elevatorStatus == Enum_ElevatorStatus.Top_Stall)

@@ -130,6 +130,8 @@ public class Cs_FPSController : MonoBehaviour
         // Old velocity
         Vector3 v3_oldVelocity = gameObject.GetComponent<Rigidbody>().velocity;
 
+        Vector3 v3_PushDirection = new Vector3();
+
         // Combine (not multiply) the player's current rotation (Quat) into the input vector (Vec3)
         Vector3 v3_FinalRotation = gameObject.transform.rotation * v3_Direction_;
 
@@ -147,6 +149,12 @@ public class Cs_FPSController : MonoBehaviour
 
             // Apply fake gravity (synthetic Terminal Velocity) - Note: RigidBody gravity is OFF
             if (hit.distance > f_RayCast_DownwardDistance) v3_newVelocity.y = v3_oldVelocity.y - (Time.deltaTime * 50);
+
+            // Determine direction to push against ramp
+            v3_PushDirection = RampDirection();
+
+            // Apply velocity to player
+            v3_newVelocity = Vector3.ProjectOnPlane(v3_newVelocity, v3_PushDirection);
         }
         else
         {
@@ -155,13 +163,7 @@ public class Cs_FPSController : MonoBehaviour
 
             ResetJump();
         }
-
-        // Determine direction to push against ramp
-        Vector3 v3_PushDirection = RampDirection();
-
-        // Apply velocity to player
-        v3_newVelocity = Vector3.ProjectOnPlane(v3_newVelocity, v3_PushDirection);
-
+        
         gameObject.GetComponent<Rigidbody>().velocity = v3_newVelocity;
         gameObject.GetComponent<Rigidbody>().AddForce(v3_PushDirection);
     }
@@ -324,11 +326,11 @@ public class Cs_FPSController : MonoBehaviour
 
         b_CanJump = true;
 
-        if (f_JumpTimer < 0.2f)
+        if (f_JumpTimer < 0.1f)
         {
             f_JumpTimer += Time.deltaTime;
 
-            if (f_JumpTimer > 0.2f) f_JumpTimer = 0.2f;
+            if (f_JumpTimer > 0.1f) f_JumpTimer = 0.1f;
 
             // Disable the ability to jump during this initial window
             b_CanJump = false;
