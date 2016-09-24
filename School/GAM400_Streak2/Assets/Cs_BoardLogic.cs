@@ -26,6 +26,10 @@ public class Cs_BoardLogic : MonoBehaviour
 
     Enum_BlockType[,] BlockArray;
 
+    // Current Active Block Information
+    Vector2 v2_ActiveBlockLocation;
+    public Enum_BlockSize e_BlockSize = Enum_BlockSize.size_2x2;
+
 	// Use this for initialization
 	void Start ()
     {
@@ -43,7 +47,34 @@ public class Cs_BoardLogic : MonoBehaviour
         //SetBlock(2, 3, Enum_BlockType.Block_3_Static);
         //SetBlock(3, 3, Enum_BlockType.Block_3_Active);
 
+        v2_ActiveBlockLocation = new Vector2(1, 1);
+
         PrintArrayToConsole();
+    }
+
+    void CreateNewBlock()
+    {
+        // Find the 'X' location to set the block location
+        if(e_BlockSize == Enum_BlockSize.size_2x2 || e_BlockSize == Enum_BlockSize.size_2x3)
+        {
+            // Finds the center of the List width
+            v2_ActiveBlockLocation.x = (int)((i_ArrayWidth - 1) / 2);
+        }
+        else
+        {
+            // Finds the center of the List width, and shifts to the left one space
+            v2_ActiveBlockLocation.x = (int)((i_ArrayWidth - 1) / 2) - 1;
+        }
+
+        // Find the 'Y' location to set the block location
+        if (e_BlockSize == Enum_BlockSize.size_2x3 || e_BlockSize == Enum_BlockSize.size_3x3)
+        {
+            v2_ActiveBlockLocation.y = i_ArrayHeight - 3;
+        }
+        else v2_ActiveBlockLocation.y = i_ArrayHeight - 2;
+
+        // Manually create a set of new blocks in the proper location
+        SetBlock(v2_ActiveBlockLocation, Enum_BlockType.Block_3_Active);
     }
 
     void Initialize_BlockArray()
@@ -164,6 +195,9 @@ public class Cs_BoardLogic : MonoBehaviour
             SetBlock((int)v2_BottomLeft.x + 2, (int)v2_BottomLeft.y + 2, Enum_BlockType.Empty);
         }
         #endregion
+
+        // Move the CurrentBlockLocation 'y'
+        --v2_ActiveBlockLocation.y;
     }
 
     // Complete
@@ -257,6 +291,8 @@ public class Cs_BoardLogic : MonoBehaviour
             SetBlock((int)v2_BottomLeft.x + 2, (int)v2_BottomLeft.y + 2, Enum_BlockType.Empty);
         }
         #endregion
+
+        --v2_ActiveBlockLocation.y;
     }
 
     // TODO: Fix & Complete
@@ -331,6 +367,8 @@ public class Cs_BoardLogic : MonoBehaviour
         SetBlock((int)v2_BottomLeft.x + 0, (int)v2_BottomLeft.y + 0, Enum_BlockType.Empty);
 
         #endregion
+
+        ++v2_ActiveBlockLocation.x;
     }
 
     // TODO: Start
@@ -351,6 +389,11 @@ public class Cs_BoardLogic : MonoBehaviour
         if (y_Pos_ < 0 || y_Pos_ >= i_ArrayHeight) return;
 
         BlockArray[y_Pos_, x_Pos_] = blockType_;
+    }
+    
+    void SetBlock(Vector2 blockPos_, Enum_BlockType blockType_)
+    {
+        SetBlock((int)blockPos_.x, (int)blockPos_.y, blockType_);
     }
 
     void AllBlocksStatic()
@@ -408,6 +451,8 @@ public class Cs_BoardLogic : MonoBehaviour
             }
         }
         #endregion
+
+        CreateNewBlock();
     }
 
     Enum_BlockType GetBlock(int x_Pos_, int y_Pos_)
@@ -421,21 +466,21 @@ public class Cs_BoardLogic : MonoBehaviour
     {
 	    if(Input.GetKeyDown(KeyCode.S))
         {
-            MoveActiveBlocks_Down(new Vector2( 1, 1 ), Enum_BlockSize.size_3x3);
+            MoveActiveBlocks_Down(v2_ActiveBlockLocation, Enum_BlockSize.size_3x3);
 
             PrintArrayToConsole();
         }
 
         if (Input.GetKeyDown(KeyCode.A))
         {
-            MoveActiveBlocks_Left(new Vector2(1, 1), Enum_BlockSize.size_3x3);
+            MoveActiveBlocks_Left(v2_ActiveBlockLocation, Enum_BlockSize.size_3x3);
 
             PrintArrayToConsole();
         }
 
         if (Input.GetKeyDown(KeyCode.D))
         {
-            MoveActiveBlocks_Right(new Vector2(1, 1), Enum_BlockSize.size_2x2);
+            MoveActiveBlocks_Right(v2_ActiveBlockLocation, Enum_BlockSize.size_2x2);
 
             PrintArrayToConsole();
         }
