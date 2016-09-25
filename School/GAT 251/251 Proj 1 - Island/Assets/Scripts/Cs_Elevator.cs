@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-enum Enum_ElevatorStatus
+public enum Enum_ElevatorStatus
 {
     GoTo_Bottom,
     Bottom_Stall,
@@ -28,6 +28,20 @@ public class Cs_Elevator : MonoBehaviour
 
         gameObject.transform.position = v3_newPos;
 	}
+
+    public Enum_ElevatorStatus GetState()
+    {
+        return elevatorStatus;
+    }
+
+    public Enum_ElevatorStatus CycleElevator()
+    {
+        if (elevatorStatus == Enum_ElevatorStatus.Bottom_Stall) elevatorStatus = Enum_ElevatorStatus.GoTo_Top;
+
+        if (elevatorStatus == Enum_ElevatorStatus.Top_Stall) elevatorStatus = Enum_ElevatorStatus.GoTo_Bottom;
+
+        return elevatorStatus;
+    }
 	
 	// Update is called once per frame
 	void Update ()
@@ -51,6 +65,7 @@ public class Cs_Elevator : MonoBehaviour
 
         if (elevatorStatus == Enum_ElevatorStatus.Bottom_Stall)
         {
+            /*
             f_Timer += Time.deltaTime;
 
             if(f_Timer >= f_Delay)
@@ -59,6 +74,7 @@ public class Cs_Elevator : MonoBehaviour
 
                 elevatorStatus = Enum_ElevatorStatus.GoTo_Top;
             }
+            */
         }
 
         if (elevatorStatus == Enum_ElevatorStatus.GoTo_Top)
@@ -77,6 +93,7 @@ public class Cs_Elevator : MonoBehaviour
 
         if (elevatorStatus == Enum_ElevatorStatus.Top_Stall)
         {
+            /*
             f_Timer += Time.deltaTime;
 
             if(f_Timer >= f_Delay)
@@ -85,6 +102,7 @@ public class Cs_Elevator : MonoBehaviour
 
                 elevatorStatus = Enum_ElevatorStatus.GoTo_Bottom;
             }
+            */
         }
     }
 }

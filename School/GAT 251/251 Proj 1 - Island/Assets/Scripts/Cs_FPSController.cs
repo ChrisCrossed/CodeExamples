@@ -27,7 +27,7 @@ public class Cs_FPSController : MonoBehaviour
     float f_xRot_Vel;
 
     bool b_CanJump;
-    GameObject go_RaycastObj;
+    GameObject go_RaycastObj_Jump;
     float f_JumpTimer;
     bool b_Sprinting;
     float f_RayCast_DownwardDistance;
@@ -38,6 +38,11 @@ public class Cs_FPSController : MonoBehaviour
     public float F_SPRINTING_FOV;
     public bool Xbox_Camera_Inverted = false;
     float INVERTED_CAMERA_MULTIPLIER;
+
+    // Interactivity Raycasting
+    GameObject go_RaycastObj_Use;
+    public GameObject ui_Reticle;
+    GameObject go_UseObject;
 
     float f_UITimer = 3.0f;
     string s_Text;
@@ -55,10 +60,12 @@ public class Cs_FPSController : MonoBehaviour
 
         b_Keyboard = false;
         b_CanJump = true;
-        go_RaycastObj = gameObject.transform.Find("JumpRaycast").gameObject;
+        go_RaycastObj_Jump = gameObject.transform.Find("JumpRaycast").gameObject;
         f_RayCast_DownwardDistance = 0.25f;
-        // f_RayCast_DownwardDistance = 1f;
         f_MoveSpeedMultiplier = 1;
+
+        // Interactivity Raycasting
+        go_RaycastObj_Use = gameObject.transform.Find("CameraRaycast").gameObject;
 
         playerCam = gameObject.GetComponentsInChildren<Camera>();
     }
@@ -73,6 +80,9 @@ public class Cs_FPSController : MonoBehaviour
 
         // Check if the player's allowed to jump again
         UpdateJump();
+
+        // Update the raycast & reticle for interactivity
+        UpdateUIReticle();
 
         f_UITimer += Time.deltaTime;
         
@@ -117,7 +127,8 @@ public class Cs_FPSController : MonoBehaviour
             Input.GetKey(KeyCode.A) ||
             Input.GetKey(KeyCode.D) ||
             Input.GetKey(KeyCode.LeftControl) ||
-            Input.GetKey(KeyCode.Space))
+            Input.GetKey(KeyCode.Space) ||
+            Input.GetKey(KeyCode.E))
         {
             return true;
         }
@@ -145,7 +156,7 @@ public class Cs_FPSController : MonoBehaviour
             RaycastHit hit;
 
             // Raycast straight down 
-            Physics.Raycast(go_RaycastObj.transform.position, -transform.up, out hit);
+            Physics.Raycast(go_RaycastObj_Jump.transform.position, -transform.up, out hit);
 
             // Apply fake gravity (synthetic Terminal Velocity) - Note: RigidBody gravity is OFF
             if (hit.distance > f_RayCast_DownwardDistance) v3_newVelocity.y = v3_oldVelocity.y - (Time.deltaTime * 50);
@@ -174,7 +185,7 @@ public class Cs_FPSController : MonoBehaviour
         RaycastHit hit;
 
         // Raycast straight down 
-        Physics.Raycast(go_RaycastObj.transform.position, -transform.up, out hit, f_RayCast_DownwardDistance);
+        Physics.Raycast(go_RaycastObj_Jump.transform.position, -transform.up, out hit, f_RayCast_DownwardDistance);
 
         // Return the opposite direction against the ramp
         return -hit.normal;
@@ -203,6 +214,11 @@ public class Cs_FPSController : MonoBehaviour
         else if (Input.GetKey(KeyCode.D) && !Input.GetKey(KeyCode.A))
         {
             v3_PlayerInput.x = 1;
+        }
+        
+        if(Input.GetKeyDown(KeyCode.E))
+        {
+            UseObject();
         }
         #endregion
 
@@ -338,7 +354,7 @@ public class Cs_FPSController : MonoBehaviour
         else
         {
             // If the player isn't touching the ground, disable the ability to jump.
-            if (!Physics.Raycast(go_RaycastObj.transform.position, -transform.up, out hit, 0.3f))
+            if (!Physics.Raycast(go_RaycastObj_Jump.transform.position, -transform.up, out hit, 0.3f))
             {
                 b_CanJump = false;
             }
@@ -448,6 +464,47 @@ public class Cs_FPSController : MonoBehaviour
         if (f_UITimer > 60f) s_Text = " ";
 
         GameObject.Find("Text").gameObject.GetComponent<Text>().text = s_Text;
+    }
+
+    void UpdateUIReticle()
+    {
+        RaycastHit hit;
+
+        Physics.Raycast(go_RaycastObj_Use.transform.position, playerCam[0].transform.forward, out hit, 4.0f);
+
+        if(hit.collider)
+        {
+            // Change color of reticle
+            ui_Reticle.GetComponent<Image>().color = new Color(1, 0, 0);
+
+            // Set the object we are viewing
+            if(hit.collider.gameObject.tag == "RaycastObject")
+            {
+                go_UseObject = hit.collider.gameObject;
+            }
+        }
+        else
+        {
+            // Reset color of reticle
+            ui_Reticle.GetComponent<Image>().color = new Color(1, 1, 1);
+
+            // Disable the ability to 'use' an object
+            go_UseObject = null;
+        }
+    }
+
+    void UseObject()
+    {
+        print("Attempting to use...");
+        if(go_UseObject != null)
+        {
+            print("... Use successful!");
+            if(go_UseObject.GetComponent<Cs_ElevatorButton>())
+            {
+                print("Using an elevator button.");
+                go_UseObject.GetComponent<Cs_ElevatorButton>().UseButton();
+            }
+        }
     }
 
     void SetMouseSmoothing(bool b_IsMouseSmooth_, float f_lookSmoothDamp_ = 0.1f)

@@ -75,6 +75,9 @@ public class Cs_BoardLogic : MonoBehaviour
 
         // Manually create a set of new blocks in the proper location
         SetBlock(v2_ActiveBlockLocation, Enum_BlockType.Block_3_Active);
+        SetBlock(new Vector2(v2_ActiveBlockLocation.x + 1, v2_ActiveBlockLocation.y), Enum_BlockType.Block_3_Active);
+        SetBlock(new Vector2(v2_ActiveBlockLocation.x + 1, v2_ActiveBlockLocation.y + 1), Enum_BlockType.Block_3_Active);
+        SetBlock(new Vector2(v2_ActiveBlockLocation.x, v2_ActiveBlockLocation.y + 1), Enum_BlockType.Block_3_Active);
     }
 
     void Initialize_BlockArray()
