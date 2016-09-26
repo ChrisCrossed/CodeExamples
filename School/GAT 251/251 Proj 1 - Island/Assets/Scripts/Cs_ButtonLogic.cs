@@ -40,11 +40,10 @@ public class Cs_ButtonLogic : MonoBehaviour
             f_ButtonTimer = f_ButtonTimer_Max;
         }
     }
-	
-	// Update is called once per frame
-	void Update ()
+
+    void UpdateButtonModel()
     {
-        if(f_ButtonTimer > 0.0f)
+        if (f_ButtonTimer > 0.0f)
         {
             f_ButtonTimer -= Time.deltaTime;
 
@@ -57,7 +56,7 @@ public class Cs_ButtonLogic : MonoBehaviour
 
         gameObject.transform.localPosition = Vector3.Lerp(gameObject.transform.localPosition, v3_newPos, 5 * Time.deltaTime);
 
-        if(b_IsActive)
+        if (b_IsActive)
         {
             gameObject.GetComponent<MeshRenderer>().material.Lerp(gameObject.GetComponent<MeshRenderer>().material, mat_Active, 5 * Time.deltaTime);
         }
@@ -65,5 +64,11 @@ public class Cs_ButtonLogic : MonoBehaviour
         {
             gameObject.GetComponent<MeshRenderer>().material.Lerp(gameObject.GetComponent<MeshRenderer>().material, mat_Inactive, 5 * Time.deltaTime);
         }
+    }
+
+    // Update is called once per frame
+    void Update ()
+    {
+        UpdateButtonModel();
     }
 }

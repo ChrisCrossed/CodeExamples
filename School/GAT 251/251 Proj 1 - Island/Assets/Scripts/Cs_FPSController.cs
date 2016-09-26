@@ -218,7 +218,10 @@ public class Cs_FPSController : MonoBehaviour
         
         if(Input.GetKeyDown(KeyCode.E))
         {
-            UseObject();
+            if (go_UseObject != null)
+            {
+                UseObject();
+            }
         }
         #endregion
 
@@ -482,6 +485,15 @@ public class Cs_FPSController : MonoBehaviour
             {
                 go_UseObject = hit.collider.gameObject;
             }
+
+            if(hit.collider.gameObject.tag == "DoNotRaycast")
+            {
+                // Reset color of reticle
+                ui_Reticle.GetComponent<Image>().color = new Color(1, 1, 1);
+
+                // Disable the ability to 'use' an object
+                go_UseObject = null;
+            }
         }
         else
         {
@@ -495,7 +507,6 @@ public class Cs_FPSController : MonoBehaviour
 
     void UseObject()
     {
-        print("Attempting to use " + go_UseObject.name);
         if(go_UseObject != null)
         {
             print("... Use successful!");

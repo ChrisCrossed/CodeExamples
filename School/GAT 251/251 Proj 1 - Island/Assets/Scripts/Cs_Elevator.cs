@@ -65,16 +65,7 @@ public class Cs_Elevator : MonoBehaviour
 
         if (elevatorStatus == Enum_ElevatorStatus.Bottom_Stall)
         {
-            /*
-            f_Timer += Time.deltaTime;
-
-            if(f_Timer >= f_Delay)
-            {
-                f_Timer = 0.0f;
-
-                elevatorStatus = Enum_ElevatorStatus.GoTo_Top;
-            }
-            */
+            
         }
 
         if (elevatorStatus == Enum_ElevatorStatus.GoTo_Top)
@@ -93,16 +84,7 @@ public class Cs_Elevator : MonoBehaviour
 
         if (elevatorStatus == Enum_ElevatorStatus.Top_Stall)
         {
-            /*
-            f_Timer += Time.deltaTime;
-
-            if(f_Timer >= f_Delay)
-            {
-                f_Timer = 0.0f;
-
-                elevatorStatus = Enum_ElevatorStatus.GoTo_Bottom;
-            }
-            */
+            
         }
     }
 }
