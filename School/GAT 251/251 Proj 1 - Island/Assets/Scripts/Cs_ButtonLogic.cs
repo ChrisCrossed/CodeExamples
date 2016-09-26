@@ -5,7 +5,10 @@ public class Cs_ButtonLogic : MonoBehaviour
 {
     float f_yStartPos;
     float f_PosModifier = 0.2f;
+
     bool b_IsActive;
+    float f_ButtonTimer;
+    float f_ButtonTimer_Max = 0.5f;
 
     Material mat_Active;
     Material mat_Inactive;
@@ -19,18 +22,34 @@ public class Cs_ButtonLogic : MonoBehaviour
 
         mat_Active = Resources.Load("Mat_Active", typeof(Material)) as Material;
         mat_Inactive = Resources.Load("Mat_Inactive", typeof(Material)) as Material;
+
+        f_ButtonTimer = f_ButtonTimer_Max;
     }
 
     public void SetActive(bool b_IsActive_)
     {
         b_IsActive = b_IsActive_;
     }
+
+    public void UseButton()
+    {
+        if(f_ButtonTimer == 0.0f)
+        {
+            transform.parent.gameObject.GetComponent<Cs_ControlPanel>().SetLight(gameObject.name, !b_IsActive);
+
+            f_ButtonTimer = f_ButtonTimer_Max;
+        }
+    }
 	
 	// Update is called once per frame
 	void Update ()
     {
-        if (Input.GetKeyDown(KeyCode.R)) SetActive(false);
-        if (Input.GetKeyDown(KeyCode.T)) SetActive(true);
+        if(f_ButtonTimer > 0.0f)
+        {
+            f_ButtonTimer -= Time.deltaTime;
+
+            if (f_ButtonTimer < 0.0f) f_ButtonTimer = 0.0f;
+        }
 
         v3_newPos = gameObject.transform.localPosition;
 

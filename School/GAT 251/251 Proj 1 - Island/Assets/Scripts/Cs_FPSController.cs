@@ -495,7 +495,7 @@ public class Cs_FPSController : MonoBehaviour
 
     void UseObject()
     {
-        print("Attempting to use...");
+        print("Attempting to use " + go_UseObject.name);
         if(go_UseObject != null)
         {
             print("... Use successful!");
@@ -503,6 +503,18 @@ public class Cs_FPSController : MonoBehaviour
             {
                 print("Using an elevator button.");
                 go_UseObject.GetComponent<Cs_ElevatorButton>().UseButton();
+            }
+
+            if (go_UseObject.GetComponent<Cs_ButtonLogic>())
+            {
+                print("Using an Panel Light.");
+                go_UseObject.GetComponent<Cs_ButtonLogic>().UseButton();
+            }
+
+            if (go_UseObject.GetComponent<Cs_HintButtonLogic>())
+            {
+                print("Using a Hint Button");
+                go_UseObject.GetComponent<Cs_HintButtonLogic>().UseButton();
             }
         }
     }
