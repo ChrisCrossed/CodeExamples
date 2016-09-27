@@ -68,6 +68,7 @@ public class Cs_FPSController : MonoBehaviour
         go_RaycastObj_Use = gameObject.transform.Find("CameraRaycast").gameObject;
 
         playerCam = gameObject.GetComponentsInChildren<Camera>();
+        playerCam[0].fieldOfView = f_NORMAL_FOV;
     }
 
     // Update is called once per frame
@@ -462,7 +463,7 @@ public class Cs_FPSController : MonoBehaviour
         }
         if( f_UITimer >= 30.0f)
         {
-            s_Text = "Press (Letter) 'O' to make the camera glide. I'd love feedback on that!\nPressing 'P' inverts your controller's camera.";
+            // s_Text = "Press (Letter) 'O' to make the camera glide. I'd love feedback on that!\nPressing 'P' inverts your controller's camera.";
         }
         if (f_UITimer > 60f) s_Text = " ";
 
