@@ -10,11 +10,11 @@ public class Cs_ControlPanel : MonoBehaviour
 	// Use this for initialization
 	void Start ()
     {
+        b_Buttons = new bool[16];
+
         InitializeButtons();
 
         if (!b_IsControlPanel) DisableButtonRaycast();
-
-        b_Buttons = new bool[16];
 	}
 
     void InitializeButtons()
@@ -23,6 +23,8 @@ public class Cs_ControlPanel : MonoBehaviour
         {
             // Find each child button and set them to 'off'
             gameObject.transform.Find(i_.ToString()).GetComponent<Cs_ButtonLogic>().SetActive(true);
+
+            b_Buttons[i_] = false;
         }
     }
 
@@ -37,6 +39,18 @@ public class Cs_ControlPanel : MonoBehaviour
     public void SetLight(string s_Pos_, bool b_IsOn_)
     {
         gameObject.transform.Find(s_Pos_).GetComponent<Cs_ButtonLogic>().SetActive(b_IsOn_);
+
+        b_Buttons[int.Parse(s_Pos_)] = b_IsOn_;
+    }
+
+    public bool[] GetBoolArray()
+    {
+        for (int i_ = 0; i_ < 16; ++i_)
+        {
+            b_Buttons[i_] = gameObject.transform.Find(i_.ToString()).GetComponent<Cs_ButtonLogic>().GetState();
+        }
+
+        return b_Buttons;
     }
 
     void DisableButtonRaycast()
@@ -49,7 +63,6 @@ public class Cs_ControlPanel : MonoBehaviour
         }
     }
 
-	
 	// Update is called once per frame
 	void Update ()
     {

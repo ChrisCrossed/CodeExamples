@@ -478,16 +478,16 @@ public class Cs_FPSController : MonoBehaviour
 
         if(hit.collider)
         {
-            // Change color of reticle
-            ui_Reticle.GetComponent<Image>().color = new Color(1, 0, 0);
-
             // Set the object we are viewing
             if(hit.collider.gameObject.tag == "RaycastObject")
             {
                 go_UseObject = hit.collider.gameObject;
+
+                // Change color of reticle
+                ui_Reticle.GetComponent<Image>().color = new Color(1, 0, 0);
             }
 
-            if(hit.collider.gameObject.tag == "DoNotRaycast")
+            if (hit.collider.gameObject.tag == "DoNotRaycast")
             {
                 // Reset color of reticle
                 ui_Reticle.GetComponent<Image>().color = new Color(1, 1, 1);
@@ -508,6 +508,8 @@ public class Cs_FPSController : MonoBehaviour
 
     void UseObject()
     {
+        print("Trying to use " + go_UseObject.name);
+
         if(go_UseObject != null)
         {
             print("... Use successful!");
@@ -527,6 +529,18 @@ public class Cs_FPSController : MonoBehaviour
             {
                 print("Using a Hint Button");
                 go_UseObject.GetComponent<Cs_HintButtonLogic>().UseButton();
+            }
+
+            if( go_UseObject.GetComponent<Cs_ObsButtonLogic>())
+            {
+                print("Using an Obs Button");
+                go_UseObject.GetComponent<Cs_ObsButtonLogic>().UseButton();
+            }
+
+            if (go_UseObject.GetComponent<Cs_LeverLogic>())
+            {
+                print("Using a Lever");
+                go_UseObject.GetComponent<Cs_LeverLogic>().UseButton();
             }
         }
     }

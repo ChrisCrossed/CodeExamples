@@ -31,6 +31,11 @@ public class Cs_ButtonLogic : MonoBehaviour
         b_IsActive = b_IsActive_;
     }
 
+    public bool GetState()
+    {
+        return b_IsActive;
+    }
+
     public void UseButton()
     {
         if(f_ButtonTimer == 0.0f)
