@@ -3,9 +3,8 @@ using System.Collections;
 
 public class Cs_ObservatoryLogic : MonoBehaviour
 {
-    float f_Rotation;
-    int i_NumberToLookAt;
-    Vector3 v3_CurrentRotation = new Vector3();
+    float f_Rotation = 45f;
+    int i_NumberToLookAt = 2;
 
     // Use this for initialization
     void Start ()
@@ -17,10 +16,15 @@ public class Cs_ObservatoryLogic : MonoBehaviour
     {
         i_NumberToLookAt = i_Number_;
     }
+
+    public int GetPositionToLookAt()
+    {
+        return i_NumberToLookAt;
+    }
 	
 	// Update is called once per frame
 	void Update ()
     {
-        gameObject.GetComponent<Rigidbody>().MoveRotation(Quaternion.Lerp(gameObject.transform.rotation, Quaternion.Euler(new Vector3(0, i_NumberToLookAt * 45, 0)), Time.deltaTime / 2));
+        gameObject.GetComponent<Rigidbody>().MoveRotation(Quaternion.Lerp(gameObject.transform.rotation, Quaternion.Euler(new Vector3(0, i_NumberToLookAt * f_Rotation, 0)), Time.deltaTime / 2));
 	}
 }

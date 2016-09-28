@@ -46,6 +46,8 @@ public class Cs_FPSController : MonoBehaviour
 
     float f_UITimer = 3.0f;
     string s_Text;
+    bool b_IsFading = true;
+    GameObject go_FadeInOut;
 
     // Use this for initialization
     void Start()
@@ -69,6 +71,8 @@ public class Cs_FPSController : MonoBehaviour
 
         playerCam = gameObject.GetComponentsInChildren<Camera>();
         playerCam[0].fieldOfView = f_NORMAL_FOV;
+
+        go_FadeInOut = transform.Find("FadeInOut").gameObject;
     }
 
     // Update is called once per frame
@@ -86,8 +90,42 @@ public class Cs_FPSController : MonoBehaviour
         UpdateUIReticle();
 
         f_UITimer += Time.deltaTime;
+
+        UpdateFadeInOut(b_IsFading);
         
         if (Input.GetKeyDown(KeyCode.Escape)) Application.Quit();
+    }
+
+    void UpdateFadeInOut(bool b_IsFading_)
+    {
+        Color newColor = go_FadeInOut.GetComponent<MeshRenderer>().material.color;
+
+        if (b_IsFading_)
+        {
+            newColor.a -= Time.deltaTime / 3;
+
+            if (newColor.a < 0.0f) newColor.a = 0.0f;
+        }
+        else
+        {
+            newColor.a += Time.deltaTime / 3;
+
+            if (newColor.a > 1.0f) newColor.a = 1.0f;
+        }
+
+        if (newColor.a == 1.0f && !b_IsFading_)
+        {
+            print("We quit");
+            Application.Quit();
+        }
+
+
+        go_FadeInOut.GetComponent<MeshRenderer>().material.color = newColor;
+    }
+
+    public void FadeToBlack()
+    {
+        b_IsFading = false;
     }
 
     void LateUpdate()
@@ -239,7 +277,7 @@ public class Cs_FPSController : MonoBehaviour
         #endregion
 
         #region Sprint
-        if (Input.GetKey(KeyCode.LeftControl))
+        if (Input.GetKey(KeyCode.LeftShift))
         {
             if (b_CanJump)
             {
@@ -459,10 +497,11 @@ public class Cs_FPSController : MonoBehaviour
 
         if( f_UITimer > 5.0f) 
         {
-            s_Text = " ";
+            s_Text = "W/A/S/D to move, Mouse to look, E to use (red dot on HUD),\nHold Left Shift to run, Space Bar to Jump.\nCollect the three keys and find the exit.";
         }
-        if( f_UITimer >= 30.0f)
+        if( f_UITimer >= 60.0f)
         {
+            s_Text = " ";
             // s_Text = "Press (Letter) 'O' to make the camera glide. I'd love feedback on that!\nPressing 'P' inverts your controller's camera.";
         }
         if (f_UITimer > 60f) s_Text = " ";

@@ -13,6 +13,9 @@ public class Cs_LeverLogic : MonoBehaviour
     bool[] b_LightArray = new bool[16];
 
     bool[] b_CorrectAnswer = new bool[16];
+    public GameObject go_FakeBase;
+    public GameObject go_ExitStairs;
+    public GameObject go_Observatory;
 
     // Use this for initialization
     void Start ()
@@ -51,9 +54,12 @@ public class Cs_LeverLogic : MonoBehaviour
 
             b_LightArray = go_ControlPanel.GetComponent<Cs_ControlPanel>().GetBoolArray();
 
-            if (CheckCorrectAnswer())
+            int i_ObsPosition = go_Observatory.GetComponent<Cs_ObservatoryLogic>().GetPositionToLookAt();
+
+            if (CheckCorrectAnswer() && i_ObsPosition == 0)
             {
-                print("Success!");
+                go_ExitStairs.SetActive(true);
+                go_FakeBase.SetActive(false);
             }
             else print("Fail...");
         }
