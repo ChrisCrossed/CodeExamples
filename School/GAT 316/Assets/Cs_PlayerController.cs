@@ -2,6 +2,14 @@
 using System.Collections;
 using XInputDotNetPure;
 
+public enum Enum_CameraState
+{
+    Lerp_ToPlayer,
+    Lerp_FromPlayer,
+    OnPlayer,
+    OnTempPoint
+}
+
 public class Cs_PlayerController : MonoBehaviour
 {
     // PLAYER STATS & INFORMATION
@@ -34,10 +42,22 @@ public class Cs_PlayerController : MonoBehaviour
     // Raycast Objects
     GameObject go_SlopeRaycast;
 
+    // Camera information
+    GameObject go_Camera;
+    GameObject go_Camera_DefaultPos;
+    GameObject go_Camera_TempPos;
+    Enum_CameraState cameraState = Enum_CameraState.OnPlayer;
+    float cameraLerpTime = 0.75f;
+    float cameraLerpTime_Curr;
+
     // Use this for initialization
     void Start ()
     {
         go_SlopeRaycast = transform.FindChild("SlopeRaycast").gameObject;
+
+        // Define Camera Information
+        go_Camera = GameObject.Find("Main Camera");
+        go_Camera_DefaultPos = transform.Find("Camera_Player").gameObject;
     }
 	
 	// Update is called once per frame
@@ -48,6 +68,9 @@ public class Cs_PlayerController : MonoBehaviour
         if(b_KeyboardUsedLast) Input_Keyboard(); else Input_Controller();
 
         currSpeedReadOnly = gameObject.GetComponent<Rigidbody>().velocity.magnitude;
+
+        // Update Camera position/rotation
+        UpdateCameraPosition();
 	}
 
     bool KeyboardCheck(bool b_KeyboardPressed_)
@@ -74,8 +97,6 @@ public class Cs_PlayerController : MonoBehaviour
                 TEMPORARY_UI_SYSTEM("Controller: Standard", true);
             }
         }*/
-
-        print(b_KeyboardPressed_);
 
         if (Input.GetKey(KeyCode.W) ||
             Input.GetKey(KeyCode.S) ||
@@ -124,6 +145,7 @@ public class Cs_PlayerController : MonoBehaviour
         // Accept Left Analog Stick input, apply into Vector3
         v3_InputVector.x = state.ThumbSticks.Left.X;
         v3_InputVector.z = state.ThumbSticks.Left.Y;
+
         #endregion
 
         #region Sprinting
@@ -137,21 +159,24 @@ public class Cs_PlayerController : MonoBehaviour
         {
             if (v3_InputVector.magnitude < 0.1f) b_IsSprinting = false;
         }
-        
+
         // If the player speed isn't 0, apply preset speeds
         if (v3_InputVector.magnitude != float.Epsilon)
         {
+            print(v3_InputVector.magnitude);
+
             if      (v3_InputVector.magnitude < 0.15f)   f_Magnitude = 0;
-            else if (v3_InputVector.magnitude < 0.95f)   f_Magnitude = f_Magnitude_Sneak;
+            else if (v3_InputVector.magnitude < 0.82f)   f_Magnitude = f_Magnitude_Sneak; // 0.82 is the minimum magnitude reachable when the analog stick is pushed in one direction
             else    f_Magnitude = f_Magnitude_Brisk;
 
             if (b_IsSprinting)   f_Magnitude = f_Magnitude_Sprint;
+
         }
         #endregion
 
         // Normalize
         v3_InputVector.Normalize();
-
+        
         // Pass information into PlayerMovement()
         PlayerMovement(v3_InputVector, f_Magnitude);
 
@@ -254,6 +279,71 @@ public class Cs_PlayerController : MonoBehaviour
         PlayerMovement(v3_InputVector, f_Magnitude);
 
         v3_PriorVector = v3_InputVector;
+    }
+
+    void UpdateCameraPosition()
+    {
+        if(cameraState == Enum_CameraState.OnPlayer)
+        {
+            // Set default parameters
+            go_Camera.transform.rotation = go_Camera_DefaultPos.transform.rotation;
+            go_Camera.transform.position = go_Camera_DefaultPos.transform.position;
+        }
+        else if(cameraState == Enum_CameraState.OnTempPoint)
+        {
+            // Set temporary parameters
+            if(go_Camera_TempPos != null)
+            {
+                go_Camera.transform.rotation = go_Camera_TempPos.transform.rotation;
+                go_Camera.transform.position = go_Camera_TempPos.transform.position;
+            }
+            else
+            {
+                // Reset to player's position & set camera state
+            }
+        }
+        else if(cameraState == Enum_CameraState.Lerp_FromPlayer || cameraState == Enum_CameraState.Lerp_ToPlayer)
+        {
+            //increment timer once per frame
+            cameraLerpTime_Curr += Time.deltaTime;
+            if (cameraLerpTime_Curr > cameraLerpTime)
+            {
+                cameraLerpTime_Curr = cameraLerpTime;
+            }
+
+            //lerp!
+            float perc = cameraLerpTime_Curr / cameraLerpTime;
+
+            if(cameraState == Enum_CameraState.Lerp_FromPlayer)
+            {
+                go_Camera.transform.position = Vector3.Lerp(go_Camera_DefaultPos.transform.position, go_Camera_TempPos.transform.position, perc);
+                go_Camera.transform.rotation = Quaternion.Slerp(go_Camera_DefaultPos.transform.rotation, go_Camera_TempPos.transform.rotation, perc);
+
+                if (cameraLerpTime == cameraLerpTime_Curr) cameraState = Enum_CameraState.OnTempPoint;
+            }
+            else // Going to player
+            {
+                go_Camera.transform.position = Vector3.Lerp(go_Camera_TempPos.transform.position, go_Camera_DefaultPos.transform.position, perc);
+                go_Camera.transform.rotation = Quaternion.Slerp(go_Camera_TempPos.transform.rotation, go_Camera_DefaultPos.transform.rotation, perc);
+
+                if (cameraLerpTime == cameraLerpTime_Curr) cameraState = Enum_CameraState.OnPlayer;
+            }
+        }
+    }
+
+    public void SetCameraPosition( GameObject go_CameraPos_ = null )
+    {
+        if(go_CameraPos_ == null)
+        {
+            cameraState = Enum_CameraState.Lerp_ToPlayer;
+        }
+        else
+        {
+            go_Camera_TempPos = go_CameraPos_;
+            cameraState = Enum_CameraState.Lerp_FromPlayer;
+        }
+
+        cameraLerpTime_Curr = 0f;
     }
 
     RaycastHit EvaluateGroundVector()

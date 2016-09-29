@@ -325,6 +325,14 @@ public class Cs_FPSController : MonoBehaviour
 
         // Capture controller Analog magnitude
         float f_Magnitude = v3_PlayerInput.magnitude;
+
+        if (state.Buttons.X == ButtonState.Pressed && prevState.Buttons.X == ButtonState.Released)
+        {
+            if (go_UseObject != null)
+            {
+                UseObject();
+            }
+        }
         #endregion
 
         #region Jump
