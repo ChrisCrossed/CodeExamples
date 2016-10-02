@@ -9,9 +9,10 @@ public class Cs_CameraTrigger : MonoBehaviour
 	// Use this for initialization
 	void Start ()
     {
+        // Initialize objects
         go_Player = GameObject.Find("Player");
 
-        if(go_CameraObj == null)
+        if (go_CameraObj == null)
         {
             print(gameObject.name + " at " + gameObject.transform.position + " has no camera!");
         }
@@ -23,8 +24,11 @@ public class Cs_CameraTrigger : MonoBehaviour
 
         if(go_CollisionObj.tag == "Player")
         {
-            // Tell player's camera to lerp to this game object
-            go_Player.GetComponent<Cs_PlayerController>().SetCameraPosition(go_CameraObj);
+            if(go_CameraObj != null)
+            {
+                // Tell player's camera to lerp to this game object
+                go_Player.GetComponent<Cs_PlayerController>().SetCameraPosition(go_CameraObj);
+            }
         }
     }
 
@@ -34,8 +38,11 @@ public class Cs_CameraTrigger : MonoBehaviour
 
         if (go_CollisionObj.tag == "Player")
         {
-            // Tell player's camera to return to default
-            go_Player.GetComponent<Cs_PlayerController>().SetCameraPosition();
+            if (go_CameraObj != null)
+            {
+                // Tell player's camera to return to default
+                go_Player.GetComponent<Cs_PlayerController>().SetCameraPosition();
+            }
         }
     }
 }
