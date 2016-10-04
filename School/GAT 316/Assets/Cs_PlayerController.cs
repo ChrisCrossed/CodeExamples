@@ -50,6 +50,14 @@ public class Cs_PlayerController : MonoBehaviour
     float cameraLerpTime = 0.75f;
     float cameraLerpTime_Curr;
 
+    // Abilities/Projectile
+    public GameObject go_FireLocation;
+    public GameObject prefab_Rock;
+    public GameObject go_TargetObject;
+    Vector3 v3_TargetLocation;
+    public float f_FiringAngle = 45.0f;
+    public float f_Gravity = 9.8f;
+
     // Use this for initialization
     void Start ()
     {
@@ -58,6 +66,10 @@ public class Cs_PlayerController : MonoBehaviour
         // Define Camera Information
         go_Camera = GameObject.Find("Main Camera");
         go_Camera_DefaultPos = transform.Find("Camera_Player").gameObject;
+
+        // Abilities/Projectile
+        v3_TargetLocation = go_TargetObject.transform.position;
+
     }
 	
 	// Update is called once per frame
@@ -163,8 +175,6 @@ public class Cs_PlayerController : MonoBehaviour
         // If the player speed isn't 0, apply preset speeds
         if (v3_InputVector.magnitude != float.Epsilon)
         {
-            print(v3_InputVector.magnitude);
-
             if      (v3_InputVector.magnitude < 0.15f)   f_Magnitude = 0;
             else if (v3_InputVector.magnitude < 0.82f)   f_Magnitude = f_Magnitude_Sneak; // 0.82 is the minimum magnitude reachable when the analog stick is pushed in one direction
             else    f_Magnitude = f_Magnitude_Brisk;
@@ -172,6 +182,16 @@ public class Cs_PlayerController : MonoBehaviour
             if (b_IsSprinting)   f_Magnitude = f_Magnitude_Sprint;
 
         }
+        #endregion
+
+        #region Use Ability
+
+        // Throw Rock
+        if(state.Buttons.X == ButtonState.Pressed && prevState.Buttons.X == ButtonState.Released)
+        {
+            // ThrowRockAtLocation();
+        }
+
         #endregion
 
         // Normalize
@@ -184,6 +204,13 @@ public class Cs_PlayerController : MonoBehaviour
 
     void Input_Keyboard()
     {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            Vector3 v3_ThrowVector = CalculateThrow();
+
+            ThrowRockAtLocation(v3_ThrowVector);
+        }
+
         #region Movement
         // Create new temporary Vector3 to apply keyboard input
         Vector3 v3_InputVector = new Vector3();
@@ -353,5 +380,42 @@ public class Cs_PlayerController : MonoBehaviour
         Physics.Raycast(go_SlopeRaycast.transform.position, -transform.up, out hit);
 
         return hit;
+    }
+
+    Vector3 CalculateThrow()
+    {
+        f_Gravity = Physics.gravity.magnitude;
+        float f_Angle = f_FiringAngle * Mathf.Deg2Rad;
+
+        Vector3 v3_HorizontalTarget = new Vector3(v3_TargetLocation.x, 0, v3_TargetLocation.z);
+        Vector3 v3_HorizontalPosition = new Vector3(gameObject.transform.position.x, 0, gameObject.transform.position.z);
+
+        float f_Distance = Vector3.Distance(v3_HorizontalTarget, v3_HorizontalPosition);
+        float f_yOffset = gameObject.transform.position.y - v3_TargetLocation.y;
+
+        float f_InitialVelocity = (1 / Mathf.Cos(f_Angle)) * Mathf.Sqrt((0.5f * f_Gravity * Mathf.Pow(f_Distance, 2)) / (f_Distance * Mathf.Tan(f_Angle) + f_yOffset));
+
+        Vector3 v3_Velocity = new Vector3(0, f_InitialVelocity * Mathf.Sin(f_Angle), f_InitialVelocity * Mathf.Cos(f_Angle));
+
+        float f_AngleBetweenObjects = Vector3.Angle(Vector3.forward, v3_HorizontalTarget - v3_HorizontalPosition);
+
+        Vector3 v3_FinalVelocity = Quaternion.AngleAxis(f_AngleBetweenObjects, Vector3.up) * v3_Velocity;
+       
+
+        if(v3_HorizontalTarget.x < v3_HorizontalPosition.x)
+        {
+            v3_FinalVelocity.x *= -1;
+        }
+
+        return v3_FinalVelocity;
+    }
+
+    void ThrowRockAtLocation(Vector3 v3_Velocity_)
+    {
+        GameObject go_Rock = (GameObject)Instantiate(prefab_Rock, go_FireLocation.transform.position, gameObject.transform.rotation);
+
+        go_Rock.GetComponent<Rigidbody>().velocity = v3_Velocity_;
+
+        print(go_Rock.GetComponent<Rigidbody>().velocity);
     }
 }
