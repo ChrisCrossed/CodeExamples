@@ -8,14 +8,22 @@ public class Cs_LeverLogic : MonoBehaviour
 
     float f_ButtonModelTimer;
     GameObject go_ButtonModel;
+    
+    Material mat_FailSuccess;
+
+    [SerializeField]
+    GameObject go_Door;
 
     public GameObject go_ControlPanel;
     bool[] b_LightArray = new bool[16];
-
     bool[] b_CorrectAnswer = new bool[16];
-    public GameObject go_FakeBase;
-    public GameObject go_ExitStairs;
-    public GameObject go_Observatory;
+
+    [SerializeField]
+    Material mat_SuccessFail;
+    Color color_Fail;
+    Color color_Success;
+    bool b_ChangeColor;
+
 
     // Use this for initialization
     void Start ()
@@ -28,6 +36,13 @@ public class Cs_LeverLogic : MonoBehaviour
         }
 
         SetCorrectAnswer();
+
+        #region Set Colors
+        color_Fail = new Color(1, (float)(100 / 255), 0);
+        color_Success = new Color((float)100 / 255, 1, 0);
+
+        if (mat_SuccessFail != null) mat_SuccessFail.color = color_Fail;
+        #endregion
     }
 
     void SetCorrectAnswer()
@@ -54,12 +69,9 @@ public class Cs_LeverLogic : MonoBehaviour
 
             b_LightArray = go_ControlPanel.GetComponent<Cs_ControlPanel>().GetBoolArray();
 
-            int i_ObsPosition = go_Observatory.GetComponent<Cs_ObservatoryLogic>().GetPositionToLookAt();
-
-            if (CheckCorrectAnswer() && i_ObsPosition == 0)
+            if (CheckCorrectAnswer())
             {
-                go_ExitStairs.SetActive(true);
-                go_FakeBase.SetActive(false);
+                go_Door.GetComponent<Cs_Door>().MoveDoor();
             }
             else print("Fail...");
         }
@@ -87,15 +99,14 @@ public class Cs_LeverLogic : MonoBehaviour
         // Button Model Movement
         if (f_ButtonModelTimer >= 1.25f)
         {
-            Vector3 v3_newPos = gameObject.transform.eulerAngles;
-
-            gameObject.transform.eulerAngles = new Vector3(0, 0, Mathf.LerpAngle(v3_newPos.z, -30f, 0.05f));
+            float f_LerpAngle = Mathf.LerpAngle(gameObject.transform.eulerAngles.z, gameObject.transform.eulerAngles.z - 15f, 0.05f);
+            gameObject.transform.eulerAngles = new Vector3(gameObject.transform.eulerAngles.x, gameObject.transform.eulerAngles.y, f_LerpAngle);
         }
         else if (f_ButtonModelTimer >= 0.5f)
         {
-            Vector3 v3_newPos = gameObject.transform.eulerAngles;
+            float f_LerpAngle = Mathf.LerpAngle(gameObject.transform.eulerAngles.z, gameObject.transform.eulerAngles.z + 15f, 0.05f);
 
-            gameObject.transform.eulerAngles = new Vector3(0, 0, Mathf.LerpAngle(v3_newPos.z, 0f, 0.05f));
+            gameObject.transform.eulerAngles = new Vector3(gameObject.transform.eulerAngles.x, gameObject.transform.eulerAngles.y, f_LerpAngle);
         }
 
         if (f_ButtonModelTimer != 0.0f)

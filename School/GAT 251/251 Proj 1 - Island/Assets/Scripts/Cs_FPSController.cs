@@ -48,6 +48,7 @@ public class Cs_FPSController : MonoBehaviour
     string s_Text;
     bool b_IsFading = true;
     GameObject go_FadeInOut;
+    float f_FadeTimer = 3.0f;
 
     // Use this for initialization
     void Start()
@@ -73,6 +74,7 @@ public class Cs_FPSController : MonoBehaviour
         playerCam[0].fieldOfView = f_NORMAL_FOV;
 
         go_FadeInOut = transform.Find("FadeInOut").gameObject;
+        go_FadeInOut.SetActive(true);
     }
 
     // Update is called once per frame
@@ -98,29 +100,38 @@ public class Cs_FPSController : MonoBehaviour
 
     void UpdateFadeInOut(bool b_IsFading_)
     {
-        Color newColor = go_FadeInOut.GetComponent<MeshRenderer>().material.color;
-
-        if (b_IsFading_)
+        if(f_FadeTimer != 0)
         {
-            newColor.a -= Time.deltaTime / 3;
+            f_FadeTimer -= Time.deltaTime;
 
-            if (newColor.a < 0.0f) newColor.a = 0.0f;
+            if (f_FadeTimer <= 0.0f) f_FadeTimer = 0.0f;
         }
         else
         {
-            newColor.a += Time.deltaTime / 3;
+            Color newColor = go_FadeInOut.GetComponent<MeshRenderer>().material.color;
 
-            if (newColor.a > 1.0f) newColor.a = 1.0f;
+            if (b_IsFading_)
+            {
+                newColor.a -= Time.deltaTime / 3;
+
+                if (newColor.a < 0.0f) newColor.a = 0.0f;
+            }
+            else
+            {
+                newColor.a += Time.deltaTime / 3;
+
+                if (newColor.a > 1.0f) newColor.a = 1.0f;
+            }
+
+            if (newColor.a == 1.0f && !b_IsFading_)
+            {
+                print("We quit");
+                Application.Quit();
+            }
+
+
+            go_FadeInOut.GetComponent<MeshRenderer>().material.color = newColor;
         }
-
-        if (newColor.a == 1.0f && !b_IsFading_)
-        {
-            print("We quit");
-            Application.Quit();
-        }
-
-
-        go_FadeInOut.GetComponent<MeshRenderer>().material.color = newColor;
     }
 
     public void FadeToBlack()
@@ -503,7 +514,7 @@ public class Cs_FPSController : MonoBehaviour
 
         f_UITimer += Time.deltaTime;
 
-        if( f_UITimer > 5.0f) 
+        if( f_UITimer > 15.0f) 
         {
             s_Text = "W/A/S/D to move, Mouse to look, E to use (red dot on HUD),\nHold Left Shift to run, Space Bar to Jump.\nCollect the three keys and find the exit.";
         }
@@ -534,7 +545,8 @@ public class Cs_FPSController : MonoBehaviour
                 ui_Reticle.GetComponent<Image>().color = new Color(1, 0, 0);
             }
 
-            if (hit.collider.gameObject.tag == "DoNotRaycast")
+            // if (hit.collider.gameObject.tag == "DoNotRaycast" )
+            else
             {
                 // Reset color of reticle
                 ui_Reticle.GetComponent<Image>().color = new Color(1, 1, 1);
@@ -588,6 +600,12 @@ public class Cs_FPSController : MonoBehaviour
             {
                 print("Using a Lever");
                 go_UseObject.GetComponent<Cs_LeverLogic>().UseButton();
+            }
+
+            if (go_UseObject.GetComponent<Cs_Lever_Door>())
+            {
+                print("Using a Lever");
+                go_UseObject.GetComponent<Cs_Lever_Door>().UseButton();
             }
         }
     }
