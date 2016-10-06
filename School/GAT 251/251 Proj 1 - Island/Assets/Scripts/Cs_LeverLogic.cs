@@ -86,28 +86,8 @@ public class Cs_LeverLogic : MonoBehaviour
             if (CheckCorrectAnswer())
             {
                 go_Door.GetComponent<Cs_Door>().MoveDoor();
-            }
-            else
-            {
-                string str_Temp = "";
 
-                for (int i_ = 0; i_ < 16; ++i_)
-                {
-                    if (i_ != 16) str_Temp += b_CorrectAnswer[i_].ToString() + ", ";
-                    else str_Temp += b_CorrectAnswer[i_].ToString() + ".";
-                }
-
-                print(gameObject.name + " got answer: " + str_Temp);
-
-                str_Temp = "";
-
-                for (int i_ = 0; i_ < 16; ++i_)
-                {
-                    if (i_ != 16) str_Temp += b_LightArray[i_].ToString() + ", ";
-                    else str_Temp += b_LightArray[i_].ToString() + ".";
-                }
-
-                print("Control Panel had answer: " + str_Temp);
+                b_ChangeColor = true;
             }
         }
     }
@@ -158,5 +138,14 @@ public class Cs_LeverLogic : MonoBehaviour
         UpdateButtonModel();
 
         if (Input.GetKeyDown(KeyCode.C)) UseButton();
-	}
+
+        if (b_ChangeColor)
+        {
+            Color currentColor = mat_SuccessFail.color;
+
+            currentColor = Color.Lerp(currentColor, color_Success, Time.deltaTime * 5);
+
+            mat_SuccessFail.color = currentColor;
+        }
+    }
 }

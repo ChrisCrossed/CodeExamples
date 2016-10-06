@@ -9,6 +9,12 @@ public class Cs_HintButtonLogic : MonoBehaviour
     float f_ButtonModelTimer;
     GameObject go_ButtonModel;
 
+    [SerializeField]
+    Material mat_SuccessFail;
+    Color color_Fail;
+    Color color_Success;
+    bool b_ChangeColor;
+
     public GameObject go_ControlPanel;
     public bool[] TopRow = new bool[4];
     public bool[] SecondRow = new bool[4];
@@ -23,6 +29,16 @@ public class Cs_HintButtonLogic : MonoBehaviour
         go_ButtonModel = transform.Find("ButtonModel").gameObject;
 
         InitializeBoolPattern();
+
+        #region Set Colors
+        if (mat_SuccessFail != null)
+        {
+            color_Fail = new Color(1, (float)(100 / 255), 0);
+            color_Success = new Color((float)100 / 255, 1, 0);
+
+            mat_SuccessFail.color = color_Fail;
+        }
+        #endregion
     }
 
     public void UseButton()
@@ -43,6 +59,11 @@ public class Cs_HintButtonLogic : MonoBehaviour
             else
             {
                 print("No Control Panel Script attached!");
+            }
+
+            if(mat_SuccessFail != null)
+            {
+                b_ChangeColor = true;
             }
         }
     }
@@ -110,5 +131,14 @@ public class Cs_HintButtonLogic : MonoBehaviour
 	void Update ()
     {
         UpdateButtonModel();
+
+        if (b_ChangeColor)
+        {
+            Color currentColor = mat_SuccessFail.color;
+
+            currentColor = Color.Lerp(currentColor, color_Success, Time.deltaTime * 5);
+
+            mat_SuccessFail.color = currentColor;
+        }
     }
 }
