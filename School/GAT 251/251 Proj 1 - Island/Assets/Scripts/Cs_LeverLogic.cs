@@ -14,6 +14,7 @@ public class Cs_LeverLogic : MonoBehaviour
     [SerializeField]
     GameObject go_Door;
 
+    public GameObject go_CorrectAnswerSource;
     public GameObject go_ControlPanel;
     bool[] b_LightArray = new bool[16];
     bool[] b_CorrectAnswer = new bool[16];
@@ -47,16 +48,28 @@ public class Cs_LeverLogic : MonoBehaviour
 
     void SetCorrectAnswer()
     {
-        b_CorrectAnswer[0] = true;
-        b_CorrectAnswer[1] = true;
-        b_CorrectAnswer[2] = true;
+        if ( go_CorrectAnswerSource.GetComponent<Cs_ControlPanel>() )
+        {
+            b_CorrectAnswer = go_CorrectAnswerSource.GetComponent<Cs_ControlPanel>().GetBoolArray();
+        }
+        else if( go_CorrectAnswerSource.GetComponent<Cs_HintButtonLogic>() )
+        {
+            b_CorrectAnswer = go_CorrectAnswerSource.GetComponent<Cs_HintButtonLogic>().GetBoolArray();
+        }
+        else
+        {
+            print("No Correct Answer Set");
+        }
 
-        b_CorrectAnswer[4] = true;
-        b_CorrectAnswer[6] = true;
-        b_CorrectAnswer[7] = true;
+        string str_Temp = "";
 
-        b_CorrectAnswer[12] = true;
-        b_CorrectAnswer[14] = true;
+        for(int i_ = 0; i_ < 16; ++i_)
+        {
+            if(i_ != 16) str_Temp += b_CorrectAnswer[i_].ToString() + ", ";
+            else str_Temp += b_CorrectAnswer[i_].ToString() + ".";
+        }
+
+        print(gameObject.name + " got answer: " + str_Temp);
     }
 
     public void UseButton()
@@ -67,13 +80,34 @@ public class Cs_LeverLogic : MonoBehaviour
 
             f_ButtonTimer = 0.0f;
 
-            b_LightArray = go_ControlPanel.GetComponent<Cs_ControlPanel>().GetBoolArray();
+            // b_LightArray = go_ControlPanel.GetComponent<Cs_ControlPanel>().GetBoolArray();
 
             if (CheckCorrectAnswer())
             {
                 go_Door.GetComponent<Cs_Door>().MoveDoor();
             }
-            else print("Fail...");
+            else
+            {
+                string str_Temp = "";
+
+                for (int i_ = 0; i_ < 16; ++i_)
+                {
+                    if (i_ != 16) str_Temp += b_CorrectAnswer[i_].ToString() + ", ";
+                    else str_Temp += b_CorrectAnswer[i_].ToString() + ".";
+                }
+
+                print(gameObject.name + " got answer: " + str_Temp);
+
+                str_Temp = "";
+
+                for (int i_ = 0; i_ < 16; ++i_)
+                {
+                    if (i_ != 16) str_Temp += b_LightArray[i_].ToString() + ", ";
+                    else str_Temp += b_LightArray[i_].ToString() + ".";
+                }
+
+                print("Control Panel had answer: " + str_Temp);
+            }
         }
     }
 

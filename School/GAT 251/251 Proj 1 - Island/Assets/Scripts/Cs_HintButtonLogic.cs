@@ -100,6 +100,11 @@ public class Cs_HintButtonLogic : MonoBehaviour
         PatternList[14] = BottomRow[2];
         PatternList[15] = BottomRow[3];
     }
+
+    public bool[] GetBoolArray()
+    {
+        return PatternList;
+    }
 	
 	// Update is called once per frame
 	void Update ()

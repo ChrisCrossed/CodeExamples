@@ -4,6 +4,10 @@ using System.Collections;
 public class Cs_ControlPanel : MonoBehaviour
 {
     public bool b_IsControlPanel;
+    public bool b_PresetButtonsCorrect;
+    
+    [SerializeField]
+    bool[] b_PresetButtons = new bool[16];
 
     bool[] b_Buttons;
 
@@ -22,9 +26,9 @@ public class Cs_ControlPanel : MonoBehaviour
         for(int i_ = 0; i_ < 16; ++i_)
         {
             // Find each child button and set them to 'off'
-            gameObject.transform.Find(i_.ToString()).GetComponent<Cs_ButtonLogic>().SetActive(true);
+            gameObject.transform.Find(i_.ToString()).GetComponent<Cs_ButtonLogic>().SetActive(b_PresetButtons[i_]);
 
-            b_Buttons[i_] = false;
+            b_Buttons[i_] = b_PresetButtons[i_];
         }
     }
 
@@ -45,9 +49,20 @@ public class Cs_ControlPanel : MonoBehaviour
 
     public bool[] GetBoolArray()
     {
-        for (int i_ = 0; i_ < 16; ++i_)
+        // This is a usable control panel and 
+        if(!b_PresetButtonsCorrect)
         {
-            b_Buttons[i_] = gameObject.transform.Find(i_.ToString()).GetComponent<Cs_ButtonLogic>().GetState();
+            for (int i_ = 0; i_ < 16; ++i_)
+            {
+                if(gameObject.transform.Find(i_.ToString()).GetComponent<Cs_ButtonLogic>())
+                {
+                    b_Buttons[i_] = gameObject.transform.Find(i_.ToString()).GetComponent<Cs_ButtonLogic>().GetState();
+                }
+            }
+        }
+        else
+        {
+            b_Buttons = b_PresetButtons;
         }
 
         return b_Buttons;
