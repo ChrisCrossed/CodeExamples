@@ -49,14 +49,29 @@ public class Cs_ControlPanel : MonoBehaviour
 
     public bool[] GetBoolArray()
     {
+        if(!b_IsControlPanel && b_PresetButtonsCorrect)
+        {
+            return b_PresetButtons;
+        }
+
+        return b_Buttons;
+        /*
         // This is a usable control panel and 
         if(!b_PresetButtonsCorrect)
         {
             for (int i_ = 0; i_ < 16; ++i_)
             {
-                if(gameObject.transform.Find(i_.ToString()).GetComponent<Cs_ButtonLogic>())
+                if(gameObject.transform.Find(i_.ToString()).gameObject.activeSelf)
                 {
-                    b_Buttons[i_] = gameObject.transform.Find(i_.ToString()).GetComponent<Cs_ButtonLogic>().GetState();
+                    if(gameObject.transform.Find(i_.ToString()).GetComponent<Cs_ButtonLogic>())
+                    {
+                        b_Buttons[i_] = gameObject.transform.Find(i_.ToString()).GetComponent<Cs_ButtonLogic>().GetState();
+                    }
+                }
+                else
+                {
+                    print("Caught " + i_.ToString() + " inactive. Set false.");
+                    b_Buttons[i_] = false;
                 }
             }
         }
@@ -66,6 +81,7 @@ public class Cs_ControlPanel : MonoBehaviour
         }
 
         return b_Buttons;
+        */
     }
 
     void DisableButtonRaycast()

@@ -50,6 +50,7 @@ public class Cs_LeverLogic : MonoBehaviour
     {
         if ( go_CorrectAnswerSource.GetComponent<Cs_ControlPanel>() )
         {
+            print(gameObject.name + " wants BoolArray from " + go_CorrectAnswerSource.name);
             b_CorrectAnswer = go_CorrectAnswerSource.GetComponent<Cs_ControlPanel>().GetBoolArray();
         }
         else if( go_CorrectAnswerSource.GetComponent<Cs_HintButtonLogic>() )
@@ -80,7 +81,7 @@ public class Cs_LeverLogic : MonoBehaviour
 
             f_ButtonTimer = 0.0f;
 
-            // b_LightArray = go_ControlPanel.GetComponent<Cs_ControlPanel>().GetBoolArray();
+            b_LightArray = go_ControlPanel.GetComponent<Cs_ControlPanel>().GetBoolArray();
 
             if (CheckCorrectAnswer())
             {
