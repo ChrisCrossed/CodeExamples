@@ -15,7 +15,7 @@ public class Cs_HintButtonLogic : MonoBehaviour
     Color color_Success;
     bool b_ChangeColor;
 
-    public GameObject go_ControlPanel;
+    public GameObject go_HintPanel;
     public bool[] TopRow = new bool[4];
     public bool[] SecondRow = new bool[4];
     public bool[] ThirdRow = new bool[4];
@@ -49,11 +49,11 @@ public class Cs_HintButtonLogic : MonoBehaviour
 
             f_ButtonTimer = 0.0f;
 
-            if(go_ControlPanel.GetComponent<Cs_ControlPanel>())
+            if(go_HintPanel.GetComponent<Cs_ControlPanel>())
             {
                 for(int i_ = 0; i_ < 16; ++i_)
                 {
-                    go_ControlPanel.GetComponent<Cs_ControlPanel>().SetLight(i_, PatternList[i_]);
+                    go_HintPanel.GetComponent<Cs_ControlPanel>().SetLight(i_, PatternList[i_]);
                 }
             }
             else

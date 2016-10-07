@@ -55,33 +55,6 @@ public class Cs_ControlPanel : MonoBehaviour
         }
 
         return b_Buttons;
-        /*
-        // This is a usable control panel and 
-        if(!b_PresetButtonsCorrect)
-        {
-            for (int i_ = 0; i_ < 16; ++i_)
-            {
-                if(gameObject.transform.Find(i_.ToString()).gameObject.activeSelf)
-                {
-                    if(gameObject.transform.Find(i_.ToString()).GetComponent<Cs_ButtonLogic>())
-                    {
-                        b_Buttons[i_] = gameObject.transform.Find(i_.ToString()).GetComponent<Cs_ButtonLogic>().GetState();
-                    }
-                }
-                else
-                {
-                    print("Caught " + i_.ToString() + " inactive. Set false.");
-                    b_Buttons[i_] = false;
-                }
-            }
-        }
-        else
-        {
-            b_Buttons = b_PresetButtons;
-        }
-
-        return b_Buttons;
-        */
     }
 
     void DisableButtonRaycast()
@@ -89,7 +62,6 @@ public class Cs_ControlPanel : MonoBehaviour
         for (int i_ = 0; i_ < 16; ++i_)
         {
             // Find each child button and set them to 'off'
-            // gameObject.transform.Find(i_.ToString()).tag = "Untagged";
             gameObject.transform.Find(i_.ToString()).gameObject.layer = 2;
         }
     }

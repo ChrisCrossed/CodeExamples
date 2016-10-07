@@ -18,8 +18,11 @@ public class Cs_Door : MonoBehaviour
     [SerializeField]
     Enum_MoveDirection moveDirection;
 
-	// Use this for initialization
-	void Start ()
+    [SerializeField]
+    bool b_StartOpen;
+
+    // Use this for initialization
+    void Start ()
     {
         if(moveDirection == Enum_MoveDirection.Right)
         {
@@ -31,6 +34,8 @@ public class Cs_Door : MonoBehaviour
         }
 
         v3_StartingPos = gameObject.transform.position;
+
+        if (b_StartOpen) MoveDoor();
 	}
 	
 	// Update is called once per frame

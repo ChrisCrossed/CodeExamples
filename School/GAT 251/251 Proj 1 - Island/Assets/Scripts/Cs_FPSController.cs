@@ -456,6 +456,8 @@ public class Cs_FPSController : MonoBehaviour
 
         #endregion
 
+        if (Input.GetMouseButtonDown(0) && go_UseObject != null) UseObject();
+
         // The camera, although a child, is treated separately by Unity. Give it the X and Y.
         playerCam[0].transform.rotation = Quaternion.Euler(-f_yRot_Curr, f_xRot_Curr, 0);
 
