@@ -82,6 +82,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Cs_Door.cs" />
+    <Compile Include="Assets\Cs_DoorTriggerClose.cs" />
     <Compile Include="Assets\Cs_Exit.cs" />
     <Compile Include="Assets\Cs_KeyLogic.cs" />
     <Compile Include="Assets\Cs_Lever_Door.cs" />

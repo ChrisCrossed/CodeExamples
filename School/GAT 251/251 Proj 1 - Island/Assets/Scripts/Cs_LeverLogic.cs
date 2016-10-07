@@ -8,8 +8,6 @@ public class Cs_LeverLogic : MonoBehaviour
 
     float f_ButtonModelTimer;
     GameObject go_ButtonModel;
-    
-    Material mat_FailSuccess;
 
     [SerializeField]
     GameObject go_Door;
@@ -139,7 +137,7 @@ public class Cs_LeverLogic : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.C)) UseButton();
 
-        if (b_ChangeColor)
+        if (b_ChangeColor && mat_SuccessFail != null)
         {
             Color currentColor = mat_SuccessFail.color;
 

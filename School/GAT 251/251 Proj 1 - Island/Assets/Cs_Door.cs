@@ -10,6 +10,7 @@ enum Enum_MoveDirection
 public class Cs_Door : MonoBehaviour
 {
     bool b_IsMoving;
+    bool b_IsReset;
     Vector3 v3_StartingPos;
     float f_MoveDistance;
     float f_MoveSpeed = 2f;
@@ -40,9 +41,15 @@ public class Cs_Door : MonoBehaviour
             if(AllowedToMove())
             {
                 Vector3 v3_LerpPosition = gameObject.transform.right * (Time.deltaTime * f_MoveSpeed);
-                
+
                 gameObject.transform.position += v3_LerpPosition;
             }
+        }
+        else if(b_IsReset)
+        {
+            gameObject.transform.position = v3_StartingPos;
+
+            b_IsReset = false;
         }
 	}
 
@@ -61,5 +68,10 @@ public class Cs_Door : MonoBehaviour
     public void MoveDoor()
     {
         b_IsMoving = true;
+    }
+
+    public void CloseDoor()
+    {
+        b_IsReset = true;
     }
 }
