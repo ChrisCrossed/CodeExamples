@@ -38,7 +38,7 @@ public class Cs_Elevator : MonoBehaviour
     {
         return elevatorStatus;
     }
-s
+
     public Enum_ElevatorStatus CycleElevator()
     {
         if (elevatorStatus == Enum_ElevatorStatus.Bottom_Stall) elevatorStatus = Enum_ElevatorStatus.GoTo_Top;

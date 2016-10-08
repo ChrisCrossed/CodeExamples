@@ -55,6 +55,7 @@ public class Cs_FPSController : MonoBehaviour
     {
         // Disable mouse cursor
         Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
 
         // Set the Camera on the controller to be 'Standard' viewing (Default: Up is Up)
         if (Xbox_Camera_Inverted) INVERTED_CAMERA_MULTIPLIER = -1; else INVERTED_CAMERA_MULTIPLIER = 1;
