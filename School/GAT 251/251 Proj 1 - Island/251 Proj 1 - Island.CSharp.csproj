@@ -84,6 +84,7 @@
     <Compile Include="Assets\Cs_Door.cs" />
     <Compile Include="Assets\Cs_DoorTriggerClose.cs" />
     <Compile Include="Assets\Cs_Exit.cs" />
+    <Compile Include="Assets\Cs_FakeGround.cs" />
     <Compile Include="Assets\Cs_KeyLogic.cs" />
     <Compile Include="Assets\Cs_Lever_Door.cs" />
     <Compile Include="Assets\Cs_Platform.cs" />

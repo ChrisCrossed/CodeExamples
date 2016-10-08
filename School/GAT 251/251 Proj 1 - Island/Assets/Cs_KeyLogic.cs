@@ -28,7 +28,7 @@ public class Cs_KeyLogic : MonoBehaviour
         {
             if(b_KillKey)
             {
-                float f_Alpha = gameObject.GetComponent<MeshRenderer>().material.color.a - Time.deltaTime;
+                float f_Alpha = gameObject.GetComponent<MeshRenderer>().material.color.a - (Time.deltaTime * 2);
 
                 if (f_Alpha <= 0) Destroy(gameObject);
                 else

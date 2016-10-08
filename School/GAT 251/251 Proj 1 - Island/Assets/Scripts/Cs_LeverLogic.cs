@@ -9,7 +9,7 @@ public class Cs_LeverLogic : MonoBehaviour
     float f_ButtonModelTimer;
     GameObject go_ButtonModel;
 
-    [SerializeField]
+    public
     GameObject go_Door;
 
     public GameObject go_CorrectAnswerSource;
@@ -17,8 +17,13 @@ public class Cs_LeverLogic : MonoBehaviour
     bool[] b_LightArray = new bool[16];
     bool[] b_CorrectAnswer = new bool[16];
 
-    [SerializeField]
-    Material mat_SuccessFail;
+    public bool b_HasSecondPanel = false;
+    public GameObject go_CorrectAnswerSourceTwo;
+    public GameObject go_ControlPanelTwo;
+    bool[] b_LightArrayTwo = new bool[16];
+    bool[] b_CorrectAnswerTwo = new bool[16];
+
+    public Material mat_SuccessFail;
     Color color_Fail;
     Color color_Success;
     bool b_ChangeColor;
@@ -48,27 +53,24 @@ public class Cs_LeverLogic : MonoBehaviour
     {
         if ( go_CorrectAnswerSource.GetComponent<Cs_ControlPanel>() )
         {
-            print(gameObject.name + " wants BoolArray from " + go_CorrectAnswerSource.name);
             b_CorrectAnswer = go_CorrectAnswerSource.GetComponent<Cs_ControlPanel>().GetBoolArray();
         }
         else if( go_CorrectAnswerSource.GetComponent<Cs_HintButtonLogic>() )
         {
             b_CorrectAnswer = go_CorrectAnswerSource.GetComponent<Cs_HintButtonLogic>().GetBoolArray();
         }
-        else
+        
+        if(b_HasSecondPanel)
         {
-            print("No Correct Answer Set");
+            if (go_CorrectAnswerSourceTwo.GetComponent<Cs_ControlPanel>())
+            {
+                b_CorrectAnswerTwo = go_CorrectAnswerSourceTwo.GetComponent<Cs_ControlPanel>().GetBoolArray();
+            }
+            else if (go_CorrectAnswerSourceTwo.GetComponent<Cs_HintButtonLogic>())
+            {
+                b_CorrectAnswerTwo = go_CorrectAnswerSourceTwo.GetComponent<Cs_HintButtonLogic>().GetBoolArray();
+            }
         }
-
-        string str_Temp = "";
-
-        for(int i_ = 0; i_ < 16; ++i_)
-        {
-            if(i_ != 16) str_Temp += b_CorrectAnswer[i_].ToString() + ", ";
-            else str_Temp += b_CorrectAnswer[i_].ToString() + ".";
-        }
-
-        print(gameObject.name + " got answer: " + str_Temp);
     }
 
     public void UseButton()
@@ -81,11 +83,20 @@ public class Cs_LeverLogic : MonoBehaviour
 
             b_LightArray = go_ControlPanel.GetComponent<Cs_ControlPanel>().GetBoolArray();
 
+            if (b_HasSecondPanel) b_LightArrayTwo = go_ControlPanelTwo.GetComponent<Cs_ControlPanel>().GetBoolArray();
+
             if (CheckCorrectAnswer())
             {
-                go_Door.GetComponent<Cs_Door>().MoveDoor();
+                if(go_Door.GetComponent<Cs_Door>())
+                {
+                    go_Door.GetComponent<Cs_Door>().MoveDoor();
 
-                b_ChangeColor = true;
+                    b_ChangeColor = true;
+                }
+                else if(go_Door.GetComponent<Cs_FakeGround>())
+                {
+                    go_Door.GetComponent<Cs_FakeGround>().OpenUnderground();
+                }
             }
         }
     }
@@ -94,8 +105,80 @@ public class Cs_LeverLogic : MonoBehaviour
     {
         for(int i_ = 0; i_ < 16; ++i_)
         {
-            if (b_LightArray[i_] != b_CorrectAnswer[i_]) return false;
+            if (b_LightArray[i_] != b_CorrectAnswer[i_])
+            {
+                /* PRINT STUFF
+                print("First panel wrong");
+
+                string tempString = "";
+
+                for (int j_ = 0; j_ < 16; ++j_) { tempString += b_LightArray[j_].ToString(); tempString += ", "; }
+                print("Light Array: " + tempString);
+
+                ///
+
+                tempString = "";
+                for (int j_ = 0; j_ < 4; ++j_) { tempString += b_CorrectAnswer[j_].ToString(); tempString += ", "; }
+                print("Correct Array: " + tempString);
+
+                tempString = "";
+                for (int j_ = 4; j_ < 8; ++j_) { tempString += b_CorrectAnswer[j_].ToString(); tempString += ", "; }
+                print("Correct Array: " + tempString);
+
+                tempString = "";
+                for (int j_ = 8; j_ < 12; ++j_) { tempString += b_CorrectAnswer[j_].ToString(); tempString += ", "; }
+                print("Correct Array: " + tempString);
+
+                tempString = "";
+                for (int j_ = 12; j_ < 16; ++j_) { tempString += b_CorrectAnswer[j_].ToString(); tempString += ", "; }
+                print("Correct Array: " + tempString);
+                */
+
+                return false;
+            }
         }
+
+        print("First panel correct");
+
+        if(b_HasSecondPanel)
+        {
+            for (int i_ = 0; i_ < 16; ++i_)
+            {
+                if (b_LightArrayTwo[i_] != b_CorrectAnswerTwo[i_])
+                {
+                    print("Second panel wrong");
+
+                    print("First panel wrong");
+
+                    string tempString = "";
+
+                    for (int j_ = 0; j_ < 16; ++j_) { tempString += b_LightArray[j_].ToString(); tempString += ", "; }
+                    print("Light Array: " + tempString);
+
+                    ///
+
+                    tempString = "";
+                    for (int j_ = 0; j_ < 4; ++j_) { tempString += b_CorrectAnswer[j_].ToString(); tempString += ", "; }
+                    print("Correct Array: " + tempString);
+
+                    tempString = "";
+                    for (int j_ = 4; j_ < 8; ++j_) { tempString += b_CorrectAnswer[j_].ToString(); tempString += ", "; }
+                    print("Correct Array: " + tempString);
+
+                    tempString = "";
+                    for (int j_ = 8; j_ < 12; ++j_) { tempString += b_CorrectAnswer[j_].ToString(); tempString += ", "; }
+                    print("Correct Array: " + tempString);
+
+                    tempString = "";
+                    for (int j_ = 12; j_ < 16; ++j_) { tempString += b_CorrectAnswer[j_].ToString(); tempString += ", "; }
+                    print("Correct Array: " + tempString);
+
+                    return false;
+                }
+            }
+        }
+
+        print("Second panel correct");
 
         return true;
     }

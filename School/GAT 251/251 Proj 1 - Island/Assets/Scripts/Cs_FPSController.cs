@@ -126,7 +126,6 @@ public class Cs_FPSController : MonoBehaviour
 
             if (newColor.a == 1.0f && !b_IsFading_)
             {
-                print("We quit");
                 Application.Quit();
             }
 
@@ -567,44 +566,35 @@ public class Cs_FPSController : MonoBehaviour
 
     void UseObject()
     {
-        print("Trying to use " + go_UseObject.name);
-
         if(go_UseObject != null)
         {
-            print("... Use successful!");
             if(go_UseObject.GetComponent<Cs_ElevatorButton>())
             {
-                print("Using an elevator button.");
                 go_UseObject.GetComponent<Cs_ElevatorButton>().UseButton();
             }
 
             if (go_UseObject.GetComponent<Cs_ButtonLogic>())
             {
-                print("Using an Panel Light.");
                 go_UseObject.GetComponent<Cs_ButtonLogic>().UseButton();
             }
 
             if (go_UseObject.GetComponent<Cs_HintButtonLogic>())
             {
-                print("Using a Hint Button");
                 go_UseObject.GetComponent<Cs_HintButtonLogic>().UseButton();
             }
 
             if( go_UseObject.GetComponent<Cs_ObsButtonLogic>())
             {
-                print("Using an Obs Button");
                 go_UseObject.GetComponent<Cs_ObsButtonLogic>().UseButton();
             }
 
             if (go_UseObject.GetComponent<Cs_LeverLogic>())
             {
-                print("Using a Lever");
                 go_UseObject.GetComponent<Cs_LeverLogic>().UseButton();
             }
 
             if (go_UseObject.GetComponent<Cs_Lever_Door>())
             {
-                print("Using a Lever");
                 go_UseObject.GetComponent<Cs_Lever_Door>().UseButton();
             }
         }
