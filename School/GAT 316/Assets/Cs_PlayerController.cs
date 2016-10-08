@@ -87,29 +87,6 @@ public class Cs_PlayerController : MonoBehaviour
 
     bool KeyboardCheck(bool b_KeyboardPressed_)
     {
-        /*
-        if (Input.GetKeyDown(KeyCode.O))
-        {
-            b_MouseSmoothing = !b_MouseSmoothing;
-            SetMouseSmoothing(b_MouseSmoothing);
-
-            if (b_MouseSmoothing) TEMPORARY_UI_SYSTEM("Smooth Look: Enabled", true); else TEMPORARY_UI_SYSTEM("Smooth Look: Disabled", true);
-        }
-
-        if (Input.GetKeyDown(KeyCode.P))
-        {
-            INVERTED_CAMERA_MULTIPLIER *= -1;
-
-            if (INVERTED_CAMERA_MULTIPLIER == -1)
-            {
-                TEMPORARY_UI_SYSTEM("Controller: Inverted", true);
-            }
-            else
-            {
-                TEMPORARY_UI_SYSTEM("Controller: Standard", true);
-            }
-        }*/
-
         if (Input.GetKey(KeyCode.W) ||
             Input.GetKey(KeyCode.S) ||
             Input.GetKey(KeyCode.A) ||

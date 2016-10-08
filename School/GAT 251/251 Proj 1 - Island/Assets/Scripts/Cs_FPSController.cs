@@ -420,9 +420,6 @@ public class Cs_FPSController : MonoBehaviour
                 b_CanJump = false;
             }
         }
-
-        // Check if the player's in the air.
-        // Physics.Raycast( go_RaycastObj.transform.position, -transform.up, out hit
     }
 
     void ResetJump()

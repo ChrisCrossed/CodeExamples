@@ -21,12 +21,17 @@ public class Cs_Elevator : MonoBehaviour
     Enum_ElevatorStatus elevatorStatus = Enum_ElevatorStatus.Bottom_Stall;
     Vector3 v3_newPos;
 
-	// Use this for initialization
-	void Start ()
+    float f_SnapDistance = 0.025f;
+    float f_DistanceTimer;
+
+    // Use this for initialization
+    void Start ()
     {
         v3_newPos = go_BottomPosition.transform.position;
 
         gameObject.transform.position = v3_newPos;
+
+        f_DistanceTimer = Vector3.Distance(go_BottomPosition.transform.position, go_TopPosition.transform.position) * 2;
 	}
 
     public Enum_ElevatorStatus GetState()
@@ -46,21 +51,26 @@ public class Cs_Elevator : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
     {
-        // 0.025f
-        float f_SnapDistance = 0.025f;
-
         if(elevatorStatus == Enum_ElevatorStatus.GoTo_Bottom)
         {
-            // v3_newPos = Vector3.SmoothDamp(gameObject.transform.position, go_BottomPosition.transform.position, ref v3_RefVelocity, f_Speed);
-            v3_newPos = Vector3.SmoothDamp(gameObject.transform.position, go_BottomPosition.transform.position, ref v3_RefVelocity, 2 / f_Speed);
+            f_Timer += Time.deltaTime / 5;
 
-            if (gameObject.transform.position.y <= (go_BottomPosition.transform.position.y + f_SnapDistance))
+            if (f_Timer > f_DistanceTimer) { f_Timer = f_DistanceTimer; }
+
+            float perc = f_Timer / f_DistanceTimer;
+
+            v3_newPos = Vector3.Lerp(gameObject.transform.position, go_BottomPosition.transform.position, perc);
+
+            gameObject.GetComponent<Rigidbody>().MovePosition(v3_newPos);
+
+            if (Vector3.Distance(gameObject.transform.position, go_BottomPosition.transform.position) <= f_SnapDistance)
             {
-                gameObject.GetComponent<Rigidbody>().MovePosition(go_BottomPosition.transform.position);
+                gameObject.transform.position = go_BottomPosition.transform.position;
 
                 elevatorStatus = Enum_ElevatorStatus.Bottom_Stall;
+
+                f_Timer = 0.0f;
             }
-            else gameObject.GetComponent<Rigidbody>().MovePosition(v3_newPos);
         }
 
         if (elevatorStatus == Enum_ElevatorStatus.Bottom_Stall)
@@ -70,7 +80,26 @@ public class Cs_Elevator : MonoBehaviour
 
         if (elevatorStatus == Enum_ElevatorStatus.GoTo_Top)
         {
-            // v3_newPos = Vector3.SmoothDamp(gameObject.transform.position, go_TopPosition.transform.position, ref v3_RefVelocity, f_Speed);
+            f_Timer += Time.deltaTime;
+
+            if(f_Timer > f_DistanceTimer) { f_Timer = f_DistanceTimer; }
+
+            float perc = f_Timer / f_DistanceTimer;
+
+            v3_newPos = Vector3.Lerp(gameObject.transform.position, go_TopPosition.transform.position, perc);
+
+            gameObject.GetComponent<Rigidbody>().MovePosition(v3_newPos);
+
+            if(Vector3.Distance(gameObject.transform.position, go_TopPosition.transform.position) <= f_SnapDistance)
+            {
+                gameObject.transform.position = go_TopPosition.transform.position;
+
+                elevatorStatus = Enum_ElevatorStatus.Top_Stall;
+
+                f_Timer = 0.0f;
+            }
+
+            /*
             v3_newPos = Vector3.SmoothDamp(gameObject.transform.position, go_TopPosition.transform.position, ref v3_RefVelocity, 1 / f_Speed);
 
             if (gameObject.transform.position.y >= (go_TopPosition.transform.position.y - f_SnapDistance))
@@ -80,6 +109,21 @@ public class Cs_Elevator : MonoBehaviour
                 elevatorStatus = Enum_ElevatorStatus.Top_Stall;
             }
             else gameObject.GetComponent<Rigidbody>().MovePosition(v3_newPos);
+            */
+
+            /*
+            //increment timer once per frame
+            cameraLerpTime_Curr += Time.deltaTime;
+            if (cameraLerpTime_Curr > cameraLerpTime)
+            {
+                cameraLerpTime_Curr = cameraLerpTime;
+            }
+
+            //lerp!
+            float perc = cameraLerpTime_Curr / cameraLerpTime;
+
+            go_Camera.transform.position = Vector3.Lerp(go_Camera_DefaultPos.transform.position, go_Camera_TempPos.transform.position, perc);
+            */
         }
 
         if (elevatorStatus == Enum_ElevatorStatus.Top_Stall)
