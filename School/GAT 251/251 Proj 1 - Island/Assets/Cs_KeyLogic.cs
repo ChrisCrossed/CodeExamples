@@ -6,6 +6,7 @@ public class Cs_KeyLogic : MonoBehaviour
     [SerializeField]
     bool b_IsFake = false;
     bool b_KillKey = false;
+    float f_StartingHeight;
 
 	// Use this for initialization
 	void Start ()
@@ -14,6 +15,8 @@ public class Cs_KeyLogic : MonoBehaviour
         {
             gameObject.GetComponent<Collider>().enabled = false;
         }
+
+        f_StartingHeight = gameObject.transform.position.y;
 	}
 	
 	// Update is called once per frame
@@ -28,7 +31,7 @@ public class Cs_KeyLogic : MonoBehaviour
         {
             if(b_KillKey)
             {
-                float f_Alpha = gameObject.GetComponent<MeshRenderer>().material.color.a - (Time.deltaTime * 2);
+                float f_Alpha = gameObject.GetComponent<MeshRenderer>().material.color.a - (Time.deltaTime * 3);
 
                 if (f_Alpha <= 0) Destroy(gameObject);
                 else
@@ -43,9 +46,20 @@ public class Cs_KeyLogic : MonoBehaviour
         }
 	}
 
+    float f_Height;
     void RotateKey()
     {
+        Vector3 currRot = gameObject.transform.eulerAngles;
+        currRot.y = Mathf.LerpAngle(currRot.y, currRot.y + 90, Time.deltaTime);
 
+        // currRot.y = f_StartingHeight + Mathf.Sin(Time.deltaTime * 5);
+
+        Vector3 newPos = gameObject.transform.position;
+        f_Height += Time.deltaTime;
+        newPos.y = f_StartingHeight + Mathf.Sin(f_Height) / 2;
+
+        gameObject.transform.eulerAngles = currRot;
+        gameObject.transform.position = newPos;
     }
 
     public void DestroyKey()

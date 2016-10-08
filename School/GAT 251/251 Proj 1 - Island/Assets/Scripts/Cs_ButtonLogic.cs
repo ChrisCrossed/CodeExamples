@@ -3,7 +3,6 @@ using System.Collections;
 
 public class Cs_ButtonLogic : MonoBehaviour
 {
-    Vector3 v3_StartPos;
     float f_yStartPos;
     float f_PosModifier = 0.2f;
 
@@ -19,7 +18,6 @@ public class Cs_ButtonLogic : MonoBehaviour
     // Use this for initialization
     void Start ()
     {
-        v3_StartPos = gameObject.transform.localPosition;
         f_yStartPos = gameObject.transform.localPosition.y;
 
         mat_Active = Resources.Load("Mat_Active", typeof(Material)) as Material;

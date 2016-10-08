@@ -90,13 +90,13 @@ public class Cs_LeverLogic : MonoBehaviour
                 if(go_Door.GetComponent<Cs_Door>())
                 {
                     go_Door.GetComponent<Cs_Door>().MoveDoor();
-
-                    b_ChangeColor = true;
                 }
                 else if(go_Door.GetComponent<Cs_FakeGround>())
                 {
                     go_Door.GetComponent<Cs_FakeGround>().OpenUnderground();
                 }
+
+                b_ChangeColor = true;
             }
         }
     }
@@ -146,39 +146,12 @@ public class Cs_LeverLogic : MonoBehaviour
             {
                 if (b_LightArrayTwo[i_] != b_CorrectAnswerTwo[i_])
                 {
-                    print("Second panel wrong");
-
-                    print("First panel wrong");
-
-                    string tempString = "";
-
-                    for (int j_ = 0; j_ < 16; ++j_) { tempString += b_LightArray[j_].ToString(); tempString += ", "; }
-                    print("Light Array: " + tempString);
-
-                    ///
-
-                    tempString = "";
-                    for (int j_ = 0; j_ < 4; ++j_) { tempString += b_CorrectAnswer[j_].ToString(); tempString += ", "; }
-                    print("Correct Array: " + tempString);
-
-                    tempString = "";
-                    for (int j_ = 4; j_ < 8; ++j_) { tempString += b_CorrectAnswer[j_].ToString(); tempString += ", "; }
-                    print("Correct Array: " + tempString);
-
-                    tempString = "";
-                    for (int j_ = 8; j_ < 12; ++j_) { tempString += b_CorrectAnswer[j_].ToString(); tempString += ", "; }
-                    print("Correct Array: " + tempString);
-
-                    tempString = "";
-                    for (int j_ = 12; j_ < 16; ++j_) { tempString += b_CorrectAnswer[j_].ToString(); tempString += ", "; }
-                    print("Correct Array: " + tempString);
-
                     return false;
                 }
             }
         }
 
-        print("Second panel correct");
+        if(b_HasSecondPanel) print("Second panel correct");
 
         return true;
     }
