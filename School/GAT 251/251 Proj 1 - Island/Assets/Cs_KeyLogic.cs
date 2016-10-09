@@ -71,6 +71,9 @@ public class Cs_KeyLogic : MonoBehaviour
     {
         if (collision_.gameObject.name == "Capsule")
         {
+            // collision_.gameObject.GetComponent<Cs_FPSController>().IncrementKeyCounter();
+            collision_.gameObject.transform.root.GetComponent<Cs_FPSController>().IncrementKeyCounter();
+
             Destroy(gameObject);
         }
     }

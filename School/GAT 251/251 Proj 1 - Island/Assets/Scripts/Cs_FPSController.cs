@@ -50,6 +50,12 @@ public class Cs_FPSController : MonoBehaviour
     GameObject go_FadeInOut;
     float f_FadeTimer = 3.0f;
 
+    void Awake()
+    {
+        go_FadeInOut = transform.Find("FadeInOut").gameObject;
+        go_FadeInOut.SetActive(true);
+    }
+
     // Use this for initialization
     void Start()
     {
@@ -74,13 +80,18 @@ public class Cs_FPSController : MonoBehaviour
         playerCam = gameObject.GetComponentsInChildren<Camera>();
         playerCam[0].fieldOfView = f_NORMAL_FOV;
 
-        go_FadeInOut = transform.Find("FadeInOut").gameObject;
-        go_FadeInOut.SetActive(true);
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            print("Cheat Activated");
+
+            FadeToBlack();
+        }
+
         b_Keyboard = KeyboardCheck(b_Keyboard);
         
         // However, we want to restrict movement conflictions as much as possible.
@@ -127,6 +138,8 @@ public class Cs_FPSController : MonoBehaviour
             if (newColor.a == 1.0f && !b_IsFading_)
             {
                 Application.Quit();
+
+                print(" WE QUIT ");
             }
 
 
@@ -150,6 +163,7 @@ public class Cs_FPSController : MonoBehaviour
 
     bool KeyboardCheck(bool b_KeyboardPressed)
     {
+        /*
         if (Input.GetKeyDown(KeyCode.O))
         {
             b_MouseSmoothing = !b_MouseSmoothing;
@@ -171,6 +185,7 @@ public class Cs_FPSController : MonoBehaviour
                 TEMPORARY_UI_SYSTEM("Controller: Standard", true);
             }
         }
+        */
 
         if (Input.GetKey(KeyCode.W) ||
             Input.GetKey(KeyCode.S) ||
@@ -324,6 +339,8 @@ public class Cs_FPSController : MonoBehaviour
         if(state.Buttons.Start == ButtonState.Pressed)
         {
             Application.Quit();
+
+            print("APPLICATION QUIT");
         }
 
         #region Input
@@ -505,24 +522,37 @@ public class Cs_FPSController : MonoBehaviour
         playerCam[0].fieldOfView = f_FOV;
     }
 
+    public void IncrementKeyCounter()
+    {
+        ++i_KeysCollected;
+    }
+
+    int i_KeysCollected;
     void TEMPORARY_UI_SYSTEM(string s_Info_ = null, bool b_ResetTimer = false)
     {
-        if (b_ResetTimer) f_UITimer = 0.0f;
+        #region Current Objective
+        GameObject.Find("Text_Progress").gameObject.GetComponent<Text>().text = "Keys: " + i_KeysCollected + "/4";
+        Vector3 v3_Position = GameObject.Find("Text_Progress").gameObject.transform.position;
+        #endregion
+
+        if (b_ResetTimer)
+        {
+            f_UITimer = 0.0f;
+        }
 
         if (s_Info_ != null) { s_Text = s_Info_; }
 
         f_UITimer += Time.deltaTime;
 
-        if( f_UITimer > 15.0f) 
+        if ( f_UITimer > 15.0f) 
         {
-            s_Text = "W/A/S/D to move, Mouse to look, E to use (red dot on HUD),\nHold Left Shift to run, Space Bar to Jump.\nCollect the three keys and find the exit.";
+            s_Text = "W/A/S/D to move, Mouse to look,\nUse (red dot on HUD): E or Left Mouse,\nHold Left Shift to run, Space Bar to Jump.\nCollect the three keys and find the exit.";
         }
+
         if( f_UITimer >= 60.0f)
         {
-            s_Text = " ";
-            // s_Text = "Press (Letter) 'O' to make the camera glide. I'd love feedback on that!\nPressing 'P' inverts your controller's camera.";
+            s_Text = "";
         }
-        if (f_UITimer > 60f) s_Text = " ";
 
         GameObject.Find("Text").gameObject.GetComponent<Text>().text = s_Text;
     }
