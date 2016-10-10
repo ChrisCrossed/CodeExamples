@@ -77,7 +77,11 @@ public class Cs_PlayerController : MonoBehaviour
     {
         b_KeyboardUsedLast = KeyboardCheck(b_KeyboardUsedLast);
 
-        if(b_KeyboardUsedLast) Input_Keyboard(); else Input_Controller();
+        if (b_KeyboardUsedLast)
+        {
+            // Input_Keyboard();
+        }
+        else Input_Controller();
 
         currSpeedReadOnly = gameObject.GetComponent<Rigidbody>().velocity.magnitude;
 
@@ -161,14 +165,34 @@ public class Cs_PlayerController : MonoBehaviour
         }
         #endregion
 
+        #region Update Aim/Fire
+        bool b_AllowedToFire_ReticleMagnitude = false;
+
+        // Get the currect Vector of the right analog stick
+        Vector2 v2_RightStickVector;
+        v2_RightStickVector.x = state.ThumbSticks.Right.X;
+        v2_RightStickVector.y = state.ThumbSticks.Right.Y;
+        v2_RightStickVector.Normalize();
+
+        // Get the 'magnitude' of the stick being pressed in
+        float f_RightStickMagnitude = Vector2.SqrMagnitude(new Vector2(state.ThumbSticks.Right.X, state.ThumbSticks.Right.Y));
+
+        // Pass information in to the UpdateReticle function
+        v3_TargetLocation = go_TargetObject.transform.position;
+        UpdateReticle(v2_RightStickVector, f_RightStickMagnitude);
+
+        if (f_RightStickMagnitude >= 0.4f) b_AllowedToFire_ReticleMagnitude = true;
+        #endregion
+
         #region Use Ability
-
         // Throw Rock
-        if(state.Buttons.X == ButtonState.Pressed && prevState.Buttons.X == ButtonState.Released)
+        if( state.Buttons.RightShoulder == ButtonState.Pressed && prevState.Buttons.RightShoulder == ButtonState.Released &&
+            b_AllowedToFire_ReticleMagnitude )
         {
-            // ThrowRockAtLocation();
-        }
+            Vector3 v3_ThrowVector = CalculateThrow();
 
+            ThrowRockAtLocation(v3_ThrowVector);
+        }
         #endregion
 
         // Normalize
@@ -176,7 +200,54 @@ public class Cs_PlayerController : MonoBehaviour
         
         // Pass information into PlayerMovement()
         PlayerMovement(v3_InputVector, f_Magnitude);
+    }
 
+    public float f_AimingDistance = 5.0f;
+    float f_ReticleFadeTimer;
+    void UpdateReticle( Vector2 v2_Vector_, float f_Magnitude )
+    {
+        // Reposition the Reticle's X/Z in comparison to the player's position
+        Vector3 v3_ReticlePosition = gameObject.transform.position;
+        Vector3 v3_ConvertedVector = new Vector3(v2_Vector_.x, 0, v2_Vector_.y);
+        v3_ReticlePosition += v3_ConvertedVector * f_Magnitude * f_AimingDistance;
+
+        // Raycast down from the Reticle's current X/Z position to find ground to apply on to
+        RaycastHit hit;
+        Physics.Raycast(new Vector3(v3_ReticlePosition.x, v3_ReticlePosition.y + 5, v3_ReticlePosition.z), -transform.up, out hit);
+        Vector3 v3_NewPosition = hit.point;
+        v3_NewPosition.y += 0.1f;
+
+        // Rotate the reticle to match the surface it hits
+        Vector3 v3_FinalRotation = Vector3.ProjectOnPlane(-transform.up + new Vector3(90, 0, 0), hit.normal);
+
+        // Apply final position
+        go_TargetObject.transform.position = v3_NewPosition;
+        go_TargetObject.transform.eulerAngles = v3_FinalRotation;
+
+        if (f_Magnitude >= 0.4f)
+        {
+            if(f_ReticleFadeTimer < 1.0f)
+            {
+                f_ReticleFadeTimer += Time.deltaTime * 10;
+
+                if (f_ReticleFadeTimer > 1.0f) f_ReticleFadeTimer = 1.0f;
+            }
+        }
+        else
+        {
+            if (f_ReticleFadeTimer > 0)
+            {
+                if (f_ReticleFadeTimer > 0.5f) f_ReticleFadeTimer = 0.5f;
+
+                f_ReticleFadeTimer -= Time.deltaTime;
+
+                if (f_ReticleFadeTimer < 0.0f) f_ReticleFadeTimer = 0.0f;
+            }
+        }
+
+        Color clr_Fade = go_TargetObject.GetComponent<MeshRenderer>().material.color;
+        clr_Fade.a = f_ReticleFadeTimer;
+        go_TargetObject.GetComponent<MeshRenderer>().material.color = clr_Fade;
     }
 
     void Input_Keyboard()
