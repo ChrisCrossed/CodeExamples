@@ -7,10 +7,11 @@ public class Cs_RockLogic : MonoBehaviour
     float f_Timer;
     float f_LiveTimer;
     bool b_IsDead;
+    bool b_HasMadeSound;
 
     void Start()
     {
-        // gameObject.GetComponent<Rigidbody>().velocity = transform.up * 3;
+        
     }
 
     // Update is called once per frame
@@ -40,6 +41,14 @@ public class Cs_RockLogic : MonoBehaviour
         {
             if(hit.collider.gameObject.tag == "Ground")
             {
+                // Tell 'sound collider' to inform enemies (Occurs as a trigger BEFORE making the change to 'IsTrigger = true'
+                if(!b_HasMadeSound)
+                {
+                    gameObject.transform.Find("Sound_Collider").GetComponent<Cs_RockSoundLogic>().MakeSound();
+                    
+                    b_HasMadeSound = true;
+                }
+
                 gameObject.GetComponent<Collider>().isTrigger = false;
             }
         }

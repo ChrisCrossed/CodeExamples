@@ -189,7 +189,8 @@ public class Cs_PlayerController : MonoBehaviour
         if( state.Buttons.RightShoulder == ButtonState.Pressed && prevState.Buttons.RightShoulder == ButtonState.Released &&
             b_AllowedToFire_ReticleMagnitude )
         {
-            Vector3 v3_ThrowVector = CalculateThrow();
+            float f_StickMagnitude = Vector2.SqrMagnitude(new Vector2(state.ThumbSticks.Right.X, state.ThumbSticks.Right.Y));
+            Vector3 v3_ThrowVector = CalculateThrow(f_StickMagnitude);
 
             ThrowRockAtLocation(v3_ThrowVector);
         }
@@ -254,9 +255,9 @@ public class Cs_PlayerController : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            Vector3 v3_ThrowVector = CalculateThrow();
+            //Vector3 v3_ThrowVector = CalculateThrow();
 
-            ThrowRockAtLocation(v3_ThrowVector);
+            //ThrowRockAtLocation(v3_ThrowVector);
         }
 
         #region Movement
@@ -430,10 +431,10 @@ public class Cs_PlayerController : MonoBehaviour
         return hit;
     }
 
-    Vector3 CalculateThrow()
+    Vector3 CalculateThrow( float f_AnalogStickMagnitude_ )
     {
         f_Gravity = Physics.gravity.magnitude;
-        float f_Angle = f_FiringAngle * Mathf.Deg2Rad;
+        float f_Angle = (f_FiringAngle * f_AnalogStickMagnitude_) * Mathf.Deg2Rad;
 
         Vector3 v3_HorizontalTarget = new Vector3(v3_TargetLocation.x, 0, v3_TargetLocation.z);
         Vector3 v3_HorizontalPosition = new Vector3(gameObject.transform.position.x, 0, gameObject.transform.position.z);
@@ -463,7 +464,5 @@ public class Cs_PlayerController : MonoBehaviour
         GameObject go_Rock = (GameObject)Instantiate(prefab_Rock, go_FireLocation.transform.position, gameObject.transform.rotation);
 
         go_Rock.GetComponent<Rigidbody>().velocity = v3_Velocity_;
-
-        print(go_Rock.GetComponent<Rigidbody>().velocity);
     }
 }
