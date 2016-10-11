@@ -112,7 +112,6 @@ public class Cs_EnemyLogic_Grunt : MonoBehaviour
             gameObject.GetComponent<NavMeshAgent>().destination = go_Player_LastKnownLocation.transform.position;
         }
 
-        print(e_EnemyState);
     }
     float f_BasicMoveSpeed = 3.5f;
     void GoToState_Patrol()

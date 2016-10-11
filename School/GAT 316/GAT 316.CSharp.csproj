@@ -82,6 +82,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Cs_CameraTrigger.cs" />
+    <Compile Include="Assets\Cs_EndGame.cs" />
     <Compile Include="Assets\Cs_EnemyLogic_Grunt.cs" />
     <Compile Include="Assets\Cs_EnemyVisionLogic.cs" />
     <Compile Include="Assets\Cs_PatrolPointLogic.cs" />
