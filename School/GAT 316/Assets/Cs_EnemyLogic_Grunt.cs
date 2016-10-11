@@ -10,9 +10,11 @@ enum Enum_EnemyState
 
 public class Cs_EnemyLogic_Grunt : MonoBehaviour
 {
-    [SerializeField] GameObject[] go_PatrolPath = new GameObject[10];
+    [SerializeField] GameObject[] go_PatrolPath = new GameObject[20];
 
     [SerializeField] Enum_EnemyState e_EnemyState = Enum_EnemyState.Patrol;
+
+    GameObject go_Player_LastKnownLocation;
 
 	// Use this for initialization
 	void Start ()
@@ -34,6 +36,7 @@ public class Cs_EnemyLogic_Grunt : MonoBehaviour
             f_MAX_WAIT_TIME = go_PatrolPath[0].GetComponent<Cs_PatrolPointLogic>().GetWaitTime();
         }
 
+        go_Player_LastKnownLocation = GameObject.Find("Player_LastKnownLoc");
     }
 
     float f_PatrolWaitTimer;
@@ -45,8 +48,8 @@ public class Cs_EnemyLogic_Grunt : MonoBehaviour
     // Updates every 0.1 seconds as to not overload/stutter gameplay elements
     void UpdateTick()
     {
-        print(gameObject.GetComponent<NavMeshAgent>().remainingDistance);
-        print(f_InvestigateTimer);
+        // print(gameObject.GetComponent<NavMeshAgent>().remainingDistance);
+        // print(f_InvestigateTimer);
 
         if(e_EnemyState == Enum_EnemyState.Patrol)
         {
@@ -67,7 +70,7 @@ public class Cs_EnemyLogic_Grunt : MonoBehaviour
                     if (f_PatrolWaitTimer >= f_MAX_WAIT_TIME)
                     {
                         // Increment/Reset
-                        if (go_PatrolPath[i_PatrolPoint + 1] != null)
+                        if (go_PatrolPath[i_PatrolPoint + 1] != null && (i_PatrolPoint + 1) < go_PatrolPath.Length)
                         {
                             ++i_PatrolPoint;
                         }
@@ -106,21 +109,10 @@ public class Cs_EnemyLogic_Grunt : MonoBehaviour
         }
         else if(e_EnemyState == Enum_EnemyState.ChasePlayer)
         {
-            
+            gameObject.GetComponent<NavMeshAgent>().destination = go_Player_LastKnownLocation.transform.position;
         }
 
-        /*
-        if(Vector3.Distance(gameObject.transform.position, go_EndPoint.transform.position) > 2.0f)
-        {
-            if(gameObject.GetComponent<NavMeshAgent>().enabled)
-            {
-                Vector3 v3_PlayerPos = go_EndPoint.transform.position;
-
-                gameObject.GetComponent<NavMeshAgent>().destination = v3_PlayerPos;
-                gameObject.GetComponent<NavMeshAgent>().stoppingDistance = 5.0f;
-            }
-        }
-        */
+        print(e_EnemyState);
     }
     float f_BasicMoveSpeed = 3.5f;
     void GoToState_Patrol()
@@ -159,13 +151,29 @@ public class Cs_EnemyLogic_Grunt : MonoBehaviour
         // Go To State
         e_EnemyState = Enum_EnemyState.InvestigateLocation;
     }
-
-    void GoToState_ChasePlayer()
+    
+    public void GoToState_ChasePlayer( GameObject go_Player_, bool b_SeeThePlayer_ = false)
     {
-        // Apply basic details
+        #region Reset basic details
+        gameObject.GetComponent<NavMeshAgent>().destination = go_Player_LastKnownLocation.transform.position;
+        gameObject.GetComponent<NavMeshAgent>().stoppingDistance = 0.1f;
+        gameObject.GetComponent<NavMeshAgent>().speed = f_SprintMoveSpeed;
+        gameObject.GetComponent<NavMeshAgent>().acceleration = 5.0f;
 
-        // Go To State
-        e_EnemyState = Enum_EnemyState.ChasePlayer;
+        // Record the last known location
+        if (b_SeeThePlayer_)
+        {
+            go_Player_LastKnownLocation.transform.position = go_Player_.transform.position;
+
+            // Go To State
+            e_EnemyState = Enum_EnemyState.ChasePlayer;
+        }
+        else
+        {
+            GoToState_InvestigateLocation(go_Player_LastKnownLocation);
+        }
+        #endregion
+
     }
 
     // Update is called once per frame

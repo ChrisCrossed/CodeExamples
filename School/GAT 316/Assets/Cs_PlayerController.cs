@@ -181,7 +181,7 @@ public class Cs_PlayerController : MonoBehaviour
         v3_TargetLocation = go_TargetObject.transform.position;
         UpdateReticle(v2_RightStickVector, f_RightStickMagnitude);
 
-        if (f_RightStickMagnitude >= 0.4f) b_AllowedToFire_ReticleMagnitude = true;
+        if (f_RightStickMagnitude >= 0.3f) b_AllowedToFire_ReticleMagnitude = true;
         #endregion
 
         #region Use Ability
@@ -463,6 +463,9 @@ public class Cs_PlayerController : MonoBehaviour
     {
         GameObject go_Rock = (GameObject)Instantiate(prefab_Rock, go_FireLocation.transform.position, gameObject.transform.rotation);
 
-        go_Rock.GetComponent<Rigidbody>().velocity = v3_Velocity_;
+        if(v3_Velocity_ != null)
+        {
+            go_Rock.GetComponent<Rigidbody>().velocity = v3_Velocity_;
+        }
     }
 }
