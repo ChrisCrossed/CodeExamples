@@ -9,8 +9,7 @@ public class Cs_LeverLogic : MonoBehaviour
     float f_ButtonModelTimer;
     GameObject go_ButtonModel;
 
-    public
-    GameObject go_Door;
+    public GameObject go_Door;
 
     public GameObject go_CorrectAnswerSource;
     public GameObject go_ControlPanel;
@@ -27,7 +26,6 @@ public class Cs_LeverLogic : MonoBehaviour
     Color color_Fail;
     Color color_Success;
     bool b_ChangeColor;
-
 
     // Use this for initialization
     void Start ()
@@ -73,6 +71,7 @@ public class Cs_LeverLogic : MonoBehaviour
         }
     }
 
+    [SerializeField] GameObject go_SFX;
     public void UseButton()
     {
         if (f_ButtonTimer == f_MAX_BUTTON_TIMER)
@@ -98,6 +97,8 @@ public class Cs_LeverLogic : MonoBehaviour
 
                 b_ChangeColor = true;
             }
+
+            go_SFX.GetComponent<AudioSource>().Play();
         }
     }
 
@@ -107,38 +108,9 @@ public class Cs_LeverLogic : MonoBehaviour
         {
             if (b_LightArray[i_] != b_CorrectAnswer[i_])
             {
-                /* PRINT STUFF
-                print("First panel wrong");
-
-                string tempString = "";
-
-                for (int j_ = 0; j_ < 16; ++j_) { tempString += b_LightArray[j_].ToString(); tempString += ", "; }
-                print("Light Array: " + tempString);
-
-                ///
-
-                tempString = "";
-                for (int j_ = 0; j_ < 4; ++j_) { tempString += b_CorrectAnswer[j_].ToString(); tempString += ", "; }
-                print("Correct Array: " + tempString);
-
-                tempString = "";
-                for (int j_ = 4; j_ < 8; ++j_) { tempString += b_CorrectAnswer[j_].ToString(); tempString += ", "; }
-                print("Correct Array: " + tempString);
-
-                tempString = "";
-                for (int j_ = 8; j_ < 12; ++j_) { tempString += b_CorrectAnswer[j_].ToString(); tempString += ", "; }
-                print("Correct Array: " + tempString);
-
-                tempString = "";
-                for (int j_ = 12; j_ < 16; ++j_) { tempString += b_CorrectAnswer[j_].ToString(); tempString += ", "; }
-                print("Correct Array: " + tempString);
-                */
-
                 return false;
             }
         }
-
-        print("First panel correct");
 
         if(b_HasSecondPanel)
         {
@@ -150,8 +122,6 @@ public class Cs_LeverLogic : MonoBehaviour
                 }
             }
         }
-
-        if(b_HasSecondPanel) print("Second panel correct");
 
         return true;
     }
@@ -190,8 +160,6 @@ public class Cs_LeverLogic : MonoBehaviour
     void Update ()
     {
         UpdateButtonModel();
-
-        if (Input.GetKeyDown(KeyCode.C)) UseButton();
 
         if (b_ChangeColor && mat_SuccessFail != null)
         {

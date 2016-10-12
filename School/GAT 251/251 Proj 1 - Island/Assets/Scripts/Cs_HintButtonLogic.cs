@@ -41,6 +41,7 @@ public class Cs_HintButtonLogic : MonoBehaviour
         #endregion
     }
 
+    [SerializeField] GameObject go_SFX;
     public void UseButton()
     {
         if(f_ButtonTimer == f_MAX_BUTTON_TIMER)
@@ -65,6 +66,8 @@ public class Cs_HintButtonLogic : MonoBehaviour
             {
                 b_ChangeColor = true;
             }
+
+            go_SFX.GetComponent<AudioSource>().Play();
         }
     }
 

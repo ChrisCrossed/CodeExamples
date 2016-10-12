@@ -43,6 +43,7 @@ public class Cs_Lever_Door : MonoBehaviour
         }
     }
 
+    [SerializeField] GameObject go_SFX;
     public void UseButton()
     {
         if (f_ButtonTimer == f_MAX_BUTTON_TIMER)
@@ -54,6 +55,8 @@ public class Cs_Lever_Door : MonoBehaviour
             go_Door.GetComponent<Cs_Door>().MoveDoor();
 
             if(mat_SuccessFail != null) b_ChangeColor = true;
+
+            go_SFX.GetComponent<AudioSource>().Play();
         }
     }
 
