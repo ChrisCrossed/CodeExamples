@@ -32,6 +32,8 @@ public class Cs_EnemyVisionLogic : MonoBehaviour
         {
             gameObject.GetComponent<MeshRenderer>().enabled = false;
 
+            go_Root.GetComponent<Cs_EnemyLogic_Grunt>().GoToState_Patrol();
+
             b_PRESENTATION_TEST = false;
         }
         if (Input.GetKeyDown(KeyCode.O))

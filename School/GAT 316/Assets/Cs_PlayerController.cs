@@ -75,6 +75,8 @@ public class Cs_PlayerController : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
     {
+        if (Input.GetKeyDown(KeyCode.Escape)) Application.Quit();
+
         b_KeyboardUsedLast = KeyboardCheck(b_KeyboardUsedLast);
 
         if (b_KeyboardUsedLast)

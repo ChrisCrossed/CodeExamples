@@ -62,9 +62,14 @@ public class Cs_KeyLogic : MonoBehaviour
         gameObject.transform.position = newPos;
     }
 
+    [SerializeField] GameObject go_SFX;
+    [SerializeField] AudioClip sfx_RealKey;
+    [SerializeField] AudioClip sfx_FakeKey;
     public void DestroyKey()
     {
         b_KillKey = true;
+
+        go_SFX.GetComponent<AudioSource>().PlayOneShot(sfx_FakeKey);
     }
 
     void OnTriggerEnter(Collider collision_)
@@ -73,6 +78,8 @@ public class Cs_KeyLogic : MonoBehaviour
         {
             // collision_.gameObject.GetComponent<Cs_FPSController>().IncrementKeyCounter();
             collision_.gameObject.transform.root.GetComponent<Cs_FPSController>().IncrementKeyCounter();
+
+            go_SFX.GetComponent<AudioSource>().PlayOneShot(sfx_RealKey);
 
             Destroy(gameObject);
         }

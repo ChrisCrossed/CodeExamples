@@ -70,13 +70,23 @@ public class Cs_Door : MonoBehaviour
         return true;
     }
 
+    [SerializeField] GameObject go_SFX;
+    [SerializeField] AudioClip sfx_OpenDoor;
+    [SerializeField] AudioClip sfx_CloseDoor;
     public void MoveDoor()
     {
         b_IsMoving = true;
+
+        if(!b_StartOpen)
+        {
+            go_SFX.GetComponent<AudioSource>().PlayOneShot(sfx_OpenDoor);
+        }
     }
 
     public void CloseDoor()
     {
         b_IsReset = true;
+
+        go_SFX.GetComponent<AudioSource>().PlayOneShot(sfx_CloseDoor);
     }
 }

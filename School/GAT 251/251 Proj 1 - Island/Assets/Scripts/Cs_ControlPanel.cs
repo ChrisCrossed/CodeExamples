@@ -40,11 +40,20 @@ public class Cs_ControlPanel : MonoBehaviour
         SetLight(i_Pos_.ToString(), b_IsOn_);
     }
 
+    [SerializeField] GameObject go_SFX;
+    [SerializeField] AudioClip sfx_ButtonOn;
+    [SerializeField] AudioClip sfx_ButtonOff;
     public void SetLight(string s_Pos_, bool b_IsOn_)
     {
         gameObject.transform.Find(s_Pos_).GetComponent<Cs_ButtonLogic>().SetActive(b_IsOn_);
 
         b_Buttons[int.Parse(s_Pos_)] = b_IsOn_;
+
+        if(go_SFX != null)
+        {
+            if (b_IsOn_) go_SFX.GetComponent<AudioSource>().PlayOneShot(sfx_ButtonOn);
+            else if (!b_IsOn_) go_SFX.GetComponent<AudioSource>().PlayOneShot(sfx_ButtonOff);
+        }
     }
 
     public bool[] GetBoolArray()

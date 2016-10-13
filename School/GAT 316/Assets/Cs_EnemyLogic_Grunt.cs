@@ -114,7 +114,7 @@ public class Cs_EnemyLogic_Grunt : MonoBehaviour
 
     }
     float f_BasicMoveSpeed = 3.5f;
-    void GoToState_Patrol()
+    public void GoToState_Patrol()
     {
         #region Reset Basic Details
         // Reset timer

@@ -125,7 +125,7 @@ public class Cs_FPSController : MonoBehaviour
             if (b_IsFading_)
             {
                 newColor.a -= Time.deltaTime / 3;
-
+                
                 if (newColor.a < 0.0f) newColor.a = 0.0f;
             }
             else
@@ -133,6 +133,8 @@ public class Cs_FPSController : MonoBehaviour
                 newColor.a += Time.deltaTime / 3;
 
                 if (newColor.a > 1.0f) newColor.a = 1.0f;
+
+                transform.Find("Audio Source").GetComponent<AudioSource>().volume = 0.5f - (newColor.a / 2);
             }
 
             if (newColor.a == 1.0f && !b_IsFading_)
@@ -546,10 +548,14 @@ public class Cs_FPSController : MonoBehaviour
 
         if ( f_UITimer > 15.0f) 
         {
-            s_Text = "W/A/S/D to move, Mouse to look,\nUse (red dot on HUD): E or Left Mouse,\nHold Left Shift to run, Space Bar to Jump.\nCollect the three keys and find the exit.";
+            s_Text = "W/A/S/D to move, Mouse to look,\n\nUse (red dot on HUD): E or Left Mouse,\n\nHold Left Shift to run, Space Bar to Jump.";
         }
 
         if( f_UITimer >= 60.0f)
+        {
+            s_Text = "Collect the four keys and find the exit.\n\nPen & Paper Highly Recommended";
+        }
+        if (f_UITimer >= 100.0f)
         {
             s_Text = "";
         }
