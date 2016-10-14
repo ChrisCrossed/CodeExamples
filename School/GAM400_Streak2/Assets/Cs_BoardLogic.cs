@@ -37,15 +37,22 @@ public class Cs_BoardLogic : MonoBehaviour
 
         Initialize_BlockArray();
 
+        // Default (2x2)
         SetBlock(1, 1, Enum_BlockType.Block_2_Active);
         SetBlock(2, 1, Enum_BlockType.Block_1_Active);
-        //SetBlock(3, 1, Enum_BlockType.Block_1_Active);
         SetBlock(1, 2, Enum_BlockType.Block_2_Active);
         SetBlock(2, 2, Enum_BlockType.Block_1_Active);
-        //SetBlock(3, 2, Enum_BlockType.Block_2_Active);
-        //SetBlock(1, 3, Enum_BlockType.Block_1_Active);
-        //SetBlock(2, 3, Enum_BlockType.Block_3_Static);
-        //SetBlock(3, 3, Enum_BlockType.Block_3_Active);
+
+        // 3 wide
+        // SetBlock(3, 1, Enum_BlockType.Block_1_Active);
+        // SetBlock(3, 2, Enum_BlockType.Block_2_Active);
+
+        // 3 high
+        // SetBlock(1, 3, Enum_BlockType.Block_1_Active);
+        // SetBlock(2, 3, Enum_BlockType.Block_3_Static);
+
+        // (3x3)
+        // SetBlock(3, 3, Enum_BlockType.Block_3_Active);
 
         v2_ActiveBlockLocation = new Vector2(1, 1);
 
@@ -105,7 +112,7 @@ public class Cs_BoardLogic : MonoBehaviour
             }
             print(tempString);
         }
-        print("\n-----------------------------------------------------------------\n");
+        print("Active Block: " + v2_ActiveBlockLocation + "\n-----------------------------------------------------------------\n");
     }
 
     #region Block Position Manipulation
@@ -295,7 +302,7 @@ public class Cs_BoardLogic : MonoBehaviour
         }
         #endregion
 
-        --v2_ActiveBlockLocation.y;
+        --v2_ActiveBlockLocation.x;
     }
 
     // TODO: Fix & Complete
@@ -306,7 +313,9 @@ public class Cs_BoardLogic : MonoBehaviour
         if (BlockSize_ == Enum_BlockSize.size_2x2 || BlockSize_ == Enum_BlockSize.size_2x3)
         {
             // If the position to the right of the block doesn't exist, quit out.
-            if (v2_BottomLeft.x + 2 >= i_ArrayWidth) { return; }
+            if (v2_BottomLeft.x + 2 > i_ArrayWidth) { return; }
+            // if (v2_BottomLeft.x + 2 > ) { return; }
+
 
             // If the position to the right of the block isn't empty, quit out
             if (GetBlock( (int)v2_BottomLeft.x + 2, (int)v2_BottomLeft.y    ) != Enum_BlockType.Empty) { return; }
