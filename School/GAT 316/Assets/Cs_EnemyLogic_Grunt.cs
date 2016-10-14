@@ -131,21 +131,18 @@ public class Cs_EnemyLogic_Grunt : MonoBehaviour
         e_EnemyState = Enum_EnemyState.Patrol;
     }
 
-    GameObject go_InvestigateLocation;
+    Vector3 v3_InvestigateLocation;
     float f_SprintMoveSpeed = 6f;
-    public void GoToState_InvestigateLocation(GameObject go_InvestigateLocation_)
+    public void GoToState_InvestigateLocation( Vector3 v3_InvestigateLocation_ )
     {
         #region Reset Basic Details
         f_InvestigateTimer = 0.0f;
 
-        gameObject.GetComponent<NavMeshAgent>().destination = go_InvestigateLocation_.transform.position;
+        gameObject.GetComponent<NavMeshAgent>().destination = v3_InvestigateLocation_;
         gameObject.GetComponent<NavMeshAgent>().stoppingDistance = 0.1f;
         gameObject.GetComponent<NavMeshAgent>().speed = f_SprintMoveSpeed;
         gameObject.GetComponent<NavMeshAgent>().acceleration = 5.0f;
         #endregion
-
-        // Apply basic details
-        go_InvestigateLocation = go_InvestigateLocation_;
 
         // Go To State
         e_EnemyState = Enum_EnemyState.InvestigateLocation;
@@ -169,7 +166,7 @@ public class Cs_EnemyLogic_Grunt : MonoBehaviour
         }
         else
         {
-            GoToState_InvestigateLocation(go_Player_LastKnownLocation);
+            GoToState_InvestigateLocation(go_Player_LastKnownLocation.transform.position);
         }
         #endregion
 

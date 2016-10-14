@@ -22,7 +22,7 @@ public class Cs_RockSoundLogic : MonoBehaviour
             {
                 print("Telling " + go_EnemyList[i].name + " to go to: " + gameObject.transform.position);
 
-                go_EnemyList[i].GetComponent<Cs_EnemyLogic_Grunt>().GoToState_InvestigateLocation(gameObject);
+                go_EnemyList[i].GetComponent<Cs_EnemyLogic_Grunt>().GoToState_InvestigateLocation(gameObject.transform.position);
             }
         }
     }

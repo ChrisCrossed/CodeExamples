@@ -25,6 +25,7 @@ public class Cs_EnemyVisionLogic : MonoBehaviour
 
     float f_SeePlayerTimer;
     bool b_PlayerInCollider;
+    Vector3 v3_LastKnownLocation;
     // Update is called once per frame
     void Update ()
     {
@@ -71,11 +72,11 @@ public class Cs_EnemyVisionLogic : MonoBehaviour
             // Find the line between the raycast point & where the player currently is
             Physics.Raycast(go_RaycastPoint.transform.position, v3_Vector, out hit);
 
-            Debug.DrawRay(go_RaycastPoint.transform.position, v3_Vector, Color.red, 5.0f);
+            Debug.DrawRay(go_RaycastPoint.transform.position, v3_Vector, Color.red, 50.0f);
 
             if (hit.collider.transform.root.tag == "Player")
             {
-                go_Player = hit.collider.transform.root.gameObject;
+                v3_LastKnownLocation = hit.collider.transform.root.gameObject.transform.position;
 
                 print(go_Root.name + " sees the player");
 
@@ -83,8 +84,15 @@ public class Cs_EnemyVisionLogic : MonoBehaviour
             }
             else
             {
-                go_Root.GetComponent<Cs_EnemyLogic_Grunt>().GoToState_InvestigateLocation(go_Player);
+                b_PlayerInCollider = false;
+
+                if (v3_LastKnownLocation != null)
+                {
+                    go_Root.GetComponent<Cs_EnemyLogic_Grunt>().GoToState_InvestigateLocation(v3_LastKnownLocation);
+                }
             }
+
+            f_SeePlayerTimer = 0.0f;
             // go_Root.GetComponent<Cs_EnemyLogic_Grunt>().GoToState_ChasePlayer(go_Player, false);
         }
         // go_Root.GetComponent<Cs_EnemyLogic_Grunt>().GoToState_ChasePlayer(go_Player, false);
@@ -115,11 +123,8 @@ public class Cs_EnemyVisionLogic : MonoBehaviour
                 {
                     go_Player = hit.collider.transform.root.gameObject;
 
-                    print(go_Root.name + " sees the player");
-
                     b_PlayerInCollider = true;
                 }
-                else b_PlayerInCollider = false;
             }
             // else b_PlayerInCollider = false;
             #endregion
