@@ -6,6 +6,9 @@ public class Cs_CameraTrigger : MonoBehaviour
     public GameObject go_CameraObj;
     GameObject go_Player;
 
+    [SerializeField] bool b_StartPosition;
+    float f_DestroyTimer;
+
 	// Use this for initialization
 	void Start ()
     {
@@ -42,6 +45,12 @@ public class Cs_CameraTrigger : MonoBehaviour
             {
                 // Tell player's camera to return to default
                 go_Player.GetComponent<Cs_PlayerController>().SetCameraPosition();
+            }
+
+            if (b_StartPosition)
+            {
+                // Hacky way to keep the object around to refer to while not allowing the player to touch it
+                gameObject.GetComponent<Collider>().enabled = false;
             }
         }
     }

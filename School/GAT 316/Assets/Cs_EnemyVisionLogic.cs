@@ -80,7 +80,7 @@ public class Cs_EnemyVisionLogic : MonoBehaviour
 
                 print(go_Root.name + " sees the player");
 
-                go_Root.GetComponent<Cs_EnemyLogic_Grunt>().GoToState_ChasePlayer(go_Player, true);
+                go_Root.GetComponent<Cs_EnemyLogic_Grunt>().GoToState_ChasePlayer(v3_LastKnownLocation, true);
             }
             else
             {

@@ -46,9 +46,9 @@ public class Cs_PlayerController : MonoBehaviour
     GameObject go_Camera;
     GameObject go_Camera_DefaultPos;
     GameObject go_Camera_TempPos;
-    Enum_CameraState cameraState = Enum_CameraState.OnPlayer;
+    Enum_CameraState cameraState = Enum_CameraState.Lerp_ToPlayer;
     float cameraLerpTime = 0.75f;
-    float cameraLerpTime_Curr;
+    float cameraLerpTime_Curr = 0.75f;
 
     // Abilities/Projectile
     public GameObject go_FireLocation;
@@ -66,11 +66,11 @@ public class Cs_PlayerController : MonoBehaviour
         // Define Camera Information
         go_Camera = GameObject.Find("Main Camera");
         go_Camera_DefaultPos = transform.Find("Camera_Player").gameObject;
-        SetCameraPosition(go_Camera_DefaultPos);
 
         // Abilities/Projectile
         v3_TargetLocation = go_TargetObject.transform.position;
 
+        SetCameraPosition(go_Camera_DefaultPos);
     }
 	
 	// Update is called once per frame
@@ -420,11 +420,15 @@ public class Cs_PlayerController : MonoBehaviour
             // Lerp calculations
             float perc = cameraLerpTime_Curr / cameraLerpTime;
 
-            Vector3 v3_Vector = go_Camera_TempPos.transform.position - go_Camera_DefaultPos.transform.position;
-            Vector3 v3_Rotation = go_Camera_TempPos.transform.eulerAngles - go_Camera_DefaultPos.transform.eulerAngles;
+            if(go_Camera_TempPos != null && go_Camera_DefaultPos != null)
+            {
+                Vector3 v3_Vector = go_Camera_TempPos.transform.position - go_Camera_DefaultPos.transform.position;
+                Vector3 v3_Rotation = go_Camera_TempPos.transform.eulerAngles - go_Camera_DefaultPos.transform.eulerAngles;
+
+                go_Camera.transform.position = go_Camera_DefaultPos.transform.position + (v3_Vector * perc);
+                go_Camera.transform.eulerAngles = go_Camera_DefaultPos.transform.eulerAngles + (v3_Rotation * perc);
+            }
             
-            go_Camera.transform.position = go_Camera_DefaultPos.transform.position + (v3_Vector * perc);
-            go_Camera.transform.eulerAngles = go_Camera_DefaultPos.transform.eulerAngles + (v3_Rotation * perc);
         }
             #endregion
     }
