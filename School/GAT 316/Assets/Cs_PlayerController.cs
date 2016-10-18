@@ -46,9 +46,9 @@ public class Cs_PlayerController : MonoBehaviour
     GameObject go_Camera;
     GameObject go_Camera_DefaultPos;
     GameObject go_Camera_TempPos;
-    Enum_CameraState cameraState = Enum_CameraState.OnPlayer;
+    Enum_CameraState cameraState = Enum_CameraState.Lerp_ToPlayer;
     float cameraLerpTime = 0.75f;
-    float cameraLerpTime_Curr;
+    float cameraLerpTime_Curr = 0.75f;
 
     // Abilities/Projectile
     public GameObject go_FireLocation;
@@ -70,6 +70,7 @@ public class Cs_PlayerController : MonoBehaviour
         // Abilities/Projectile
         v3_TargetLocation = go_TargetObject.transform.position;
 
+        SetCameraPosition(go_Camera_DefaultPos);
     }
 	
 	// Update is called once per frame
@@ -214,9 +215,13 @@ public class Cs_PlayerController : MonoBehaviour
         Vector3 v3_ConvertedVector = new Vector3(v2_Vector_.x, 0, v2_Vector_.y);
         v3_ReticlePosition += v3_ConvertedVector * f_Magnitude * f_AimingDistance;
 
+        // int layer_mask = LayerMask.GetMask("Player", "Enemy");
+        int layer_mask = LayerMask.GetMask("Ground");
+
         // Raycast down from the Reticle's current X/Z position to find ground to apply on to
         RaycastHit hit;
-        Physics.Raycast(new Vector3(v3_ReticlePosition.x, v3_ReticlePosition.y + 5, v3_ReticlePosition.z), -transform.up, out hit);
+        Physics.Raycast(new Vector3(v3_ReticlePosition.x, v3_ReticlePosition.y + 5, v3_ReticlePosition.z), -transform.up, out hit, 10.0f, layer_mask);
+
         Vector3 v3_NewPosition = hit.point;
         v3_NewPosition.y += 0.1f;
 
@@ -361,14 +366,21 @@ public class Cs_PlayerController : MonoBehaviour
 
     void UpdateCameraPosition()
     {
-        if(cameraState == Enum_CameraState.OnPlayer)
+        #region Camera On Player
+        if (cameraState == Enum_CameraState.OnPlayer)
         {
+            /*
             // Set default parameters
             go_Camera.transform.rotation = go_Camera_DefaultPos.transform.rotation;
             go_Camera.transform.position = go_Camera_DefaultPos.transform.position;
+            */
         }
-        else if(cameraState == Enum_CameraState.OnTempPoint)
+        #endregion
+
+        #region Camera On Temporary Location
+        else if (cameraState == Enum_CameraState.OnTempPoint)
         {
+            /*
             // Set temporary parameters
             if(go_Camera_TempPos != null)
             {
@@ -379,34 +391,48 @@ public class Cs_PlayerController : MonoBehaviour
             {
                 // Reset to player's position & set camera state
             }
+            */
         }
-        else if(cameraState == Enum_CameraState.Lerp_FromPlayer || cameraState == Enum_CameraState.Lerp_ToPlayer)
+        #endregion
+
+        #region Camera Lerp FROM player TO temp location
+        else if (cameraState == Enum_CameraState.Lerp_FromPlayer || cameraState == Enum_CameraState.Lerp_ToPlayer)
         {
-            //increment timer once per frame
-            cameraLerpTime_Curr += Time.deltaTime;
-            if (cameraLerpTime_Curr > cameraLerpTime)
-            {
-                cameraLerpTime_Curr = cameraLerpTime;
-            }
-
-            //lerp!
-            float perc = cameraLerpTime_Curr / cameraLerpTime;
-
+            // Camera timer increments as it travels to the temp location
             if(cameraState == Enum_CameraState.Lerp_FromPlayer)
             {
-                go_Camera.transform.position = Vector3.Lerp(go_Camera_DefaultPos.transform.position, go_Camera_TempPos.transform.position, perc);
-                go_Camera.transform.rotation = Quaternion.Slerp(go_Camera_DefaultPos.transform.rotation, go_Camera_TempPos.transform.rotation, perc);
+                cameraLerpTime_Curr += Time.deltaTime;
 
-                if (cameraLerpTime == cameraLerpTime_Curr) cameraState = Enum_CameraState.OnTempPoint;
+                if (cameraLerpTime_Curr > cameraLerpTime)
+                {
+                    cameraLerpTime_Curr = cameraLerpTime;
+                }
             }
-            else // Going to player
+            // Camera timer decrements as it travels back to the player
+            else
             {
-                go_Camera.transform.position = Vector3.Lerp(go_Camera_TempPos.transform.position, go_Camera_DefaultPos.transform.position, perc);
-                go_Camera.transform.rotation = Quaternion.Slerp(go_Camera_TempPos.transform.rotation, go_Camera_DefaultPos.transform.rotation, perc);
+                cameraLerpTime_Curr -= Time.deltaTime;
 
-                if (cameraLerpTime == cameraLerpTime_Curr) cameraState = Enum_CameraState.OnPlayer;
+                if(cameraLerpTime_Curr <= 0)
+                {
+                    cameraLerpTime_Curr = 0;
+                }
             }
+
+            // Lerp calculations
+            float perc = cameraLerpTime_Curr / cameraLerpTime;
+
+            if(go_Camera_TempPos != null && go_Camera_DefaultPos != null)
+            {
+                Vector3 v3_Vector = go_Camera_TempPos.transform.position - go_Camera_DefaultPos.transform.position;
+                Vector3 v3_Rotation = go_Camera_TempPos.transform.eulerAngles - go_Camera_DefaultPos.transform.eulerAngles;
+
+                go_Camera.transform.position = go_Camera_DefaultPos.transform.position + (v3_Vector * perc);
+                go_Camera.transform.eulerAngles = go_Camera_DefaultPos.transform.eulerAngles + (v3_Rotation * perc);
+            }
+            
         }
+            #endregion
     }
 
     public void SetCameraPosition( GameObject go_CameraPos_ = null )
@@ -420,8 +446,6 @@ public class Cs_PlayerController : MonoBehaviour
             go_Camera_TempPos = go_CameraPos_;
             cameraState = Enum_CameraState.Lerp_FromPlayer;
         }
-
-        cameraLerpTime_Curr = 0f;
     }
 
     RaycastHit EvaluateGroundVector()
