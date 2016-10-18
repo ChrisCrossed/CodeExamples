@@ -4,9 +4,14 @@ using System.Collections;
 public class Cs_SkiingPlayerController : MonoBehaviour
 {
     float f_Velocity;
-    GameObject go_RaycastPoint;
     Vector3 v3_CurrentVector;
     bool b_GravityApplied;
+
+    GameObject go_RaycastPoint_1;
+    GameObject go_RaycastPoint_2;
+    GameObject go_RaycastPoint_3;
+    GameObject go_RaycastPoint_4;
+
 
     // Physics Materials
     PhysicMaterial physMat_Ski;
@@ -15,17 +20,22 @@ public class Cs_SkiingPlayerController : MonoBehaviour
 	// Use this for initialization
 	void Start ()
     {
-        go_RaycastPoint = transform.Find("RaycastPoint").gameObject;
+        go_RaycastPoint_1 = transform.Find("RaycastPoint_1").gameObject;
+        go_RaycastPoint_2 = transform.Find("RaycastPoint_2").gameObject;
+        go_RaycastPoint_3 = transform.Find("RaycastPoint_3").gameObject;
+        go_RaycastPoint_4 = transform.Find("RaycastPoint_4").gameObject;
 
         physMat_Ski  = (PhysicMaterial)Resources.Load("PhysMat_Ski");
         physMat_Walk = (PhysicMaterial)Resources.Load("PhysMat_Walk");
     }
-	
-	// Update is called once per frame
-	void Update ()
+
+    Vector3 v3_Velocity;
+    // Update is called once per frame
+    void Update ()
     {
+        // print("Current speed: " + gameObject.GetComponent<Rigidbody>().velocity.magnitude);
+
         #region PlayerSliding
-        Vector3 v3_Velocity = gameObject.GetComponent<Rigidbody>().velocity;
 
         // If player is skiing
         if(Input.GetKey(KeyCode.Space))
@@ -34,12 +44,36 @@ public class Cs_SkiingPlayerController : MonoBehaviour
             gameObject.GetComponent<Collider>().material = physMat_Ski;
 
             // Raycast down and grab the angle of the terrain
-            RaycastHit hit;
-            if(Physics.Raycast(go_RaycastPoint.transform.position, -transform.up, out hit, 1.5f))
+            RaycastHit hit = CheckRaycasts();
+            if(hit.distance <= 1.5f)
             {
-                Vector3 v3_GroundVector = Vector3.ProjectOnPlane(gameObject.transform.forward, hit.normal);
+                if(v3_Velocity == new Vector3())
+                {
+                    v3_Velocity = gameObject.GetComponent<Rigidbody>().velocity;
+                    print("Set Velocity: " + v3_Velocity.magnitude);
+                }
 
-                gameObject.GetComponent<Rigidbody>().AddForce(v3_GroundVector + v3_Velocity);
+                print("Speed: " + gameObject.GetComponent<Rigidbody>().velocity.magnitude);
+
+                // This works, using the direction they're moving.
+                Vector3 v3_GroundVector = Vector3.ProjectOnPlane(gameObject.GetComponent<Rigidbody>().velocity, hit.normal);
+
+                // test
+                v3_GroundVector.Normalize();
+
+                if(gameObject.GetComponent<Rigidbody>().velocity.magnitude <= v3_Velocity.magnitude)
+                {
+                    gameObject.GetComponent<Rigidbody>().velocity = v3_GroundVector * v3_Velocity.magnitude;
+                }
+            }
+            else
+            {
+                if(v3_Velocity != new Vector3())
+                {
+                    v3_Velocity = new Vector3();
+
+                    print("Reset Velocity");
+                }
             }
         }
         // If player is not skiing
@@ -47,8 +81,16 @@ public class Cs_SkiingPlayerController : MonoBehaviour
         {
             // Set PhysicsMaterial
             gameObject.GetComponent<Collider>().material = physMat_Walk;
+
+            if (v3_Velocity != new Vector3())
+            {
+                v3_Velocity = new Vector3();
+
+                print("Reset Velocity");
+            }
         }
 
+        /*
         if(Input.GetKey(KeyCode.W))
         {
             if(gameObject.GetComponent<Rigidbody>().velocity.magnitude <= 10)
@@ -62,6 +104,7 @@ public class Cs_SkiingPlayerController : MonoBehaviour
                 print((gameObject.transform.forward * Time.deltaTime * 5));
             }
         }
+        */
 
         // Vector3 v3_CurrPos = gameObject.transform.position;
         //gameObject.transform.position = hit.point + (gameObject.transform.up * 1);
@@ -71,21 +114,28 @@ public class Cs_SkiingPlayerController : MonoBehaviour
         #endregion
     }
 
-    /*
-    void OnCollisionEnter(Collision collision_)
+    RaycastHit CheckRaycasts()
     {
-        if(collision_.gameObject.tag == "Ground")
-        {
-            b_GravityApplied = false;
-        }
-    }
+        // outHit is what we'll be sending out from the function
+        RaycastHit outHit;
 
-    void OnCollisionExit(Collision collision_)
-    {
-        if (collision_.gameObject.tag == "Ground")
-        {
-            b_GravityApplied = true;
-        }
+        // tempHit is what we'll compare against
+        RaycastHit tempHit;
+
+        // Set the default as outHit automatically
+        Physics.Raycast(go_RaycastPoint_1.transform.position, -transform.up, out outHit);
+
+        // Begin comparing against the other three. Find the shortest distance
+        Physics.Raycast(go_RaycastPoint_2.transform.position, -transform.up, out tempHit);
+        if (tempHit.distance < outHit.distance) outHit = tempHit;
+
+        Physics.Raycast(go_RaycastPoint_3.transform.position, -transform.up, out tempHit);
+        if (tempHit.distance < outHit.distance) outHit = tempHit;
+
+        Physics.Raycast(go_RaycastPoint_4.transform.position, -transform.up, out tempHit);
+        if (tempHit.distance < outHit.distance) outHit = tempHit;
+
+        // Return the shortest hit distance
+        return outHit;
     }
-    */
 }
