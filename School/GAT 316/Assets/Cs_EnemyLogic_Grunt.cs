@@ -14,7 +14,7 @@ public class Cs_EnemyLogic_Grunt : MonoBehaviour
 
     [SerializeField] Enum_EnemyState e_EnemyState = Enum_EnemyState.Patrol;
 
-    GameObject go_Player_LastKnownLocation;
+    Vector3 v3_LastKnownLocation;
 
 	// Use this for initialization
 	void Start ()
@@ -35,8 +35,6 @@ public class Cs_EnemyLogic_Grunt : MonoBehaviour
         {
             f_MAX_WAIT_TIME = go_PatrolPath[0].GetComponent<Cs_PatrolPointLogic>().GetWaitTime();
         }
-
-        go_Player_LastKnownLocation = GameObject.Find("Player_LastKnownLoc");
     }
 
     float f_PatrolWaitTimer;
@@ -45,11 +43,6 @@ public class Cs_EnemyLogic_Grunt : MonoBehaviour
 
     float f_InvestigateTimer;
     float f_MAX_INVESTIGATE_TIME = 5.0f;
-    // Updates every 0.1 seconds as to not overload/stutter gameplay elements
-    void UpdateTick()
-    {
-        
-    }
 
     float f_BasicMoveSpeed = 3.5f;
     public void GoToState_Patrol()
@@ -89,23 +82,16 @@ public class Cs_EnemyLogic_Grunt : MonoBehaviour
     public void GoToState_ChasePlayer( Vector3 v3_PlayerLastKnownLocation_, bool b_SeeThePlayer_ = false)
     {
         #region Reset basic details
-        gameObject.GetComponent<NavMeshAgent>().destination = v3_PlayerLastKnownLocation_;
+        // Go To State
+        e_EnemyState = Enum_EnemyState.ChasePlayer;
+
+        v3_LastKnownLocation = v3_PlayerLastKnownLocation_;
+
+        gameObject.GetComponent<NavMeshAgent>().destination = v3_LastKnownLocation;
         gameObject.GetComponent<NavMeshAgent>().stoppingDistance = 0.1f;
         gameObject.GetComponent<NavMeshAgent>().speed = f_SprintMoveSpeed;
         gameObject.GetComponent<NavMeshAgent>().acceleration = 5.0f;
 
-        // Record the last known location
-        if (b_SeeThePlayer_)
-        {
-            // go_Player_LastKnownLocation.transform.position = v3_PlayerLastKnownLocation_;
-
-            // Go To State
-            e_EnemyState = Enum_EnemyState.ChasePlayer;
-        }
-        else
-        {
-            GoToState_InvestigateLocation(v3_PlayerLastKnownLocation_);
-        }
         #endregion
 
     }
@@ -158,10 +144,12 @@ public class Cs_EnemyLogic_Grunt : MonoBehaviour
         }
         else if (e_EnemyState == Enum_EnemyState.InvestigateLocation)
         {
+            print("Investigate: " + v3_LastKnownLocation);
+
             // if (Vector3.Distance(gameObject.transform.position, v3_InvestigateLocation) <= gameObject.GetComponent<NavMeshAgent>().radius + 0.15f)
             if (gameObject.GetComponent<NavMeshAgent>().remainingDistance <= 0.15f)
             {
-                f_InvestigateTimer += 0.1f;
+                f_InvestigateTimer += Time.deltaTime;
 
                 // If the Wait Timer reaches a certain point, go to the next point & reset the timer
                 if (f_InvestigateTimer >= f_MAX_INVESTIGATE_TIME)
@@ -172,8 +160,9 @@ public class Cs_EnemyLogic_Grunt : MonoBehaviour
         }
         else if (e_EnemyState == Enum_EnemyState.ChasePlayer)
         {
-            // gameObject.GetComponent<NavMeshAgent>().destination = go_Player_LastKnownLocation.transform.position;
-            gameObject.GetComponent<NavMeshAgent>().destination = v3_InvestigateLocation;
+            print("Chase: " + v3_LastKnownLocation);
+            
+            gameObject.GetComponent<NavMeshAgent>().destination = v3_LastKnownLocation;
         }
     }
 }

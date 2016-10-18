@@ -35,11 +35,12 @@ public class Cs_SkiingPlayerController : MonoBehaviour
 
             // Raycast down and grab the angle of the terrain
             RaycastHit hit;
-            if(Physics.Raycast(go_RaycastPoint.transform.position, -transform.up, out hit, 1.5f))
+            int i_LayerMask = LayerMask.GetMask("Ground");
+            if(Physics.Raycast(go_RaycastPoint.transform.position, -transform.up, out hit, 1.5f, i_LayerMask))
             {
                 Vector3 v3_GroundVector = Vector3.ProjectOnPlane(gameObject.transform.forward, hit.normal);
 
-                gameObject.GetComponent<Rigidbody>().AddForce(v3_GroundVector + v3_Velocity);
+                gameObject.GetComponent<Rigidbody>().AddForce(v3_GroundVector);
             }
         }
         // If player is not skiing
@@ -51,7 +52,7 @@ public class Cs_SkiingPlayerController : MonoBehaviour
 
         if(Input.GetKey(KeyCode.W))
         {
-            if(gameObject.GetComponent<Rigidbody>().velocity.magnitude <= 10)
+            if(gameObject.GetComponent<Rigidbody>().velocity.magnitude <= 13)
             {
                 f_Velocity += Time.deltaTime;
 

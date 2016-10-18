@@ -13,6 +13,7 @@ public class Cs_EnemyVisionLogic : MonoBehaviour
 	// Use this for initialization
 	void Start ()
     {
+        go_Player = GameObject.Find("Player");
         go_Root = gameObject.transform.root.gameObject;
         go_RaycastPoint = go_Root.transform.Find("VisionRaycast").gameObject;
 
@@ -51,15 +52,10 @@ public class Cs_EnemyVisionLogic : MonoBehaviour
             b_PRESENTATION_TEST = true;
         }
 
-        #region Run a test every .1 seconds to see if we see the player in the collider
-        if(f_SeePlayerTimer <= 0.1f)
-        {
-            f_SeePlayerTimer += Time.deltaTime;
+        #region Run a test to see if we see the player in the collider
 
-            if (f_SeePlayerTimer > 0.1f) f_SeePlayerTimer = 0.1f;
-        }
-
-        if(f_SeePlayerTimer == 0.1f && b_PlayerInCollider)
+        // if(f_SeePlayerTimer == 0.1f && b_PlayerInCollider)
+        if (b_PlayerInCollider)
         {
             Vector3 v3_Vector = new Vector3(go_Player.transform.position.x - go_RaycastPoint.transform.position.x,
                                             go_Player.transform.position.y - go_RaycastPoint.transform.position.y,
@@ -69,65 +65,73 @@ public class Cs_EnemyVisionLogic : MonoBehaviour
 
             RaycastHit hit;
 
-            // Find the line between the raycast point & where the player currently is
-            Physics.Raycast(go_RaycastPoint.transform.position, v3_Vector, out hit);
+            int playerLayerMask = LayerMask.GetMask("Player");
 
-            Debug.DrawRay(go_RaycastPoint.transform.position, v3_Vector, Color.red, 50.0f);
+            // Find the line between the raycast point & where the player currently is
+            Physics.Raycast(go_RaycastPoint.transform.position, v3_Vector, out hit, float.PositiveInfinity, playerLayerMask);
+            Debug.DrawRay(go_RaycastPoint.transform.position, v3_Vector, Color.red, Time.deltaTime);
 
             if (hit.collider.transform.root.tag == "Player")
             {
-                v3_LastKnownLocation = hit.collider.transform.root.gameObject.transform.position;
+                // v3_LastKnownLocation = hit.collider.transform.root.gameObject.transform.position;
+                v3_LastKnownLocation = go_Player.transform.position;
+
+                Debug.DrawLine(go_RaycastPoint.transform.position, v3_LastKnownLocation, Color.blue, Time.deltaTime);
 
                 print(go_Root.name + " sees the player");
 
                 go_Root.GetComponent<Cs_EnemyLogic_Grunt>().GoToState_ChasePlayer(v3_LastKnownLocation, true);
             }
-            else
-            {
-                b_PlayerInCollider = false;
-
-                if (v3_LastKnownLocation != null)
-                {
-                    go_Root.GetComponent<Cs_EnemyLogic_Grunt>().GoToState_InvestigateLocation(v3_LastKnownLocation);
-                }
-            }
-
-            f_SeePlayerTimer = 0.0f;
-            // go_Root.GetComponent<Cs_EnemyLogic_Grunt>().GoToState_ChasePlayer(go_Player, false);
         }
         // go_Root.GetComponent<Cs_EnemyLogic_Grunt>().GoToState_ChasePlayer(go_Player, false);
         #endregion
     }
 
+    bool CheckIfPlayerSeenInCollider()
+    {
+        return true;
+    }
+
     void OnTriggerEnter( Collider collider_ )
     {
-        if(b_PRESENTATION_TEST)
+        #region Working Vision Code
+        if (collider_.transform.root.gameObject.tag == "Player")
         {
-            #region Working Vision Code
-            if (collider_.transform.root.gameObject.tag == "Player")
+            Vector3 v3_Vector = new Vector3(collider_.transform.root.gameObject.transform.position.x - go_RaycastPoint.transform.position.x,
+                                            collider_.transform.root.gameObject.transform.position.y - go_RaycastPoint.transform.position.y,
+                                            collider_.transform.root.gameObject.transform.position.z - go_RaycastPoint.transform.position.z);
+
+            v3_Vector.Normalize();
+
+            RaycastHit hit;
+
+            // Find the line between the raycast point & where the player currently is
+            Physics.Raycast(go_RaycastPoint.transform.position, v3_Vector, out hit);
+
+            Debug.DrawRay(go_RaycastPoint.transform.position, v3_Vector, Color.red, 5.0f);
+
+            if (hit.collider.transform.root.tag == "Player")
             {
-                Vector3 v3_Vector = new Vector3(collider_.transform.root.gameObject.transform.position.x - go_RaycastPoint.transform.position.x,
-                                                collider_.transform.root.gameObject.transform.position.y - go_RaycastPoint.transform.position.y,
-                                                collider_.transform.root.gameObject.transform.position.z - go_RaycastPoint.transform.position.z);
+                go_Player = hit.collider.transform.root.gameObject;
 
-                v3_Vector.Normalize();
-
-                RaycastHit hit;
-
-                // Find the line between the raycast point & where the player currently is
-                Physics.Raycast(go_RaycastPoint.transform.position, v3_Vector, out hit);
-
-                Debug.DrawRay(go_RaycastPoint.transform.position, v3_Vector, Color.red, 5.0f);
-
-                if (hit.collider.transform.root.tag == "Player")
-                {
-                    go_Player = hit.collider.transform.root.gameObject;
-
-                    b_PlayerInCollider = true;
-                }
+                b_PlayerInCollider = true;
             }
-            // else b_PlayerInCollider = false;
-            #endregion
+        }
+        #endregion
+
+        if (b_PlayerInCollider) print("Collider touched, we see the player"); else print("Collider touched, we DO NOT see the player");
+    }
+
+    void OnTriggerExit( Collider collider_ )
+    {
+        if (collider_.transform.root.gameObject.tag == "Player")
+        {
+            b_PlayerInCollider = false;
+
+            if (v3_LastKnownLocation != null)
+            {
+                go_Root.GetComponent<Cs_EnemyLogic_Grunt>().GoToState_InvestigateLocation(v3_LastKnownLocation);
+            }
         }
     }
 }

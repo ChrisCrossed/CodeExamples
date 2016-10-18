@@ -76,8 +76,6 @@ public class Cs_PlayerController : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
     {
-        print(cameraState);
-
         if (Input.GetKeyDown(KeyCode.Escape)) Application.Quit();
 
         b_KeyboardUsedLast = KeyboardCheck(b_KeyboardUsedLast);
@@ -217,9 +215,13 @@ public class Cs_PlayerController : MonoBehaviour
         Vector3 v3_ConvertedVector = new Vector3(v2_Vector_.x, 0, v2_Vector_.y);
         v3_ReticlePosition += v3_ConvertedVector * f_Magnitude * f_AimingDistance;
 
+        // int layer_mask = LayerMask.GetMask("Player", "Enemy");
+        int layer_mask = LayerMask.GetMask("Ground");
+
         // Raycast down from the Reticle's current X/Z position to find ground to apply on to
         RaycastHit hit;
-        Physics.Raycast(new Vector3(v3_ReticlePosition.x, v3_ReticlePosition.y + 5, v3_ReticlePosition.z), -transform.up, out hit);
+        Physics.Raycast(new Vector3(v3_ReticlePosition.x, v3_ReticlePosition.y + 5, v3_ReticlePosition.z), -transform.up, out hit, 10.0f, layer_mask);
+
         Vector3 v3_NewPosition = hit.point;
         v3_NewPosition.y += 0.1f;
 
