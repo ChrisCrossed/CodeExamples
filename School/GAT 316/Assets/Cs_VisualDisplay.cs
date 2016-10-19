@@ -7,8 +7,9 @@ public class Cs_VisualDisplay : MonoBehaviour
     // Reference: https://www.youtube.com/watch?v=rQG9aUWarwE
     // Part 2: https://www.youtube.com/watch?v=73Dc5JTCmKI
 
+    [Range(0, 50)]
     public float f_ViewRadius;
-    [Range(0, 360)]
+    [Range(0, 361)]
     public float f_ViewAngle;
 
     public LayerMask i_LayerMask;
@@ -26,10 +27,12 @@ public class Cs_VisualDisplay : MonoBehaviour
         viewMesh = new Mesh();
         viewMesh.name = "View Mesh";
         viewMeshFilter.mesh = viewMesh;
+
+        i_ObstacleMask = LayerMask.GetMask("Wall", "Player");
 	}
 	
 	// Update is called once per frame
-	void Update ()
+	void LateUpdate ()
     {
         DrawFieldOfView();
 	}
