@@ -187,7 +187,7 @@ public class Cs_EnemyLogic_Grunt : MonoBehaviour
         }
         else if (e_EnemyState == Enum_EnemyState.ChasePlayer)
         {
-            print("Chase: " + v3_LastKnownLocation);
+            // print("Chase: " + v3_LastKnownLocation);
             
             gameObject.GetComponent<NavMeshAgent>().destination = v3_LastKnownLocation;
         }
