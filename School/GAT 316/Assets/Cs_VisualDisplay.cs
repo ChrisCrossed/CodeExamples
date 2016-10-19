@@ -17,9 +17,38 @@ public class Cs_VisualDisplay : MonoBehaviour
 
     [Range(0, 1)]
     public float f_MeshResolution;
+    public int i_EdgeResolveIterations;
+    public float f_EdgeDistanceThreshhold;
 
     public MeshFilter viewMeshFilter;
     Mesh viewMesh;
+
+    public struct ViewCastInfo
+    {
+        public bool hit;
+        public Vector3 point;
+        public float dist;
+        public float angle;
+
+        public ViewCastInfo(bool _hit, Vector3 _point, float _dist, float _angle)
+        {
+            hit = _hit;
+            point = _point;
+            dist = _dist;
+            angle = _angle;
+        }
+    }
+    public struct EdgeInfo
+    {
+        public Vector3 v3_PointA;
+        public Vector3 v3_PointB;
+
+        public EdgeInfo( Vector3 _v3_PointA, Vector3 _v3_PointB )
+        {
+            v3_PointA = _v3_PointA;
+            v3_PointB = _v3_PointB;
+        }
+    }
 
 	// Use this for initialization
 	void Start ()
@@ -46,13 +75,37 @@ public class Cs_VisualDisplay : MonoBehaviour
 
         List<Vector3> v3_ViewPoints = new List<Vector3>();
 
+        ViewCastInfo oldViewCast = new ViewCastInfo();
+
         for(int i_ = 0; i_ < i_StepCount; ++i_)
         {
             float f_Angle = transform.eulerAngles.y - f_ViewAngle / 2 + f_StepAngleSize * i_;
 
             ViewCastInfo newViewCast = ViewCast(f_Angle);
 
+            if (i_ > 0)
+            {
+                bool b_EdgeDistanceThreshholdExceeded = Mathf.Abs(oldViewCast.dist - newViewCast.dist) > f_EdgeDistanceThreshhold;
+
+                if(oldViewCast.hit != newViewCast.hit || (oldViewCast.hit && newViewCast.hit && b_EdgeDistanceThreshholdExceeded) )
+                {
+                    EdgeInfo edge = FindEdge(oldViewCast, newViewCast);
+
+                    if(edge.v3_PointA != Vector3.zero)
+                    {
+                        v3_ViewPoints.Add(edge.v3_PointA);
+                    }
+
+                    if (edge.v3_PointB != Vector3.zero)
+                    {
+                        v3_ViewPoints.Add(edge.v3_PointB);
+                    }
+                }
+            }
+
             v3_ViewPoints.Add(newViewCast.point);
+
+            oldViewCast = newViewCast;
 
             // Debug.DrawLine(transform.position, transform.position + Get_DirFromAngle(f_Angle, true) * f_ViewRadius, Color.red);
         }
@@ -81,6 +134,36 @@ public class Cs_VisualDisplay : MonoBehaviour
         viewMesh.RecalculateNormals();
     }
 
+    EdgeInfo FindEdge(ViewCastInfo minViewCast, ViewCastInfo maxViewCast)
+    {
+        float f_MinAngle = minViewCast.angle;
+        float f_MaxAngle = maxViewCast.angle;
+
+        Vector3 v3_MinPoint = Vector3.zero;
+        Vector3 v3_MaxPoint = Vector3.zero;
+
+        for(int i_ = 0; i_ < i_EdgeResolveIterations; ++i_)
+        {
+            float f_Angle = (f_MinAngle + f_MaxAngle) / 2;
+            ViewCastInfo newViewCast = ViewCast(f_Angle);
+
+            bool b_EdgeDistanceThreshholdExceeded = Mathf.Abs(minViewCast.dist - newViewCast.dist) > f_EdgeDistanceThreshhold;
+
+            if (newViewCast.hit == minViewCast.hit && !b_EdgeDistanceThreshholdExceeded )
+            {
+                f_MinAngle = f_Angle;
+                v3_MinPoint = newViewCast.point;
+            }
+            else
+            {
+                f_MaxAngle = f_Angle;
+                v3_MaxPoint = newViewCast.point;
+            }
+        }
+
+        return new EdgeInfo(v3_MinPoint, v3_MaxPoint);
+    }
+
     ViewCastInfo ViewCast( float f_GlobalAngle_ )
     {
         Vector3 dir = Get_DirFromAngle(f_GlobalAngle_, true);
@@ -96,20 +179,15 @@ public class Cs_VisualDisplay : MonoBehaviour
         }
     }
 
-    public struct ViewCastInfo
+    public Vector3 Get_DirFromAngle( float angleInDegrees_, bool b_AngleIsGlobal_ = false)
     {
-        public bool hit;
-        public Vector3 point;
-        public float dist;
-        public float angle;
-
-        public ViewCastInfo(bool _hit, Vector3 _point, float _dist, float _angle)
+        if(!b_AngleIsGlobal_)
         {
-            hit = _hit;
-            point = _point;
-            dist = _dist;
-            angle = _angle;
+            angleInDegrees_ += transform.eulerAngles.y;
         }
+
+        // This switch between Sin & Cos is discussed in the first tutorial, due to trig running Sin(90-x) which is the same as Cos(x).
+        return new Vector3( Mathf.Sin( angleInDegrees_ * Mathf.Deg2Rad ), 0, Mathf.Cos( angleInDegrees_ * Mathf.Deg2Rad ));
     }
 
     // Detects objects within the proper radius and refers to them. You already have code that does this elsewhere.
@@ -133,16 +211,5 @@ public class Cs_VisualDisplay : MonoBehaviour
                 }
             }
         }
-    }
-
-    public Vector3 Get_DirFromAngle( float angleInDegrees_, bool b_AngleIsGlobal_ = false)
-    {
-        if(!b_AngleIsGlobal_)
-        {
-            angleInDegrees_ += transform.eulerAngles.y;
-        }
-
-        // This switch between Sin & Cos is discussed in the first tutorial, due to trig running Sin(90-x) which is the same as Cos(x).
-        return new Vector3( Mathf.Sin( angleInDegrees_ * Mathf.Deg2Rad ), 0, Mathf.Cos( angleInDegrees_ * Mathf.Deg2Rad ));
     }
 }
