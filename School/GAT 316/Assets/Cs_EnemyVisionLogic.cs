@@ -6,8 +6,6 @@ public class Cs_EnemyVisionLogic : MonoBehaviour
     GameObject go_Root;
     GameObject go_RaycastPoint;
 
-    bool b_PRESENTATION_TEST;
-
     GameObject go_Player;
 
     int i_LayerMask;
@@ -22,8 +20,6 @@ public class Cs_EnemyVisionLogic : MonoBehaviour
 
         #region PRESENTATION STUFF
         gameObject.GetComponent<MeshRenderer>().enabled = false;
-
-        b_PRESENTATION_TEST = false;
         #endregion
 
         // LayerMask info
@@ -42,21 +38,15 @@ public class Cs_EnemyVisionLogic : MonoBehaviour
             gameObject.GetComponent<MeshRenderer>().enabled = false;
 
             go_Root.GetComponent<Cs_EnemyLogic_Grunt>().GoToState_Patrol();
-
-            b_PRESENTATION_TEST = false;
         }
         if (Input.GetKeyDown(KeyCode.O))
         {
             gameObject.GetComponent<MeshRenderer>().enabled = true;
-
-            b_PRESENTATION_TEST = true;
         }
 
         if (Input.GetKeyDown(KeyCode.P))
         {
             gameObject.GetComponent<MeshRenderer>().enabled = false;
-
-            b_PRESENTATION_TEST = true;
         }
     }
 
@@ -130,7 +120,7 @@ public class Cs_EnemyVisionLogic : MonoBehaviour
             {
                 b_PlayerInCollider = false;
 
-                if (v3_LastKnownLocation != null)
+                if (v3_LastKnownLocation != new Vector3())
                 {
                     go_Root.GetComponent<Cs_EnemyLogic_Grunt>().GoToState_InvestigateLocation(v3_LastKnownLocation);
                 }

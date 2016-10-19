@@ -27,7 +27,6 @@ public class Cs_PlayerController : MonoBehaviour
     
     // Player variables
     Vector3 v3_CurrentVelocity;
-    Vector3 v3_PriorVector;
     bool b_IsSprinting = false;
 
     // Controller vs. Keyboard - Last Used
@@ -319,8 +318,6 @@ public class Cs_PlayerController : MonoBehaviour
             {
                 // Set timer to the Alloted Time to wait
                 f_DoubleTapForSprintTimer = f_TIME_ALLOWANCE;
-
-                v3_PriorVector = v3_InputVector;
             }
             else
             {
@@ -360,8 +357,6 @@ public class Cs_PlayerController : MonoBehaviour
 
         // Pass information into PlayerMovement()
         PlayerMovement(v3_InputVector, f_Magnitude);
-
-        v3_PriorVector = v3_InputVector;
     }
 
     void UpdateCameraPosition()
@@ -489,9 +484,13 @@ public class Cs_PlayerController : MonoBehaviour
     {
         GameObject go_Rock = (GameObject)Instantiate(prefab_Rock, go_FireLocation.transform.position, gameObject.transform.rotation);
 
-        if(v3_Velocity_ != null)
+        if(v3_Velocity_ != new Vector3())
         {
+            // Applies a velocity on the object as it's thrown
             go_Rock.GetComponent<Rigidbody>().velocity = v3_Velocity_;
+
+            // Applies a spin for one frame as it's thrown, like a grenade
+            go_Rock.GetComponent<Rigidbody>().AddRelativeTorque(v3_Velocity_ * 100, ForceMode.Force);
         }
     }
 }

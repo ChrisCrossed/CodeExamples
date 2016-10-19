@@ -85,6 +85,7 @@
     <Compile Include="Assets\Cs_EndGame.cs" />
     <Compile Include="Assets\Cs_EnemyLogic_Grunt.cs" />
     <Compile Include="Assets\Cs_EnemyVisionLogic.cs" />
+    <Compile Include="Assets\Cs_LockPosRot.cs" />
     <Compile Include="Assets\Cs_PatrolPointLogic.cs" />
     <Compile Include="Assets\Cs_PlayerController.cs" />
     <Compile Include="Assets\Cs_RockLogic.cs" />

@@ -8,6 +8,7 @@ public class Cs_RockLogic : MonoBehaviour
     float f_LiveTimer;
     bool b_IsDead;
     bool b_HasMadeSound;
+    float f_HitTimer;
 
     void Start()
     {
@@ -33,6 +34,8 @@ public class Cs_RockLogic : MonoBehaviour
         }
 
         UpdateLiveTimer();
+
+        if (f_HitTimer > 0) f_HitTimer += Time.deltaTime;
 	}
 
     void UpdateRaycast()
@@ -52,6 +55,8 @@ public class Cs_RockLogic : MonoBehaviour
             {
                 gameObject.transform.Find("Sound_Collider").GetComponent<Cs_RockSoundLogic>().MakeSound();
 
+                f_HitTimer += Time.deltaTime;
+
                 b_HasMadeSound = true;
             }
 
@@ -65,6 +70,8 @@ public class Cs_RockLogic : MonoBehaviour
             {
                 gameObject.transform.Find("Sound_Collider").GetComponent<Cs_RockSoundLogic>().MakeSound();
 
+                f_HitTimer += Time.deltaTime;
+
                 b_HasMadeSound = true;
             }
 
@@ -76,30 +83,6 @@ public class Cs_RockLogic : MonoBehaviour
             // gameObject.GetComponent<Collider>().isTrigger = true;
             gameObject.GetComponent<Collider>().isTrigger = true;
         }
-
-        /*
-        Physics.Raycast(gameObject.transform.position, Vector3.down, out hit, 0.2f);
-
-        if(hit.collider != null)
-        {
-            if(hit.collider.gameObject.tag == "Ground")
-            {
-                // Tell 'sound collider' to inform enemies (Occurs as a trigger BEFORE making the change to 'IsTrigger = true'
-                if(!b_HasMadeSound)
-                {
-                    gameObject.transform.Find("Sound_Collider").GetComponent<Cs_RockSoundLogic>().MakeSound();
-                    
-                    b_HasMadeSound = true;
-                }
-
-                gameObject.GetComponent<Collider>().isTrigger = false;
-            }
-        }
-        else
-        {
-            gameObject.GetComponent<Collider>().isTrigger = true;
-        }
-        */
     }
 
     void CheckMagnitude()
@@ -147,6 +130,15 @@ public class Cs_RockLogic : MonoBehaviour
         if (f_LiveTimer >= 10.0f)
         {
             b_IsDead = true;
+        }
+    }
+
+    void OnCollisionEnter( Collision collision_ )
+    {
+        if(f_HitTimer >= 1f)
+        {
+            print(f_HitTimer);
+            gameObject.transform.Find("Sound_Collider").GetComponent<Cs_RockSoundLogic>().MakeSound();
         }
     }
 }
