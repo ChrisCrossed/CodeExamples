@@ -68,11 +68,10 @@ public class Cs_EnemyVisionLogic : MonoBehaviour
             int playerLayerMask = LayerMask.GetMask("Player");
 
             // Find the line between the raycast point & where the player currently is
-            Physics.Raycast(go_RaycastPoint.transform.position, v3_Vector, out hit, float.PositiveInfinity, playerLayerMask);
-            Debug.DrawRay(go_RaycastPoint.transform.position, v3_Vector, Color.red, Time.deltaTime);
-
-            if (hit.collider.transform.root.tag == "Player")
+            if(Physics.Raycast(go_RaycastPoint.transform.position, v3_Vector, out hit, float.PositiveInfinity, playerLayerMask))
             {
+                Debug.DrawRay(go_RaycastPoint.transform.position, v3_Vector, Color.red, Time.deltaTime);
+
                 // v3_LastKnownLocation = hit.collider.transform.root.gameObject.transform.position;
                 v3_LastKnownLocation = go_Player.transform.position;
 
@@ -104,15 +103,14 @@ public class Cs_EnemyVisionLogic : MonoBehaviour
             v3_Vector.Normalize();
 
             RaycastHit hit;
+            int i_LayerMask = LayerMask.GetMask("Player");
 
             // Find the line between the raycast point & where the player currently is
-            Physics.Raycast(go_RaycastPoint.transform.position, v3_Vector, out hit);
-
-            Debug.DrawRay(go_RaycastPoint.transform.position, v3_Vector, Color.red, 5.0f);
-
-            if (hit.collider.transform.root.tag == "Player")
+            if(Physics.Raycast(go_RaycastPoint.transform.position, v3_Vector, out hit, float.PositiveInfinity, i_LayerMask))
             {
-                go_Player = hit.collider.transform.root.gameObject;
+                Debug.DrawRay(go_RaycastPoint.transform.position, v3_Vector, Color.red, 5.0f);
+
+                go_Player = hit.collider.gameObject;
 
                 b_PlayerInCollider = true;
             }

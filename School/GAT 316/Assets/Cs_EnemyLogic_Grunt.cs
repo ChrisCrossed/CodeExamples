@@ -16,6 +16,9 @@ public class Cs_EnemyLogic_Grunt : MonoBehaviour
 
     Vector3 v3_LastKnownLocation;
 
+    GameObject go_ExclamationMark;
+    GameObject go_QuestionMark;
+
 	// Use this for initialization
 	void Start ()
     {
@@ -35,6 +38,10 @@ public class Cs_EnemyLogic_Grunt : MonoBehaviour
         {
             f_MAX_WAIT_TIME = go_PatrolPath[0].GetComponent<Cs_PatrolPointLogic>().GetWaitTime();
         }
+
+        // Set the models above the player
+        go_ExclamationMark = transform.Find("Mdl_ExclamationMark").gameObject;
+        go_QuestionMark = transform.Find("Mdl_QuestionMark").gameObject;
     }
 
     float f_PatrolWaitTimer;
@@ -94,6 +101,26 @@ public class Cs_EnemyLogic_Grunt : MonoBehaviour
 
         #endregion
 
+    }
+
+    void SetIconState( Enum_EnemyState e_EnemyState_ )
+    {
+        // Set the exclamation mark
+        if(e_EnemyState_ == Enum_EnemyState.ChasePlayer)
+        {
+            go_ExclamationMark.GetComponent<MeshRenderer>().enabled = true;
+            go_QuestionMark.GetComponent<MeshRenderer>().enabled = false;
+        }
+        else if(e_EnemyState_ == Enum_EnemyState.InvestigateLocation)
+        {
+            go_ExclamationMark.GetComponent<MeshRenderer>().enabled = false;
+            go_QuestionMark.GetComponent<MeshRenderer>().enabled = true;
+        }
+        else // Default state
+        {
+            go_ExclamationMark.GetComponent<MeshRenderer>().enabled = false;
+            go_QuestionMark.GetComponent<MeshRenderer>().enabled = false;
+        }
     }
 
     // Update is called once per frame
@@ -164,5 +191,7 @@ public class Cs_EnemyLogic_Grunt : MonoBehaviour
             
             gameObject.GetComponent<NavMeshAgent>().destination = v3_LastKnownLocation;
         }
-    }
+
+        SetIconState(e_EnemyState);
+    } // End Update
 }
