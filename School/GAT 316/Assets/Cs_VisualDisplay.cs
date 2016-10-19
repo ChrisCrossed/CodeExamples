@@ -11,6 +11,8 @@ public class Cs_VisualDisplay : MonoBehaviour
     public float f_ViewRadius;
     [Range(0, 361)]
     public float f_ViewAngle;
+    [Range(0, 360)]
+    public float f_StartAngle;
 
     public LayerMask i_LayerMask;
     public LayerMask i_ObstacleMask;
@@ -69,7 +71,7 @@ public class Cs_VisualDisplay : MonoBehaviour
     void DrawFieldOfView()
     {
         // Ray count
-        int i_StepCount = Mathf.RoundToInt(f_ViewAngle * f_MeshResolution);
+        int i_StepCount = Mathf.RoundToInt((f_ViewAngle + f_StartAngle) * f_MeshResolution);
 
         float f_StepAngleSize = f_ViewAngle / i_StepCount;
 
@@ -79,7 +81,7 @@ public class Cs_VisualDisplay : MonoBehaviour
 
         for(int i_ = 0; i_ < i_StepCount; ++i_)
         {
-            float f_Angle = transform.eulerAngles.y - f_ViewAngle / 2 + f_StepAngleSize * i_;
+            float f_Angle = (transform.eulerAngles.y + f_StartAngle) - f_ViewAngle / 2 + f_StepAngleSize * i_;
 
             ViewCastInfo newViewCast = ViewCast(f_Angle);
 

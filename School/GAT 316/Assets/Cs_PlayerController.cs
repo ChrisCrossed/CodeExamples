@@ -216,7 +216,7 @@ public class Cs_PlayerController : MonoBehaviour
         v3_ReticlePosition += v3_ConvertedVector * f_Magnitude * f_AimingDistance;
 
         // int layer_mask = LayerMask.GetMask("Player", "Enemy");
-        int layer_mask = LayerMask.GetMask("Ground");
+        int layer_mask = LayerMask.GetMask("Ground", "Wall");
 
         // Raycast down from the Reticle's current X/Z position to find ground to apply on to
         RaycastHit hit;

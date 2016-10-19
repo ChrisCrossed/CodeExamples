@@ -35,6 +35,40 @@ public class Cs_RockLogic : MonoBehaviour
     {
         RaycastHit hit;
 
+        int layer_mask = LayerMask.GetMask("Ground", "Wall");
+
+        Vector3 v3_VelocityNormalized = gameObject.GetComponent<Rigidbody>().velocity.normalized;
+
+        if(Physics.Raycast(gameObject.transform.position, Vector3.down, out hit, 0.1f, layer_mask))
+        {
+            // Tell 'sound collider' to inform enemies (Occurs as a trigger BEFORE making the change to 'IsTrigger = true'
+            if (!b_HasMadeSound)
+            {
+                gameObject.transform.Find("Sound_Collider").GetComponent<Cs_RockSoundLogic>().MakeSound();
+
+                b_HasMadeSound = true;
+            }
+
+            gameObject.GetComponent<Collider>().isTrigger = false;
+        }
+        else if (Physics.Raycast(gameObject.transform.position, v3_VelocityNormalized, out hit, 0.1f, layer_mask))
+        {
+            // Tell 'sound collider' to inform enemies (Occurs as a trigger BEFORE making the change to 'IsTrigger = true'
+            if (!b_HasMadeSound)
+            {
+                gameObject.transform.Find("Sound_Collider").GetComponent<Cs_RockSoundLogic>().MakeSound();
+
+                b_HasMadeSound = true;
+            }
+
+            gameObject.GetComponent<Collider>().isTrigger = false;
+        }
+        else
+        {
+            gameObject.GetComponent<Collider>().isTrigger = true;
+        }
+
+        /*
         Physics.Raycast(gameObject.transform.position, Vector3.down, out hit, 0.2f);
 
         if(hit.collider != null)
@@ -56,6 +90,7 @@ public class Cs_RockLogic : MonoBehaviour
         {
             gameObject.GetComponent<Collider>().isTrigger = true;
         }
+        */
     }
 
     void CheckMagnitude()
