@@ -27,7 +27,7 @@ public class Cs_EnemyVisionLogic : MonoBehaviour
         #endregion
 
         // LayerMask info
-        i_LayerMask = LayerMask.GetMask("Player", "Ground");
+        i_LayerMask = LayerMask.GetMask("Player", "Wall");
         i_LayerMask_NotPlayer = 9;  // Kinda have to hardcode the ground here. The player is '8', so anything greater than that is NOT the player. You can't use LayerMask.GetMask to return an int.
     }
 
@@ -58,36 +58,6 @@ public class Cs_EnemyVisionLogic : MonoBehaviour
 
             b_PRESENTATION_TEST = true;
         }
-
-        #region Run a test to see if we see the player in the collider
-
-        // if(f_SeePlayerTimer == 0.1f && b_PlayerInCollider)
-        /*
-        if (b_PlayerInCollider)
-        {
-            Vector3 v3_Vector = new Vector3(go_Player.transform.position.x - go_RaycastPoint.transform.position.x,
-                                            go_Player.transform.position.y - go_RaycastPoint.transform.position.y,
-                                            go_Player.transform.position.z - go_RaycastPoint.transform.position.z);
-
-            v3_Vector.Normalize();
-
-            RaycastHit hit;
-
-            int playerLayerMask = LayerMask.GetMask("Player", "Ground");
-
-            // Find the line between the raycast point & where the player currently is
-            if(Physics.Raycast(go_RaycastPoint.transform.position, v3_Vector, out hit, float.PositiveInfinity, playerLayerMask))
-            {
-                Debug.DrawRay(go_RaycastPoint.transform.position, v3_Vector, Color.red, Time.deltaTime);
-
-                // v3_LastKnownLocation = hit.collider.transform.root.gameObject.transform.position;
-                v3_LastKnownLocation = go_Player.transform.position;
-
-                go_Root.GetComponent<Cs_EnemyLogic_Grunt>().GoToState_ChasePlayer(v3_LastKnownLocation, true);
-            }
-        }*/
-        // go_Root.GetComponent<Cs_EnemyLogic_Grunt>().GoToState_ChasePlayer(go_Player, false);
-        #endregion
     }
 
     void CheckToSeePlayer( Collider collider_ )
