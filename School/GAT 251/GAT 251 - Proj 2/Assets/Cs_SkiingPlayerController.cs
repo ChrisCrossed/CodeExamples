@@ -12,10 +12,11 @@ public class Cs_SkiingPlayerController : MonoBehaviour
     GameObject go_RaycastPoint_3;
     GameObject go_RaycastPoint_4;
 
-
     // Physics Materials
     PhysicMaterial physMat_Ski;
     PhysicMaterial physMat_Walk;
+
+    [SerializeField] float f_MaxSpeed;
 
 	// Use this for initialization
 	void Start ()
@@ -45,12 +46,26 @@ public class Cs_SkiingPlayerController : MonoBehaviour
 
             // Raycast down and grab the angle of the terrain
             RaycastHit hit = CheckRaycasts();
-            if(hit.distance <= 1.5f)
+            
+            // This checks to be sure there is ground below us & it is within a certain distance
+            if( hit.distance <= 1.5f && ( hit.normal != new Vector3() ) )
             {
                 if(v3_Velocity == new Vector3())
                 {
-                    v3_Velocity = gameObject.GetComponent<Rigidbody>().velocity;
-                    print("Set Velocity: " + v3_Velocity.magnitude);
+                    if(!(f_MaxSpeed <= 0))
+                    {
+                        v3_Velocity = gameObject.GetComponent<Rigidbody>().velocity;
+                        v3_Velocity.Normalize();
+                        v3_Velocity *= f_MaxSpeed;
+
+                        print("Set Velocity: " + v3_Velocity.magnitude);
+                    }
+                    else
+                    {
+                        v3_Velocity = gameObject.GetComponent<Rigidbody>().velocity;
+
+                        print("Set Velocity: " + v3_Velocity.magnitude);
+                    }
                 }
 
                 print("Speed: " + gameObject.GetComponent<Rigidbody>().velocity.magnitude);
@@ -58,7 +73,7 @@ public class Cs_SkiingPlayerController : MonoBehaviour
                 // This works, using the direction they're moving.
                 Vector3 v3_GroundVector = Vector3.ProjectOnPlane(gameObject.GetComponent<Rigidbody>().velocity, hit.normal);
 
-                // test
+                // Normalizes the vector
                 v3_GroundVector.Normalize();
 
                 if(gameObject.GetComponent<Rigidbody>().velocity.magnitude <= v3_Velocity.magnitude)
@@ -123,17 +138,23 @@ public class Cs_SkiingPlayerController : MonoBehaviour
         RaycastHit tempHit;
 
         // Set the default as outHit automatically
-        Physics.Raycast(go_RaycastPoint_1.transform.position, -transform.up, out outHit);
+        Physics.Raycast(go_RaycastPoint_1.transform.position, -transform.up, out outHit, 1.5f);
 
         // Begin comparing against the other three. Find the shortest distance
-        Physics.Raycast(go_RaycastPoint_2.transform.position, -transform.up, out tempHit);
-        if (tempHit.distance < outHit.distance) outHit = tempHit;
+        if (Physics.Raycast(go_RaycastPoint_2.transform.position, -transform.up, out tempHit, 1.5f))
+        {
+            if (tempHit.distance < outHit.distance) outHit = tempHit;
+        }
 
-        Physics.Raycast(go_RaycastPoint_3.transform.position, -transform.up, out tempHit);
-        if (tempHit.distance < outHit.distance) outHit = tempHit;
+        if (Physics.Raycast(go_RaycastPoint_3.transform.position, -transform.up, out tempHit, 1.5f))
+        {
+            if (tempHit.distance < outHit.distance) outHit = tempHit;
+        }
 
-        Physics.Raycast(go_RaycastPoint_4.transform.position, -transform.up, out tempHit);
-        if (tempHit.distance < outHit.distance) outHit = tempHit;
+        if (Physics.Raycast(go_RaycastPoint_4.transform.position, -transform.up, out tempHit, 1.5f))
+        {
+            if (tempHit.distance < outHit.distance) outHit = tempHit;
+        }
 
         // Return the shortest hit distance
         return outHit;
