@@ -17,7 +17,10 @@ public class Cs_RockLogic : MonoBehaviour
     // Update is called once per frame
 	void Update ()
     {
-        UpdateRaycast();
+        if(gameObject.GetComponent<MeshCollider>().isTrigger)
+        {
+            UpdateRaycast();
+        }
 
         if(!b_IsDead)
         {
@@ -39,6 +42,8 @@ public class Cs_RockLogic : MonoBehaviour
 
         Vector3 v3_VelocityNormalized = gameObject.GetComponent<Rigidbody>().velocity.normalized;
 
+        Debug.DrawRay(gameObject.transform.position, v3_VelocityNormalized, Color.red);
+
         if(Physics.Raycast(gameObject.transform.position, Vector3.down, out hit, 0.1f, layer_mask))
         {
             // Tell 'sound collider' to inform enemies (Occurs as a trigger BEFORE making the change to 'IsTrigger = true'
@@ -50,6 +55,7 @@ public class Cs_RockLogic : MonoBehaviour
             }
 
             gameObject.GetComponent<Collider>().isTrigger = false;
+            // gameObject.GetComponent<MeshCollider>().isTrigger = false;
         }
         else if (Physics.Raycast(gameObject.transform.position, v3_VelocityNormalized, out hit, 0.1f, layer_mask))
         {
@@ -62,10 +68,12 @@ public class Cs_RockLogic : MonoBehaviour
             }
 
             gameObject.GetComponent<Collider>().isTrigger = false;
+            // gameObject.GetComponent<MeshCollider>().isTrigger = false;
         }
         else
         {
             gameObject.GetComponent<Collider>().isTrigger = true;
+            // gameObject.GetComponent<MeshCollider>().isTrigger = true;
         }
 
         /*
