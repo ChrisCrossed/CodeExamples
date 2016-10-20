@@ -81,6 +81,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Cs_CameraLogic.cs" />
     <Compile Include="Assets\Cs_CameraTrigger.cs" />
     <Compile Include="Assets\Cs_EndGame.cs" />
     <Compile Include="Assets\Cs_EnemyLogic_Grunt.cs" />
@@ -91,6 +92,7 @@
     <Compile Include="Assets\Cs_RockLogic.cs" />
     <Compile Include="Assets\Cs_RockSoundLogic.cs" />
     <Compile Include="Assets\Cs_VisualDisplay.cs" />
+    <Compile Include="Assets\Cs_WallLogic.cs" />
     <Compile Include="Assets\ProCore\ProBuilder\API Examples\Icosphere FFT\Scripts\CameraControls.cs" />
     <Compile Include="Assets\ProCore\ProBuilder\API Examples\Icosphere FFT\Scripts\IcoBumpin.cs" />
     <Compile Include="Assets\ProCore\ProBuilder\API Examples\Misc\HueCube.cs" />

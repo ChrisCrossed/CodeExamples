@@ -33,6 +33,7 @@ public class Cs_EnemyVisionLogic : MonoBehaviour
     // Update is called once per frame
     void Update ()
     {
+        /*
         if (Input.GetKeyDown(KeyCode.I))
         {
             gameObject.GetComponent<MeshRenderer>().enabled = false;
@@ -48,6 +49,7 @@ public class Cs_EnemyVisionLogic : MonoBehaviour
         {
             gameObject.GetComponent<MeshRenderer>().enabled = false;
         }
+        */
     }
 
     void CheckToSeePlayer( Collider collider_ )
