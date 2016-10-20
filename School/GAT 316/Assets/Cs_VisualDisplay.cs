@@ -14,6 +14,8 @@ public class Cs_VisualDisplay : MonoBehaviour
     [Range(0, 360)]
     public float f_StartAngle;
 
+    [SerializeField] float f_StartRadius = 1.0f;
+
     public LayerMask i_LayerMask;
     public LayerMask i_ObstacleMask;
 
@@ -117,7 +119,8 @@ public class Cs_VisualDisplay : MonoBehaviour
         int[] triangles = new int[(i_VertexCount - 2) * 3];
 
         vertices[0] = Vector3.zero;
-        for(int i_ = 0; i_ < i_VertexCount - 1; ++i_)
+
+        for (int i_ = 0; i_ < i_VertexCount - 1; ++i_)
         {
             vertices[i_ + 1] = transform.InverseTransformPoint(v3_ViewPoints[i_]);
 
@@ -171,7 +174,8 @@ public class Cs_VisualDisplay : MonoBehaviour
         Vector3 dir = Get_DirFromAngle(f_GlobalAngle_, true);
         RaycastHit hit;
 
-        if(Physics.Raycast( transform.position, dir, out hit, f_ViewRadius, i_ObstacleMask))
+        // if(Physics.Raycast( transform.position, dir, out hit, f_ViewRadius, i_ObstacleMask ) )
+        if (Physics.Raycast(transform.position, dir, out hit, f_ViewRadius, i_ObstacleMask))
         {
             return new ViewCastInfo(true, hit.point, hit.distance, f_GlobalAngle_);
         }
@@ -193,6 +197,7 @@ public class Cs_VisualDisplay : MonoBehaviour
     }
 
     // Detects objects within the proper radius and refers to them. You already have code that does this elsewhere.
+    /*
     void FindVisableTargets()
     {
         Collider[] targetsInViewRadius = Physics.OverlapSphere(transform.position, f_ViewRadius, i_LayerMask);
@@ -214,4 +219,5 @@ public class Cs_VisualDisplay : MonoBehaviour
             }
         }
     }
+    */
 }

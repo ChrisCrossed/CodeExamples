@@ -57,6 +57,9 @@ public class Cs_PlayerController : MonoBehaviour
     public float f_FiringAngle = 45.0f;
     public float f_Gravity = 9.8f;
 
+    // Camera Trigger variables
+    float f_DisableTimer;
+
     // Use this for initialization
     void Start ()
     {
@@ -69,27 +72,47 @@ public class Cs_PlayerController : MonoBehaviour
         // Abilities/Projectile
         v3_TargetLocation = go_TargetObject.transform.position;
 
-        SetCameraPosition();
+        Set_CameraPosition();
     }
 	
 	// Update is called once per frame
 	void Update ()
     {
+        if (Input.GetKeyDown(KeyCode.P)) Set_FadeState(!b_FadeToBlack);
+
         if (Input.GetKeyDown(KeyCode.Escape)) Application.Quit();
 
-        b_KeyboardUsedLast = KeyboardCheck(b_KeyboardUsedLast);
-
-        if (b_KeyboardUsedLast)
+        // Stop player movement while touching specific triggers
+        if (f_DisableTimer > 0)
         {
-            // Input_Keyboard();
+            // Reduce the timer back down to 0
+            f_DisableTimer -= Time.deltaTime;
+
+            // Clamp
+            if (f_DisableTimer < 0) f_DisableTimer = 0;
+
+            // Return out and don't accept player input this frame
+            return;
         }
-        else Input_Controller();
+        else
+        {
+            b_KeyboardUsedLast = KeyboardCheck(b_KeyboardUsedLast);
+
+            if (b_KeyboardUsedLast)
+            {
+                // Input_Keyboard();
+            }
+            else Input_Controller();
+        }
 
         currSpeedReadOnly = gameObject.GetComponent<Rigidbody>().velocity.magnitude;
 	}
 
     void LateUpdate()
     {
+        // Update fade out/in
+        FadeState();
+
         // Update Camera position/rotation
         UpdateCameraPosition();
     }
@@ -397,15 +420,12 @@ public class Cs_PlayerController : MonoBehaviour
 
                 go_Camera.transform.position = go_Camera_DefaultPos.transform.position + (v3_Vector * perc);
                 go_Camera.transform.eulerAngles = go_Camera_DefaultPos.transform.eulerAngles + (v3_Rotation * perc);
-            }
-            
+            }   
         }
-
-        print(cameraLerpTime_Curr);
     }
 
     GameObject go_PreviousCameraPos;
-    public void SetCameraPosition( GameObject go_CameraPos_ = null )
+    public void Set_CameraPosition( GameObject go_CameraPos_ = null )
     {
         // Only change away from the previous camera once we've already changed to the new one (Stops camera errors from differing, close-by triggers)
         if(go_PreviousCameraPos != go_Camera_TempPos)
@@ -476,5 +496,47 @@ public class Cs_PlayerController : MonoBehaviour
             // Applies a spin for one frame as it's thrown, like a grenade
             go_Rock.GetComponent<Rigidbody>().AddRelativeTorque(v3_Velocity_ * 100, ForceMode.Force);
         }
+    }
+
+    public void Set_PlayerDisableTimer( float f_DisableTimer_ )
+    {
+        f_DisableTimer = f_DisableTimer_;
+    }
+
+    bool b_FadeToBlack = false;
+    public void Set_FadeState( bool b_FadeToBlack_ )
+    {
+        b_FadeToBlack = b_FadeToBlack_;
+    }
+
+    float f_FadeTimer = 3.0f;
+    float f_FadeTimer_Max = 1.5f;
+    float f_Transparency;
+    [SerializeField] GameObject go_FadeInOutObj;
+    void FadeState()
+    {
+        // 0 timer = 0 opacity (completely transparent). full timer = full opacity.
+        // Not fading to black, we go transparent.
+        if(b_FadeToBlack)
+        {
+            if(f_FadeTimer < f_FadeTimer_Max) f_FadeTimer += Time.deltaTime;
+
+            if (f_FadeTimer > f_FadeTimer_Max) f_FadeTimer = f_FadeTimer_Max;
+        }
+        else // Go transparent
+        {
+            if (f_FadeTimer > 0) f_FadeTimer -= Time.deltaTime;
+
+            if (f_FadeTimer < 0) f_FadeTimer = 0;
+
+        }
+
+        f_Transparency = f_FadeTimer / f_FadeTimer_Max;
+        if (f_Transparency > 1) f_Transparency = 1;
+
+        // Set fade object's transparency
+        Color clr_CurrColor = go_FadeInOutObj.GetComponent<MeshRenderer>().material.color;
+        clr_CurrColor.a = f_Transparency;
+        go_FadeInOutObj.GetComponent<MeshRenderer>().material.color = clr_CurrColor;
     }
 }

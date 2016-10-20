@@ -9,6 +9,9 @@ public class Cs_CameraTrigger : MonoBehaviour
     [SerializeField] bool b_StartPosition;
     float f_DestroyTimer;
 
+    [SerializeField]
+    float f_DisableOnTouchTimer;
+
 	// Use this for initialization
 	void Start ()
     {
@@ -19,9 +22,25 @@ public class Cs_CameraTrigger : MonoBehaviour
         {
             print(gameObject.name + " at " + gameObject.transform.position + " has no camera!");
         }
+
+        // Ensure that if there's a timer assigned to 'DisableOnTouchTimer', that we force 'b_StartPosition' to be enabled
+        if (f_DisableOnTouchTimer > 0) b_StartPosition = true;
 	}
 
-    void OnTriggerStay(Collider collision_)
+    void OnTriggerEnter( Collider collision_ )
+    {
+        GameObject go_CollisionObj = collision_.transform.root.gameObject;
+
+        if (go_CollisionObj.tag == "Player")
+        {
+            if( f_DisableOnTouchTimer > 0 && b_StartPosition )
+            {
+                go_CollisionObj.GetComponent<Cs_PlayerController>().Set_PlayerDisableTimer(f_DisableOnTouchTimer);
+            }
+        }
+    }
+
+    void OnTriggerStay( Collider collision_ )
     {
         GameObject go_CollisionObj = collision_.transform.root.gameObject;
 
@@ -30,12 +49,12 @@ public class Cs_CameraTrigger : MonoBehaviour
             if(go_CameraObj != null)
             {
                 // Tell player's camera to lerp to this game object
-                go_Player.GetComponent<Cs_PlayerController>().SetCameraPosition(go_CameraObj);
+                go_Player.GetComponent<Cs_PlayerController>().Set_CameraPosition(go_CameraObj);
             }
         }
     }
 
-    void OnTriggerExit(Collider collision_)
+    void OnTriggerExit( Collider collision_ )
     {
         GameObject go_CollisionObj = collision_.transform.root.gameObject;
 
@@ -44,7 +63,7 @@ public class Cs_CameraTrigger : MonoBehaviour
             if (go_CameraObj != null)
             {
                 // Tell player's camera to return to default
-                go_Player.GetComponent<Cs_PlayerController>().SetCameraPosition();
+                go_Player.GetComponent<Cs_PlayerController>().Set_CameraPosition();
             }
 
             if (b_StartPosition)

@@ -43,12 +43,28 @@ public class Cs_WallLogic : MonoBehaviour
                 if (f_TransparencyTimer > 1) f_TransparencyTimer = 1;
             }
 
-            Color clr_CurrColor = gameObject.GetComponent<MeshRenderer>().material.color;
-            clr_CurrColor.a = f_TransparencyTimer;
-            gameObject.GetComponent<MeshRenderer>().material.color = clr_CurrColor;
-            print(clr_CurrColor.ToString());
+            SetMaterialsVisibility(f_TransparencyTimer);
         }
 	}
+
+    void SetMaterialsVisibility( float f_Transparency_ )
+    {
+        Material[] mat_CurrColor = gameObject.GetComponent<MeshRenderer>().materials;
+
+        for(int i_ = 0; i_ < mat_CurrColor.Length; ++i_)
+        {
+            // if(mat_CurrColor[i_].re)
+
+            Color currColor = mat_CurrColor[i_].color;
+            currColor.a = f_Transparency_;
+            mat_CurrColor[i_].color = currColor;
+        }
+        /*Color clr_CurrColor = gameObject.GetComponent<MeshRenderer>().material.color;
+        clr_CurrColor.a = f_TransparencyTimer;
+        gameObject.GetComponent<MeshRenderer>().material.color = clr_CurrColor;
+        print(clr_CurrColor.ToString());
+        */
+    }
 
     public void SetVisibilityState( bool b_GoToTransparent_ )
     {
