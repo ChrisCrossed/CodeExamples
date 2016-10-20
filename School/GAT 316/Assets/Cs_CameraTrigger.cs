@@ -21,7 +21,7 @@ public class Cs_CameraTrigger : MonoBehaviour
         }
 	}
 
-    void OnTriggerEnter(Collider collision_)
+    void OnTriggerStay(Collider collision_)
     {
         GameObject go_CollisionObj = collision_.transform.root.gameObject;
 

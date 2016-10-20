@@ -45,9 +45,9 @@ public class Cs_PlayerController : MonoBehaviour
     GameObject go_Camera;
     GameObject go_Camera_DefaultPos;
     GameObject go_Camera_TempPos;
-    Enum_CameraState cameraState = Enum_CameraState.Lerp_ToPlayer;
-    float cameraLerpTime = 0.75f;
-    float cameraLerpTime_Curr = 0.75f;
+    Enum_CameraState cameraState;
+    float cameraLerpTime = 1.5f;
+    float cameraLerpTime_Curr;
 
     // Abilities/Projectile
     public GameObject go_FireLocation;
@@ -69,7 +69,7 @@ public class Cs_PlayerController : MonoBehaviour
         // Abilities/Projectile
         v3_TargetLocation = go_TargetObject.transform.position;
 
-        SetCameraPosition(go_Camera_DefaultPos);
+        SetCameraPosition();
     }
 	
 	// Update is called once per frame
@@ -86,10 +86,13 @@ public class Cs_PlayerController : MonoBehaviour
         else Input_Controller();
 
         currSpeedReadOnly = gameObject.GetComponent<Rigidbody>().velocity.magnitude;
+	}
 
+    void LateUpdate()
+    {
         // Update Camera position/rotation
         UpdateCameraPosition();
-	}
+    }
 
     bool KeyboardCheck(bool b_KeyboardPressed_)
     {
@@ -361,37 +364,7 @@ public class Cs_PlayerController : MonoBehaviour
 
     void UpdateCameraPosition()
     {
-        #region Camera On Player
-        if (cameraState == Enum_CameraState.OnPlayer)
-        {
-            /*
-            // Set default parameters
-            go_Camera.transform.rotation = go_Camera_DefaultPos.transform.rotation;
-            go_Camera.transform.position = go_Camera_DefaultPos.transform.position;
-            */
-        }
-        #endregion
-
-        #region Camera On Temporary Location
-        else if (cameraState == Enum_CameraState.OnTempPoint)
-        {
-            /*
-            // Set temporary parameters
-            if(go_Camera_TempPos != null)
-            {
-                go_Camera.transform.rotation = go_Camera_TempPos.transform.rotation;
-                go_Camera.transform.position = go_Camera_TempPos.transform.position;
-            }
-            else
-            {
-                // Reset to player's position & set camera state
-            }
-            */
-        }
-        #endregion
-
-        #region Camera Lerp FROM player TO temp location
-        else if (cameraState == Enum_CameraState.Lerp_FromPlayer || cameraState == Enum_CameraState.Lerp_ToPlayer)
+        if (cameraState == Enum_CameraState.Lerp_FromPlayer || cameraState == Enum_CameraState.Lerp_ToPlayer)
         {
             // Camera timer increments as it travels to the temp location
             if(cameraState == Enum_CameraState.Lerp_FromPlayer)
@@ -406,7 +379,7 @@ public class Cs_PlayerController : MonoBehaviour
             // Camera timer decrements as it travels back to the player
             else
             {
-                cameraLerpTime_Curr -= Time.deltaTime;
+                cameraLerpTime_Curr -= (Time.deltaTime * 2);
 
                 if(cameraLerpTime_Curr <= 0)
                 {
@@ -427,19 +400,30 @@ public class Cs_PlayerController : MonoBehaviour
             }
             
         }
-            #endregion
+
+        print(cameraLerpTime_Curr);
     }
 
+    GameObject go_PreviousCameraPos;
     public void SetCameraPosition( GameObject go_CameraPos_ = null )
     {
+        // Only change away from the previous camera once we've already changed to the new one (Stops camera errors from differing, close-by triggers)
+        if(go_PreviousCameraPos != go_Camera_TempPos)
+        {
+            go_PreviousCameraPos = go_Camera_TempPos;
+        }
+
         if(go_CameraPos_ == null)
         {
             cameraState = Enum_CameraState.Lerp_ToPlayer;
         }
         else
         {
-            go_Camera_TempPos = go_CameraPos_;
-            cameraState = Enum_CameraState.Lerp_FromPlayer;
+            if(cameraLerpTime_Curr == 0)
+            {
+                go_Camera_TempPos = go_CameraPos_;
+                cameraState = Enum_CameraState.Lerp_FromPlayer;
+            }
         }
     }
 
