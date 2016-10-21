@@ -77,6 +77,19 @@ public class Cs_EnemyLogic_Grunt : MonoBehaviour
 
     Vector3 v3_InvestigateLocation;
     float f_SprintMoveSpeed = 6f;
+    public void GoToState_InvestigateLocation()
+    {
+        if(v3_InvestigateLocation != new Vector3())
+        {
+            GoToState_InvestigateLocation(v3_InvestigateLocation);
+        }
+        else
+        {
+            print("Enemy " + gameObject.name + " has no investigate point! Going to 'patrol'");
+
+            GoToState_Patrol();
+        }
+    }
     public void GoToState_InvestigateLocation( Vector3 v3_InvestigateLocation_ )
     {
         #region Reset Basic Details
@@ -133,7 +146,6 @@ public class Cs_EnemyLogic_Grunt : MonoBehaviour
     }
 
     // Update is called once per frame
-    float f_UpdateTimer;
 	void Update ()
     {
         if (e_EnemyState == Enum_EnemyState.Patrol)

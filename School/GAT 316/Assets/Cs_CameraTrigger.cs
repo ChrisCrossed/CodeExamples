@@ -10,7 +10,7 @@ public class Cs_CameraTrigger : MonoBehaviour
     float f_DestroyTimer;
 
     [SerializeField]
-    float f_DisableOnTouchTimer;
+    float f_TimerDisableOnTouch;
 
 	// Use this for initialization
 	void Start ()
@@ -24,7 +24,7 @@ public class Cs_CameraTrigger : MonoBehaviour
         }
 
         // Ensure that if there's a timer assigned to 'DisableOnTouchTimer', that we force 'b_StartPosition' to be enabled
-        if (f_DisableOnTouchTimer > 0) b_StartPosition = true;
+        if (f_TimerDisableOnTouch > 0) b_StartPosition = true;
 	}
 
     void OnTriggerEnter( Collider collision_ )
@@ -33,9 +33,9 @@ public class Cs_CameraTrigger : MonoBehaviour
 
         if (go_CollisionObj.tag == "Player")
         {
-            if( f_DisableOnTouchTimer > 0 && b_StartPosition )
+            if( f_TimerDisableOnTouch > 0 && b_StartPosition )
             {
-                go_CollisionObj.GetComponent<Cs_PlayerController>().Set_PlayerDisableTimer(f_DisableOnTouchTimer);
+                go_CollisionObj.GetComponent<Cs_PlayerController>().Set_PlayerDisableTimer(f_TimerDisableOnTouch);
             }
         }
     }
