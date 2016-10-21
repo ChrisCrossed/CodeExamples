@@ -15,8 +15,11 @@ public class Cs_WallLogic : MonoBehaviour
     void Start()
     {
         // Set the wall to be considered a 'wall'
-        int i_LayerMask = LayerMask.NameToLayer("Wall");
-        gameObject.layer = i_LayerMask;
+        if(gameObject.layer != LayerMask.NameToLayer("Trigger"))
+        {
+            int i_LayerMask = LayerMask.NameToLayer("Wall");
+            gameObject.layer = i_LayerMask;
+        }
     }
 
     // Update is called once per frame

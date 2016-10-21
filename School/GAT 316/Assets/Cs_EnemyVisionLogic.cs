@@ -70,7 +70,9 @@ public class Cs_EnemyVisionLogic : MonoBehaviour
 
             Debug.DrawRay(go_RaycastPoint.transform.position, v3_Vector * hit.distance, Color.red);
 
-            if(hit.collider.gameObject.layer == LayerMask.NameToLayer("Player"))
+            if (hit.collider.gameObject.layer != LayerMask.NameToLayer("Player")) return;
+
+            if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Player"))
             {
                 b_PlayerInCollider = true;
 

@@ -101,6 +101,7 @@ public class Cs_EnemyLogic_Grunt : MonoBehaviour
     {
         #region Reset Basic Details
         // f_InvestigateTimer = 0.0f;
+        f_InvestigateTimer = f_MAX_INVESTIGATE_TIME;
 
         gameObject.GetComponent<NavMeshAgent>().destination = v3_InvestigateLocation_;
         gameObject.GetComponent<NavMeshAgent>().stoppingDistance = f_StoppingDistance;
