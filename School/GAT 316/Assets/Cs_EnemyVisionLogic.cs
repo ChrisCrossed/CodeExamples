@@ -23,7 +23,7 @@ public class Cs_EnemyVisionLogic : MonoBehaviour
         #endregion
 
         // LayerMask info
-        i_LayerMask = LayerMask.GetMask("Player", "Wall");
+        i_LayerMask = LayerMask.NameToLayer("Player");
         i_LayerMask_NotPlayer = 9;  // Kinda have to hardcode the ground here. The player is '8', so anything greater than that is NOT the player. You can't use LayerMask.GetMask to return an int.
     }
 
@@ -33,6 +33,7 @@ public class Cs_EnemyVisionLogic : MonoBehaviour
     // Update is called once per frame
     void Update ()
     {
+        /*
         if (Input.GetKeyDown(KeyCode.I))
         {
             gameObject.GetComponent<MeshRenderer>().enabled = false;
@@ -48,10 +49,46 @@ public class Cs_EnemyVisionLogic : MonoBehaviour
         {
             gameObject.GetComponent<MeshRenderer>().enabled = false;
         }
+        */
     }
 
     void CheckToSeePlayer( Collider collider_ )
     {
+        int i_LayerMask = LayerMask.GetMask("Player", "Wall");
+
+        Vector3 v3_Vector = new Vector3(go_Player.transform.position.x - go_RaycastPoint.transform.position.x,
+                                        go_Player.transform.position.y - go_RaycastPoint.transform.position.y,
+                                        go_Player.transform.position.z - go_RaycastPoint.transform.position.z);
+
+        v3_Vector.Normalize();
+
+        RaycastHit hit;
+
+        if (Physics.Raycast(go_RaycastPoint.transform.position, v3_Vector, out hit, 12.5f, i_LayerMask))
+        {
+            // print(hit.collider.transform.root.gameObject.layer);
+
+            Debug.DrawRay(go_RaycastPoint.transform.position, v3_Vector * hit.distance, Color.red);
+
+            if(hit.collider.gameObject.layer == LayerMask.NameToLayer("Player"))
+            {
+                b_PlayerInCollider = true;
+
+                v3_LastKnownLocation = go_Player.transform.position;
+
+                go_Root.GetComponent<Cs_EnemyLogic_Grunt>().GoToState_ChasePlayer(v3_LastKnownLocation, true);
+            }
+            else
+            {
+                b_PlayerInCollider = false;
+
+                go_Root.GetComponent<Cs_EnemyLogic_Grunt>().GoToState_InvestigateLocation(v3_LastKnownLocation);
+            }
+        }
+
+        /*
+        print(collider_.transform.root.gameObject.tag);
+
         if (collider_.transform.root.gameObject.tag == "Player")
         {
             Vector3 v3_Vector = new Vector3(collider_.transform.root.gameObject.transform.position.x - go_RaycastPoint.transform.position.x,
@@ -78,25 +115,32 @@ public class Cs_EnemyVisionLogic : MonoBehaviour
                 go_Root.GetComponent<Cs_EnemyLogic_Grunt>().GoToState_ChasePlayer(v3_LastKnownLocation, true);
             }
         }
+        */
     }
 
     void OnTriggerEnter( Collider collider_ )
     {
         #region Working Vision Code
         // If this is the VisionCone, we just see the player.
-        if(gameObject.name == "VisionCone")
+        if (gameObject.name == "VisionCone")
         {
-            CheckToSeePlayer( collider_ );
+            if (collider_.transform.root.gameObject.tag == "Player")
+            {
+                CheckToSeePlayer( collider_ );
+            }
         }
         #endregion
 
-        if (b_PlayerInCollider) print("Collider touched, we see the player"); else print("Collider touched, we DO NOT see the player");
+        // if (b_PlayerInCollider) print("Collider touched, we see the player"); else print("Collider touched, we DO NOT see the player");
     }
 
     void OnTriggerStay( Collider collider_ )
     {
+        // print("Touching: " + collider_.gameObject.name);
+        // print("Trigger: " + gameObject.name);
+
         // Check to see if this is the Radius Trigger (and not the Vision Trigger)
-        if(gameObject.name == "RadiusTrigger")
+        if (gameObject.name == "RadiusTrigger")
         {
             // If this is the player...
             if (collider_.transform.root.gameObject.tag == "Player")
@@ -108,7 +152,22 @@ public class Cs_EnemyVisionLogic : MonoBehaviour
                     CheckToSeePlayer( collider_ );
                 }
             }
+
+            // if (b_PlayerInCollider) print("Collider touched, we see the player"); else print("Collider touched, we DO NOT see the player");
         }
+        else if(gameObject.name == "VisionCone")
+        {
+            if (collider_.transform.root.gameObject.tag == "Player")
+            {
+                #region Working Vision Code
+                // If this is the VisionCone, we just see the player.
+                CheckToSeePlayer(collider_);
+                #endregion
+            }
+
+            // if (b_PlayerInCollider) print("Collider touched, we see the player"); else print("Collider touched, we DO NOT see the player");
+        }
+
     }
 
     void OnTriggerExit( Collider collider_ )

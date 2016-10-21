@@ -42,6 +42,8 @@ public class Cs_EnemyLogic_Grunt : MonoBehaviour
         // Set the models above the player
         go_ExclamationMark = transform.Find("Mdl_ExclamationMark").gameObject;
         go_QuestionMark = transform.Find("Mdl_QuestionMark").gameObject;
+
+        GoToState_Patrol();
     }
 
     float f_PatrolWaitTimer;
@@ -51,18 +53,22 @@ public class Cs_EnemyLogic_Grunt : MonoBehaviour
     float f_InvestigateTimer;
     float f_MAX_INVESTIGATE_TIME = 5.0f;
 
-    float f_BasicMoveSpeed = 3.5f;
+    float f_BasicMoveSpeed = 4f;
+    float f_StoppingDistance = 0.1f;
+    float f_Acceleration = 6f;
     public void GoToState_Patrol()
     {
         #region Reset Basic Details
+        gameObject.GetComponent<NavMeshAgent>().stoppingDistance = f_StoppingDistance;
+        gameObject.GetComponent<NavMeshAgent>().speed = f_BasicMoveSpeed;
+        gameObject.GetComponent<NavMeshAgent>().acceleration = f_Acceleration;
+        gameObject.GetComponent<NavMeshAgent>().updateRotation = true;
+
         // Reset timer
         f_PatrolWaitTimer = 0f;
 
         // Set next wait timer
         f_MAX_WAIT_TIME = go_PatrolPath[i_PatrolPoint].GetComponent<Cs_PatrolPointLogic>().GetWaitTime();
-
-        // Reset speed
-        gameObject.GetComponent<NavMeshAgent>().speed = f_BasicMoveSpeed;
         #endregion
 
         // Go To State
@@ -77,9 +83,10 @@ public class Cs_EnemyLogic_Grunt : MonoBehaviour
         f_InvestigateTimer = 0.0f;
 
         gameObject.GetComponent<NavMeshAgent>().destination = v3_InvestigateLocation_;
-        gameObject.GetComponent<NavMeshAgent>().stoppingDistance = 0.1f;
+        gameObject.GetComponent<NavMeshAgent>().stoppingDistance = f_StoppingDistance;
         gameObject.GetComponent<NavMeshAgent>().speed = f_SprintMoveSpeed;
         gameObject.GetComponent<NavMeshAgent>().acceleration = 5.0f;
+        gameObject.GetComponent<NavMeshAgent>().updateRotation = true;
         #endregion
 
         // Go To State
@@ -95,9 +102,11 @@ public class Cs_EnemyLogic_Grunt : MonoBehaviour
         v3_LastKnownLocation = v3_PlayerLastKnownLocation_;
 
         gameObject.GetComponent<NavMeshAgent>().destination = v3_LastKnownLocation;
-        gameObject.GetComponent<NavMeshAgent>().stoppingDistance = 0.1f;
-        gameObject.GetComponent<NavMeshAgent>().speed = f_SprintMoveSpeed;
-        gameObject.GetComponent<NavMeshAgent>().acceleration = 5.0f;
+        gameObject.GetComponent<NavMeshAgent>().stoppingDistance = f_StoppingDistance;
+        gameObject.GetComponent<NavMeshAgent>().speed = f_SprintMoveSpeed * 1.5f;
+        gameObject.GetComponent<NavMeshAgent>().acceleration = 8;
+        gameObject.GetComponent<NavMeshAgent>().updateRotation = false;
+        
 
         #endregion
 
@@ -140,10 +149,22 @@ public class Cs_EnemyLogic_Grunt : MonoBehaviour
                 // if (gameObject.GetComponent<NavMeshAgent>().remainingDistance <= gameObject.GetComponent<NavMeshAgent>().radius + 0.15f)
                 if (Vector3.Distance(gameObject.transform.position, v3_PatrolPos) <= gameObject.GetComponent<NavMeshAgent>().radius + 0.15f)
                 {
-                    f_PatrolWaitTimer += 0.1f;
+                    f_PatrolWaitTimer += Time.deltaTime;
+
+                    // Make the enemy rotate to match the angle of the patrol point
+                    if(f_MAX_WAIT_TIME != 0)
+                    {
+                        // Disable the enemies ability to rotate naturally
+                        gameObject.GetComponent<NavMeshAgent>().updateRotation = false;
+
+                        // Set the manual rotation
+                        Vector3 v3_CurrRot = gameObject.transform.eulerAngles;
+                        v3_CurrRot.y = Mathf.LerpAngle(gameObject.transform.eulerAngles.y, go_PatrolPath[i_PatrolPoint].transform.eulerAngles.y, 3 * Time.deltaTime);
+                        gameObject.transform.eulerAngles = v3_CurrRot;
+                    }
 
                     // If the Wait Timer reaches a certain point, go to the next point & reset the timer
-                    if (f_PatrolWaitTimer >= f_MAX_WAIT_TIME)
+                    if (f_PatrolWaitTimer >= f_MAX_WAIT_TIME && f_MAX_WAIT_TIME >= 0.0f)
                     {
                         // Increment/Reset
                         if (go_PatrolPath[i_PatrolPoint + 1] != null && (i_PatrolPoint + 1) < go_PatrolPath.Length)
@@ -187,7 +208,10 @@ public class Cs_EnemyLogic_Grunt : MonoBehaviour
         }
         else if (e_EnemyState == Enum_EnemyState.ChasePlayer)
         {
-            // print("Chase: " + v3_LastKnownLocation);
+            // Lerp between the enemies current look rotation and where the player's position is
+            var targetRotation = Quaternion.LookRotation(v3_LastKnownLocation - gameObject.transform.position);
+            
+            gameObject.transform.rotation = Quaternion.Slerp(gameObject.transform.rotation, targetRotation, 10 * Time.deltaTime);
             
             gameObject.GetComponent<NavMeshAgent>().destination = v3_LastKnownLocation;
         }
