@@ -3,10 +3,10 @@ using System.Collections;
 
 public class Cs_LevelLogic : MonoBehaviour
 {
-    [SerializeField] static float f_MaxTimer_FromChaseToInvestigate;
+    [SerializeField] float f_MaxTimer_FromChaseToInvestigate;
     float f_Timer_FromChaseToInvestigate;
 
-    [SerializeField] static float f_MaxTimer_FromInvestigateToPatrol;
+    [SerializeField] float f_MaxTimer_FromInvestigateToPatrol;
     float f_Timer_FromInvestigateToPatrol;
 
     [SerializeField] GameObject[] DisableObjectsOnChase = new GameObject[5];
@@ -29,8 +29,33 @@ public class Cs_LevelLogic : MonoBehaviour
         go_Player = GameObject.Find("Player");
 	}
 
-    public void Set_ChaseState()
+    bool CheckEnemyInList( GameObject go_EnemyObject_ )
     {
+        // If an enemy is provided, check to see if this enemy is within the list of controllable enemies
+        if (go_EnemyObject_ != null)
+        {
+            for( int i_ = 0; i_ < EnemiesToControl.Length; ++i_)
+            {
+                if( go_EnemyObject_ == EnemiesToControl[i_] )
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public void Set_ChaseState( GameObject go_EnemyObject_ = null)
+    {
+        if(go_EnemyObject_ != null)
+        {
+            if(CheckEnemyInList( go_EnemyObject_ ) == false)
+            {
+                return;
+            }
+        }
+
         // When the player is spotted, reset the f_Timer
         f_Timer_FromChaseToInvestigate = f_MaxTimer_FromChaseToInvestigate;
 
@@ -46,8 +71,17 @@ public class Cs_LevelLogic : MonoBehaviour
         }
     }
 
-    public void Set_InvestigateState( bool b_InvesticatePlayerLocation_ )
+    public void Set_InvestigateState( bool b_InvesticatePlayerLocation_ , GameObject go_EnemyObject_ = null )
     {
+        // Check to make sure the enemy calling this is within the list
+        if (go_EnemyObject_ != null)
+        {
+            if (CheckEnemyInList(go_EnemyObject_) == false)
+            {
+                return;
+            }
+        }
+
         // Reset timer
         f_Timer_FromInvestigateToPatrol = f_MaxTimer_FromInvestigateToPatrol;
 
@@ -71,8 +105,16 @@ public class Cs_LevelLogic : MonoBehaviour
         }
     }
 
-    public void Set_PatrolState()
+    public void Set_PatrolState( GameObject go_EnemyObject_ = null )
     {
+        if (go_EnemyObject_ != null)
+        {
+            if (CheckEnemyInList(go_EnemyObject_) == false)
+            {
+                return;
+            }
+        }
+
         f_Timer_FromChaseToInvestigate = f_MaxTimer_FromChaseToInvestigate;
         f_Timer_FromInvestigateToPatrol = f_MaxTimer_FromInvestigateToPatrol;
 
@@ -85,6 +127,30 @@ public class Cs_LevelLogic : MonoBehaviour
                EnemiesToControl[i_].GetComponent<Cs_EnemyLogic_Grunt>().GoToState_Patrol();
             }
         }
+    }
+
+    public float Get_CurrentTimer(Enum_EnemyState e_EnemyState_, bool b_GetMaxTimer = false, GameObject go_EnemyObject_ = null )
+    {
+        if (go_EnemyObject_ != null)
+        {
+            if (CheckEnemyInList(go_EnemyObject_) == false)
+            {
+                return -1f;
+            }
+        }
+
+        if (e_EnemyState_ == Enum_EnemyState.ChasePlayer)
+        {
+            if (!b_GetMaxTimer) return f_Timer_FromChaseToInvestigate;
+            else return f_MaxTimer_FromChaseToInvestigate;
+        }
+        else if(e_EnemyState_ == Enum_EnemyState.InvestigateLocation)
+        {
+            if (!b_GetMaxTimer) return f_Timer_FromInvestigateToPatrol;
+            else return f_MaxTimer_FromInvestigateToPatrol;
+        }
+
+        return 0f;
     }
 	
 	// Update is called once per frame

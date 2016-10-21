@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-enum Enum_EnemyState
+public enum Enum_EnemyState
 {
     Patrol,
     InvestigateLocation,
@@ -19,8 +19,10 @@ public class Cs_EnemyLogic_Grunt : MonoBehaviour
     GameObject go_ExclamationMark;
     GameObject go_QuestionMark;
 
-	// Use this for initialization
-	void Start ()
+    GameObject go_LevelLogic;
+
+    // Use this for initialization
+    void Start ()
     {
         // Set the first patrol point for the guard
         if(gameObject.GetComponent<NavMeshAgent>().enabled)
@@ -42,6 +44,11 @@ public class Cs_EnemyLogic_Grunt : MonoBehaviour
         // Set the models above the player
         go_ExclamationMark = transform.Find("Mdl_ExclamationMark").gameObject;
         go_QuestionMark = transform.Find("Mdl_QuestionMark").gameObject;
+
+        // Grab timers from the LevelLogic system
+        go_LevelLogic = GameObject.Find("LevelLogic").gameObject;
+        f_MAX_INVESTIGATE_TIME = go_LevelLogic.GetComponent<Cs_LevelLogic>().Get_CurrentTimer(Enum_EnemyState.InvestigateLocation, true, gameObject);
+        f_InvestigateTimer = go_LevelLogic.GetComponent<Cs_LevelLogic>().Get_CurrentTimer(Enum_EnemyState.InvestigateLocation, false, gameObject);
 
         GoToState_Patrol();
     }
@@ -93,7 +100,7 @@ public class Cs_EnemyLogic_Grunt : MonoBehaviour
     public void GoToState_InvestigateLocation( Vector3 v3_InvestigateLocation_ )
     {
         #region Reset Basic Details
-        f_InvestigateTimer = 0.0f;
+        // f_InvestigateTimer = 0.0f;
 
         gameObject.GetComponent<NavMeshAgent>().destination = v3_InvestigateLocation_;
         gameObject.GetComponent<NavMeshAgent>().stoppingDistance = f_StoppingDistance;
@@ -148,6 +155,7 @@ public class Cs_EnemyLogic_Grunt : MonoBehaviour
     // Update is called once per frame
 	void Update ()
     {
+        #region Patrol
         if (e_EnemyState == Enum_EnemyState.Patrol)
         {
             // If within a set distance of the patrol point, increment the Wait Timer
@@ -202,22 +210,31 @@ public class Cs_EnemyLogic_Grunt : MonoBehaviour
 
             // If the enemy hears a sound, investigate (Reset Wait Timer, record last known patrol position)
         }
+        #endregion
+
+        #region Investigate
         else if (e_EnemyState == Enum_EnemyState.InvestigateLocation)
         {
-            print("Investigate: " + v3_LastKnownLocation);
+            print("Investigate: " + f_InvestigateTimer + " / " + f_MAX_INVESTIGATE_TIME);
 
             // if (Vector3.Distance(gameObject.transform.position, v3_InvestigateLocation) <= gameObject.GetComponent<NavMeshAgent>().radius + 0.15f)
             if (gameObject.GetComponent<NavMeshAgent>().remainingDistance <= 0.15f)
             {
-                f_InvestigateTimer += Time.deltaTime;
+                // f_InvestigateTimer += Time.deltaTime;
+                f_InvestigateTimer -= Time.deltaTime;
 
                 // If the Wait Timer reaches a certain point, go to the next point & reset the timer
-                if (f_InvestigateTimer >= f_MAX_INVESTIGATE_TIME)
+                // if (f_InvestigateTimer >= f_MAX_INVESTIGATE_TIME)
+                if (f_InvestigateTimer <= 0)
                 {
-                    GoToState_Patrol();
+                    // GoToState_Patrol();
+                    go_LevelLogic.GetComponent<Cs_LevelLogic>().Set_PatrolState(gameObject);
                 }
             }
         }
+        #endregion
+
+        #region Chase
         else if (e_EnemyState == Enum_EnemyState.ChasePlayer)
         {
             // Lerp between the enemies current look rotation and where the player's position is
@@ -227,6 +244,7 @@ public class Cs_EnemyLogic_Grunt : MonoBehaviour
             
             gameObject.GetComponent<NavMeshAgent>().destination = v3_LastKnownLocation;
         }
+        #endregion
 
         SetIconState(e_EnemyState);
     } // End Update
