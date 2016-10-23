@@ -60,9 +60,9 @@ public class Cs_WallLogic : MonoBehaviour
 
             if(f_Transparency_ == 1.0f)
             {
-                print("Making Opaque: " + f_Transparency_);
+                // print("Making Opaque: " + f_Transparency_);
                 // mat_CurrColor[i_].SetFloat("_Mode", 1.0f);
-                Material mat = GetComponentInChildren<MeshRenderer>().materials[0];
+                Material mat = GetComponentInChildren<MeshRenderer>().materials[i_];
 
                 // Got guide: http://sassybot.com/blog/swapping-rendering-mode-in-unity-5-0/
                 mat.SetFloat("_Mode", 0); // Sets the material to Opaque
@@ -72,13 +72,18 @@ public class Cs_WallLogic : MonoBehaviour
                 mat.DisableKeyword("_ALPHABLEND_ON");
                 mat.DisableKeyword("_ALPHAPREMULTIPLY_ON");
                 mat.renderQueue = -1;
-                // mat.
+                
+                // Set transparency for metallic objects only if they are already metallic
+                if (mat.GetFloat("_Metallic") > (f_LowestTransparencyPoint - 0.01f))
+                {
+                    mat.SetFloat("_Metallic", f_Transparency_);
+                }
             }
             else
             {
-                print("Making Transparent: " + currColor.a);
+                // print("Making Transparent: " + currColor.a);
                 // mat_CurrColor[i_].SetFloat("_Mode", 4.0f);
-                Material mat = GetComponentInChildren<MeshRenderer>().materials[0];
+                Material mat = GetComponentInChildren<MeshRenderer>().materials[i_];
 
                 // Got guide: http://sassybot.com/blog/swapping-rendering-mode-in-unity-5-0/
                 mat.SetFloat("_Mode", 3); // Sets the material to Transparent
@@ -88,8 +93,15 @@ public class Cs_WallLogic : MonoBehaviour
                 mat.DisableKeyword("_ALPHABLEND_ON");
                 mat.EnableKeyword("_ALPHAPREMULTIPLY_ON");
                 mat.renderQueue = 3000;
+
+                // Set transparency for metallic objects only if they are already metallic
+                if (mat.GetFloat("_Metallic") > (f_LowestTransparencyPoint - 0.01f))
+                {
+                    mat.SetFloat("_Metallic", f_Transparency_);
+                }
             }
 
+            // GetComponent<MeshRenderer>().met
             currColor.a = f_Transparency_;
             mat_CurrColor[i_].color = currColor;
 
