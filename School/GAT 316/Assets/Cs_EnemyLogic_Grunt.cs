@@ -21,24 +21,37 @@ public class Cs_EnemyLogic_Grunt : MonoBehaviour
 
     GameObject go_LevelLogic;
 
+    [SerializeField] int i_StartPatrolPoint = 0;
+
     // Use this for initialization
     void Start ()
     {
+        // If there's a custom start position...
+        if(i_StartPatrolPoint > 0)
+        {
+            // Check to see the patrol position exists
+            if(go_PatrolPath[i_StartPatrolPoint] != null)
+            {
+                // Set the new default position
+                i_PatrolPoint = i_StartPatrolPoint;
+            }
+        }
+
         // Set the first patrol point for the guard
         if(gameObject.GetComponent<NavMeshAgent>().enabled)
         {
             NavMeshAgent agent = GetComponent<NavMeshAgent>();
-            if(go_PatrolPath[0] != null)
+            if(go_PatrolPath[i_PatrolPoint] != null)
             {
-                agent.destination = go_PatrolPath[0].transform.position;
+                agent.destination = go_PatrolPath[i_PatrolPoint].transform.position;
             }
             else { print(gameObject.name + " NEEDS A PATROL PATH "); }
         }
 
         // Set the wait time for the first patrol point
-        if(go_PatrolPath[0] != null)
+        if(go_PatrolPath[i_PatrolPoint] != null)
         {
-            f_MAX_WAIT_TIME = go_PatrolPath[0].GetComponent<Cs_PatrolPointLogic>().GetWaitTime();
+            f_MAX_WAIT_TIME = go_PatrolPath[i_PatrolPoint].GetComponent<Cs_PatrolPointLogic>().GetWaitTime();
         }
 
         // Set the models above the player
@@ -187,6 +200,8 @@ public class Cs_EnemyLogic_Grunt : MonoBehaviour
                     // If the Wait Timer reaches a certain point, go to the next point & reset the timer
                     if (f_PatrolWaitTimer >= f_MAX_WAIT_TIME && f_MAX_WAIT_TIME >= 0.0f)
                     {
+                        gameObject.GetComponent<NavMeshAgent>().updateRotation = true;
+
                         // Increment/Reset
                         if (go_PatrolPath[i_PatrolPoint + 1] != null && (i_PatrolPoint + 1) < go_PatrolPath.Length)
                         {

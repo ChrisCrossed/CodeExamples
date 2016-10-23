@@ -56,11 +56,43 @@ public class Cs_WallLogic : MonoBehaviour
 
         for(int i_ = 0; i_ < mat_CurrColor.Length; ++i_)
         {
-            // if(mat_CurrColor[i_].re)
-
             Color currColor = mat_CurrColor[i_].color;
+
+            if(f_Transparency_ == 1.0f)
+            {
+                print("Making Opaque: " + f_Transparency_);
+                // mat_CurrColor[i_].SetFloat("_Mode", 1.0f);
+                Material mat = GetComponentInChildren<MeshRenderer>().materials[0];
+
+                // Got guide: http://sassybot.com/blog/swapping-rendering-mode-in-unity-5-0/
+                mat.SetFloat("_Mode", 0); // Sets the material to Opaque
+                mat.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.Zero);
+                mat.SetInt("_ZWrite", 1);
+                mat.DisableKeyword("_ALPHATEST_ON");
+                mat.DisableKeyword("_ALPHABLEND_ON");
+                mat.DisableKeyword("_ALPHAPREMULTIPLY_ON");
+                mat.renderQueue = -1;
+                // mat.
+            }
+            else
+            {
+                print("Making Transparent: " + currColor.a);
+                // mat_CurrColor[i_].SetFloat("_Mode", 4.0f);
+                Material mat = GetComponentInChildren<MeshRenderer>().materials[0];
+
+                // Got guide: http://sassybot.com/blog/swapping-rendering-mode-in-unity-5-0/
+                mat.SetFloat("_Mode", 3); // Sets the material to Transparent
+                mat.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+                mat.SetInt("_ZWrite", 0);
+                mat.DisableKeyword("_ALPHATEST_ON");
+                mat.DisableKeyword("_ALPHABLEND_ON");
+                mat.EnableKeyword("_ALPHAPREMULTIPLY_ON");
+                mat.renderQueue = 3000;
+            }
+
             currColor.a = f_Transparency_;
             mat_CurrColor[i_].color = currColor;
+
         }
         /*Color clr_CurrColor = gameObject.GetComponent<MeshRenderer>().material.color;
         clr_CurrColor.a = f_TransparencyTimer;
