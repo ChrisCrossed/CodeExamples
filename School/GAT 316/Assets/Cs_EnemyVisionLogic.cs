@@ -52,63 +52,48 @@ public class Cs_EnemyVisionLogic : MonoBehaviour
         */
     }
 
+    float f_ChasePlayerTimer;
+    float f_ChasePlayerTimer_Max = 3.0f;
     void CheckToSeePlayer( Collider collider_ )
     {
+        // Clarify which objects we want to cast to, specifically the player & objects they can hide behind.
         int i_LayerMask = LayerMask.GetMask("Player", "Wall");
 
+        // Find the vector between the raycast point & the player
         Vector3 v3_Vector = new Vector3(go_Player.transform.position.x - go_RaycastPoint.transform.position.x,
                                         go_Player.transform.position.y - go_RaycastPoint.transform.position.y,
                                         go_Player.transform.position.z - go_RaycastPoint.transform.position.z);
 
+        // Normalize the vector
         v3_Vector.Normalize();
 
+        // Store the raycast information
         RaycastHit hit;
 
-        if (Physics.Raycast(go_RaycastPoint.transform.position, v3_Vector, out hit, 12.5f, i_LayerMask))
+        // If a ray from the enemy, toward the player, hits *any* object specified, continue through
+        if (Physics.Raycast(go_RaycastPoint.transform.position, v3_Vector, out hit, float.PositiveInfinity, i_LayerMask))
         {
-            // print(hit.collider.transform.root.gameObject.layer);
-
+            // Show the angle in the editor
             Debug.DrawRay(go_RaycastPoint.transform.position, v3_Vector * hit.distance, Color.red);
 
-            if (hit.collider.gameObject.layer != LayerMask.NameToLayer("Player")) return;
-
-            if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Player"))
+            // This intentionally blocks here so that objects (like walls) can interfere with spotting the player.
+            if (hit.collider.gameObject.layer != LayerMask.NameToLayer("Player"))
             {
-                b_PlayerInCollider = true;
+                f_ChasePlayerTimer += Time.deltaTime;
+                if(f_ChasePlayerTimer >= f_ChasePlayerTimer_Max && b_PlayerInCollider)
+                {
+                    b_PlayerInCollider = false;
 
-                v3_LastKnownLocation = go_Player.transform.position;
-
-                go_Root.GetComponent<Cs_EnemyLogic_Grunt>().GoToState_ChasePlayer(v3_LastKnownLocation, true);
+                    go_Root.GetComponent<Cs_EnemyLogic_Grunt>().GoToState_InvestigateLocation(v3_LastKnownLocation);
+                }
+                
+                return;
             }
+            // Otherwise, we hit the player.
             else
             {
-                b_PlayerInCollider = false;
-
-                go_Root.GetComponent<Cs_EnemyLogic_Grunt>().GoToState_InvestigateLocation(v3_LastKnownLocation);
-            }
-        }
-
-        /*
-        print(collider_.transform.root.gameObject.tag);
-
-        if (collider_.transform.root.gameObject.tag == "Player")
-        {
-            Vector3 v3_Vector = new Vector3(collider_.transform.root.gameObject.transform.position.x - go_RaycastPoint.transform.position.x,
-                                            collider_.transform.root.gameObject.transform.position.y - go_RaycastPoint.transform.position.y,
-                                            collider_.transform.root.gameObject.transform.position.z - go_RaycastPoint.transform.position.z);
-
-            v3_Vector.Normalize();
-
-            RaycastHit hit;
-
-            // Find the line between the raycast point & where the player currently is
-            if (Physics.Raycast(go_RaycastPoint.transform.position, v3_Vector, out hit, 10.0f, i_LayerMask))
-            {
-                if (hit.collider.gameObject.layer >= i_LayerMask_NotPlayer) return;
-
-                Debug.DrawRay(go_RaycastPoint.transform.position, v3_Vector, Color.red, 5.0f);
-
-                go_Player = hit.collider.gameObject;
+                // Reset the timer 
+                f_ChasePlayerTimer = 0.0f;
 
                 b_PlayerInCollider = true;
 
@@ -117,7 +102,6 @@ public class Cs_EnemyVisionLogic : MonoBehaviour
                 go_Root.GetComponent<Cs_EnemyLogic_Grunt>().GoToState_ChasePlayer(v3_LastKnownLocation, true);
             }
         }
-        */
     }
 
     void OnTriggerEnter( Collider collider_ )

@@ -122,9 +122,12 @@ public class Cs_LevelLogic : MonoBehaviour
 
         for (int i_ = 0; i_ < EnemiesToControl.Length; ++i_)
         {
-            if (EnemiesToControl[i_].GetComponent<Cs_EnemyLogic_Grunt>())
+            if(EnemiesToControl[i_] != null)
             {
-               EnemiesToControl[i_].GetComponent<Cs_EnemyLogic_Grunt>().GoToState_Patrol();
+                if (EnemiesToControl[i_].GetComponent<Cs_EnemyLogic_Grunt>())
+                {
+                   EnemiesToControl[i_].GetComponent<Cs_EnemyLogic_Grunt>().GoToState_Patrol();
+                }
             }
         }
     }
