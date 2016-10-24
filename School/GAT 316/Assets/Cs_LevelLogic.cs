@@ -3,6 +3,8 @@ using System.Collections;
 
 public class Cs_LevelLogic : MonoBehaviour
 {
+    [SerializeField] string NameOfRegion_ReadOnly;
+
     [SerializeField] float f_MaxTimer_FromChaseToInvestigate;
     float f_Timer_FromChaseToInvestigate;
 
@@ -81,7 +83,7 @@ public class Cs_LevelLogic : MonoBehaviour
         DisableObjectsInList(DisableObjectsOnChase);
     }
 
-    public void Set_InvestigateState( bool b_InvesticatePlayerLocation_ , GameObject go_EnemyObject_ = null )
+    public void Set_InvestigateState( bool b_InvestigatePlayerLocation_ , GameObject go_EnemyObject_ = null )
     {
         // Check to make sure the enemy calling this is within the list
         if (go_EnemyObject_ != null)
@@ -104,7 +106,7 @@ public class Cs_LevelLogic : MonoBehaviour
             {
                 if (EnemiesToControl[i_].GetComponent<Cs_EnemyLogic_Grunt>())
                 {
-                    if(b_InvesticatePlayerLocation_)
+                    if(b_InvestigatePlayerLocation_)
                     {
                         EnemiesToControl[i_].GetComponent<Cs_EnemyLogic_Grunt>().GoToState_InvestigateLocation(go_Player.transform.position);
                     }

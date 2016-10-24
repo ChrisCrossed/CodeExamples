@@ -86,7 +86,16 @@ public class Cs_EnemyVisionLogic : MonoBehaviour
 
                     go_Root.GetComponent<Cs_EnemyLogic_Grunt>().GoToState_InvestigateLocation(v3_LastKnownLocation);
 
-                    GameObject.Find("LevelLogic").GetComponent<Cs_LevelLogic>().Set_InvestigateState(go_Root);
+                    // Find the 'LevelLogic' object and grab all the 'LevelLogic' scripts within it
+                    Cs_LevelLogic[] lvlLogic = GameObject.Find("LevelLogic").GetComponents<Cs_LevelLogic>();
+                    for(int i_ = 0; i_ < lvlLogic.Length; ++i_)
+                    {
+                        // Call each script's Investigate State
+                        lvlLogic[i_].Set_InvestigateState(go_Root);
+                    }
+
+                    // GameObject.Find("LevelLogic").GetComponent<Cs_LevelLogic>().Set_InvestigateState(go_Root);
+                    
                 }
                 
                 return;
@@ -104,7 +113,15 @@ public class Cs_EnemyVisionLogic : MonoBehaviour
                 go_Root.GetComponent<Cs_EnemyLogic_Grunt>().GoToState_ChasePlayer(v3_LastKnownLocation, true);
 
                 // print("Calling state: CHASE");
-                GameObject.Find("LevelLogic").GetComponent<Cs_LevelLogic>().Set_ChaseState(go_Root);
+
+                // Find the 'LevelLogic' object and grab all the 'LevelLogic' scripts within it
+                Cs_LevelLogic[] lvlLogic = GameObject.Find("LevelLogic").GetComponents<Cs_LevelLogic>();
+                for (int i_ = 0; i_ < lvlLogic.Length; ++i_)
+                {
+                    // Call each script's Chase State
+                    lvlLogic[i_].Set_ChaseState(go_Root);
+                }
+                // GameObject.Find("LevelLogic").GetComponent<Cs_LevelLogic>().Set_ChaseState(go_Root);
             }
         }
     }

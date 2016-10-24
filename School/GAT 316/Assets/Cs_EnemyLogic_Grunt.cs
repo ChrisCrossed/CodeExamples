@@ -59,9 +59,18 @@ public class Cs_EnemyLogic_Grunt : MonoBehaviour
         go_QuestionMark = transform.Find("Mdl_QuestionMark").gameObject;
 
         // Grab timers from the LevelLogic system
-        go_LevelLogic = GameObject.Find("LevelLogic").gameObject;
-        f_MAX_INVESTIGATE_TIME = go_LevelLogic.GetComponent<Cs_LevelLogic>().Get_CurrentTimer(Enum_EnemyState.InvestigateLocation, true, gameObject);
-        f_InvestigateTimer = go_LevelLogic.GetComponent<Cs_LevelLogic>().Get_CurrentTimer(Enum_EnemyState.InvestigateLocation, false, gameObject);
+        Cs_LevelLogic[] lvlLogic = GameObject.Find("LevelLogic").GetComponents<Cs_LevelLogic>();
+        for (int i_ = 0; i_ < lvlLogic.Length; ++i_)
+        {
+            print("Calling logic number " + i_);
+
+            // Call their 'Get Current Timer' functions, which also determine if this script contains this enemy
+            float f_TimeCheck = lvlLogic[i_].Get_CurrentTimer(Enum_EnemyState.InvestigateLocation, true, gameObject);
+            if(f_TimeCheck != -1) f_MAX_INVESTIGATE_TIME = f_TimeCheck;
+            
+            f_TimeCheck = lvlLogic[i_].Get_CurrentTimer(Enum_EnemyState.InvestigateLocation, false, gameObject);
+            if (f_TimeCheck != -1) f_InvestigateTimer = f_TimeCheck;
+        }
 
         GoToState_Patrol();
     }
