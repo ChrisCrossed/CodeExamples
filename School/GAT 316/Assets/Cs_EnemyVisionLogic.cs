@@ -187,6 +187,13 @@ public class Cs_EnemyVisionLogic : MonoBehaviour
 
                 if (v3_LastKnownLocation != new Vector3())
                 {
+                    Cs_LevelLogic[] lvlLogic = GameObject.Find("LevelLogic").GetComponents<Cs_LevelLogic>();
+                    for (int i_ = 0; i_ < lvlLogic.Length; ++i_)
+                    {
+                        // Call each script's Chase State
+                        lvlLogic[i_].Set_InvestigateState(false);
+                    }
+
                     go_Root.GetComponent<Cs_EnemyLogic_Grunt>().GoToState_InvestigateLocation(v3_LastKnownLocation);
                 }
             }
