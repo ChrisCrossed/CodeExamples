@@ -206,9 +206,6 @@ public class Cs_LevelLogic : MonoBehaviour
                 {
                     go_EnableList_[i_].GetComponent<Cs_GateScript>().Set_DoorOpen(true);
                 }
-
-                // Doors
-                // if()
             }
         }
     }
