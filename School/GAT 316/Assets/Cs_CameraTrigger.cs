@@ -9,8 +9,8 @@ public class Cs_CameraTrigger : MonoBehaviour
     [SerializeField] bool b_StartPosition;
     float f_DestroyTimer;
 
-    [SerializeField]
-    float f_TimerDisableOnTouch;
+    [SerializeField] float f_TimerDisableOnTouch;
+    [SerializeField] float f_DestroyAfterTime = -1;
 
 	// Use this for initialization
 	void Start ()
@@ -27,6 +27,22 @@ public class Cs_CameraTrigger : MonoBehaviour
         if (f_TimerDisableOnTouch > 0) b_StartPosition = true;
 	}
 
+    void Update()
+    {
+        if(f_DestroyAfterTime > 0 && f_DestroyTimer > 0)
+        {
+            f_DestroyTimer -= Time.deltaTime;
+
+            if (f_DestroyTimer <= 0)
+            {
+                gameObject.GetComponent<Collider>().enabled = false;
+
+                // Tell player's camera to return to default
+                go_Player.GetComponent<Cs_PlayerController>().Set_CameraPosition();
+            }
+        }
+    }
+
     void OnTriggerEnter( Collider collision_ )
     {
         GameObject go_CollisionObj = collision_.transform.root.gameObject;
@@ -37,6 +53,8 @@ public class Cs_CameraTrigger : MonoBehaviour
             {
                 go_CollisionObj.GetComponent<Cs_PlayerController>().Set_PlayerDisableTimer(f_TimerDisableOnTouch);
             }
+
+            f_DestroyTimer = f_DestroyAfterTime;
         }
     }
 

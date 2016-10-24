@@ -418,12 +418,13 @@ public class Cs_PlayerController : MonoBehaviour
             {
                 Vector3 v3_Vector = go_Camera_TempPos.transform.position - go_Camera_DefaultPos.transform.position;
                 // go_Camera_TempPos.transform.rotation - go_Camera_DefaultPos.transform.rotation;
-                Quaternion q_Rot = Quaternion.FromToRotation(go_Camera_TempPos.transform.eulerAngles, go_Camera_DefaultPos.transform.position);
+                // Quaternion q_Rot = Quaternion.FromToRotation(go_Camera_TempPos.transform.eulerAngles, go_Camera_DefaultPos.transform.position);
                 // Vector3 v3_Rotation = go_Camera_TempPos.transform.eulerAngles - go_Camera_DefaultPos.transform.eulerAngles;
 
                 go_Camera.transform.position = go_Camera_DefaultPos.transform.position + (v3_Vector * perc);
                 // go_Camera.transform.eulerAngles = go_Camera_DefaultPos.transform.eulerAngles + (v3_Rotation * perc);
-                go_Camera.transform.position = go_Camera_DefaultPos.transform.rotation + (q_Rot * perc);
+                // go_Camera.transform.position = go_Camera_DefaultPos.transform.rotation + (q_Rot * perc);
+                go_Camera.transform.rotation = Quaternion.Lerp(go_Camera_DefaultPos.transform.rotation, go_Camera_TempPos.transform.rotation, perc);
             }   
         }
     }

@@ -86,7 +86,8 @@ public class Cs_GateScript : MonoBehaviour
             else // Closing door
             {
                 // Decrement timer
-                f_MoveTime -= Time.deltaTime;
+                // If an objective door
+                f_MoveTime -= Time.deltaTime * 3;
 
                 // Clamp
                 if (f_MoveTime < 0) f_MoveTime = 0;
