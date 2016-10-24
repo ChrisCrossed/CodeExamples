@@ -231,7 +231,7 @@ public class Cs_EnemyLogic_Grunt : MonoBehaviour
         #region Investigate
         else if (e_EnemyState == Enum_EnemyState.InvestigateLocation)
         {
-            print("Investigate: " + f_InvestigateTimer + " / " + f_MAX_INVESTIGATE_TIME);
+            // print("Investigate: " + f_InvestigateTimer + " / " + f_MAX_INVESTIGATE_TIME);
 
             // if (Vector3.Distance(gameObject.transform.position, v3_InvestigateLocation) <= gameObject.GetComponent<NavMeshAgent>().radius + 0.15f)
             if (gameObject.GetComponent<NavMeshAgent>().remainingDistance <= 0.15f)

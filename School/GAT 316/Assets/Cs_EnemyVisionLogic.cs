@@ -85,6 +85,8 @@ public class Cs_EnemyVisionLogic : MonoBehaviour
                     b_PlayerInCollider = false;
 
                     go_Root.GetComponent<Cs_EnemyLogic_Grunt>().GoToState_InvestigateLocation(v3_LastKnownLocation);
+
+                    GameObject.Find("LevelLogic").GetComponent<Cs_LevelLogic>().Set_InvestigateState(go_Root);
                 }
                 
                 return;
@@ -100,6 +102,9 @@ public class Cs_EnemyVisionLogic : MonoBehaviour
                 v3_LastKnownLocation = go_Player.transform.position;
 
                 go_Root.GetComponent<Cs_EnemyLogic_Grunt>().GoToState_ChasePlayer(v3_LastKnownLocation, true);
+
+                // print("Calling state: CHASE");
+                GameObject.Find("LevelLogic").GetComponent<Cs_LevelLogic>().Set_ChaseState(go_Root);
             }
         }
     }
@@ -116,8 +121,6 @@ public class Cs_EnemyVisionLogic : MonoBehaviour
             }
         }
         #endregion
-
-        // if (b_PlayerInCollider) print("Collider touched, we see the player"); else print("Collider touched, we DO NOT see the player");
     }
 
     void OnTriggerStay( Collider collider_ )
