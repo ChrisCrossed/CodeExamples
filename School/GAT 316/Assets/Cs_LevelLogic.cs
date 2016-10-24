@@ -229,8 +229,8 @@ public class Cs_LevelLogic : MonoBehaviour
                 // Reset timer
                 f_Timer_FromChaseToInvestigate = f_MaxTimer_FromChaseToInvestigate;
 
-                // Change state
-                Set_InvestigateState(true);
+                // Change state (Saying we don't know where the player is)
+                Set_InvestigateState(false);
             }
         }
         else if(e_EnemiesState == Enum_EnemyState.InvestigateLocation)
