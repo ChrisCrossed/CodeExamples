@@ -62,8 +62,6 @@ public class Cs_EnemyLogic_Grunt : MonoBehaviour
         Cs_LevelLogic[] lvlLogic = GameObject.Find("LevelLogic").GetComponents<Cs_LevelLogic>();
         for (int i_ = 0; i_ < lvlLogic.Length; ++i_)
         {
-            print("Calling logic number " + i_);
-
             // Call their 'Get Current Timer' functions, which also determine if this script contains this enemy
             float f_TimeCheck = lvlLogic[i_].Get_CurrentTimer(Enum_EnemyState.InvestigateLocation, true, gameObject);
             if(f_TimeCheck != -1) f_MAX_INVESTIGATE_TIME = f_TimeCheck;
@@ -227,19 +225,12 @@ public class Cs_EnemyLogic_Grunt : MonoBehaviour
                     }
                 }
             }
-
-
-            // If the enemy sees the player, chase them (Reset Wait Timer, record last known patrol position)
-
-            // If the enemy hears a sound, investigate (Reset Wait Timer, record last known patrol position)
         }
         #endregion
 
         #region Investigate
         else if (e_EnemyState == Enum_EnemyState.InvestigateLocation)
         {
-            // print("Investigate: " + f_InvestigateTimer + " / " + f_MAX_INVESTIGATE_TIME);
-
             // if (Vector3.Distance(gameObject.transform.position, v3_InvestigateLocation) <= gameObject.GetComponent<NavMeshAgent>().radius + 0.15f)
             if (gameObject.GetComponent<NavMeshAgent>().remainingDistance <= 0.15f)
             {
@@ -247,7 +238,6 @@ public class Cs_EnemyLogic_Grunt : MonoBehaviour
                 f_InvestigateTimer -= Time.deltaTime;
 
                 // If the Wait Timer reaches a certain point, go to the next point & reset the timer
-                // if (f_InvestigateTimer >= f_MAX_INVESTIGATE_TIME)
                 if (f_InvestigateTimer <= 0)
                 {
                     // GoToState_Patrol();

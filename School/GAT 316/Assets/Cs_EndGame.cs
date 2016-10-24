@@ -8,6 +8,13 @@ public class Cs_EndGame : MonoBehaviour
     bool b_EndGame;
     float f_EndGameTimer;
 
+    GameObject go_Player;
+
+    void Start()
+    {
+        go_Player = GameObject.Find("Player");
+    }
+
     void Update()
     {
         if(b_EndGame)
@@ -27,11 +34,20 @@ public class Cs_EndGame : MonoBehaviour
     {
         if (collider_.transform.root.gameObject.tag == "Player")
         {
-            print("Touched");
-
-            go_Door.SetActive(true);
+            if (go_Door != null)
+            {
+                go_Door.SetActive(true);
+            }
 
             b_EndGame = true;
+
+            if(go_Player != null)
+            {
+                if(go_Player.GetComponent<Cs_PlayerController>())
+                {
+                    go_Player.GetComponent<Cs_PlayerController>().Set_FadeState(true);
+                }
+            }
         }
     }
 }

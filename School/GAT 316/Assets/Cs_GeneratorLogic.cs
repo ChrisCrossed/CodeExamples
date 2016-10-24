@@ -14,12 +14,6 @@ public class Cs_GeneratorLogic : MonoBehaviour
     GamePadState state;
     GamePadState prevState;
     public PlayerIndex playerOne = PlayerIndex.One;
-
-    // Use this for initialization
-    void Start ()
-    {
-	
-	}
 	
 	// Update is called once per frame
 	void Update ()
@@ -31,7 +25,6 @@ public class Cs_GeneratorLogic : MonoBehaviour
 
             if (state.Buttons.X == ButtonState.Pressed && prevState.Buttons.X == ButtonState.Released)
             {
-                print("Pressed");
                 Set_ObjectiveState(true);
 
                 if(go_Objective != null)
@@ -56,7 +49,6 @@ public class Cs_GeneratorLogic : MonoBehaviour
     {
         if(collider_.transform.root.gameObject.name == "Player")
         {
-            print("Enter");
             b_PlayerInCollider = true;
         }
     }
@@ -65,7 +57,6 @@ public class Cs_GeneratorLogic : MonoBehaviour
     {
         if (collider_.transform.root.gameObject.name == "Player")
         {
-            print("Exit");
             b_PlayerInCollider = false;
         }
     }
