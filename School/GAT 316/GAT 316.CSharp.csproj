@@ -87,6 +87,7 @@
     <Compile Include="Assets\Cs_EnemyLogic_Grunt.cs" />
     <Compile Include="Assets\Cs_EnemyVisionLogic.cs" />
     <Compile Include="Assets\Cs_GateScript.cs" />
+    <Compile Include="Assets\Cs_GeneratorLogic.cs" />
     <Compile Include="Assets\Cs_LevelLogic.cs" />
     <Compile Include="Assets\Cs_LockPosRot.cs" />
     <Compile Include="Assets\Cs_PatrolPointLogic.cs" />

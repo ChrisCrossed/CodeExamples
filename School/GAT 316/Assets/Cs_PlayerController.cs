@@ -203,7 +203,8 @@ public class Cs_PlayerController : MonoBehaviour
         v2_RightStickVector.Normalize();
 
         // Get the 'magnitude' of the stick being pressed in
-        float f_RightStickMagnitude = Vector2.SqrMagnitude(new Vector2(state.ThumbSticks.Right.X, state.ThumbSticks.Right.Y));
+        //float f_RightStickMagnitude = Mathf.Sqrt(Vector2.SqrMagnitude(new Vector2(state.ThumbSticks.Right.X, state.ThumbSticks.Right.Y)));
+        float f_RightStickMagnitude = new Vector2(state.ThumbSticks.Right.X, state.ThumbSticks.Right.Y).magnitude;
 
         // Pass information in to the UpdateReticle function
         v3_TargetLocation = go_TargetObject.transform.position;

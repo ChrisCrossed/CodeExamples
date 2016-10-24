@@ -17,6 +17,7 @@ public class Cs_GateScript : MonoBehaviour
     float f_MoveTime;
 
     [SerializeField] bool b_StartOpen;
+    [SerializeField] bool b_IsObjectiveActive = true;
 
     Vector3 v3_FinalPos;
     Vector3 v3_StartPos;
@@ -107,8 +108,17 @@ public class Cs_GateScript : MonoBehaviour
 
     public void Set_DoorOpen( bool b_IsOpen_ )
     {
-        b_IsOpen = b_IsOpen_;
+        if(b_IsObjectiveActive)
+        {
+            b_IsOpen = b_IsOpen_;
 
-        b_PreviousDoorState = !b_IsOpen;
+            b_PreviousDoorState = !b_IsOpen;
+        }
+
+    }
+
+    public void Set_ObjectiveActive( bool b_IsActive_ )
+    {
+        b_IsObjectiveActive = b_IsActive_;
     }
 }

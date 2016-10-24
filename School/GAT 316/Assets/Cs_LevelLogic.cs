@@ -83,7 +83,7 @@ public class Cs_LevelLogic : MonoBehaviour
         DisableObjectsInList(DisableObjectsOnChase);
     }
 
-    public void Set_InvestigateState( bool b_InvestigatePlayerLocation_ , GameObject go_EnemyObject_ = null )
+    public void Set_InvestigateState( GameObject go_EnemyObject_ = null)
     {
         // Check to make sure the enemy calling this is within the list
         if (go_EnemyObject_ != null)
@@ -92,7 +92,6 @@ public class Cs_LevelLogic : MonoBehaviour
             {
                 return;
             }
-        }
 
         // Reset timer
         f_Timer_FromInvestigateToPatrol = f_MaxTimer_FromInvestigateToPatrol;
@@ -106,6 +105,12 @@ public class Cs_LevelLogic : MonoBehaviour
             {
                 if (EnemiesToControl[i_].GetComponent<Cs_EnemyLogic_Grunt>())
                 {
+                    EnemiesToControl[i_].GetComponent<Cs_EnemyLogic_Grunt>().GoToState_InvestigateLocation(go_Player.transform.position);
+                }
+
+                /*
+                if (EnemiesToControl[i_].GetComponent<Cs_EnemyLogic_Grunt>())
+                {
                     if(b_InvestigatePlayerLocation_)
                     {
                         EnemiesToControl[i_].GetComponent<Cs_EnemyLogic_Grunt>().GoToState_InvestigateLocation(go_Player.transform.position);
@@ -113,9 +118,10 @@ public class Cs_LevelLogic : MonoBehaviour
                     else
                     {
                         // Goes to their last known investigation point
-                        EnemiesToControl[i_].GetComponent<Cs_EnemyLogic_Grunt>().GoToState_InvestigateLocation();
+                        EnemiesToControl[i_].GetComponent<Cs_EnemyLogic_Grunt>().GoToState_InvestigateLocation(v3_InvestigateLocation);
                     }
                 }
+                */
             }
         }
         
@@ -124,6 +130,8 @@ public class Cs_LevelLogic : MonoBehaviour
 
         // Disable appropriate objects for 'Investigate' state
         DisableObjectsInList( DisableObjectsOnInvestigate );
+
+        }
     }
 
     public void Set_PatrolState( GameObject go_EnemyObject_ = null )
@@ -198,6 +206,9 @@ public class Cs_LevelLogic : MonoBehaviour
                 {
                     go_EnableList_[i_].GetComponent<Cs_GateScript>().Set_DoorOpen(true);
                 }
+
+                // Doors
+                // if()
             }
         }
     }
@@ -230,7 +241,7 @@ public class Cs_LevelLogic : MonoBehaviour
                 f_Timer_FromChaseToInvestigate = f_MaxTimer_FromChaseToInvestigate;
 
                 // Change state (Saying we don't know where the player is)
-                Set_InvestigateState(false);
+                Set_InvestigateState();
             }
         }
         else if(e_EnemiesState == Enum_EnemyState.InvestigateLocation)

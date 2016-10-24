@@ -149,8 +149,6 @@ public class Cs_EnemyLogic_Grunt : MonoBehaviour
         gameObject.GetComponent<NavMeshAgent>().speed = f_SprintMoveSpeed * 1.5f;
         gameObject.GetComponent<NavMeshAgent>().acceleration = 8;
         gameObject.GetComponent<NavMeshAgent>().updateRotation = false;
-        
-
         #endregion
 
     }

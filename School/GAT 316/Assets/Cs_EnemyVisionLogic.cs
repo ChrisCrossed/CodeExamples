@@ -191,7 +191,7 @@ public class Cs_EnemyVisionLogic : MonoBehaviour
                     for (int i_ = 0; i_ < lvlLogic.Length; ++i_)
                     {
                         // Call each script's Chase State
-                        lvlLogic[i_].Set_InvestigateState(false);
+                        lvlLogic[i_].Set_InvestigateState( go_Root );
                     }
 
                     go_Root.GetComponent<Cs_EnemyLogic_Grunt>().GoToState_InvestigateLocation(v3_LastKnownLocation);
