@@ -16,6 +16,10 @@ public class Cs_SkiingPlayerController : MonoBehaviour
     PhysicMaterial physMat_Ski;
     PhysicMaterial physMat_Walk;
 
+    // Jump bool. Resets on collision with ground
+    bool b_CanJump;
+    bool b_IsSkiing;
+
     [SerializeField] float f_MaxSpeed;
 
 	// Use this for initialization
@@ -35,60 +39,22 @@ public class Cs_SkiingPlayerController : MonoBehaviour
     void Update ()
     {
         // print("Current speed: " + gameObject.GetComponent<Rigidbody>().velocity.magnitude);
+        print(b_CanJump);
 
         #region PlayerSliding
 
         // If player is skiing
         if(Input.GetKey(KeyCode.Space))
         {
-            // Set PhysicsMaterial
-            gameObject.GetComponent<Collider>().material = physMat_Ski;
-
-            // Raycast down and grab the angle of the terrain
-            RaycastHit hit = CheckRaycasts();
-            
-            // This checks to be sure there is ground below us & it is within a certain distance
-            if( hit.distance <= 1.5f && ( hit.normal != new Vector3() ) )
+            if(b_CanJump)
             {
-                if(v3_Velocity == new Vector3())
-                {
-                    if(!(f_MaxSpeed <= 0))
-                    {
-                        v3_Velocity = gameObject.GetComponent<Rigidbody>().velocity;
-                        v3_Velocity.Normalize();
-                        v3_Velocity *= f_MaxSpeed;
+                Jump();
 
-                        print("Set Velocity: " + v3_Velocity.magnitude);
-                    }
-                    else
-                    {
-                        v3_Velocity = gameObject.GetComponent<Rigidbody>().velocity;
-
-                        print("Set Velocity: " + v3_Velocity.magnitude);
-                    }
-                }
-
-                print("Speed: " + gameObject.GetComponent<Rigidbody>().velocity.magnitude);
-
-                // This works, using the direction they're moving.
-                Vector3 v3_GroundVector = Vector3.ProjectOnPlane(gameObject.GetComponent<Rigidbody>().velocity, hit.normal);
-
-                // Normalizes the vector
-                v3_GroundVector.Normalize();
-
-                if(gameObject.GetComponent<Rigidbody>().velocity.magnitude <= v3_Velocity.magnitude)
-                {
-                    gameObject.GetComponent<Rigidbody>().velocity = v3_GroundVector * v3_Velocity.magnitude;
-                }
+                b_CanJump = false;
             }
             else
             {
-                if(v3_Velocity != new Vector3())
-                {
-                    v3_Velocity = new Vector3();
-
-                    print("Reset Velocity");
-                }
+                Ski();
             }
         }
         // If player is not skiing
@@ -129,6 +95,76 @@ public class Cs_SkiingPlayerController : MonoBehaviour
         #endregion
     }
 
+    float f_JumpMagnitude_Curr;
+    [SerializeField] float f_MaxJumpMagnitude;
+    void Jump()
+    {
+        // While the player is holding down the space bar, keep 'jumping'.
+        if(Input.GetKeyDown(KeyCode.Space))
+        {
+            // Apply velocity
+            Debug.DrawRay(gameObject.transform.position, gameObject.transform.up, Color.red, 5.0f);
+            gameObject.GetComponent<Rigidbody>().AddForce(gameObject.transform.up * f_JumpMagnitude_Curr * gameObject.GetComponent<Rigidbody>().mass);
+
+            // f_JumpMagnitude_Curr -= Time.deltaTime * 5;
+        }
+    }
+
+    void Ski()
+    {
+        #region Ski (if in the air)
+        // Raycast down and grab the angle of the terrain
+        RaycastHit hit = CheckRaycasts();
+
+        // This checks to be sure there is ground below us & it is within a certain distance
+        if (hit.distance <= 1.5f && (hit.normal != new Vector3()))
+        {
+            if (v3_Velocity == new Vector3())
+            {
+                // Set PhysicsMaterial
+                gameObject.GetComponent<Collider>().material = physMat_Ski;
+
+                if (!(f_MaxSpeed <= 0))
+                {
+                    v3_Velocity = gameObject.GetComponent<Rigidbody>().velocity;
+                    v3_Velocity.Normalize();
+                    v3_Velocity *= f_MaxSpeed;
+
+                    print("Set Velocity: " + v3_Velocity.magnitude);
+                }
+                else
+                {
+                    v3_Velocity = gameObject.GetComponent<Rigidbody>().velocity;
+
+                    print("Set Velocity: " + v3_Velocity.magnitude);
+                }
+            }
+
+            print("Speed: " + gameObject.GetComponent<Rigidbody>().velocity.magnitude);
+
+            // This works, using the direction they're moving.
+            Vector3 v3_GroundVector = Vector3.ProjectOnPlane(gameObject.GetComponent<Rigidbody>().velocity, hit.normal);
+
+            // Normalizes the vector
+            v3_GroundVector.Normalize();
+
+            if (gameObject.GetComponent<Rigidbody>().velocity.magnitude <= v3_Velocity.magnitude)
+            {
+                gameObject.GetComponent<Rigidbody>().velocity = v3_GroundVector * v3_Velocity.magnitude;
+            }
+        }
+        else
+        {
+            if (v3_Velocity != new Vector3())
+            {
+                v3_Velocity = new Vector3();
+
+                print("Reset Velocity");
+            }
+        }
+        #endregion
+    }
+
     RaycastHit CheckRaycasts()
     {
         // outHit is what we'll be sending out from the function
@@ -158,5 +194,29 @@ public class Cs_SkiingPlayerController : MonoBehaviour
 
         // Return the shortest hit distance
         return outHit;
+    }
+
+    void OnCollisionEnter( Collision collision_ )
+    {
+        if(!b_CanJump)
+        {
+            int i_LayerMask = LayerMask.GetMask("Ground");
+
+            float f_RaycastDistance = 0.1f;
+
+            GameObject go_RaycastPoint_Jump = GameObject.Find("RaycastPoint_Jump");
+
+            RaycastHit hit;
+
+            Physics.Raycast(go_RaycastPoint_Jump.transform.position, -gameObject.transform.up, out hit, f_RaycastDistance, i_LayerMask);
+
+            if(hit.distance <= f_RaycastDistance)
+            {
+                // Reset jump capabilities
+                b_CanJump = true;
+
+                f_JumpMagnitude_Curr = f_MaxJumpMagnitude;
+            }
+        }
     }
 }
