@@ -51,6 +51,8 @@ public class Cs_SkiingPlayerController : MonoBehaviour
         // Update mouse look
         MouseInput();
 
+        Jetpack();
+
         #region PlayerSliding
 
         // On the first moment the spacebar is pressed, jump
@@ -208,6 +210,39 @@ public class Cs_SkiingPlayerController : MonoBehaviour
         }
     }
 
+    float f_Jetpack_Curr = 10f;
+    float f_Jetpack_Max = 10f;
+    void Jetpack()
+    {
+        if(Input.GetMouseButton(1))
+        {
+            if(f_Jetpack_Curr >= 0.1f)
+            {
+                f_Jetpack_Curr -= Time.deltaTime * 2;
+
+                Vector3 v3_CurrVelocity = gameObject.GetComponent<Rigidbody>().velocity;
+                v3_CurrVelocity.y += (f_MaxJumpMagnitude * Time.deltaTime * 2) / 5;
+
+                if (v3_CurrVelocity.y < 1.5f)
+                {
+                    v3_CurrVelocity.y += 1.5f * Time.deltaTime;
+                }
+
+                AirPush();
+
+                gameObject.GetComponent<Rigidbody>().velocity = v3_CurrVelocity;
+            }
+        }
+        else
+        {
+            f_Jetpack_Curr += Time.deltaTime;
+
+            if (f_Jetpack_Curr > f_Jetpack_Max) f_Jetpack_Curr = f_Jetpack_Max;
+        }
+
+        // print("Jetpack: " + f_Jetpack_Curr);
+    }
+
     void Ski()
     {
         #region Ski (if in the air)
@@ -243,9 +278,14 @@ public class Cs_SkiingPlayerController : MonoBehaviour
         }
         #endregion
 
+        // AirPush();
+    }
+
+    void AirPush()
+    {
         Vector3 v3_AirPush = new Vector3();
         // Apply basic velocities based on player input
-        if(Input.GetKey(KeyCode.A) && !Input.GetKey(KeyCode.D))
+        if (Input.GetKey(KeyCode.A) && !Input.GetKey(KeyCode.D))
         {
             // Apply left movement
             v3_AirPush.x = -1;
@@ -253,26 +293,27 @@ public class Cs_SkiingPlayerController : MonoBehaviour
 
             print("Pushing: Left");
         }
-        else if(Input.GetKey(KeyCode.D) && !Input.GetKey(KeyCode.A))
+        else if (Input.GetKey(KeyCode.D) && !Input.GetKey(KeyCode.A))
         {
             // gameObject.GetComponent<Rigidbody>().AddForce(gameObject.transform.right * 2f);
             v3_AirPush.x = 1;
             print("Pushing: Right");
         }
 
-        if(Input.GetKey(KeyCode.S))
+        if (Input.GetKey(KeyCode.S))
         {
-            v3_AirPush.z = -1;
+            // gameObject.GetComponent<Rigidbody>().AddForce(-gameObject.transform.forward * 3f);
+            v3_AirPush.z = -2;
             print("Pushing: Back");
         }
 
-        if(v3_AirPush != new Vector3())
+        if (v3_AirPush != new Vector3())
         {
             v3_AirPush.Normalize();
 
             Vector3 v3_FinalAirPush = gameObject.transform.rotation * v3_AirPush;
 
-            gameObject.GetComponent<Rigidbody>().AddForce(v3_FinalAirPush * 2f);
+            gameObject.GetComponent<Rigidbody>().AddForce(v3_FinalAirPush * 3f);
         }
     }
 
