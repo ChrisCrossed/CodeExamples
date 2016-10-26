@@ -35,78 +35,128 @@ public class Cs_SkiingPlayerController : MonoBehaviour
     }
 
     Vector3 v3_Velocity;
+    float f_JumpTimer;
+
     // Update is called once per frame
     void Update ()
     {
         // print("Current speed: " + gameObject.GetComponent<Rigidbody>().velocity.magnitude);
-        print(b_CanJump);
-
         #region PlayerSliding
 
-        // If player is skiing
-        if(Input.GetKey(KeyCode.Space))
+        // On the first moment the spacebar is pressed, jump
+        if (Input.GetKeyDown(KeyCode.Space))
         {
-            if(b_CanJump)
-            {
-                Jump();
+            Jump();
+        }
+        // Otherwise, if the button is held down, the player is skiing
+        else if (Input.GetKey(KeyCode.Space))
+        {
+            // Increment a timer to be sure the whole jump can be fulfilled
+            if(f_JumpTimer < 0.5f) f_JumpTimer += Time.deltaTime;
 
-                b_CanJump = false;
-            }
-            else
-            {
-                Ski();
-            }
+            if(f_JumpTimer > 0.5f) Ski();
         }
         // If player is not skiing
         else
         {
             // Set PhysicsMaterial
             gameObject.GetComponent<Collider>().material = physMat_Walk;
-
+            
+            /*
             if (v3_Velocity != new Vector3())
             {
                 v3_Velocity = new Vector3();
 
-                print("Reset Velocity");
+                // print("Reset Velocity");
             }
+            */
+
+            PlayerInput();
         }
-
-        /*
-        if(Input.GetKey(KeyCode.W))
-        {
-            if(gameObject.GetComponent<Rigidbody>().velocity.magnitude <= 10)
-            {
-                f_Velocity += Time.deltaTime;
-
-                v3_Velocity = gameObject.GetComponent<Rigidbody>().velocity + (gameObject.transform.forward * f_Velocity);
-
-                gameObject.GetComponent<Rigidbody>().velocity = v3_Velocity;
-
-                print((gameObject.transform.forward * Time.deltaTime * 5));
-            }
-        }
-        */
-
-        // Vector3 v3_CurrPos = gameObject.transform.position;
-        //gameObject.transform.position = hit.point + (gameObject.transform.up * 1);
-
-        // Apply a forward vector and push the player in that direction
-        // gameObject.GetComponent<Rigidbody>().velocity = v3_GroundVector * 10;
         #endregion
+    }
+
+    float f_Speed = 0.0f;
+    float f_MaxRunSpeed = 10f;
+    float f_Acceleration = 20f;
+    void PlayerInput()
+    {
+        Vector3 v3_OldVelocity = gameObject.GetComponent<Rigidbody>().velocity;
+        float f_JumpVelocity = v3_OldVelocity.y;
+
+        Vector3 v3_InputVelocity = new Vector3();
+
+        if(Input.GetKey(KeyCode.W) && !Input.GetKey(KeyCode.S))
+        {
+            v3_InputVelocity.z = 1;
+        }
+        else if(!Input.GetKey(KeyCode.W) && Input.GetKey(KeyCode.S))
+        {
+            v3_InputVelocity.z = -1;
+        }
+
+        if (Input.GetKey(KeyCode.A) && !Input.GetKey(KeyCode.D))
+        {
+            v3_InputVelocity.x = -1;
+        }
+        else if (!Input.GetKey(KeyCode.A) && Input.GetKey(KeyCode.D))
+        {
+            v3_InputVelocity.x = 1;
+        }
+
+        v3_InputVelocity.Normalize();
+        
+        if (Input.GetKey(KeyCode.W) ||
+            Input.GetKey(KeyCode.S) ||
+            Input.GetKey(KeyCode.A) ||
+            Input.GetKey(KeyCode.D))
+        {
+            f_Speed += Time.deltaTime * f_Acceleration;
+
+            if (f_Speed > f_MaxRunSpeed) f_Speed = f_MaxRunSpeed;
+
+            // v3_NewVelocity *= f_Speed;
+        }
+        else
+        {
+            f_Speed -= Time.deltaTime * f_Acceleration;
+
+            if (f_Speed < 0) f_Speed = 0;
+        }
+
+        // Aligning vector to that of the player's rotation
+        // Vector3 v3_FinalVelocity = gameObject.transform.rotation * v3_InputVelocity * f_Speed;
+        Vector3 v3_FinalVelocity = Vector3.Lerp(v3_OldVelocity, gameObject.transform.rotation * v3_InputVelocity * f_Speed, f_Acceleration);
+
+        // Restore y velocity
+        v3_FinalVelocity.y = f_JumpVelocity;
+
+        RaycastHit hit;
+        int i_LayerMask = LayerMask.GetMask("Ground");
+        Physics.Raycast(gameObject.transform.position, -transform.up, out hit, float.PositiveInfinity, i_LayerMask);
+
+        // Project upon a plane
+        v3_NewVelocity = Vector3.ProjectOnPlane(v3_NewVelocity, -hit.normal);
+
+        // Set final rotation
+        gameObject.GetComponent<Rigidbody>().velocity = v3_FinalVelocity;
     }
 
     float f_JumpMagnitude_Curr;
     [SerializeField] float f_MaxJumpMagnitude;
+    Vector3 v3_NewVelocity;
     void Jump()
     {
-        // While the player is holding down the space bar, keep 'jumping'.
-        if(Input.GetKeyDown(KeyCode.Space))
+        if(b_CanJump)
         {
-            // Apply velocity
-            Debug.DrawRay(gameObject.transform.position, gameObject.transform.up, Color.red, 5.0f);
-            gameObject.GetComponent<Rigidbody>().AddForce(gameObject.transform.up * f_JumpMagnitude_Curr * gameObject.GetComponent<Rigidbody>().mass);
+            Vector3 v3_CurrVelocity = gameObject.GetComponent<Rigidbody>().velocity;
+            v3_CurrVelocity.y = 5;
 
-            // f_JumpMagnitude_Curr -= Time.deltaTime * 5;
+            gameObject.GetComponent<Rigidbody>().velocity = v3_CurrVelocity;
+
+            b_CanJump = false;
+
+            f_JumpTimer = 0;
         }
     }
 
@@ -116,8 +166,10 @@ public class Cs_SkiingPlayerController : MonoBehaviour
         // Raycast down and grab the angle of the terrain
         RaycastHit hit = CheckRaycasts();
 
+        print(hit.distance);
+
         // This checks to be sure there is ground below us & it is within a certain distance
-        if (hit.distance <= 1.5f && (hit.normal != new Vector3()))
+        if (hit.distance < 1.0f && (hit.normal != new Vector3()))
         {
             if (v3_Velocity == new Vector3())
             {
@@ -130,17 +182,17 @@ public class Cs_SkiingPlayerController : MonoBehaviour
                     v3_Velocity.Normalize();
                     v3_Velocity *= f_MaxSpeed;
 
-                    print("Set Velocity: " + v3_Velocity.magnitude);
+                    // print("Set Velocity: " + v3_Velocity.magnitude);
                 }
                 else
                 {
                     v3_Velocity = gameObject.GetComponent<Rigidbody>().velocity;
 
-                    print("Set Velocity: " + v3_Velocity.magnitude);
+                    // print("Set Velocity: " + v3_Velocity.magnitude);
                 }
             }
 
-            print("Speed: " + gameObject.GetComponent<Rigidbody>().velocity.magnitude);
+            // print("Speed: " + gameObject.GetComponent<Rigidbody>().velocity.magnitude);
 
             // This works, using the direction they're moving.
             Vector3 v3_GroundVector = Vector3.ProjectOnPlane(gameObject.GetComponent<Rigidbody>().velocity, hit.normal);
@@ -159,7 +211,7 @@ public class Cs_SkiingPlayerController : MonoBehaviour
             {
                 v3_Velocity = new Vector3();
 
-                print("Reset Velocity");
+                // print("Reset Velocity");
             }
         }
         #endregion
