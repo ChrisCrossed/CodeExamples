@@ -1,0 +1,92 @@
+﻿using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+
+public class Cs_VisualRadius : MonoBehaviour
+{
+    [SerializeField] int i_NumVisualizePoints;
+
+    List<GameObject> go_ArrayPoints = new List<GameObject>();
+
+    float f_Radius = 0;
+
+	// Use this for initialization
+	void Start ()
+    {
+        // Create a series of empty game objects, add to a list
+        for (int i_ = 0; i_ < i_NumVisualizePoints; ++i_)
+        {
+            GameObject go_Point = new GameObject();
+
+            go_Point.name = "go_Point_" + i_;
+
+            go_Point.transform.SetParent(transform.Find("PointsList"));
+
+            go_ArrayPoints.Add(go_Point);
+        }
+
+        float f_Angle = 360f / i_NumVisualizePoints;
+
+        // Go through the series of empty game objects & set their rotation based on the number of Visual Points
+        for(int j_ = 0; j_ < go_ArrayPoints.Count; ++j_)
+        {
+            go_ArrayPoints[j_].transform.rotation = Quaternion.Euler(0, f_Angle * j_, 0);
+
+            go_ArrayPoints[j_].transform.position = gameObject.transform.forward * f_Radius;
+        }
+
+        SetRadius();
+	}
+
+    void SetRadius()
+    {
+        float f_Magnitude = gameObject.GetComponent<Rigidbody>().velocity.magnitude;
+        if (f_Magnitude >= 0.2f)
+        {
+            f_Radius = gameObject.GetComponent<Rigidbody>().velocity.magnitude;
+        }
+        else
+        {
+            f_Radius = 0;
+        }
+
+        // Cycle through all objects in list, moving their position based on the center of the game object * radius
+        for(int i_ = 0; i_ < go_ArrayPoints.Count; ++i_)
+        {
+            // go_ArrayPoints[i_].transform.position = new Vector3(0, 0, 0);
+            go_ArrayPoints[i_].transform.position = go_ArrayPoints[i_].transform.forward * f_Radius;
+        }
+
+        SetLineRenderer();
+    }
+
+    void SetLineRenderer()
+    {
+        // Tell the line renderer how many positions will exist
+        gameObject.GetComponent<LineRenderer>().SetVertexCount(go_ArrayPoints.Count + 1);
+
+        for (int i_ = 0; i_ < go_ArrayPoints.Count + 1; ++i_)
+        {
+            //// Set the next point to connect to
+            //int j_;
+
+            //if (i_ != go_ArrayPoints.Count - 1) j_ = i_ + 1;
+            //else j_ = 0;
+            if(i_ != go_ArrayPoints.Count)
+            {
+                // Apply lines to each point in the line renderer
+                gameObject.GetComponent<LineRenderer>().SetPosition(i_, go_ArrayPoints[i_].transform.position + gameObject.transform.position);
+            }
+            else
+            {
+                gameObject.GetComponent<LineRenderer>().SetPosition(i_, go_ArrayPoints[0].transform.position + gameObject.transform.position);
+            }
+        }
+    }
+	
+	// Update is called once per frame
+	void Update ()
+    {
+        SetRadius();
+	}
+}
