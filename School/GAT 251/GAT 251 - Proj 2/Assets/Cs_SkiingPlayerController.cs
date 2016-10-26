@@ -3,10 +3,6 @@ using System.Collections;
 
 public class Cs_SkiingPlayerController : MonoBehaviour
 {
-    float f_Velocity;
-    Vector3 v3_CurrentVector;
-    bool b_GravityApplied;
-
     GameObject go_RaycastPoint_1;
     GameObject go_RaycastPoint_2;
     GameObject go_RaycastPoint_3;
@@ -18,13 +14,17 @@ public class Cs_SkiingPlayerController : MonoBehaviour
 
     // Jump bool. Resets on collision with ground
     bool b_CanJump;
-    bool b_IsSkiing;
 
     [SerializeField] float f_MaxSpeed;
 
 	// Use this for initialization
 	void Start ()
     {
+        Debug.Log(transform.rotation.eulerAngles);
+
+        f_xRot = transform.eulerAngles.y;
+        f_xRot_Curr = f_xRot;
+
         go_RaycastPoint_1 = transform.Find("RaycastPoint_1").gameObject;
         go_RaycastPoint_2 = transform.Find("RaycastPoint_2").gameObject;
         go_RaycastPoint_3 = transform.Find("RaycastPoint_3").gameObject;
@@ -36,6 +36,8 @@ public class Cs_SkiingPlayerController : MonoBehaviour
         go_Camera = transform.Find("MainCamera").gameObject;
 
         Cursor.lockState = CursorLockMode.Locked;
+
+        //gameObject.transform.rotation = Quaternion.Euler(0, 180, 0);
     }
 
     Vector3 v3_Velocity;
@@ -44,7 +46,7 @@ public class Cs_SkiingPlayerController : MonoBehaviour
     // Update is called once per frame
     void Update ()
     {
-        print("Current speed: " + gameObject.GetComponent<Rigidbody>().velocity.magnitude);
+        //print("Current speed: " + gameObject.GetComponent<Rigidbody>().velocity.magnitude);
 
         // Update mouse look
         MouseInput();
@@ -108,7 +110,7 @@ public class Cs_SkiingPlayerController : MonoBehaviour
         f_yRot_Curr = Mathf.SmoothDamp(f_yRot_Curr, f_yRot, ref f_yRot_Vel, f_lookSmoothDamp);
 
         #endregion
-        
+
         // Apply vertical rotation to Camera
         go_Camera.transform.rotation = Quaternion.Euler(-f_yRot_Curr, f_xRot_Curr, 0);
 
@@ -125,7 +127,7 @@ public class Cs_SkiingPlayerController : MonoBehaviour
 
         // If the player is in the air, do not manipulate their movement velocity
         RaycastHit hit = CheckRaycasts();
-        print(hit.distance);
+        //print(hit.distance);
 
         if(hit.distance < 2f)
         {
@@ -212,8 +214,6 @@ public class Cs_SkiingPlayerController : MonoBehaviour
         // Raycast down and grab the angle of the terrain
         RaycastHit hit = CheckRaycasts();
 
-        print(hit.distance);
-
         // This checks to be sure there is ground below us & it is within a certain distance
         if (hit.distance < 1.1f && (hit.normal != new Vector3()))
         {
@@ -229,43 +229,51 @@ public class Cs_SkiingPlayerController : MonoBehaviour
                     v3_Velocity = Vector3.ProjectOnPlane(v3_Velocity, hit.normal);
                     v3_Velocity.Normalize();
                     v3_Velocity *= f_MaxSpeed;
-
-                    // print("Set Velocity: " + v3_Velocity.magnitude);
                 }
                 else
                 {
                     v3_Velocity = gameObject.GetComponent<Rigidbody>().velocity;
-
-                    // print("Set Velocity: " + v3_Velocity.magnitude);
                 }
             }
 
-            // print("Speed: " + gameObject.GetComponent<Rigidbody>().velocity.magnitude);
-
-            // This works, using the direction they're moving.
-            // Vector3 v3_GroundVector = Vector3.ProjectOnPlane(gameObject.GetComponent<Rigidbody>().velocity, hit.normal);
-
-            // Normalizes the vector
-            // v3_GroundVector.Normalize();
-
             if (gameObject.GetComponent<Rigidbody>().velocity.magnitude <= v3_Velocity.magnitude)
             {
-                // gameObject.GetComponent<Rigidbody>().velocity = v3_GroundVector * v3_Velocity.magnitude;
                 gameObject.GetComponent<Rigidbody>().velocity = v3_Velocity;
             }
         }
-        else
-        {
-            /*
-            if (v3_Velocity != new Vector3())
-            {
-                v3_Velocity = new Vector3();
-
-                // print("Reset Velocity");
-            }
-            */
-        }
         #endregion
+
+        Vector3 v3_AirPush = new Vector3();
+        // Apply basic velocities based on player input
+        if(Input.GetKey(KeyCode.A) && !Input.GetKey(KeyCode.D))
+        {
+            // Apply left movement
+            v3_AirPush.x = -1;
+            // gameObject.GetComponent<Rigidbody>().AddForce(-gameObject.transform.right * 2f);
+
+            print("Pushing: Left");
+        }
+        else if(Input.GetKey(KeyCode.D) && !Input.GetKey(KeyCode.A))
+        {
+            // gameObject.GetComponent<Rigidbody>().AddForce(gameObject.transform.right * 2f);
+            v3_AirPush.x = 1;
+            print("Pushing: Right");
+        }
+
+        if(Input.GetKey(KeyCode.S))
+        {
+            v3_AirPush.z = -1;
+            print("Pushing: Back");
+        }
+
+        if(v3_AirPush != new Vector3())
+        {
+            v3_AirPush.Normalize();
+
+            Vector3 v3_FinalAirPush = gameObject.transform.rotation * v3_AirPush;
+
+            gameObject.GetComponent<Rigidbody>().AddForce(v3_FinalAirPush * 2f);
+        }
     }
 
     RaycastHit CheckRaycasts()
