@@ -32,6 +32,10 @@ public class Cs_SkiingPlayerController : MonoBehaviour
 
         physMat_Ski  = (PhysicMaterial)Resources.Load("PhysMat_Ski");
         physMat_Walk = (PhysicMaterial)Resources.Load("PhysMat_Walk");
+
+        go_Camera = transform.Find("MainCamera").gameObject;
+
+        Cursor.lockState = CursorLockMode.Locked;
     }
 
     Vector3 v3_Velocity;
@@ -40,7 +44,11 @@ public class Cs_SkiingPlayerController : MonoBehaviour
     // Update is called once per frame
     void Update ()
     {
-        // print("Current speed: " + gameObject.GetComponent<Rigidbody>().velocity.magnitude);
+        print("Current speed: " + gameObject.GetComponent<Rigidbody>().velocity.magnitude);
+
+        // Update mouse look
+        MouseInput();
+
         #region PlayerSliding
 
         // On the first moment the spacebar is pressed, jump
@@ -61,85 +69,123 @@ public class Cs_SkiingPlayerController : MonoBehaviour
         {
             // Set PhysicsMaterial
             gameObject.GetComponent<Collider>().material = physMat_Walk;
-            
-            /*
-            if (v3_Velocity != new Vector3())
-            {
-                v3_Velocity = new Vector3();
-
-                // print("Reset Velocity");
-            }
-            */
 
             PlayerInput();
         }
         #endregion
     }
 
+    float f_LookSensitivity = 5f;
+    float f_lookSmoothDamp = 0.1f;
+    float f_yRot;
+    float f_yRot_Curr;
+    float f_yRot_Vel;
+    float f_xRot;
+    float f_xRot_Curr;
+    float f_xRot_Vel;
+    GameObject go_Camera;
+    void MouseInput()
+    {
+        #region Mouse Horizontal
+
+        // Update Mouse State
+        f_xRot += Input.GetAxis("Mouse X") * f_LookSensitivity;
+
+        // Smooth it out
+        f_xRot_Curr = Mathf.SmoothDamp(f_xRot_Curr, f_xRot, ref f_xRot_Vel, f_lookSmoothDamp);
+
+        #endregion
+
+        #region Mouse Vertical
+
+        // Update Mouse State
+        f_yRot += Input.GetAxis("Mouse Y") * f_LookSensitivity;
+
+        // Clamp the angles (Vertical only)
+        f_yRot = Mathf.Clamp(f_yRot, -90, 90);
+
+        // Smooth it out
+        f_yRot_Curr = Mathf.SmoothDamp(f_yRot_Curr, f_yRot, ref f_yRot_Vel, f_lookSmoothDamp);
+
+        #endregion
+        
+        // Apply vertical rotation to Camera
+        go_Camera.transform.rotation = Quaternion.Euler(-f_yRot_Curr, f_xRot_Curr, 0);
+
+        // Apply horizontal rotation to gameObject
+        gameObject.transform.rotation = Quaternion.Euler(0, f_xRot_Curr, 0);
+    }
+
     float f_Speed = 0.0f;
     float f_MaxRunSpeed = 10f;
-    float f_Acceleration = 20f;
+    float f_Acceleration = 25f;
     void PlayerInput()
     {
         Vector3 v3_OldVelocity = gameObject.GetComponent<Rigidbody>().velocity;
-        float f_JumpVelocity = v3_OldVelocity.y;
 
-        Vector3 v3_InputVelocity = new Vector3();
+        // If the player is in the air, do not manipulate their movement velocity
+        RaycastHit hit = CheckRaycasts();
+        print(hit.distance);
 
-        if(Input.GetKey(KeyCode.W) && !Input.GetKey(KeyCode.S))
+        if(hit.distance < 2f)
         {
-            v3_InputVelocity.z = 1;
-        }
-        else if(!Input.GetKey(KeyCode.W) && Input.GetKey(KeyCode.S))
-        {
-            v3_InputVelocity.z = -1;
-        }
+            float f_JumpVelocity = v3_OldVelocity.y;
 
-        if (Input.GetKey(KeyCode.A) && !Input.GetKey(KeyCode.D))
-        {
-            v3_InputVelocity.x = -1;
-        }
-        else if (!Input.GetKey(KeyCode.A) && Input.GetKey(KeyCode.D))
-        {
-            v3_InputVelocity.x = 1;
-        }
+            Vector3 v3_InputVelocity = new Vector3();
 
-        v3_InputVelocity.Normalize();
+            if(Input.GetKey(KeyCode.W) && !Input.GetKey(KeyCode.S))
+            {
+                v3_InputVelocity.z = 1;
+            }
+            else if(!Input.GetKey(KeyCode.W) && Input.GetKey(KeyCode.S))
+            {
+                v3_InputVelocity.z = -1;
+            }
+
+            if (Input.GetKey(KeyCode.A) && !Input.GetKey(KeyCode.D))
+            {
+                v3_InputVelocity.x = -1;
+            }
+            else if (!Input.GetKey(KeyCode.A) && Input.GetKey(KeyCode.D))
+            {
+                v3_InputVelocity.x = 1;
+            }
+
+            v3_InputVelocity.Normalize();
         
-        if (Input.GetKey(KeyCode.W) ||
-            Input.GetKey(KeyCode.S) ||
-            Input.GetKey(KeyCode.A) ||
-            Input.GetKey(KeyCode.D))
-        {
-            f_Speed += Time.deltaTime * f_Acceleration;
+            if (Input.GetKey(KeyCode.W) ||
+                Input.GetKey(KeyCode.S) ||
+                Input.GetKey(KeyCode.A) ||
+                Input.GetKey(KeyCode.D))
+            {
+                f_Speed += Time.deltaTime * f_Acceleration;
 
-            if (f_Speed > f_MaxRunSpeed) f_Speed = f_MaxRunSpeed;
+                if (f_Speed > f_MaxRunSpeed) f_Speed = f_MaxRunSpeed;
+            }
+            else
+            {
+                f_Speed -= Time.deltaTime * f_Acceleration;
 
-            // v3_NewVelocity *= f_Speed;
+                if (f_Speed < 0) f_Speed = 0;
+            }
+
+            // Aligning vector to that of the player's rotation
+            Vector3 v3_FinalVelocity = Vector3.Lerp(v3_OldVelocity, gameObject.transform.rotation * v3_InputVelocity * f_Speed, 0.1f);
+
+            // Restore y velocity
+            v3_FinalVelocity.y = f_JumpVelocity;
+
+            // Project upon a plane
+            v3_NewVelocity = Vector3.ProjectOnPlane(v3_NewVelocity, -hit.normal);
+
+            // Set final rotation
+            gameObject.GetComponent<Rigidbody>().velocity = v3_FinalVelocity;
         }
         else
         {
-            f_Speed -= Time.deltaTime * f_Acceleration;
-
-            if (f_Speed < 0) f_Speed = 0;
+            // We're above the ground. Disable the ability to jump.
+            b_CanJump = false;
         }
-
-        // Aligning vector to that of the player's rotation
-        // Vector3 v3_FinalVelocity = gameObject.transform.rotation * v3_InputVelocity * f_Speed;
-        Vector3 v3_FinalVelocity = Vector3.Lerp(v3_OldVelocity, gameObject.transform.rotation * v3_InputVelocity * f_Speed, f_Acceleration);
-
-        // Restore y velocity
-        v3_FinalVelocity.y = f_JumpVelocity;
-
-        RaycastHit hit;
-        int i_LayerMask = LayerMask.GetMask("Ground");
-        Physics.Raycast(gameObject.transform.position, -transform.up, out hit, float.PositiveInfinity, i_LayerMask);
-
-        // Project upon a plane
-        v3_NewVelocity = Vector3.ProjectOnPlane(v3_NewVelocity, -hit.normal);
-
-        // Set final rotation
-        gameObject.GetComponent<Rigidbody>().velocity = v3_FinalVelocity;
     }
 
     float f_JumpMagnitude_Curr;
@@ -169,7 +215,7 @@ public class Cs_SkiingPlayerController : MonoBehaviour
         print(hit.distance);
 
         // This checks to be sure there is ground below us & it is within a certain distance
-        if (hit.distance < 1.0f && (hit.normal != new Vector3()))
+        if (hit.distance < 1.1f && (hit.normal != new Vector3()))
         {
             if (v3_Velocity == new Vector3())
             {
@@ -178,7 +224,9 @@ public class Cs_SkiingPlayerController : MonoBehaviour
 
                 if (!(f_MaxSpeed <= 0))
                 {
-                    v3_Velocity = gameObject.GetComponent<Rigidbody>().velocity;
+                    // v3_Velocity = gameObject.GetComponent<Rigidbody>().velocity;
+                    v3_Velocity = new Vector3(v3_Velocity.x, 0, v3_Velocity.z);
+                    v3_Velocity = Vector3.ProjectOnPlane(v3_Velocity, hit.normal);
                     v3_Velocity.Normalize();
                     v3_Velocity *= f_MaxSpeed;
 
@@ -195,24 +243,27 @@ public class Cs_SkiingPlayerController : MonoBehaviour
             // print("Speed: " + gameObject.GetComponent<Rigidbody>().velocity.magnitude);
 
             // This works, using the direction they're moving.
-            Vector3 v3_GroundVector = Vector3.ProjectOnPlane(gameObject.GetComponent<Rigidbody>().velocity, hit.normal);
+            // Vector3 v3_GroundVector = Vector3.ProjectOnPlane(gameObject.GetComponent<Rigidbody>().velocity, hit.normal);
 
             // Normalizes the vector
-            v3_GroundVector.Normalize();
+            // v3_GroundVector.Normalize();
 
             if (gameObject.GetComponent<Rigidbody>().velocity.magnitude <= v3_Velocity.magnitude)
             {
-                gameObject.GetComponent<Rigidbody>().velocity = v3_GroundVector * v3_Velocity.magnitude;
+                // gameObject.GetComponent<Rigidbody>().velocity = v3_GroundVector * v3_Velocity.magnitude;
+                gameObject.GetComponent<Rigidbody>().velocity = v3_Velocity;
             }
         }
         else
         {
+            /*
             if (v3_Velocity != new Vector3())
             {
                 v3_Velocity = new Vector3();
 
                 // print("Reset Velocity");
             }
+            */
         }
         #endregion
     }
@@ -225,21 +276,23 @@ public class Cs_SkiingPlayerController : MonoBehaviour
         // tempHit is what we'll compare against
         RaycastHit tempHit;
 
+        int i_LayerMask = LayerMask.GetMask("Ground");
+
         // Set the default as outHit automatically
-        Physics.Raycast(go_RaycastPoint_1.transform.position, -transform.up, out outHit, 1.5f);
+        Physics.Raycast(go_RaycastPoint_1.transform.position, -transform.up, out outHit, float.PositiveInfinity, i_LayerMask);
 
         // Begin comparing against the other three. Find the shortest distance
-        if (Physics.Raycast(go_RaycastPoint_2.transform.position, -transform.up, out tempHit, 1.5f))
+        if (Physics.Raycast(go_RaycastPoint_2.transform.position, -transform.up, out tempHit, float.PositiveInfinity, i_LayerMask))
         {
             if (tempHit.distance < outHit.distance) outHit = tempHit;
         }
 
-        if (Physics.Raycast(go_RaycastPoint_3.transform.position, -transform.up, out tempHit, 1.5f))
+        if (Physics.Raycast(go_RaycastPoint_3.transform.position, -transform.up, out tempHit, float.PositiveInfinity, i_LayerMask))
         {
             if (tempHit.distance < outHit.distance) outHit = tempHit;
         }
 
-        if (Physics.Raycast(go_RaycastPoint_4.transform.position, -transform.up, out tempHit, 1.5f))
+        if (Physics.Raycast(go_RaycastPoint_4.transform.position, -transform.up, out tempHit, float.PositiveInfinity, i_LayerMask))
         {
             if (tempHit.distance < outHit.distance) outHit = tempHit;
         }
