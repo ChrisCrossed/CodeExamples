@@ -47,6 +47,7 @@ public class Cs_SkiingPlayerController : MonoBehaviour
     void Update ()
     {
         //print("Current speed: " + gameObject.GetComponent<Rigidbody>().velocity.magnitude);
+        if (Input.GetKeyDown(KeyCode.Escape)) Application.Quit();
 
         // Update mouse look
         MouseInput();
