@@ -88,9 +88,6 @@ public class Cs_PlayerController : MonoBehaviour
 
             // Clamp
             if (f_DisableTimer < 0) f_DisableTimer = 0;
-
-            // Return out and don't accept player input this frame
-            return;
         }
         else
         {
@@ -132,6 +129,8 @@ public class Cs_PlayerController : MonoBehaviour
 
     void PlayerMovement( Vector3 v3_InputVector_, float f_Magnitude_ )
     {
+        print(f_DisableTimer);
+
         // Grab previous velocity to compare against
         Vector3 v3_PreviousVelocity = gameObject.GetComponent<Rigidbody>().velocity;
         Vector3 v3_NewVelocity = v3_InputVector_ * MAX_PLAYER_SPEED * f_Magnitude_;

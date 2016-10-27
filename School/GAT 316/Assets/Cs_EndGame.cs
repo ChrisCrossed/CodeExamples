@@ -32,7 +32,9 @@ public class Cs_EndGame : MonoBehaviour
 
 	void OnTriggerEnter( Collider collider_ )
     {
-        if (collider_.transform.root.gameObject.tag == "Player")
+        int i_LayerMask = LayerMask.NameToLayer("Player");
+
+        if (collider_.transform.gameObject.layer == i_LayerMask)
         {
             if (go_Door != null)
             {

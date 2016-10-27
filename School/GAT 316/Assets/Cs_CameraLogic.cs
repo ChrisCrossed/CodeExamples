@@ -50,7 +50,10 @@ public class Cs_CameraLogic : MonoBehaviour
                 go_CurrentWall = hit.collider.gameObject;
 
                 // Enable the current wall's transparency
-                go_CurrentWall.GetComponent<Cs_WallLogic>().SetVisibilityState(true);
+                if(go_CurrentWall.GetComponent<Cs_WallLogic>())
+                {
+                    go_CurrentWall.GetComponent<Cs_WallLogic>().SetVisibilityState(true);
+                }
             }
         }
         else

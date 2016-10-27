@@ -241,7 +241,10 @@ public class Cs_EnemyLogic_Grunt : MonoBehaviour
                 if (f_InvestigateTimer <= 0)
                 {
                     // GoToState_Patrol();
-                    go_LevelLogic.GetComponent<Cs_LevelLogic>().Set_PatrolState(gameObject);
+                    if(gameObject != null)
+                    {
+                        go_LevelLogic.GetComponent<Cs_LevelLogic>().Set_PatrolState(gameObject);
+                    }
                 }
             }
         }
