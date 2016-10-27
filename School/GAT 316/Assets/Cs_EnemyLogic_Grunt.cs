@@ -26,6 +26,8 @@ public class Cs_EnemyLogic_Grunt : MonoBehaviour
     // Use this for initialization
     void Start ()
     {
+        go_LevelLogic = GameObject.Find("LevelLogic");
+
         // If there's a custom start position...
         if(i_StartPatrolPoint > 0)
         {
@@ -243,7 +245,10 @@ public class Cs_EnemyLogic_Grunt : MonoBehaviour
                     // GoToState_Patrol();
                     if(gameObject != null)
                     {
-                        go_LevelLogic.GetComponent<Cs_LevelLogic>().Set_PatrolState(gameObject);
+                        if(go_LevelLogic.GetComponent<Cs_LevelLogic>())
+                        {
+                            go_LevelLogic.GetComponent<Cs_LevelLogic>().Set_PatrolState(gameObject);
+                        }
                     }
                 }
             }
