@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using XInputDotNetPure;
+using UnityEditor.Rendering;
 
 public enum Enum_CameraState
 {
@@ -63,6 +64,8 @@ public class Cs_PlayerController : MonoBehaviour
     // Use this for initialization
     void Start ()
     {
+        GameObject.Find("Canvas").GetComponent<Canvas>().enabled = true;
+
         go_SlopeRaycast = transform.FindChild("SlopeRaycast").gameObject;
 
         // Define Camera Information
@@ -129,8 +132,6 @@ public class Cs_PlayerController : MonoBehaviour
 
     void PlayerMovement( Vector3 v3_InputVector_, float f_Magnitude_ )
     {
-        print(f_DisableTimer);
-
         // Grab previous velocity to compare against
         Vector3 v3_PreviousVelocity = gameObject.GetComponent<Rigidbody>().velocity;
         Vector3 v3_NewVelocity = v3_InputVector_ * MAX_PLAYER_SPEED * f_Magnitude_;
@@ -537,8 +538,8 @@ public class Cs_PlayerController : MonoBehaviour
         if (f_Transparency > 1) f_Transparency = 1;
 
         // Set fade object's transparency
-        Color clr_CurrColor = go_FadeInOutObj.GetComponent<MeshRenderer>().material.color;
+        Color clr_CurrColor = go_FadeInOutObj.GetComponent<CanvasRenderer>().GetColor();
         clr_CurrColor.a = f_Transparency;
-        go_FadeInOutObj.GetComponent<MeshRenderer>().material.color = clr_CurrColor;
+        go_FadeInOutObj.GetComponent<CanvasRenderer>().SetColor(clr_CurrColor);
     }
 }
