@@ -199,9 +199,14 @@ public class Cs_EnemyLogic_Grunt : MonoBehaviour
                         gameObject.GetComponent<NavMeshAgent>().updateRotation = false;
 
                         // Set the manual rotation
+                        Quaternion q_CurrRot = gameObject.transform.rotation;
+                        q_CurrRot = Quaternion.Lerp(gameObject.transform.rotation, go_PatrolPath[i_PatrolPoint].transform.rotation, 3 * Time.deltaTime);
+                        gameObject.transform.rotation = q_CurrRot;
+                        /*
                         Vector3 v3_CurrRot = gameObject.transform.eulerAngles;
                         v3_CurrRot.y = Mathf.LerpAngle(gameObject.transform.eulerAngles.y, go_PatrolPath[i_PatrolPoint].transform.eulerAngles.y, 3 * Time.deltaTime);
                         gameObject.transform.eulerAngles = v3_CurrRot;
+                        */
                     }
 
                     // If the Wait Timer reaches a certain point, go to the next point & reset the timer
