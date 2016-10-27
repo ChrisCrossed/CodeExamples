@@ -78,8 +78,6 @@ public class Cs_PlayerController : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
     {
-        // if (Input.GetKeyDown(KeyCode.P)) Set_FadeState(!b_FadeToBlack);
-
         if (Input.GetKeyDown(KeyCode.Escape)) Application.Quit();
 
         // Stop player movement while touching specific triggers

@@ -37,24 +37,57 @@ public class Cs_VisualRadius : MonoBehaviour
 
         SetRadius();
 	}
-
+    float f_StepTimer = 0.5f;
+    float f_RadiusTimer;
     void SetRadius()
     {
         float f_Magnitude = gameObject.GetComponent<Rigidbody>().velocity.magnitude;
         if (f_Magnitude >= 0.2f)
         {
-            f_Radius = gameObject.GetComponent<Rigidbody>().velocity.magnitude;
+            f_Radius = gameObject.GetComponent<Rigidbody>().velocity.magnitude * .5f;
         }
         else
         {
             f_Radius = 0;
         }
 
-        // Cycle through all objects in list, moving their position based on the center of the game object * radius
-        for(int i_ = 0; i_ < go_ArrayPoints.Count; ++i_)
+        // Adjust collider to match radius of movement
+        float f_ColliderRadius = (transform.forward.z * f_Radius) / 2;
+        if (f_ColliderRadius < 0.5f) f_ColliderRadius = 0.5f;
+        gameObject.GetComponent<CapsuleCollider>().radius = f_ColliderRadius;
+
+        f_RadiusTimer += Time.deltaTime * (f_Magnitude / 1f);
+
+        if (f_RadiusTimer >= f_StepTimer && f_Magnitude != 0f)
         {
-            // go_ArrayPoints[i_].transform.position = new Vector3(0, 0, 0);
-            go_ArrayPoints[i_].transform.position = go_ArrayPoints[i_].transform.forward * f_Radius;
+            // Cycle through all objects in list, moving their position based on the center of the game object * radius
+            for(int i_ = 0; i_ < go_ArrayPoints.Count; ++i_)
+            {
+                Vector3 v3_yPos = go_ArrayPoints[i_].transform.position;
+                v3_yPos = (go_ArrayPoints[i_].transform.forward * f_Radius) / 2;
+
+                v3_yPos.y = -(gameObject.transform.lossyScale.y * 3 / 4);
+
+                // v3_yPos.y += Random.Range(-.1f * f_Magnitude, .1f * f_Magnitude);
+                v3_yPos.y += Random.Range(-(f_Magnitude / 1f), (f_Magnitude / 1f)) * 0.1f;
+                go_ArrayPoints[i_].transform.position = v3_yPos;
+            }
+
+            f_RadiusTimer = 0f;
+        }
+        else
+        {
+            // Lerp the current yPosition of each point back to 0
+            for (int i_ = 0; i_ < go_ArrayPoints.Count; ++i_)
+            {
+                Vector3 v3_yPos = go_ArrayPoints[i_].transform.position;
+                v3_yPos.x = (go_ArrayPoints[i_].transform.forward.x * f_Radius) / 2;
+                v3_yPos.z = (go_ArrayPoints[i_].transform.forward.z * f_Radius) / 2;
+
+                v3_yPos.y = Mathf.Lerp(v3_yPos.y, -(gameObject.transform.lossyScale.y * 3 / 4), f_RadiusTimer / f_StepTimer);
+                
+                go_ArrayPoints[i_].transform.position = v3_yPos;
+            }
         }
 
         SetLineRenderer();
