@@ -1,6 +1,14 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+public enum Enum_Tutorial
+{
+    Startup,
+    Jump,
+    Jetpack,
+    LookHoriz
+}
+
 public class Cs_SkiingPlayerController : MonoBehaviour
 {
     GameObject go_RaycastPoint_1;
@@ -17,11 +25,15 @@ public class Cs_SkiingPlayerController : MonoBehaviour
 
     [SerializeField] float f_MaxSpeed;
 
+    // Tutorial locks
+    bool b_Startup_Tutorial;
+    bool b_JumpAllowed_Tutorial;
+    bool b_JetpackAllowed_Tutorial;
+    bool b_LookHorizontalAllowed_Tutorial;
+
 	// Use this for initialization
 	void Start ()
     {
-        Debug.Log(transform.rotation.eulerAngles);
-
         f_xRot = transform.eulerAngles.y;
         f_xRot_Curr = f_xRot;
 
@@ -36,8 +48,6 @@ public class Cs_SkiingPlayerController : MonoBehaviour
         go_Camera = transform.Find("MainCamera").gameObject;
 
         Cursor.lockState = CursorLockMode.Locked;
-
-        //gameObject.transform.rotation = Quaternion.Euler(0, 180, 0);
     }
 
     Vector3 v3_Velocity;
@@ -49,35 +59,61 @@ public class Cs_SkiingPlayerController : MonoBehaviour
         //print("Current speed: " + gameObject.GetComponent<Rigidbody>().velocity.magnitude);
         if (Input.GetKeyDown(KeyCode.Escape)) Application.Quit();
 
-        // Update mouse look
-        MouseInput();
-
-        Jetpack();
-
-        #region PlayerSliding
-
-        // On the first moment the spacebar is pressed, jump
-        if (Input.GetKeyDown(KeyCode.Space))
+        if(b_Startup_Tutorial)
         {
-            Jump();
-        }
-        // Otherwise, if the button is held down, the player is skiing
-        else if (Input.GetKey(KeyCode.Space))
-        {
-            // Increment a timer to be sure the whole jump can be fulfilled
-            if(f_JumpTimer < 0.5f) f_JumpTimer += Time.deltaTime;
+            // Update mouse look
+            MouseInput();
 
-            if(f_JumpTimer > 0.5f) Ski();
-        }
-        // If player is not skiing
-        else
-        {
-            // Set PhysicsMaterial
-            gameObject.GetComponent<Collider>().material = physMat_Walk;
+            if(b_JetpackAllowed_Tutorial)
+            {
+                Jetpack();
+            }
 
-            PlayerInput();
+            #region PlayerSliding
+
+            // On the first moment the spacebar is pressed, jump
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                Jump();
+            }
+            // Otherwise, if the button is held down, the player is skiing
+            else if (Input.GetKey(KeyCode.Space))
+            {
+                // Increment a timer to be sure the whole jump can be fulfilled
+                if(f_JumpTimer < 0.5f) f_JumpTimer += Time.deltaTime;
+
+                if(f_JumpTimer > 0.5f) Ski();
+            }
+            // If player is not skiing
+            else
+            {
+                // Set PhysicsMaterial
+                gameObject.GetComponent<Collider>().material = physMat_Walk;
+
+                PlayerInput();
+            }
+            #endregion
         }
-        #endregion
+    }
+
+    public void Set_TutorialState( Enum_Tutorial e_Tutorial_ )
+    {
+        if( e_Tutorial_ == Enum_Tutorial.Jetpack )
+        {
+            b_JetpackAllowed_Tutorial = true;
+        }
+        else if( e_Tutorial_ == Enum_Tutorial.Jump )
+        {
+            b_JumpAllowed_Tutorial = true;
+        }
+        else if( e_Tutorial_ == Enum_Tutorial.LookHoriz )
+        {
+            b_LookHorizontalAllowed_Tutorial = true;
+        }
+        else if( e_Tutorial_ == Enum_Tutorial.Startup)
+        {
+            b_Startup_Tutorial = true;
+        }
     }
 
     float f_LookSensitivity = 5f;
@@ -93,11 +129,14 @@ public class Cs_SkiingPlayerController : MonoBehaviour
     {
         #region Mouse Horizontal
 
-        // Update Mouse State
-        f_xRot += Input.GetAxis("Mouse X") * f_LookSensitivity;
+        if(b_LookHorizontalAllowed_Tutorial)
+        {
+            // Update Mouse State
+            f_xRot += Input.GetAxis("Mouse X") * f_LookSensitivity;
 
-        // Smooth it out
-        f_xRot_Curr = Mathf.SmoothDamp(f_xRot_Curr, f_xRot, ref f_xRot_Vel, f_lookSmoothDamp);
+            // Smooth it out
+            f_xRot_Curr = Mathf.SmoothDamp(f_xRot_Curr, f_xRot, ref f_xRot_Vel, f_lookSmoothDamp);
+        }
 
         #endregion
 
@@ -138,22 +177,25 @@ public class Cs_SkiingPlayerController : MonoBehaviour
 
             Vector3 v3_InputVelocity = new Vector3();
 
-            if(Input.GetKey(KeyCode.W) && !Input.GetKey(KeyCode.S))
+            if(b_LookHorizontalAllowed_Tutorial)
             {
-                v3_InputVelocity.z = 1;
-            }
-            else if(!Input.GetKey(KeyCode.W) && Input.GetKey(KeyCode.S))
-            {
-                v3_InputVelocity.z = -1;
-            }
+                if(Input.GetKey(KeyCode.W) && !Input.GetKey(KeyCode.S))
+                {
+                    v3_InputVelocity.z = 1;
+                }
+                else if(!Input.GetKey(KeyCode.W) && Input.GetKey(KeyCode.S))
+                {
+                    v3_InputVelocity.z = -1;
+                }
 
-            if (Input.GetKey(KeyCode.A) && !Input.GetKey(KeyCode.D))
-            {
-                v3_InputVelocity.x = -1;
-            }
-            else if (!Input.GetKey(KeyCode.A) && Input.GetKey(KeyCode.D))
-            {
-                v3_InputVelocity.x = 1;
+                if (Input.GetKey(KeyCode.A) && !Input.GetKey(KeyCode.D))
+                {
+                    v3_InputVelocity.x = -1;
+                }
+                else if (!Input.GetKey(KeyCode.A) && Input.GetKey(KeyCode.D))
+                {
+                    v3_InputVelocity.x = 1;
+                }
             }
 
             v3_InputVelocity.Normalize();
@@ -229,7 +271,10 @@ public class Cs_SkiingPlayerController : MonoBehaviour
                     v3_CurrVelocity.y += 1.5f * Time.deltaTime;
                 }
 
-                AirPush();
+                if(b_LookHorizontalAllowed_Tutorial)
+                {
+                    AirPush();
+                }
 
                 gameObject.GetComponent<Rigidbody>().velocity = v3_CurrVelocity;
             }
@@ -367,8 +412,11 @@ public class Cs_SkiingPlayerController : MonoBehaviour
 
             if(hit.distance <= f_RaycastDistance)
             {
-                // Reset jump capabilities
-                b_CanJump = true;
+                if(b_JumpAllowed_Tutorial)
+                {
+                    // Reset jump capabilities
+                    b_CanJump = true;
+                }
 
                 f_JumpMagnitude_Curr = f_MaxJumpMagnitude;
             }
