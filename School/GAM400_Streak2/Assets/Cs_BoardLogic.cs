@@ -30,12 +30,12 @@ public class Cs_BoardLogic : MonoBehaviour
     Vector2 v2_ActiveBlockLocation;
     Enum_BlockSize e_BlockSize;
     [SerializeField] bool b_2w_2h_Allowed = true;
-    [SerializeField] bool b_2w_3h_Allowed = false;
-    [SerializeField] bool b_3w_2h_Allowed = false;
-    [SerializeField] bool b_3w_3h_Allowed = false;
+    [SerializeField] bool b_2w_3h_Allowed = true;
+    [SerializeField] bool b_3w_2h_Allowed = true;
+    [SerializeField] bool b_3w_3h_Allowed = true;
     [SerializeField] bool b_ThreeBlockColors = false;
 
-    Enum_BlockType[] e_NextBlockList = new Enum_BlockType[16];
+    Enum_BlockType[] e_NextBlockList = new Enum_BlockType[27];
 
 	// Use this for initialization
 	void Start ()
@@ -69,6 +69,8 @@ public class Cs_BoardLogic : MonoBehaviour
                 b_FoundNextBlock = true;
             }
         }
+        // Set random initial block
+        e_BlockSize = e_NextBlockSize;
         #endregion
 
         // Initialize NextBlockList
@@ -86,7 +88,8 @@ public class Cs_BoardLogic : MonoBehaviour
 
         PrintArrayToConsole();
     }
-    
+
+    #region Block Creation
     Enum_BlockSize e_NextBlockSize; // Choose the size of the next random block to put on the screen
     // Fills e_NextBlockList with random blocks to push into CreateNewBlock
     void PopulateNextBlockList()
@@ -161,8 +164,8 @@ public class Cs_BoardLogic : MonoBehaviour
         // Manually create a set of new blocks in the proper location
         int i_NumToShift = 0;
 
-        // Find the 'X' location to set the block location (2 high)
-        if(e_BlockSize == Enum_BlockSize.size_2w_2h || e_BlockSize == Enum_BlockSize.size_3w_2h)
+        // Find the 'X' location to set the block location (2 wide)
+        if(e_BlockSize == Enum_BlockSize.size_2w_2h || e_BlockSize == Enum_BlockSize.size_2w_3h)
         {
             // Finds the center of the List width
             v2_ActiveBlockLocation.x = (int)((i_ArrayWidth - 1) / 2);
@@ -173,18 +176,21 @@ public class Cs_BoardLogic : MonoBehaviour
             v2_ActiveBlockLocation.x = (int)((i_ArrayWidth - 1) / 2) - 1;
         }
 
-        // Find the 'Y' location to set the block location
-        if (e_BlockSize == Enum_BlockSize.size_2w_3h || e_BlockSize == Enum_BlockSize.size_3w_3h)
+        // Find the 'Y' location to set the block location (2 high)
+        if (e_BlockSize == Enum_BlockSize.size_2w_2h || e_BlockSize == Enum_BlockSize.size_3w_2h)
         {
-            v2_ActiveBlockLocation.y = i_ArrayHeight - 3;
+            v2_ActiveBlockLocation.y = i_ArrayHeight - 2;
         }
-        else v2_ActiveBlockLocation.y = i_ArrayHeight - 2;
+        // (3 high)
+        else v2_ActiveBlockLocation.y = i_ArrayHeight - 3;
 
         // Set the number of blocks to shift afterward
         if (e_BlockSize == Enum_BlockSize.size_2w_2h)                                                 i_NumToShift = 4;
         else if (e_BlockSize == Enum_BlockSize.size_2w_3h || e_BlockSize == Enum_BlockSize.size_3w_2h)  i_NumToShift = 6;
         else if (e_BlockSize == Enum_BlockSize.size_3w_3h)                                            i_NumToShift = 9;
 
+        print("BLOCK SIZE: " + e_BlockSize);
+        
         // No matter what, set the initial 2x2
         SetBlock(v2_ActiveBlockLocation,                                                    e_NextBlockList[0]);
         SetBlock(new Vector2(v2_ActiveBlockLocation.x + 1, v2_ActiveBlockLocation.y + 0),   e_NextBlockList[1]);
@@ -246,23 +252,7 @@ public class Cs_BoardLogic : MonoBehaviour
             }
         }
     }
-
-    void PrintArrayToConsole()
-    {
-        // The 'y' is reversed (top to bottom) to compensate for printing
-        for(int j = i_ArrayHeight - 1; j >= 0 ; j--)
-        {
-            string tempString = "";
-
-            for(int i = 0; i < i_ArrayWidth; ++i)
-            {
-                if (BlockArray[j, i] == Enum_BlockType.Empty) tempString += "[__] ";
-                else tempString += "[" + (int)BlockArray[j, i] + "] ";
-            }
-            print(tempString);
-        }
-        print("Active Block: " + v2_ActiveBlockLocation + "\n-----------------------------------------------------------------\n");
-    }
+    #endregion
 
     #region Block Position Manipulation
     // Complete
@@ -532,16 +522,144 @@ public class Cs_BoardLogic : MonoBehaviour
         ++v2_ActiveBlockLocation.x;
     }
 
-    // TODO: Start
+    // Complete
     void RotateBlocks_Clockwise(Vector2 v2_BottomLeft, Enum_BlockSize BlockSize_)
     {
+        // Store Bottom Left (Temporary)
+        Enum_BlockType e_TempBlockType_ = GetBlock((int)v2_BottomLeft.x, (int)v2_BottomLeft.y);
 
+        // Bottom Left -> Bottom Right
+        SetBlock((int)v2_BottomLeft.x + 0, (int)v2_BottomLeft.y + 0, GetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y + 0));
+
+        if (BlockSize_ == Enum_BlockSize.size_2w_2h)
+        {
+            // Bottom Right -> Top Right
+            SetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y + 0, GetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y + 1));
+
+            // Top Right -> Top Left
+            SetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y + 1, GetBlock((int)v2_BottomLeft.x + 0, (int)v2_BottomLeft.y + 1));
+        }
+        else if(BlockSize_ == Enum_BlockSize.size_3w_2h)
+        {
+            // (1,0) becomes (2,0)
+            SetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y + 0, GetBlock((int)v2_BottomLeft.x + 2, (int)v2_BottomLeft.y + 0));
+
+            // (2,0) becomes (2,1)
+            SetBlock((int)v2_BottomLeft.x + 2, (int)v2_BottomLeft.y + 0, GetBlock((int)v2_BottomLeft.x + 2, (int)v2_BottomLeft.y + 1));
+
+            // (2,1) becomes (1,1)
+            SetBlock((int)v2_BottomLeft.x + 2, (int)v2_BottomLeft.y + 1, GetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y + 1));
+
+            // (1,1) becomes (0,1)
+            SetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y + 1, GetBlock((int)v2_BottomLeft.x + 0, (int)v2_BottomLeft.y + 1));
+        }
+        else if(BlockSize_ == Enum_BlockSize.size_2w_3h)
+        {
+            // (1,0) becomes (1,1)
+            SetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y + 0, GetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y + 1));
+
+            // (1,1) becomes (1,2)
+            SetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y + 1, GetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y + 2));
+
+            // (1,2) becomes (0,2)
+            SetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y + 2, GetBlock((int)v2_BottomLeft.x + 0, (int)v2_BottomLeft.y + 2));
+
+            // (0,2) becomes (0,1)
+            SetBlock((int)v2_BottomLeft.x + 0, (int)v2_BottomLeft.y + 2, GetBlock((int)v2_BottomLeft.x + 0, (int)v2_BottomLeft.y + 1));
+        }
+        else if(BlockSize_ == Enum_BlockSize.size_3w_3h)
+        {
+            // (1,0) becomes (2,0)
+            SetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y + 0, GetBlock((int)v2_BottomLeft.x + 2, (int)v2_BottomLeft.y + 0));
+
+            // (2,0) becomes (2,1)
+            SetBlock((int)v2_BottomLeft.x + 2, (int)v2_BottomLeft.y + 0, GetBlock((int)v2_BottomLeft.x + 2, (int)v2_BottomLeft.y + 1));
+
+            // (2,1) becomes (2,2)
+            SetBlock((int)v2_BottomLeft.x + 2, (int)v2_BottomLeft.y + 1, GetBlock((int)v2_BottomLeft.x + 2, (int)v2_BottomLeft.y + 2));
+
+            // (2,2) becomes (1,2)
+            SetBlock((int)v2_BottomLeft.x + 2, (int)v2_BottomLeft.y + 2, GetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y + 2));
+
+            // (1,2) becomes (0,2)
+            SetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y + 2, GetBlock((int)v2_BottomLeft.x + 0, (int)v2_BottomLeft.y + 2));
+
+            // (0,2) becomes (0,1)
+            SetBlock((int)v2_BottomLeft.x + 0, (int)v2_BottomLeft.y + 2, GetBlock((int)v2_BottomLeft.x + 0, (int)v2_BottomLeft.y + 1));
+        }
+
+        // (0,1) becomes Temporary
+        SetBlock((int)v2_BottomLeft.x + 0, (int)v2_BottomLeft.y + 1, e_TempBlockType_);
     }
 
-    // TODO: Start
+    // Complete
     void RotateBlocks_CounterClock(Vector2 v2_BottomLeft, Enum_BlockSize BlockSize_)
     {
+        // Store Bottom Left (Temporary)
+        Enum_BlockType e_TempBlockType_ = GetBlock((int)v2_BottomLeft.x, (int)v2_BottomLeft.y);
 
+        // Bottom Left -> Top Left
+        SetBlock((int)v2_BottomLeft.x + 0, (int)v2_BottomLeft.y + 0, GetBlock((int)v2_BottomLeft.x + 0, (int)v2_BottomLeft.y + 1));
+
+        if (BlockSize_ == Enum_BlockSize.size_2w_2h)
+        {
+            // Top Left -> Top Right
+            SetBlock((int)v2_BottomLeft.x + 0, (int)v2_BottomLeft.y + 1, GetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y + 1));
+
+            // Top Right -> Bottom Right
+            SetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y + 1, GetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y + 0));
+        }
+        else if (BlockSize_ == Enum_BlockSize.size_3w_2h)
+        {
+            // (0,1) becomes (1,1)
+            SetBlock((int)v2_BottomLeft.x + 0, (int)v2_BottomLeft.y + 1, GetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y + 1));
+
+            // (1,1) becomes (2,1)
+            SetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y + 1, GetBlock((int)v2_BottomLeft.x + 2, (int)v2_BottomLeft.y + 1));
+
+            // (2,1) becomes (2,0)
+            SetBlock((int)v2_BottomLeft.x + 2, (int)v2_BottomLeft.y + 1, GetBlock((int)v2_BottomLeft.x + 2, (int)v2_BottomLeft.y + 0));
+
+            // (2,0) becomes (1,0)
+            SetBlock((int)v2_BottomLeft.x + 2, (int)v2_BottomLeft.y + 0, GetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y + 0));
+        }
+        else if (BlockSize_ == Enum_BlockSize.size_2w_3h)
+        {
+            // (0,1) becomes (0,2)
+            SetBlock((int)v2_BottomLeft.x + 0, (int)v2_BottomLeft.y + 1, GetBlock((int)v2_BottomLeft.x + 0, (int)v2_BottomLeft.y + 2));
+
+            // (0,2) becomes (1,2)
+            SetBlock((int)v2_BottomLeft.x + 0, (int)v2_BottomLeft.y + 2, GetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y + 2));
+
+            // (1,2) becomes (1,1)
+            SetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y + 2, GetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y + 1));
+
+            // (1,1) becomes (1,0)
+            SetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y + 1, GetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y + 0));
+        }
+        else if (BlockSize_ == Enum_BlockSize.size_3w_3h)
+        {
+            // (0,1) becomes (0,2)
+            SetBlock((int)v2_BottomLeft.x + 0, (int)v2_BottomLeft.y + 1, GetBlock((int)v2_BottomLeft.x + 0, (int)v2_BottomLeft.y + 2));
+
+            // (0,2) becomes (1,2)
+            SetBlock((int)v2_BottomLeft.x + 0, (int)v2_BottomLeft.y + 2, GetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y + 2));
+
+            // (1,2) becomes (2,2)
+            SetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y + 2, GetBlock((int)v2_BottomLeft.x + 2, (int)v2_BottomLeft.y + 2));
+
+            // (2,2) becomes (2,1)
+            SetBlock((int)v2_BottomLeft.x + 2, (int)v2_BottomLeft.y + 2, GetBlock((int)v2_BottomLeft.x + 2, (int)v2_BottomLeft.y + 1));
+
+            // (2,1) becomes (2,0)
+            SetBlock((int)v2_BottomLeft.x + 2, (int)v2_BottomLeft.y + 1, GetBlock((int)v2_BottomLeft.x + 2, (int)v2_BottomLeft.y + 0));
+
+            // (2,0) becomes (1,0)
+            SetBlock((int)v2_BottomLeft.x + 2, (int)v2_BottomLeft.y + 0, GetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y + 0));
+        }
+
+        // (1,0) becomes Temporary
+        SetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y + 0, e_TempBlockType_);
     }
 
     void SetBlock(int x_Pos_, int y_Pos_, Enum_BlockType blockType_)
@@ -625,6 +743,23 @@ public class Cs_BoardLogic : MonoBehaviour
     }
     #endregion
 
+    void PrintArrayToConsole()
+    {
+        // The 'y' is reversed (top to bottom) to compensate for printing
+        for(int j = i_ArrayHeight - 1; j >= 0 ; j--)
+        {
+            string tempString = "";
+
+            for(int i = 0; i < i_ArrayWidth; ++i)
+            {
+                if (BlockArray[j, i] == Enum_BlockType.Empty) tempString += "[__] ";
+                else tempString += "[" + (int)BlockArray[j, i] + "] ";
+            }
+            print(tempString);
+        }
+        print("Active Block: " + v2_ActiveBlockLocation + "\n-----------------------------------------------------------------\n");
+    }
+
     // Update is called once per frame
     void Update ()
     {
@@ -645,6 +780,20 @@ public class Cs_BoardLogic : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.D))
         {
             MoveActiveBlocks_Right(v2_ActiveBlockLocation, e_BlockSize);
+
+            PrintArrayToConsole();
+        }
+
+        if(Input.GetKeyDown(KeyCode.Q))
+        {
+            RotateBlocks_CounterClock(v2_ActiveBlockLocation, e_BlockSize);
+
+            PrintArrayToConsole();
+        }
+
+        if(Input.GetKeyDown(KeyCode.E))
+        {
+            RotateBlocks_Clockwise(v2_ActiveBlockLocation, e_BlockSize);
 
             PrintArrayToConsole();
         }
