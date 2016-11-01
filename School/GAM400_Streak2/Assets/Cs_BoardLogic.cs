@@ -37,6 +37,9 @@ public class Cs_BoardLogic : MonoBehaviour
 
     Enum_BlockType[] e_NextBlockList = new Enum_BlockType[27];
 
+    [SerializeField] bool b_MidRowBlank = false;
+    [Range(1, 10)] [SerializeField] int i_ExtraBlankRow = 1;
+
 	// Use this for initialization
 	void Start ()
     {
@@ -677,6 +680,19 @@ public class Cs_BoardLogic : MonoBehaviour
 
     void AllBlocksStatic()
     {
+        #region Set Left & Right Walls to 'Empty' (Done BEFORE scoring)
+        for (int y_ = 0; y_ < i_ArrayHeight; ++y_)
+        {
+            // Set Left Wall to be 'Empty'
+            SetBlock(0, y_, Enum_BlockType.Empty);
+
+            // Set Right Wall to be 'Empty'
+            SetBlock(i_ArrayWidth - 1, y_, Enum_BlockType.Empty);
+
+
+        }
+        #endregion
+
         #region Convert All to Static
         // Run through the array and convert all blocks into their static counterpart. Run bottom to top, left to right.
         for (int x_ = 0; x_ < i_ArrayWidth; ++x_)
@@ -731,18 +747,39 @@ public class Cs_BoardLogic : MonoBehaviour
         }
         #endregion
 
+        // TODO: RUN SCORE CODE HERE FIRST
+        
+        #region Set 'Mid Empty' row to empty (Done AFTER scoring)
+        for (int y_ = 0; y_ < i_ArrayHeight; ++y_)
+        {
+            if (b_MidRowBlank)
+            {
+                if (i_ExtraBlankRow > 0 &&
+                    i_ExtraBlankRow < i_ArrayWidth)
+                {
+                    SetBlock(i_ExtraBlankRow, y_, Enum_BlockType.Empty);
+                }
+            }
+        }
+        #endregion
+
         // Set the next block size to be whatever we found
         e_BlockSize = e_NextBlockSize;
 
         CreateNewBlock();
     }
 
+    Enum_BlockType GetBlock(float x_Pos_, float y_Pos_)
+    {
+        return GetBlock((int)x_Pos_, (int)y_Pos_);
+    }
     Enum_BlockType GetBlock(int x_Pos_, int y_Pos_)
     {
         return BlockArray[y_Pos_, x_Pos_];
     }
     #endregion
 
+    #region Print Array To Console
     void PrintArrayToConsole()
     {
         // The 'y' is reversed (top to bottom) to compensate for printing
@@ -752,13 +789,28 @@ public class Cs_BoardLogic : MonoBehaviour
 
             for(int i = 0; i < i_ArrayWidth; ++i)
             {
-                if (BlockArray[j, i] == Enum_BlockType.Empty) tempString += "[__] ";
+                // Left & Right 'Walls'
+                if((i == 0 || i == i_ArrayWidth - 1) && (BlockArray[j, i] == Enum_BlockType.Empty))
+                {
+                    tempString += "{!!} ";
+                }
+                else if(i_ExtraBlankRow > 0 && // Extra Blank Row is Set
+                        i_ExtraBlankRow < i_ArrayWidth && // Extra Blank Row is Set
+                        i == i_ExtraBlankRow && // This row is the one that's been set
+                        (BlockArray[j, i] == Enum_BlockType.Empty)) // The block position is empty
+                {
+                    tempString += "{!!} ";
+                }
+                // Normal empty block position
+                else if (BlockArray[j, i] == Enum_BlockType.Empty) tempString += "[__] ";
+                // Print a populated block
                 else tempString += "[" + (int)BlockArray[j, i] + "] ";
             }
             print(tempString);
         }
         print("Active Block: " + v2_ActiveBlockLocation + "\n-----------------------------------------------------------------\n");
     }
+    #endregion
 
     // Update is called once per frame
     void Update ()
