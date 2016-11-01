@@ -13,10 +13,10 @@ public enum Enum_BlockType
 }
 public enum Enum_BlockSize
 {
-    size_2x2,
-    size_2x3,
-    size_3x2,
-    size_3x3
+    size_2w_2h,
+    size_2w_3h,
+    size_3w_2h,
+    size_3w_3h
 }
 
 public class Cs_BoardLogic : MonoBehaviour
@@ -28,11 +28,11 @@ public class Cs_BoardLogic : MonoBehaviour
 
     // Current Active Block Information
     Vector2 v2_ActiveBlockLocation;
-    Enum_BlockSize e_BlockSize = Enum_BlockSize.size_2x2;
-    [SerializeField] bool b_2x2_Allowed = true;
-    [SerializeField] bool b_2x3_Allowed = false;
-    [SerializeField] bool b_3x2_Allowed = false;
-    [SerializeField] bool b_3x3_Allowed = false;
+    Enum_BlockSize e_BlockSize;
+    [SerializeField] bool b_2w_2h_Allowed = true;
+    [SerializeField] bool b_2w_3h_Allowed = false;
+    [SerializeField] bool b_3w_2h_Allowed = false;
+    [SerializeField] bool b_3w_3h_Allowed = false;
     [SerializeField] bool b_ThreeBlockColors = false;
 
     Enum_BlockType[] e_NextBlockList = new Enum_BlockType[16];
@@ -40,6 +40,37 @@ public class Cs_BoardLogic : MonoBehaviour
 	// Use this for initialization
 	void Start ()
     {
+        #region Set First Block to Random Size
+        // Determine the size of the next block to use
+        bool b_FoundNextBlock = false;
+        // While we haven't found the next block, loop
+        while (!b_FoundNextBlock)
+        {
+            int i_RandBlock = Random.Range(0, 4);
+
+            if (i_RandBlock == 0 && b_2w_2h_Allowed)
+            {
+                e_NextBlockSize = Enum_BlockSize.size_2w_2h;
+                b_FoundNextBlock = true;
+            }
+            else if (i_RandBlock == 1 && b_2w_3h_Allowed)
+            {
+                e_NextBlockSize = Enum_BlockSize.size_2w_3h;
+                b_FoundNextBlock = true;
+            }
+            else if (i_RandBlock == 2 && b_3w_2h_Allowed)
+            {
+                e_NextBlockSize = Enum_BlockSize.size_3w_2h;
+                b_FoundNextBlock = true;
+            }
+            else if (i_RandBlock == 3 && b_3w_3h_Allowed)
+            {
+                e_NextBlockSize = Enum_BlockSize.size_3w_3h;
+                b_FoundNextBlock = true;
+            }
+        }
+        #endregion
+
         // Initialize NextBlockList
         for(int i_ = 0; i_ < e_NextBlockList.Length; ++i_)
         {
@@ -51,24 +82,7 @@ public class Cs_BoardLogic : MonoBehaviour
         BlockArray = new Enum_BlockType[i_ArrayHeight, i_ArrayWidth];
         Initialize_BlockArray();
 
-        // Default (2x2)
-        // SetBlock(1, 1, Enum_BlockType.Block_2_Active);
-        // SetBlock(2, 1, Enum_BlockType.Block_1_Active);
-        // SetBlock(1, 2, Enum_BlockType.Block_2_Active);
-        // SetBlock(2, 2, Enum_BlockType.Block_1_Active);
-
-        // 3 wide
-        //SetBlock(3, 1, Enum_BlockType.Block_1_Active);
-        //SetBlock(3, 2, Enum_BlockType.Block_2_Active);
-
-        // 3 high
-        //SetBlock(1, 3, Enum_BlockType.Block_1_Active);
-        //SetBlock(2, 3, Enum_BlockType.Block_3_Static);
-
-        // (3x3)
-        // SetBlock(3, 3, Enum_BlockType.Block_3_Active);
-
-        v2_ActiveBlockLocation = new Vector2(1, 1);
+        CreateNewBlock();
 
         PrintArrayToConsole();
     }
@@ -119,24 +133,24 @@ public class Cs_BoardLogic : MonoBehaviour
         {
             int i_RandBlock = Random.Range(0, 4);
 
-            if(i_RandBlock == 0 && b_2x2_Allowed)
+            if(i_RandBlock == 0 && b_2w_2h_Allowed)
             {
-                e_NextBlockSize = Enum_BlockSize.size_2x2;
+                e_NextBlockSize = Enum_BlockSize.size_2w_2h;
                 b_FoundNextBlock = true;
             }
-            else if (i_RandBlock == 1 && b_2x3_Allowed)
+            else if (i_RandBlock == 1 && b_2w_3h_Allowed)
             {
-                e_NextBlockSize = Enum_BlockSize.size_2x3;
+                e_NextBlockSize = Enum_BlockSize.size_2w_3h;
                 b_FoundNextBlock = true;
             }
-            else if (i_RandBlock == 2 && b_3x2_Allowed)
+            else if (i_RandBlock == 2 && b_3w_2h_Allowed)
             {
-                e_NextBlockSize = Enum_BlockSize.size_3x2;
+                e_NextBlockSize = Enum_BlockSize.size_3w_2h;
                 b_FoundNextBlock = true;
             }
-            else if (i_RandBlock == 3 && b_3x3_Allowed)
+            else if (i_RandBlock == 3 && b_3w_3h_Allowed)
             {
-                e_NextBlockSize = Enum_BlockSize.size_3x3;
+                e_NextBlockSize = Enum_BlockSize.size_3w_3h;
                 b_FoundNextBlock = true;
             }
         }
@@ -148,7 +162,7 @@ public class Cs_BoardLogic : MonoBehaviour
         int i_NumToShift = 0;
 
         // Find the 'X' location to set the block location (2 high)
-        if(e_BlockSize == Enum_BlockSize.size_2x2 || e_BlockSize == Enum_BlockSize.size_2x3)
+        if(e_BlockSize == Enum_BlockSize.size_2w_2h || e_BlockSize == Enum_BlockSize.size_3w_2h)
         {
             // Finds the center of the List width
             v2_ActiveBlockLocation.x = (int)((i_ArrayWidth - 1) / 2);
@@ -160,16 +174,16 @@ public class Cs_BoardLogic : MonoBehaviour
         }
 
         // Find the 'Y' location to set the block location
-        if (e_BlockSize == Enum_BlockSize.size_2x3 || e_BlockSize == Enum_BlockSize.size_3x3)
+        if (e_BlockSize == Enum_BlockSize.size_2w_3h || e_BlockSize == Enum_BlockSize.size_3w_3h)
         {
             v2_ActiveBlockLocation.y = i_ArrayHeight - 3;
         }
         else v2_ActiveBlockLocation.y = i_ArrayHeight - 2;
 
         // Set the number of blocks to shift afterward
-        if (e_BlockSize == Enum_BlockSize.size_2x2)                                                 i_NumToShift = 4;
-        else if (e_BlockSize == Enum_BlockSize.size_2x3 || e_BlockSize == Enum_BlockSize.size_3x2)  i_NumToShift = 6;
-        else if (e_BlockSize == Enum_BlockSize.size_3x3)                                            i_NumToShift = 9;
+        if (e_BlockSize == Enum_BlockSize.size_2w_2h)                                                 i_NumToShift = 4;
+        else if (e_BlockSize == Enum_BlockSize.size_2w_3h || e_BlockSize == Enum_BlockSize.size_3w_2h)  i_NumToShift = 6;
+        else if (e_BlockSize == Enum_BlockSize.size_3w_3h)                                            i_NumToShift = 9;
 
         // No matter what, set the initial 2x2
         SetBlock(v2_ActiveBlockLocation,                                                    e_NextBlockList[0]);
@@ -177,19 +191,19 @@ public class Cs_BoardLogic : MonoBehaviour
         SetBlock(new Vector2(v2_ActiveBlockLocation.x + 0, v2_ActiveBlockLocation.y + 1),   e_NextBlockList[2]);
         SetBlock(new Vector2(v2_ActiveBlockLocation.x + 1, v2_ActiveBlockLocation.y + 1),   e_NextBlockList[3]);
 
-        // If we're specifically 2x3, set those positions
-        if( e_BlockSize == Enum_BlockSize.size_2x3 )
+        // If we're specifically 3x2, set those positions
+        if( e_BlockSize == Enum_BlockSize.size_3w_2h )
         {
             SetBlock(new Vector2(v2_ActiveBlockLocation.x + 2, v2_ActiveBlockLocation.y + 1), e_NextBlockList[4]);
             SetBlock(new Vector2(v2_ActiveBlockLocation.x + 2, v2_ActiveBlockLocation.y + 0), e_NextBlockList[5]);
         }
-        // If we're specifically 3x2, set those positions
-        else if( e_BlockSize == Enum_BlockSize.size_3x2)
+        // If we're specifically 2x3, set those positions
+        else if( e_BlockSize == Enum_BlockSize.size_2w_3h)
         {
             SetBlock(new Vector2(v2_ActiveBlockLocation.x + 0, v2_ActiveBlockLocation.y + 2), e_NextBlockList[4]);
             SetBlock(new Vector2(v2_ActiveBlockLocation.x + 1, v2_ActiveBlockLocation.y + 2), e_NextBlockList[5]);
         }
-        else if( e_BlockSize == Enum_BlockSize.size_3x3 )
+        else if( e_BlockSize == Enum_BlockSize.size_3w_3h )
         {
             SetBlock(new Vector2(v2_ActiveBlockLocation.x + 2, v2_ActiveBlockLocation.y + 1), e_NextBlockList[4]);
             SetBlock(new Vector2(v2_ActiveBlockLocation.x + 2, v2_ActiveBlockLocation.y + 0), e_NextBlockList[5]);
@@ -203,7 +217,7 @@ public class Cs_BoardLogic : MonoBehaviour
         ShiftNewBlockList( i_NumToShift );
     }
 
-    // Used within 'CreateNewBlock'
+    // Used within 'CreateNewBlock' to manipulate the Next Block List
     void ShiftNewBlockList( int i_NumToShift_ )
     {
         // Shift the blocks at the i_NumToShift_ positions down
@@ -217,6 +231,9 @@ public class Cs_BoardLogic : MonoBehaviour
         {
             e_NextBlockList[j_] = Enum_BlockType.Empty;
         }
+
+        // Re-populate the list
+        PopulateNextBlockList();
     }
 
     void Initialize_BlockArray()
@@ -239,7 +256,7 @@ public class Cs_BoardLogic : MonoBehaviour
 
             for(int i = 0; i < i_ArrayWidth; ++i)
             {
-                if (BlockArray[j, i] == Enum_BlockType.Empty) tempString += "[00] ";
+                if (BlockArray[j, i] == Enum_BlockType.Empty) tempString += "[__] ";
                 else tempString += "[" + (int)BlockArray[j, i] + "] ";
             }
             print(tempString);
@@ -257,7 +274,7 @@ public class Cs_BoardLogic : MonoBehaviour
         if (GetBlock((int)v2_BottomLeft.x, (int)v2_BottomLeft.y - 1) != Enum_BlockType.Empty) { AllBlocksStatic(); return; }
         if (GetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y - 1) != Enum_BlockType.Empty) { AllBlocksStatic(); return; }
 
-        if (BlockSize_ == Enum_BlockSize.size_3x2 || BlockSize_ == Enum_BlockSize.size_3x3)
+        if (BlockSize_ == Enum_BlockSize.size_3w_2h || BlockSize_ == Enum_BlockSize.size_3w_3h)
         {
             if (GetBlock((int)v2_BottomLeft.x + 2, (int)v2_BottomLeft.y - 1) != Enum_BlockType.Empty) { AllBlocksStatic(); return; }
         }
@@ -276,7 +293,7 @@ public class Cs_BoardLogic : MonoBehaviour
         // (1,1) -> (1, 0)
         SetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y, GetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y + 1));
 
-        if(BlockSize_ == Enum_BlockSize.size_2x2)
+        if(BlockSize_ == Enum_BlockSize.size_2w_2h)
         {
             // (0,1) -> CLEAR
             SetBlock((int)v2_BottomLeft.x, (int)v2_BottomLeft.y + 1, Enum_BlockType.Empty);
@@ -287,7 +304,7 @@ public class Cs_BoardLogic : MonoBehaviour
         #endregion
 
         #region 3 wide by 2 tall
-        if(BlockSize_ == Enum_BlockSize.size_3x2 || BlockSize_ == Enum_BlockSize.size_3x3)
+        if(BlockSize_ == Enum_BlockSize.size_3w_2h || BlockSize_ == Enum_BlockSize.size_3w_3h)
         {
             // (2, 0) -> (2, -1)
             SetBlock((int)v2_BottomLeft.x + 2, (int)v2_BottomLeft.y - 1, GetBlock((int)v2_BottomLeft.x + 2, (int)v2_BottomLeft.y));
@@ -296,7 +313,7 @@ public class Cs_BoardLogic : MonoBehaviour
             SetBlock((int)v2_BottomLeft.x + 2, (int)v2_BottomLeft.y    , GetBlock((int)v2_BottomLeft.x + 2, (int)v2_BottomLeft.y + 1));
 
             // If 3x2:
-            if (BlockSize_ == Enum_BlockSize.size_3x2)
+            if (BlockSize_ == Enum_BlockSize.size_3w_2h)
             {
                 // (0,1) -> CLEAR
                 SetBlock((int)v2_BottomLeft.x    , (int)v2_BottomLeft.y + 1, Enum_BlockType.Empty);
@@ -311,7 +328,7 @@ public class Cs_BoardLogic : MonoBehaviour
         #endregion
 
         #region 2 wide by 3 tall
-        if (BlockSize_ == Enum_BlockSize.size_2x3 || BlockSize_ == Enum_BlockSize.size_3x3)
+        if (BlockSize_ == Enum_BlockSize.size_2w_3h || BlockSize_ == Enum_BlockSize.size_3w_3h)
         {
             // (0,2) -> (0, 1) 
             SetBlock((int)v2_BottomLeft.x, (int)v2_BottomLeft.y + 1, GetBlock((int)v2_BottomLeft.x, (int)v2_BottomLeft.y + 2));
@@ -328,7 +345,7 @@ public class Cs_BoardLogic : MonoBehaviour
         #endregion
 
         #region 3 wide by 3 tall
-        if (BlockSize_ == Enum_BlockSize.size_3x3)
+        if (BlockSize_ == Enum_BlockSize.size_3w_3h)
         {
             // (2,2) -> (2,1)
             SetBlock((int)v2_BottomLeft.x + 2, (int)v2_BottomLeft.y + 1, GetBlock((int)v2_BottomLeft.x + 2, (int)v2_BottomLeft.y + 2));
@@ -353,7 +370,7 @@ public class Cs_BoardLogic : MonoBehaviour
         if (GetBlock((int)v2_BottomLeft.x - 1, (int)v2_BottomLeft.y + 1) != Enum_BlockType.Empty) { return; }
 
         // Check in case the active blocks we have are 3 high
-        if(e_BlockSize_ == Enum_BlockSize.size_2x3 || e_BlockSize_ == Enum_BlockSize.size_3x3)
+        if(e_BlockSize_ == Enum_BlockSize.size_2w_3h || e_BlockSize_ == Enum_BlockSize.size_3w_3h)
         {
             if (GetBlock((int)v2_BottomLeft.x - 1, (int)v2_BottomLeft.y + 2) != Enum_BlockType.Empty) { return; }
         }
@@ -372,7 +389,7 @@ public class Cs_BoardLogic : MonoBehaviour
         // (1, 1) -> (0, 1)
         SetBlock((int)v2_BottomLeft.x, (int)v2_BottomLeft.y + 1, GetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y + 1));
 
-        if (e_BlockSize_ == Enum_BlockSize.size_2x2)
+        if (e_BlockSize_ == Enum_BlockSize.size_2w_2h)
         {
             // (1,0) -> CLEAR
             SetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y, Enum_BlockType.Empty);
@@ -383,7 +400,7 @@ public class Cs_BoardLogic : MonoBehaviour
         #endregion
 
         #region 3 wide by 2 tall
-        if (e_BlockSize_ == Enum_BlockSize.size_3x2 || e_BlockSize_ == Enum_BlockSize.size_3x3)
+        if (e_BlockSize_ == Enum_BlockSize.size_3w_2h || e_BlockSize_ == Enum_BlockSize.size_3w_3h)
         {
             // (2, 0) -> (1, 0)
             SetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y, GetBlock((int)v2_BottomLeft.x + 2, (int)v2_BottomLeft.y));
@@ -400,7 +417,7 @@ public class Cs_BoardLogic : MonoBehaviour
         #endregion
 
         #region 2 wide by 3 tall
-        if (e_BlockSize_ == Enum_BlockSize.size_2x3 || e_BlockSize_ == Enum_BlockSize.size_3x3)
+        if (e_BlockSize_ == Enum_BlockSize.size_2w_3h || e_BlockSize_ == Enum_BlockSize.size_3w_3h)
         {
             // (0,2) -> (-1, 2) 
             SetBlock((int)v2_BottomLeft.x - 1, (int)v2_BottomLeft.y + 2, GetBlock((int)v2_BottomLeft.x, (int)v2_BottomLeft.y + 2));
@@ -409,7 +426,7 @@ public class Cs_BoardLogic : MonoBehaviour
             SetBlock((int)v2_BottomLeft.x, (int)v2_BottomLeft.y + 2, GetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y + 2));
 
             // If 2x3: 
-            if(e_BlockSize_ == Enum_BlockSize.size_2x3)
+            if(e_BlockSize_ == Enum_BlockSize.size_2w_3h)
             {
                 // (1,0) -> CLEAR
                 SetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y, Enum_BlockType.Empty);
@@ -424,7 +441,7 @@ public class Cs_BoardLogic : MonoBehaviour
         #endregion
 
         #region 3 wide by 3 tall
-        if (e_BlockSize_ == Enum_BlockSize.size_3x3)
+        if (e_BlockSize_ == Enum_BlockSize.size_3w_3h)
         {
             // (2,2) -> (1,2)
             SetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y + 2, GetBlock((int)v2_BottomLeft.x + 2, (int)v2_BottomLeft.y + 2));
@@ -442,7 +459,7 @@ public class Cs_BoardLogic : MonoBehaviour
     {
         // Check two spaces over from the bottom left block
         // Return check. Performs no operation if we're outside the size of the grid
-        if (BlockSize_ == Enum_BlockSize.size_2x2 || BlockSize_ == Enum_BlockSize.size_2x3)
+        if (BlockSize_ == Enum_BlockSize.size_2w_2h || BlockSize_ == Enum_BlockSize.size_2w_3h)
         {
             // If the position to the right of the block doesn't exist, quit out.
             if (v2_BottomLeft.x + 2 >= i_ArrayWidth) { return; }
@@ -464,13 +481,13 @@ public class Cs_BoardLogic : MonoBehaviour
         }
 
         #region Run the check from the top right, backward
-        if(BlockSize_ == Enum_BlockSize.size_3x3)
+        if(BlockSize_ == Enum_BlockSize.size_3w_3h)
         {
             // 2, 2 -> 3, 2
             SetBlock((int)v2_BottomLeft.x + 3, (int)v2_BottomLeft.y + 2, GetBlock((int)v2_BottomLeft.x + 2, (int)v2_BottomLeft.y + 2));
         }
 
-        if(BlockSize_ == Enum_BlockSize.size_2x3 || BlockSize_ == Enum_BlockSize.size_3x3)
+        if(BlockSize_ == Enum_BlockSize.size_2w_3h || BlockSize_ == Enum_BlockSize.size_3w_3h)
         {
             // 1, 2 -> 2, 2
             SetBlock((int)v2_BottomLeft.x + 2, (int)v2_BottomLeft.y + 2, GetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y + 2));
@@ -482,7 +499,7 @@ public class Cs_BoardLogic : MonoBehaviour
             SetBlock((int)v2_BottomLeft.x + 0, (int)v2_BottomLeft.y + 2, Enum_BlockType.Empty);
         }
 
-        if (BlockSize_ == Enum_BlockSize.size_3x2 || BlockSize_ == Enum_BlockSize.size_3x3)
+        if (BlockSize_ == Enum_BlockSize.size_3w_2h || BlockSize_ == Enum_BlockSize.size_3w_3h)
         {
             // 2, 1 -> 3, 1
             SetBlock((int)v2_BottomLeft.x + 3, (int)v2_BottomLeft.y + 1, GetBlock((int)v2_BottomLeft.x + 2, (int)v2_BottomLeft.y + 1));
@@ -596,13 +613,14 @@ public class Cs_BoardLogic : MonoBehaviour
         }
         #endregion
 
+        // Set the next block size to be whatever we found
+        e_BlockSize = e_NextBlockSize;
+
         CreateNewBlock();
     }
 
     Enum_BlockType GetBlock(int x_Pos_, int y_Pos_)
     {
-        print("Receiving: " + x_Pos_ + ", " + y_Pos_);
-
         return BlockArray[y_Pos_, x_Pos_];
     }
     #endregion
