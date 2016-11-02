@@ -26,10 +26,10 @@ public class Cs_SkiingPlayerController : MonoBehaviour
     [SerializeField] float f_MaxSpeed;
 
     // Tutorial locks
-    bool b_Startup_Tutorial;
-    bool b_JumpAllowed_Tutorial;
-    bool b_JetpackAllowed_Tutorial;
-    bool b_LookHorizontalAllowed_Tutorial;
+    bool b_Startup_Tutorial = true;
+    bool b_JumpAllowed_Tutorial = true;
+    bool b_JetpackAllowed_Tutorial = true;
+    bool b_LookHorizontalAllowed_Tutorial = true;
 
 	// Use this for initialization
 	void Start ()
@@ -255,9 +255,12 @@ public class Cs_SkiingPlayerController : MonoBehaviour
 
     float f_Jetpack_Curr = 10f;
     float f_Jetpack_Max = 10f;
+    GameObject go_JetpackUI;
     void Jetpack()
     {
-        if(Input.GetMouseButton(1))
+        go_JetpackUI = GameObject.Find("Jetpack");
+
+        if (Input.GetMouseButton(1))
         {
             if(f_Jetpack_Curr >= 0.1f)
             {
@@ -286,6 +289,10 @@ public class Cs_SkiingPlayerController : MonoBehaviour
             if (f_Jetpack_Curr > f_Jetpack_Max) f_Jetpack_Curr = f_Jetpack_Max;
         }
 
+        if(go_JetpackUI.GetComponent<Cs_JetpackHud>())
+        {
+            go_JetpackUI.GetComponent<Cs_JetpackHud>().Set_HUDPercentage(f_Jetpack_Curr / f_Jetpack_Max);
+        }
         // print("Jetpack: " + f_Jetpack_Curr);
     }
 
