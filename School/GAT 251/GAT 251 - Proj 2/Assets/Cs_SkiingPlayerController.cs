@@ -94,6 +94,35 @@ public class Cs_SkiingPlayerController : MonoBehaviour
             }
             #endregion
         }
+
+        // Get player speed, lerp camera's FOV between 60 & upper limit
+        GameObject go_Particle = GameObject.Find("Particle");
+        float f_PlayerSpeed = gameObject.GetComponent<Rigidbody>().velocity.magnitude;
+        float f_Percent = f_PlayerSpeed / (f_MaxSpeed * 2);
+        
+        if(f_PlayerSpeed >= 15.0f)
+        {
+            if (f_Percent > 1.0f) f_Percent = 1.0f;
+
+            // Particle Size: 0.0f to 0.2f
+            go_Particle.GetComponent<ParticleSystem>().startSize = f_Percent * 0.15f;
+
+            // Particle Speed: 5.0f to 20.0f
+            go_Particle.GetComponent<ParticleSystem>().startSpeed = (f_Percent * 12f) + 3.0f;
+        }
+        else
+        {
+            // Particle Size: 0.0f to 0.2f
+            go_Particle.GetComponent<ParticleSystem>().startSize = 0f;
+
+            // Particle Speed: 5.0f to 20.0f
+            go_Particle.GetComponent<ParticleSystem>().startSpeed = 0f;
+        }
+
+        // Camera FOV: 60f to 75f
+        float f_FOV = (f_Percent * 15f) + 60f;
+        if (f_FOV > 80) f_FOV = 80f;
+        go_Camera.GetComponent<Camera>().fieldOfView = f_FOV;
     }
 
     public void Set_TutorialState( Enum_Tutorial e_Tutorial_ )
@@ -293,7 +322,6 @@ public class Cs_SkiingPlayerController : MonoBehaviour
         {
             go_JetpackUI.GetComponent<Cs_JetpackHud>().Set_HUDPercentage(f_Jetpack_Curr / f_Jetpack_Max);
         }
-        // print("Jetpack: " + f_Jetpack_Curr);
     }
 
     void Ski()
@@ -353,11 +381,15 @@ public class Cs_SkiingPlayerController : MonoBehaviour
             print("Pushing: Right");
         }
 
-        if (Input.GetKey(KeyCode.S))
+        if (Input.GetKey(KeyCode.S) && !Input.GetKey(KeyCode.W))
         {
             // gameObject.GetComponent<Rigidbody>().AddForce(-gameObject.transform.forward * 3f);
             v3_AirPush.z = -2;
             print("Pushing: Back");
+        }
+        else if(Input.GetKey(KeyCode.W) && !Input.GetKey(KeyCode.S))
+        {
+            v3_AirPush.z = 1.0f;
         }
 
         if (v3_AirPush != new Vector3())

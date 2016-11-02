@@ -23,7 +23,7 @@ public class Cs_JetpackHud : MonoBehaviour
     public void Set_HUDPercentage( float f_Percent_ )
     {
         f_Width = f_Width_Init * f_Percent_;
-        print(f_Width_Init);
+        
         f_xPos = 25 + (f_Width / 2);
         
         Vector2 v2_CurrPos = gameObject.transform.position;
