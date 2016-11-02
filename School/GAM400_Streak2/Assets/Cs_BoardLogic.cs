@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public enum Enum_BlockType
 {
@@ -777,6 +778,90 @@ public class Cs_BoardLogic : MonoBehaviour
     {
         return BlockArray[y_Pos_, x_Pos_];
     }
+    #endregion
+
+    #region Scoring System
+    enum Enum_ScoreLineDirection
+    {
+        Right,
+        Down,
+        Up,
+        Left
+    }
+
+    public struct IntVector2
+    {
+        private int _x;
+        private int _y;
+
+        public IntVector2(int x, int y) : this()
+        {
+            this._x = x;
+            this._y = y;
+        }
+
+        public int x
+        {
+            set { _x = value; }
+            get { return _x; }
+        }
+
+        public int y
+        {
+            set { _y = value; }
+            get { return _y; }
+        }
+    }
+
+    List<IntVector2> i_ScoreLine    = new List<IntVector2>();
+    List<IntVector2> i_PathfindLine = new List<IntVector2>();
+    bool b_FoundSolution = false;
+    bool Load_ScoreLine()
+    {
+        // Reset v2_ScoreLine
+        i_ScoreLine = new List<IntVector2>();
+
+        // Reset b_FoundSolution
+        b_FoundSolution = false;
+
+        // Reset storage of previous block color
+        Enum_BlockType e_PrevBlockType = Enum_BlockType.Empty;
+
+        // Begin checking for a scoreline only if the left-most column has a block in it
+        for(int y_ = 0; y_ < i_ArrayHeight; ++y_)
+        {
+            // If the previous checked block differs than the current block
+            if(e_PrevBlockType != GetBlock(0, y_))
+            {
+                // Store the new block
+                e_PrevBlockType = GetBlock(0, y_);
+
+                // Clear the list since this is a new attempt to find a line
+                i_PathfindLine = new List<IntVector2>();
+
+                if( GetBlock(1, y_) == Enum_BlockType.Block_1_Static ||
+                    GetBlock(1, y_) == Enum_BlockType.Block_2_Static ||
+                    GetBlock(1, y_) == Enum_BlockType.Block_3_Static  )
+                {
+                    // Push findings into the i_PathfindLine
+                    i_PathfindLine.Add(new IntVector2(1, y_));
+
+                    if(ScoreLine(Enum_ScoreLineDirection.Right))
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    bool ScoreLine( Enum_ScoreLineDirection e_Dir_ )
+    {
+        return false;
+    }
+
     #endregion
 
     #region Print Array To Console
