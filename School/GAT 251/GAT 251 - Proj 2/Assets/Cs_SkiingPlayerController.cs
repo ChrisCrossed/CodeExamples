@@ -92,6 +92,8 @@ public class Cs_SkiingPlayerController : MonoBehaviour
 
                 PlayerInput();
             }
+
+            GrappleHook();
             #endregion
         }
 
@@ -322,6 +324,67 @@ public class Cs_SkiingPlayerController : MonoBehaviour
         {
             go_JetpackUI.GetComponent<Cs_JetpackHud>().Set_HUDPercentage(f_Jetpack_Curr / f_Jetpack_Max);
         }
+    }
+
+    bool b_UseGrapple;
+    Vector3 v3_GrapplePoint;
+    void GrappleHook()
+    {
+        if (Input.GetMouseButton(0))
+        {
+            if(!b_UseGrapple)
+            {
+                int i_LayerMask = LayerMask.GetMask("Ground", "Grapple");
+
+                RaycastHit hit;
+
+                if(Physics.Raycast(go_Camera.transform.position, go_Camera.transform.forward, out hit, float.PositiveInfinity, i_LayerMask))
+                {
+                    if(hit.collider.gameObject.layer == LayerMask.NameToLayer("Grapple"))
+                    {
+                        // Set b_UseGrapple to true
+                        b_UseGrapple = true;
+
+                        // Draw 'grapple rope' to grapple point
+                        gameObject.GetComponent<LineRenderer>().enabled = true;
+                        gameObject.GetComponent<LineRenderer>().SetPosition(0, gameObject.transform.position + (-gameObject.transform.up * 2));
+                        gameObject.GetComponent<LineRenderer>().SetPosition(1, hit.collider.gameObject.transform.position);
+
+                        // Find vector between player and grapple object's point
+                        v3_GrapplePoint = hit.collider.gameObject.transform.position;
+
+                        // Set PhysicsMaterial
+                        gameObject.GetComponent<Collider>().material = physMat_Walk;
+                    }
+                }
+            }
+        }
+        else
+        {
+            b_UseGrapple = false;
+
+            // Reset PhysicsMaterial
+            // gameObject.GetComponent<Collider>().material = physMat_Walk;
+
+            gameObject.GetComponent<LineRenderer>().enabled = false;
+        }
+
+        if(b_UseGrapple)
+        {
+            // Set PhysicsMaterial
+            gameObject.GetComponent<Collider>().material = physMat_Walk;
+
+            Vector3 v3_Vector = gameObject.transform.position - v3_GrapplePoint;
+
+            // Project a plane under the player based on the vector
+            gameObject.GetComponent<Rigidbody>().velocity = Vector3.ProjectOnPlane(gameObject.GetComponent<Rigidbody>().velocity, v3_Vector);
+
+            // Reset line renderer positions
+            gameObject.GetComponent<LineRenderer>().SetPosition(0, gameObject.transform.position + (-gameObject.transform.up * 2));
+            gameObject.GetComponent<LineRenderer>().SetPosition(1, v3_GrapplePoint);
+        }
+
+        print(b_UseGrapple);
     }
 
     void Ski()
