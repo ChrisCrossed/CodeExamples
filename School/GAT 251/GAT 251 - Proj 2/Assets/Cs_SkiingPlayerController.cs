@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
 
 public enum Enum_Tutorial
 {
@@ -93,7 +94,7 @@ public class Cs_SkiingPlayerController : MonoBehaviour
                 PlayerInput();
             }
 
-            GrappleHook();
+            // GrappleHook();
             #endregion
         }
 
@@ -328,8 +329,31 @@ public class Cs_SkiingPlayerController : MonoBehaviour
 
     bool b_UseGrapple;
     Vector3 v3_GrapplePoint;
+    [SerializeField] float f_GrappleDistance = 25f;
+    [SerializeField] GameObject go_Reticle;
     void GrappleHook()
     {
+        #region Update Reticle
+        RaycastHit hit_reticle;
+        int i_LayerMask_Reticle = LayerMask.GetMask("Ground", "Grapple");
+        if(Physics.Raycast(go_Camera.transform.position, go_Camera.transform.forward, out hit_reticle, f_GrappleDistance, i_LayerMask_Reticle))
+        {
+            if(hit_reticle.collider.gameObject.layer == LayerMask.NameToLayer("Grapple"))
+            {
+                go_Reticle.GetComponent<Image>().color = new Color(1, 0, 0);
+            }
+            else // First thing we *did* hit wasn't a grapple. Set to white.
+            {
+                go_Reticle.GetComponent<Image>().color = new Color(1, 1, 1);
+            }
+        }
+        else // We hit nothing. Set to white.
+        {
+            go_Reticle.GetComponent<Image>().color = new Color(1, 1, 1);
+        }
+        #endregion
+
+        #region Mouse Input
         if (Input.GetMouseButton(0))
         {
             if(!b_UseGrapple)
@@ -338,7 +362,7 @@ public class Cs_SkiingPlayerController : MonoBehaviour
 
                 RaycastHit hit;
 
-                if(Physics.Raycast(go_Camera.transform.position, go_Camera.transform.forward, out hit, float.PositiveInfinity, i_LayerMask))
+                if(Physics.Raycast(go_Camera.transform.position, go_Camera.transform.forward, out hit, f_GrappleDistance, i_LayerMask))
                 {
                     if(hit.collider.gameObject.layer == LayerMask.NameToLayer("Grapple"))
                     {
@@ -363,9 +387,6 @@ public class Cs_SkiingPlayerController : MonoBehaviour
         {
             b_UseGrapple = false;
 
-            // Reset PhysicsMaterial
-            // gameObject.GetComponent<Collider>().material = physMat_Walk;
-
             gameObject.GetComponent<LineRenderer>().enabled = false;
         }
 
@@ -376,15 +397,23 @@ public class Cs_SkiingPlayerController : MonoBehaviour
 
             Vector3 v3_Vector = gameObject.transform.position - v3_GrapplePoint;
 
+            /*v3_Velocity = new Vector3(v3_Velocity.x, 0, v3_Velocity.z);
+            v3_Velocity = Vector3.ProjectOnPlane(v3_Velocity, hit.normal);
+            v3_Velocity.Normalize();
+            v3_Velocity *= f_MaxSpeed;*/
+
+
             // Project a plane under the player based on the vector
-            gameObject.GetComponent<Rigidbody>().velocity = Vector3.ProjectOnPlane(gameObject.GetComponent<Rigidbody>().velocity, v3_Vector);
+            Vector3 v3_GrappleVelocity = Vector3.ProjectOnPlane(gameObject.GetComponent<Rigidbody>().velocity, v3_Vector);
+            v3_GrappleVelocity.Normalize();
+            v3_GrappleVelocity *= f_Speed;
+            gameObject.GetComponent<Rigidbody>().velocity = v3_GrappleVelocity;
 
             // Reset line renderer positions
             gameObject.GetComponent<LineRenderer>().SetPosition(0, gameObject.transform.position + (-gameObject.transform.up * 2));
             gameObject.GetComponent<LineRenderer>().SetPosition(1, v3_GrapplePoint);
         }
-
-        print(b_UseGrapple);
+        #endregion
     }
 
     void Ski()
@@ -421,8 +450,6 @@ public class Cs_SkiingPlayerController : MonoBehaviour
             }
         }
         #endregion
-
-        // AirPush();
     }
 
     void AirPush()

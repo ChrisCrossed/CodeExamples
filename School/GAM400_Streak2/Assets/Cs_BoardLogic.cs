@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+// using System.;
 
 public enum Enum_BlockType
 {
@@ -749,6 +750,20 @@ public class Cs_BoardLogic : MonoBehaviour
         #endregion
 
         // TODO: RUN SCORE CODE HERE FIRST
+        Load_ScoreLine();
+        string s_ScoreLine = "ScoreLine (" + iv2_ScoreLine.Count + "):";
+        for(int i_ = 0; i_ < iv2_ScoreLine.Count; ++i_)
+        {
+            if(i_ != iv2_ScoreLine.Count - 1)
+            {
+                s_ScoreLine += iv2_ScoreLine[i_] + ", ";
+            }
+            else
+            {
+                s_ScoreLine += iv2_ScoreLine[i_] + "";
+            }
+        }
+        print(s_ScoreLine);
         
         #region Set 'Mid Empty' row to empty (Done AFTER scoring)
         for (int y_ = 0; y_ < i_ArrayHeight; ++y_)
@@ -781,6 +796,8 @@ public class Cs_BoardLogic : MonoBehaviour
     #endregion
 
     #region Scoring System
+
+    #region Scoring Line Tools
     enum Enum_ScoreLineDirection
     {
         Right,
@@ -811,41 +828,84 @@ public class Cs_BoardLogic : MonoBehaviour
             set { _y = value; }
             get { return _y; }
         }
-    }
 
-    List<IntVector2> i_ScoreLine    = new List<IntVector2>();
-    List<IntVector2> i_PathfindLine = new List<IntVector2>();
+        // Reference: http://stackoverflow.com/questions/15199026/comparing-two-structs-using
+        public static bool operator ==(IntVector2 iv2_a_, IntVector2 iv2_b_)
+        {
+            return iv2_a_.Equals(iv2_b_);
+        }
+
+        public static bool operator !=(IntVector2 iv2_a_, IntVector2 iv2_b_)
+        {
+            return !iv2_a_.Equals(iv2_b_);
+        }
+    }
+    #endregion
+
+    List<IntVector2> iv2_ScoreLine    = new List<IntVector2>();
+    List<IntVector2> iv2_PathfindLine = new List<IntVector2>();
     bool b_FoundSolution = false;
+    Enum_BlockType e_CurrBlockType;
     bool Load_ScoreLine()
     {
         // Reset v2_ScoreLine
-        i_ScoreLine = new List<IntVector2>();
+        iv2_ScoreLine = new List<IntVector2>();
 
         // Reset b_FoundSolution
         b_FoundSolution = false;
 
-        // Reset storage of previous block color
-        Enum_BlockType e_PrevBlockType = Enum_BlockType.Empty;
+        // Reset storage of current block color
+        e_CurrBlockType = Enum_BlockType.Empty;
 
         // Begin checking for a scoreline only if the left-most column has a block in it
         for(int y_ = 0; y_ < i_ArrayHeight; ++y_)
         {
             // If the previous checked block differs than the current block
-            if(e_PrevBlockType != GetBlock(0, y_))
+            if(e_CurrBlockType != GetBlock(0, y_))
             {
                 // Store the new block
-                e_PrevBlockType = GetBlock(0, y_);
+                e_CurrBlockType = GetBlock(0, y_);
+
+                #region Check each column for this blocktype
+                // Initiate a check to ensure every column has at least one block in it of the current block type
+                for(int x = 0; x < i_ArrayWidth; ++x)
+                {
+                    // Reset the bool at the beginning of each column loop
+                    bool b_RowHasBlockType = false;
+
+                    // Check each column from the bottom up
+                    for(int y = 0; y < i_ArrayHeight; ++y)
+                    {
+                        // If this column has the specific block type, move to the next column
+                        if (GetBlock(x, y) == e_CurrBlockType)
+                        {
+                            b_RowHasBlockType = true;
+
+                            continue;
+                        }
+                    }
+
+                    // If we didn't find the specific block in this column, we can't have a completed line. Break out.
+                    if (!b_RowHasBlockType)
+                    {
+                        print("FAILED");
+
+                        return false;
+                    }
+                }
+                #endregion 
 
                 // Clear the list since this is a new attempt to find a line
-                i_PathfindLine = new List<IntVector2>();
+                iv2_PathfindLine = new List<IntVector2>();
 
                 if( GetBlock(1, y_) == Enum_BlockType.Block_1_Static ||
                     GetBlock(1, y_) == Enum_BlockType.Block_2_Static ||
                     GetBlock(1, y_) == Enum_BlockType.Block_3_Static  )
                 {
                     // Push findings into the i_PathfindLine
-                    i_PathfindLine.Add(new IntVector2(1, y_));
+                    iv2_PathfindLine.Add(new IntVector2(1, y_));
 
+                    // Begins the iterative check
                     if(ScoreLine(Enum_ScoreLineDirection.Right))
                     {
                         return true;
@@ -859,6 +919,244 @@ public class Cs_BoardLogic : MonoBehaviour
 
     bool ScoreLine( Enum_ScoreLineDirection e_Dir_ )
     {
+        string s_Curr = "Current List: ";
+        for(int i_ = 0; i_ < iv2_PathfindLine.Count; ++i_)
+        {
+            s_Curr += iv2_PathfindLine[i_] + ", ";
+        }
+        print(s_Curr);
+
+        // Continue from the last-populated position in the list
+        IntVector2 iv2_CurrPos = iv2_PathfindLine[iv2_PathfindLine.Count - 1];
+
+        #region If the current X position is the edge of the board, we have a line. Give the player the score.
+        // Check the X coordinate of the current position to determine if we are done
+        // 'i_ArrayWidth - 2' is the far right edge of the board, since we do not include the 'wall mechanic'
+        if(iv2_CurrPos.x == i_ArrayWidth - 2)
+        {
+            // Since we are at the far right edge, we push the list into the 'i_ScoreLine'
+            for (int i_ = 0; i_ < iv2_PathfindLine.Count; ++i_)
+            {
+                iv2_ScoreLine.Add(iv2_PathfindLine[i_]);
+            }
+
+            // TODO: Apply a score for the user
+
+            // TODO: Pause gameplay while we run a 'scoreline' visual
+
+            // (Unknown Remnant) b_AllowedToCheck = true
+
+            // Return victorious
+            return true;
+        }
+        #endregion
+
+        #region Else - Continue searching through the board
+        else // We have determined that we need to continue through the board
+        {
+            #region Check Adjacent Blocks
+            // Begin checking to determine the next locations to check
+            bool b_RightFilled = false;
+            bool b_BelowFilled = false;
+            bool b_AboveFilled = false;
+            bool b_LeftFilled  = false;
+
+            // If the space to the right exists, AND
+            // If the space to the right has the same block type AND
+            // We are searching anywhere but where we came from...
+            if( iv2_CurrPos.x + 1 < i_ArrayWidth &&
+                GetBlock(iv2_CurrPos.x + 1, iv2_CurrPos.y) == e_CurrBlockType &&
+                e_Dir_ != Enum_ScoreLineDirection.Left)
+            {
+                b_RightFilled = true;
+            }
+
+            // If the space below exists AND
+            // If the space below has the same block type AND
+            // We are searching anywhere but where we came from...
+            if( iv2_CurrPos.y - 1 >= 0 &&
+                GetBlock( iv2_CurrPos.x, iv2_CurrPos.y - 1 ) == e_CurrBlockType &&
+                e_Dir_ != Enum_ScoreLineDirection.Up )
+            {
+                b_BelowFilled = true;
+            }
+
+            // If the space above exists AND
+            // If the space above has the same block type AND
+            // We are searching anywhere but where we came from...
+            if(iv2_CurrPos.y + 1 < i_ArrayHeight &&
+               GetBlock( iv2_CurrPos.x, iv2_CurrPos.y + 1 ) == e_CurrBlockType &&
+               e_Dir_ != Enum_ScoreLineDirection.Down )
+            {
+                b_AboveFilled = true;
+            }
+
+            // If the space to the left exists AND
+            // If the space to the left has the same block type AND
+            // We are searching anywhere but where we came from...
+            if( iv2_CurrPos.x - 1 >= 0 && 
+                GetBlock( iv2_CurrPos.x - 1, iv2_CurrPos.y ) == e_CurrBlockType &&
+                e_Dir_ != Enum_ScoreLineDirection.Right )
+            {
+                b_LeftFilled = true;
+            }
+            #endregion
+
+            // Reset b_ShouldContinue;
+            bool b_ShouldContinue = true;
+
+            #region 'Right Filled' check
+            if(b_RightFilled)
+            {
+                // Set positions to check
+                IntVector2 iv2_RightAbove = new IntVector2(iv2_CurrPos.x + 1, iv2_CurrPos.y + 1);
+                IntVector2 iv2_RightBelow = new IntVector2(iv2_CurrPos.x + 1, iv2_CurrPos.y - 1);
+
+                // Check to see if the adjacent positions to the above spot are within the array EXCEPT the last position
+                for(int i_ = 0; i_ < iv2_PathfindLine.Count; ++i_)
+                {
+                    // If we ever find a position already stored within, do not continue
+                    if( iv2_PathfindLine[i_] == iv2_RightAbove ||
+                        iv2_PathfindLine[i_] == iv2_RightBelow)
+                    {
+                        b_ShouldContinue = false;
+
+                        continue;
+                    }
+                }
+
+                // Otherwise, we're good to keep checking in this direction
+                if(b_ShouldContinue)
+                {
+                    // Store the new direction (To the right)
+                    iv2_PathfindLine.Add(new IntVector2( iv2_CurrPos.x + 1, iv2_CurrPos.y ));
+
+                    // Run another iterative cycle to the right
+                    if( ScoreLine( Enum_ScoreLineDirection.Right ))
+                    {
+                        return true;
+                    }
+                }
+            }
+            #endregion
+
+            // Reset b_ShouldContinue
+            b_ShouldContinue = true;
+
+            #region 'Below Filled' check
+            if(b_BelowFilled)
+            {
+                // Set positions to check
+                IntVector2 iv2_BelowLeft = new IntVector2(iv2_CurrPos.x - 1, iv2_CurrPos.y - 1);
+                IntVector2 iv2_BelowRight = new IntVector2(iv2_CurrPos.x + 1, iv2_CurrPos.y - 1);
+
+                // Check to see if the adjacent positions to the above spot are within the array EXCEPT the last position
+                for(int i_ = 0; i_ < iv2_PathfindLine.Count; ++i_)
+                {
+                    // If we ever find a position already stored within, do not continue
+                    if ( iv2_PathfindLine[i_] == iv2_BelowLeft ||
+                        iv2_PathfindLine[i_] == iv2_BelowRight )
+                    {
+                        b_ShouldContinue = false;
+                    }
+                }
+
+                // Otherwise, we're good to keep checking in this direction
+                if(b_ShouldContinue)
+                {
+                    // Store the new direction (Down)
+                    iv2_PathfindLine.Add( new IntVector2( iv2_CurrPos.x, iv2_CurrPos.y - 1 ));
+
+                    // Run another iterative cycle downwards
+                    if( ScoreLine( Enum_ScoreLineDirection.Down ))
+                    {
+                        return true;
+                    }
+                }
+            }
+            #endregion
+
+            // Reset b_ShouldContinue
+            b_ShouldContinue = true;
+
+            #region 'Above Filled' check
+            if (b_AboveFilled)
+            {
+                // Set positions to check
+                IntVector2 iv2_AboveLeft = new IntVector2(iv2_CurrPos.x - 1, iv2_CurrPos.y + 1);
+                IntVector2 iv2_AboveRight = new IntVector2(iv2_CurrPos.x + 1, iv2_CurrPos.y + 1);
+
+                // Check to see if the adjacent positions to the above spot are within the array EXCEPT the last position
+                for (int i_ = 0; i_ < iv2_PathfindLine.Count; ++i_)
+                {
+                    // If we ever find a position already stored within, do not continue
+                    if (iv2_PathfindLine[i_] == iv2_AboveLeft ||
+                        iv2_PathfindLine[i_] == iv2_AboveRight)
+                    {
+                        b_ShouldContinue = false;
+
+                        continue;
+                    }
+                }
+
+                // Otherwise, we're good to keep checking in this direction
+                if (b_ShouldContinue)
+                {
+                    // Store the new direction (Above)
+                    iv2_PathfindLine.Add(new IntVector2(iv2_CurrPos.x, iv2_CurrPos.y + 1));
+
+                    // Run another iterative cycle above
+                    if (ScoreLine(Enum_ScoreLineDirection.Up))
+                    {
+                        return true;
+                    }
+                }
+            }
+            #endregion
+
+            // Reset b_ShouldContinue
+            b_ShouldContinue = true;
+
+            #region 'Left Filled' check
+            if (b_LeftFilled)
+            {
+                // Set positions to check
+                IntVector2 iv2_LeftAbove = new IntVector2(iv2_CurrPos.x - 1, iv2_CurrPos.y + 1);
+                IntVector2 iv2_LeftBelow = new IntVector2(iv2_CurrPos.x - 1, iv2_CurrPos.y - 1);
+
+                // Check to see if the adjacent positions to the above spot are within the array EXCEPT the last position
+                for (int i_ = 0; i_ < iv2_PathfindLine.Count; ++i_)
+                {
+                    // If we ever find a position already stored within, do not continue
+                    if (iv2_PathfindLine[i_] == iv2_LeftAbove ||
+                        iv2_PathfindLine[i_] == iv2_LeftBelow)
+                    {
+                        b_ShouldContinue = false;
+
+                        continue;
+                    }
+                }
+
+                // Otherwise, we're good to keep checking in this direction
+                if (b_ShouldContinue)
+                {
+                    // Store the new direction (Left)
+                    iv2_PathfindLine.Add( new IntVector2( iv2_CurrPos.x - 1, iv2_CurrPos.y ));
+
+                    // Run another iterative cycle above
+                    if (ScoreLine(Enum_ScoreLineDirection.Left))
+                    {
+                        return true;
+                    }
+                }
+            }
+            #endregion
+        }
+        #endregion
+
+        // If we got this far, none of the directions worked. Pop off this location and return false.
+        iv2_PathfindLine.RemoveAt(iv2_PathfindLine.Count - 1);
+
         return false;
     }
 
@@ -879,9 +1177,9 @@ public class Cs_BoardLogic : MonoBehaviour
                 {
                     tempString += "{!!} ";
                 }
-                else if(i_ExtraBlankRow > 0 && // Extra Blank Row is Set
-                        i_ExtraBlankRow < i_ArrayWidth && // Extra Blank Row is Set
-                        i == i_ExtraBlankRow && // This row is the one that's been set
+                else if( b_MidRowBlank && // The option is set for a mid row empty region
+                         i_ExtraBlankRow < i_ArrayWidth && // Extra Blank Row is Set
+                         i == i_ExtraBlankRow && // This row is the one that's been set
                         (BlockArray[j, i] == Enum_BlockType.Empty)) // The block position is empty
                 {
                     tempString += "{!!} ";
