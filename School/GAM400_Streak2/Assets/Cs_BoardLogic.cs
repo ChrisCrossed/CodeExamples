@@ -194,7 +194,7 @@ public class Cs_BoardLogic : MonoBehaviour
         else if (e_BlockSize == Enum_BlockSize.size_2w_3h || e_BlockSize == Enum_BlockSize.size_3w_2h)  i_NumToShift = 6;
         else if (e_BlockSize == Enum_BlockSize.size_3w_3h)                                            i_NumToShift = 9;
 
-        print("BLOCK SIZE: " + e_BlockSize);
+        // print("BLOCK SIZE: " + e_BlockSize);
         
         // No matter what, set the initial 2x2
         SetBlock(v2_ActiveBlockLocation,                                                    e_NextBlockList[0]);
@@ -750,20 +750,22 @@ public class Cs_BoardLogic : MonoBehaviour
         #endregion
 
         // TODO: RUN SCORE CODE HERE FIRST
-        Load_ScoreLine();
-        string s_ScoreLine = "ScoreLine (" + iv2_ScoreLine.Count + "):";
-        for(int i_ = 0; i_ < iv2_ScoreLine.Count; ++i_)
+        if(Load_ScoreLine())
         {
-            if(i_ != iv2_ScoreLine.Count - 1)
+            string s_ScoreLine = "LINE REACHED: (" + iv2_ScoreLine.Count + "):";
+            for (int i_ = 0; i_ < iv2_ScoreLine.Count; ++i_)
             {
-                s_ScoreLine += iv2_ScoreLine[i_] + ", ";
+                if (i_ != iv2_ScoreLine.Count - 1)
+                {
+                    s_ScoreLine += iv2_ScoreLine[i_] + ", ";
+                }
+                else
+                {
+                    s_ScoreLine += iv2_ScoreLine[i_] + "";
+                }
             }
-            else
-            {
-                s_ScoreLine += iv2_ScoreLine[i_] + "";
-            }
+            print(s_ScoreLine);
         }
-        print(s_ScoreLine);
         
         #region Set 'Mid Empty' row to empty (Done AFTER scoring)
         for (int y_ = 0; y_ < i_ArrayHeight; ++y_)
@@ -829,6 +831,21 @@ public class Cs_BoardLogic : MonoBehaviour
             get { return _y; }
         }
 
+        public override string ToString()
+        {
+            return string.Format("[" + this._x + ", " + this._y + "]");
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+
+        public override bool Equals(object obj)
+        {
+            return base.Equals(obj);
+        }
+
         // Reference: http://stackoverflow.com/questions/15199026/comparing-two-structs-using
         public static bool operator ==(IntVector2 iv2_a_, IntVector2 iv2_b_)
         {
@@ -857,18 +874,25 @@ public class Cs_BoardLogic : MonoBehaviour
         // Reset storage of current block color
         e_CurrBlockType = Enum_BlockType.Empty;
 
-        // Begin checking for a scoreline only if the left-most column has a block in it
+        int i_LeftBound = 1;
+        int i_RightBound = i_ArrayWidth - 1;
+
+        // Begin checking for a scoreline only if the left-most column (X = 1) has a block in it
         for(int y_ = 0; y_ < i_ArrayHeight; ++y_)
         {
-            // If the previous checked block differs than the current block
-            if(e_CurrBlockType != GetBlock(0, y_))
+            print("Checking: " + i_LeftBound + ", " + y_);
+
+            // If the previous checked block differs than the current block && isn't empty
+            if(e_CurrBlockType != GetBlock(i_LeftBound, y_) && GetBlock(i_LeftBound, y_) != Enum_BlockType.Empty)
             {
+                print("Current: " + e_CurrBlockType.ToString() + ", GetBlock: " + GetBlock(1, y_).ToString());
+
                 // Store the new block
-                e_CurrBlockType = GetBlock(0, y_);
+                e_CurrBlockType = GetBlock(i_LeftBound, y_);
 
                 #region Check each column for this blocktype
                 // Initiate a check to ensure every column has at least one block in it of the current block type
-                for(int x = 0; x < i_ArrayWidth; ++x)
+                for(int x = i_LeftBound; x < i_RightBound; ++x)
                 {
                     // Reset the bool at the beginning of each column loop
                     bool b_RowHasBlockType = false;
@@ -881,6 +905,7 @@ public class Cs_BoardLogic : MonoBehaviour
                         {
                             b_RowHasBlockType = true;
 
+                            // Move to the next column
                             continue;
                         }
                     }
@@ -1196,9 +1221,11 @@ public class Cs_BoardLogic : MonoBehaviour
     #endregion
 
     // Update is called once per frame
+    List<IntVector2> iv2_Test = new List<IntVector2>();
+    float f_Test;
     void Update ()
     {
-	    if(Input.GetKeyDown(KeyCode.S))
+        if (Input.GetKeyDown(KeyCode.S))
         {
             MoveActiveBlocks_Down(v2_ActiveBlockLocation, e_BlockSize);
 
