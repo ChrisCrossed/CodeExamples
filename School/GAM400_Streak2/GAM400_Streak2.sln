@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2015
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GAM400_Streak2.CSharp", "GAM400_Streak2.CSharp.csproj", "{707C0337-4D2F-5C2B-A84D-98A853960F21}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GAM400_Streak2.CSharp.Editor", "GAM400_Streak2.CSharp.Editor.csproj", "{06BF17F8-857C-67FD-0A35-FDD9682581E5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -13,6 +15,10 @@ Global
 		{707C0337-4D2F-5C2B-A84D-98A853960F21}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{707C0337-4D2F-5C2B-A84D-98A853960F21}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{707C0337-4D2F-5C2B-A84D-98A853960F21}.Release|Any CPU.Build.0 = Release|Any CPU
+		{06BF17F8-857C-67FD-0A35-FDD9682581E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{06BF17F8-857C-67FD-0A35-FDD9682581E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{06BF17F8-857C-67FD-0A35-FDD9682581E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{06BF17F8-857C-67FD-0A35-FDD9682581E5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
