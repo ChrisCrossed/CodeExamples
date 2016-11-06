@@ -21,6 +21,66 @@ public enum Enum_BlockSize
     size_3w_3h
 }
 
+#region Scoring Line Tools
+public enum Enum_Direction
+{
+    Right,
+    Down,
+    Up,
+    Left
+}
+
+public struct IntVector2
+{
+    private int _x;
+    private int _y;
+
+    public IntVector2(int x, int y) : this()
+    {
+        this._x = x;
+        this._y = y;
+    }
+
+    public int x
+    {
+        set { _x = value; }
+        get { return _x; }
+    }
+
+    public int y
+    {
+        set { _y = value; }
+        get { return _y; }
+    }
+
+    public override string ToString()
+    {
+        return string.Format("[" + this._x + ", " + this._y + "]");
+    }
+
+    public override int GetHashCode()
+    {
+        return base.GetHashCode();
+    }
+
+    public override bool Equals(object obj)
+    {
+        return base.Equals(obj);
+    }
+
+    // Reference: http://stackoverflow.com/questions/15199026/comparing-two-structs-using
+    public static bool operator ==(IntVector2 iv2_a_, IntVector2 iv2_b_)
+    {
+        return iv2_a_.Equals(iv2_b_);
+    }
+
+    public static bool operator !=(IntVector2 iv2_a_, IntVector2 iv2_b_)
+    {
+        return !iv2_a_.Equals(iv2_b_);
+    }
+}
+#endregion
+
 public class Cs_BoardLogic : MonoBehaviour
 {
     public int i_ArrayWidth;
@@ -798,67 +858,7 @@ public class Cs_BoardLogic : MonoBehaviour
     #endregion
 
     #region Scoring System
-
-    #region Scoring Line Tools
-    enum Enum_ScoreLineDirection
-    {
-        Right,
-        Down,
-        Up,
-        Left
-    }
-
-    public struct IntVector2
-    {
-        private int _x;
-        private int _y;
-
-        public IntVector2(int x, int y) : this()
-        {
-            this._x = x;
-            this._y = y;
-        }
-
-        public int x
-        {
-            set { _x = value; }
-            get { return _x; }
-        }
-
-        public int y
-        {
-            set { _y = value; }
-            get { return _y; }
-        }
-
-        public override string ToString()
-        {
-            return string.Format("[" + this._x + ", " + this._y + "]");
-        }
-
-        public override int GetHashCode()
-        {
-            return base.GetHashCode();
-        }
-
-        public override bool Equals(object obj)
-        {
-            return base.Equals(obj);
-        }
-
-        // Reference: http://stackoverflow.com/questions/15199026/comparing-two-structs-using
-        public static bool operator ==(IntVector2 iv2_a_, IntVector2 iv2_b_)
-        {
-            return iv2_a_.Equals(iv2_b_);
-        }
-
-        public static bool operator !=(IntVector2 iv2_a_, IntVector2 iv2_b_)
-        {
-            return !iv2_a_.Equals(iv2_b_);
-        }
-    }
-    #endregion
-
+    
     List<IntVector2> iv2_ScoreLine    = new List<IntVector2>();
     List<IntVector2> iv2_PathfindLine = new List<IntVector2>();
     bool b_FoundSolution = false;
@@ -931,7 +931,7 @@ public class Cs_BoardLogic : MonoBehaviour
                     iv2_PathfindLine.Add(new IntVector2(1, y_));
 
                     // Begins the iterative check
-                    if(ScoreLine(Enum_ScoreLineDirection.Right))
+                    if(ScoreLine(Enum_Direction.Right))
                     {
                         return true;
                     }
@@ -942,7 +942,7 @@ public class Cs_BoardLogic : MonoBehaviour
         return false;
     }
 
-    bool ScoreLine( Enum_ScoreLineDirection e_Dir_ )
+    bool ScoreLine( Enum_Direction e_Dir_ )
     {
         string s_Curr = "Current List: ";
         for(int i_ = 0; i_ < iv2_PathfindLine.Count; ++i_)
@@ -991,7 +991,7 @@ public class Cs_BoardLogic : MonoBehaviour
             // We are searching anywhere but where we came from...
             if( iv2_CurrPos.x + 1 < i_ArrayWidth &&
                 GetBlock(iv2_CurrPos.x + 1, iv2_CurrPos.y) == e_CurrBlockType &&
-                e_Dir_ != Enum_ScoreLineDirection.Left)
+                e_Dir_ != Enum_Direction.Left)
             {
                 b_RightFilled = true;
             }
@@ -1001,7 +1001,7 @@ public class Cs_BoardLogic : MonoBehaviour
             // We are searching anywhere but where we came from...
             if( iv2_CurrPos.y - 1 >= 0 &&
                 GetBlock( iv2_CurrPos.x, iv2_CurrPos.y - 1 ) == e_CurrBlockType &&
-                e_Dir_ != Enum_ScoreLineDirection.Up )
+                e_Dir_ != Enum_Direction.Up )
             {
                 b_BelowFilled = true;
             }
@@ -1011,7 +1011,7 @@ public class Cs_BoardLogic : MonoBehaviour
             // We are searching anywhere but where we came from...
             if(iv2_CurrPos.y + 1 < i_ArrayHeight &&
                GetBlock( iv2_CurrPos.x, iv2_CurrPos.y + 1 ) == e_CurrBlockType &&
-               e_Dir_ != Enum_ScoreLineDirection.Down )
+               e_Dir_ != Enum_Direction.Down )
             {
                 b_AboveFilled = true;
             }
@@ -1021,7 +1021,7 @@ public class Cs_BoardLogic : MonoBehaviour
             // We are searching anywhere but where we came from...
             if( iv2_CurrPos.x - 1 >= 0 && 
                 GetBlock( iv2_CurrPos.x - 1, iv2_CurrPos.y ) == e_CurrBlockType &&
-                e_Dir_ != Enum_ScoreLineDirection.Right )
+                e_Dir_ != Enum_Direction.Right )
             {
                 b_LeftFilled = true;
             }
@@ -1057,7 +1057,7 @@ public class Cs_BoardLogic : MonoBehaviour
                     iv2_PathfindLine.Add(new IntVector2( iv2_CurrPos.x + 1, iv2_CurrPos.y ));
 
                     // Run another iterative cycle to the right
-                    if( ScoreLine( Enum_ScoreLineDirection.Right ))
+                    if( ScoreLine( Enum_Direction.Right ))
                     {
                         return true;
                     }
@@ -1093,7 +1093,7 @@ public class Cs_BoardLogic : MonoBehaviour
                     iv2_PathfindLine.Add( new IntVector2( iv2_CurrPos.x, iv2_CurrPos.y - 1 ));
 
                     // Run another iterative cycle downwards
-                    if( ScoreLine( Enum_ScoreLineDirection.Down ))
+                    if( ScoreLine( Enum_Direction.Down ))
                     {
                         return true;
                     }
@@ -1131,7 +1131,7 @@ public class Cs_BoardLogic : MonoBehaviour
                     iv2_PathfindLine.Add(new IntVector2(iv2_CurrPos.x, iv2_CurrPos.y + 1));
 
                     // Run another iterative cycle above
-                    if (ScoreLine(Enum_ScoreLineDirection.Up))
+                    if (ScoreLine(Enum_Direction.Up))
                     {
                         return true;
                     }
@@ -1169,7 +1169,7 @@ public class Cs_BoardLogic : MonoBehaviour
                     iv2_PathfindLine.Add( new IntVector2( iv2_CurrPos.x - 1, iv2_CurrPos.y ));
 
                     // Run another iterative cycle above
-                    if (ScoreLine(Enum_ScoreLineDirection.Left))
+                    if (ScoreLine(Enum_Direction.Left))
                     {
                         return true;
                     }

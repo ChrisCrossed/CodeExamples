@@ -4,6 +4,11 @@ using System.Collections.Generic;
 
 public class Cs_BoardDisplay : MonoBehaviour
 {
+    // The virtual reference of what GridBoardLogic uses. Read only.
+    Enum_BlockType[,] BlockArray;
+    // The visual blocks we add to, change and move to show objects on the screen.
+    Enum_BlockType[,] DisplayArray;
+
     GameObject go_GridBlock;
     GameObject go_GridWall;
 
@@ -83,10 +88,6 @@ public class Cs_BoardDisplay : MonoBehaviour
         {
             CascadeTiles();
         }
-        else
-        {
-            // CollapseTiles();
-        }
     }
 
     void CascadeTiles()
@@ -128,7 +129,6 @@ public class Cs_BoardDisplay : MonoBehaviour
             if (i_CurrMax < i_Height + i_Width)
             {
                 ++i_CurrMax;
-                print(i_CurrMax);
             }
             else
             {
@@ -141,6 +141,7 @@ public class Cs_BoardDisplay : MonoBehaviour
         }
     }
 
+    // WIP
     void CollapseTiles()
     {
         f_InitBoardTimer += Time.deltaTime;
@@ -191,5 +192,20 @@ public class Cs_BoardDisplay : MonoBehaviour
                 i_CurrMax = 0;
             }
         }
+    }
+
+    public void ShiftBlocks( Enum_Direction e_MoveDir_, Enum_BlockSize e_BlockSize_, IntVector2 iv2_BottomLeft_ )
+    {
+
+    }
+
+    void DestroyBlockAt( IntVector2 iv2_DestroyLoc_ )
+    {
+
+    }
+
+    public void Set_BoardState(Enum_BlockType[,] BlockArray_ )
+    {
+        BlockArray = BlockArray_;
     }
 }
