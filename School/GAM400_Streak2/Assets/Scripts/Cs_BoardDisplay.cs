@@ -18,7 +18,7 @@ public class Cs_BoardDisplay : MonoBehaviour
         go_GridBlock = Resources.Load("GridBlock")      as GameObject;
         go_GridWall  = Resources.Load("GridBlock_Edge") as GameObject;
 
-        Init_Board(10, 5);
+        Init_Board(20, 10);
 	}
 
     // Create a row of Grid objects
@@ -83,6 +83,10 @@ public class Cs_BoardDisplay : MonoBehaviour
         {
             CascadeTiles();
         }
+        else
+        {
+            // CollapseTiles();
+        }
     }
 
     void CascadeTiles()
@@ -129,6 +133,62 @@ public class Cs_BoardDisplay : MonoBehaviour
             else
             {
                 b_IsDone = true;
+
+                // i_X = 0;
+                i_Y = 0;
+                i_CurrMax = 0;
+            }
+        }
+    }
+
+    void CollapseTiles()
+    {
+        f_InitBoardTimer += Time.deltaTime;
+
+        if (f_InitBoardTimer >= f_InitBoardTimer_Max)
+        {
+            // Reset Timer
+            f_InitBoardTimer = 0.0f;
+
+            // Set new amounts
+            // Cap X
+            i_X = i_CurrMax;
+            if (i_X > i_Width - 1) i_X = i_Width - 1;
+
+            // Cap Y
+            i_Y = i_CurrMax - i_X;
+            if (i_Y > i_Height - 1) i_Y = i_Height - 1;
+
+            Grid_Columns[i_Y][i_X].GetComponent<Cs_GridBlockLogic>().Set_FadeState(Enum_FadeState.FadeOut);
+
+            // Run through incremental loop
+            for (int i_ = 0; i_ < i_CurrMax; ++i_)
+            {
+                // As X decreases, Y increases.
+                --i_X;
+                i_Y = i_CurrMax - i_X;
+
+                if (i_X < 0) i_X = 0;
+                if (i_Y > i_Height - 1) i_Y = i_Height - 1;
+
+                if (i_Y < i_Height && i_X < i_Width)
+                {
+                    Grid_Columns[i_Y][i_X].GetComponent<Cs_GridBlockLogic>().Set_FadeState(Enum_FadeState.FadeIn);
+                }
+            }
+
+            if (i_CurrMax < i_Height + i_Width)
+            {
+                ++i_CurrMax;
+                print(i_CurrMax);
+            }
+            else
+            {
+                b_IsDone = false;
+
+                // i_X = 0;
+                i_Y = 0;
+                i_CurrMax = 0;
             }
         }
     }
