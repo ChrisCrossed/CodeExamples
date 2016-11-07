@@ -83,6 +83,8 @@ public struct IntVector2
 public class Cs_BoardLogic : MonoBehaviour
 {
     int i_Score;
+    [Range(-1, 5)] [SerializeField] int i_TimeToDrop_Max = 3;
+    float f_TimeToDrop = -3f;
 
     public int i_ArrayWidth;
     public int i_ArrayHeight;
@@ -109,8 +111,11 @@ public class Cs_BoardLogic : MonoBehaviour
         // Initialize Board
         GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Init_Board(i_ArrayWidth, i_ArrayHeight);
 
+        // Set i_TimeToDrop_Max to be -1 if it starts at 0, to make sure we aren't dropping infinitely
+        if (i_TimeToDrop_Max == 0) i_TimeToDrop_Max = -1;
+
         #region Set First Block to Random Size
-        // Determine the size of the next block to use
+            // Determine the size of the next block to use
         bool b_FoundNextBlock = false;
         // While we haven't found the next block, loop
         while (!b_FoundNextBlock)
@@ -258,38 +263,6 @@ public class Cs_BoardLogic : MonoBehaviour
         else if (e_BlockSize == Enum_BlockSize.size_2w_3h || e_BlockSize == Enum_BlockSize.size_3w_2h)  i_NumToShift = 6;
         else if (e_BlockSize == Enum_BlockSize.size_3w_3h)                                              i_NumToShift = 9;
 
-        // print("BLOCK SIZE: " + e_BlockSize);
-        
-        // No matter what, set the initial 2x2
-        SetBlock(v2_ActiveBlockLocation,                                                    e_NextBlockList[0]);
-        SetBlock(new Vector2(v2_ActiveBlockLocation.x + 1, v2_ActiveBlockLocation.y + 0),   e_NextBlockList[1]);
-        SetBlock(new Vector2(v2_ActiveBlockLocation.x + 0, v2_ActiveBlockLocation.y + 1),   e_NextBlockList[2]);
-        SetBlock(new Vector2(v2_ActiveBlockLocation.x + 1, v2_ActiveBlockLocation.y + 1),   e_NextBlockList[3]);
-
-        // If we're specifically 3x2, set those positions
-        if( e_BlockSize == Enum_BlockSize.size_3w_2h )
-        {
-            SetBlock(new Vector2(v2_ActiveBlockLocation.x + 2, v2_ActiveBlockLocation.y + 1), e_NextBlockList[4]);
-            SetBlock(new Vector2(v2_ActiveBlockLocation.x + 2, v2_ActiveBlockLocation.y + 0), e_NextBlockList[5]);
-        }
-        // If we're specifically 2x3, set those positions
-        else if( e_BlockSize == Enum_BlockSize.size_2w_3h)
-        {
-            SetBlock(new Vector2(v2_ActiveBlockLocation.x + 0, v2_ActiveBlockLocation.y + 2), e_NextBlockList[4]);
-            SetBlock(new Vector2(v2_ActiveBlockLocation.x + 1, v2_ActiveBlockLocation.y + 2), e_NextBlockList[5]);
-        }
-        else if( e_BlockSize == Enum_BlockSize.size_3w_3h )
-        {
-            SetBlock(new Vector2(v2_ActiveBlockLocation.x + 2, v2_ActiveBlockLocation.y + 1), e_NextBlockList[4]);
-            SetBlock(new Vector2(v2_ActiveBlockLocation.x + 2, v2_ActiveBlockLocation.y + 0), e_NextBlockList[5]);
-
-            SetBlock(new Vector2(v2_ActiveBlockLocation.x + 0, v2_ActiveBlockLocation.y + 2), e_NextBlockList[6]);
-            SetBlock(new Vector2(v2_ActiveBlockLocation.x + 1, v2_ActiveBlockLocation.y + 2), e_NextBlockList[7]);
-
-            SetBlock(new Vector2(v2_ActiveBlockLocation.x + 2, v2_ActiveBlockLocation.y + 2), e_NextBlockList[8]);
-        }
-
-        #region Send Blocks to Board Display
         // Create temp block list
         int i_NewBlocks_Width = 2;
         int i_NewBlocks_Height = 2;
@@ -297,15 +270,59 @@ public class Cs_BoardLogic : MonoBehaviour
         if (e_BlockSize == Enum_BlockSize.size_3w_2h || e_BlockSize == Enum_BlockSize.size_3w_3h) i_NewBlocks_Width = 3;
         if (e_BlockSize == Enum_BlockSize.size_2w_3h || e_BlockSize == Enum_BlockSize.size_3w_3h) i_NewBlocks_Height = 3;
 
+        // print("BLOCK SIZE: " + e_BlockSize);
         Enum_BlockType[,] e_SmallList = new Enum_BlockType[i_NewBlocks_Height, i_NewBlocks_Width];
-        for(int y_ = 0; y_ < i_NewBlocks_Width; ++y_)
+
+        // No matter what, set the initial 2x2
+        SetBlock(v2_ActiveBlockLocation,                                            e_NextBlockList[0]);
+        e_SmallList[0, 0] = e_NextBlockList[0];
+
+        SetBlock(new Vector2(v2_ActiveBlockLocation.x + 1, v2_ActiveBlockLocation.y + 0),   e_NextBlockList[1]);
+        e_SmallList[0, 1] = e_NextBlockList[1];
+
+        SetBlock(new Vector2(v2_ActiveBlockLocation.x + 0, v2_ActiveBlockLocation.y + 1),   e_NextBlockList[2]);
+        e_SmallList[1, 0] = e_NextBlockList[2];
+
+        SetBlock(new Vector2(v2_ActiveBlockLocation.x + 1, v2_ActiveBlockLocation.y + 1),   e_NextBlockList[3]);
+        e_SmallList[1, 1] = e_NextBlockList[3];
+
+        // If we're specifically 3x2, set those positions
+        if ( e_BlockSize == Enum_BlockSize.size_3w_2h )
         {
-            for(int x_ = 0; x_ < i_NewBlocks_Width; ++x_)
-            {
-                e_SmallList[y_, x_] = e_NextBlockList[(y_ * i_NewBlocks_Width) + x_];
-            }
+            SetBlock(new Vector2(v2_ActiveBlockLocation.x + 2, v2_ActiveBlockLocation.y + 1), e_NextBlockList[4]);
+            e_SmallList[1, 2] = e_NextBlockList[4];
+
+            SetBlock(new Vector2(v2_ActiveBlockLocation.x + 2, v2_ActiveBlockLocation.y + 0), e_NextBlockList[5]);
+            e_SmallList[0, 2] = e_NextBlockList[5];
+        }
+        // If we're specifically 2x3, set those positions
+        else if( e_BlockSize == Enum_BlockSize.size_2w_3h)
+        {
+            SetBlock(new Vector2(v2_ActiveBlockLocation.x + 0, v2_ActiveBlockLocation.y + 2), e_NextBlockList[4]);
+            e_SmallList[2, 0] = e_NextBlockList[4];
+
+            SetBlock(new Vector2(v2_ActiveBlockLocation.x + 1, v2_ActiveBlockLocation.y + 2), e_NextBlockList[5]);
+            e_SmallList[2, 1] = e_NextBlockList[5];
+        }
+        else if( e_BlockSize == Enum_BlockSize.size_3w_3h )
+        {
+            SetBlock(new Vector2(v2_ActiveBlockLocation.x + 2, v2_ActiveBlockLocation.y + 1), e_NextBlockList[4]);
+            e_SmallList[1, 2] = e_NextBlockList[4];
+
+            SetBlock(new Vector2(v2_ActiveBlockLocation.x + 2, v2_ActiveBlockLocation.y + 0), e_NextBlockList[5]);
+            e_SmallList[0, 2] = e_NextBlockList[5];
+
+            SetBlock(new Vector2(v2_ActiveBlockLocation.x + 0, v2_ActiveBlockLocation.y + 2), e_NextBlockList[6]);
+            e_SmallList[2, 0] = e_NextBlockList[6];
+
+            SetBlock(new Vector2(v2_ActiveBlockLocation.x + 1, v2_ActiveBlockLocation.y + 2), e_NextBlockList[7]);
+            e_SmallList[2, 1] = e_NextBlockList[7];
+
+            SetBlock(new Vector2(v2_ActiveBlockLocation.x + 2, v2_ActiveBlockLocation.y + 2), e_NextBlockList[8]);
+            e_SmallList[2, 2] = e_NextBlockList[8];
         }
 
+        #region Send e_SmallList to Board Display
         GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Set_NewBlocks(e_SmallList, e_BlockSize, new IntVector2((int)v2_ActiveBlockLocation.x, (int)v2_ActiveBlockLocation.y));
         #endregion
 
@@ -779,9 +796,7 @@ public class Cs_BoardLogic : MonoBehaviour
     {
         SetBlock((int)blockPos_.x, (int)blockPos_.y, blockType_);
     }
-
-    float f_PullTimer;
-    float f_PullTimer_Max = 0.1f;
+    
     void PullBlocksDown()
     {
         // Run through the array and pull blocks down to their lowest point
@@ -945,6 +960,9 @@ public class Cs_BoardLogic : MonoBehaviour
         else
         {
             CreateNewBlock();
+
+            // Reset time for new block to be created
+            f_TimeToDrop = -1f;
         }
 
         print("Current Score: " + i_Score);
@@ -1331,12 +1349,27 @@ public class Cs_BoardLogic : MonoBehaviour
     float f_Test;
     void Update ()
     {
-        // Pull Blocks Down 'queue'
-        f_PullTimer -= Time.deltaTime;
+        // Decrement timer for next time to move blocks down
+        if(i_TimeToDrop_Max > 0)
+        {
+            f_TimeToDrop += Time.deltaTime;
+
+            if(f_TimeToDrop > i_TimeToDrop_Max)
+            {
+                // Reset timer
+                f_TimeToDrop = 0;
+
+                // Drop blocks down manually
+                MoveActiveBlocks_Down(v2_ActiveBlockLocation, e_BlockSize);
+            }
+        }
 
         if (Input.GetKeyDown(KeyCode.S))
         {
             MoveActiveBlocks_Down(v2_ActiveBlockLocation, e_BlockSize);
+
+            // Reset timer to drop blocks
+            f_TimeToDrop = 0;
 
             PrintArrayToConsole();
         }
@@ -1372,6 +1405,9 @@ public class Cs_BoardLogic : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space))
         {
             AllBlocksStatic();
+
+            // Reset timer to drop blocks
+            f_TimeToDrop = -1f;
 
             PrintArrayToConsole();
         }

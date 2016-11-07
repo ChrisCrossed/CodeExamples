@@ -5,7 +5,7 @@ public class Cs_BlockOnBoardLogic : MonoBehaviour
 {
     float f_LerpTimer_Horiz;
     float f_LerpTimer_Vert;
-    float f_LerpTimer_Max = 1f;
+    float f_LerpTimer_Max = 0.25f;
 
     float f_yPos;
     float f_xPos;
@@ -14,7 +14,7 @@ public class Cs_BlockOnBoardLogic : MonoBehaviour
     int i_BoardWidth;
 
     bool b_IsDead;
-    float f_TransparencyTimer = 1.0f;
+    float f_TransparencyTimer = 0.5f;
     [SerializeField] float f_TimeToTransparent = .5f;
     [SerializeField] float f_LowestTransparencyPoint = 0.05f;
 
