@@ -16,7 +16,7 @@ public class Cs_BlockOnBoardLogic : MonoBehaviour
 	// Use this for initialization
 	void Start ()
     {
-        Init_BlockModel(5, 5, 3, 20);
+        // Init_BlockModel(5, 5, 3, 20);
 	}
 
     public void Init_BlockModel( int i_xPos_, int i_yPos_, float f_BlockScale_, int i_BoardWidth_ )

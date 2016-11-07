@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-// using System.;
 
 public enum Enum_BlockType
 {
@@ -105,6 +104,9 @@ public class Cs_BoardLogic : MonoBehaviour
 	// Use this for initialization
 	void Start ()
     {
+        // Initialize Board
+        GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Init_Board(i_ArrayWidth, i_ArrayHeight);
+
         #region Set First Block to Random Size
         // Determine the size of the next block to use
         bool b_FoundNextBlock = false;
@@ -250,9 +252,9 @@ public class Cs_BoardLogic : MonoBehaviour
         else v2_ActiveBlockLocation.y = i_ArrayHeight - 3;
 
         // Set the number of blocks to shift afterward
-        if (e_BlockSize == Enum_BlockSize.size_2w_2h)                                                 i_NumToShift = 4;
+        if (e_BlockSize == Enum_BlockSize.size_2w_2h)                                                   i_NumToShift = 4;
         else if (e_BlockSize == Enum_BlockSize.size_2w_3h || e_BlockSize == Enum_BlockSize.size_3w_2h)  i_NumToShift = 6;
-        else if (e_BlockSize == Enum_BlockSize.size_3w_3h)                                            i_NumToShift = 9;
+        else if (e_BlockSize == Enum_BlockSize.size_3w_3h)                                              i_NumToShift = 9;
 
         // print("BLOCK SIZE: " + e_BlockSize);
         
@@ -284,6 +286,26 @@ public class Cs_BoardLogic : MonoBehaviour
 
             SetBlock(new Vector2(v2_ActiveBlockLocation.x + 2, v2_ActiveBlockLocation.y + 2), e_NextBlockList[8]);
         }
+
+        #region Send Blocks to Board Display
+        // Create temp block list
+        int i_NewBlocks_Width = 2;
+        int i_NewBlocks_Height = 2;
+
+        if (e_BlockSize == Enum_BlockSize.size_3w_2h || e_BlockSize == Enum_BlockSize.size_3w_3h) i_NewBlocks_Width = 3;
+        if (e_BlockSize == Enum_BlockSize.size_2w_3h || e_BlockSize == Enum_BlockSize.size_3w_3h) i_NewBlocks_Height = 3;
+
+        Enum_BlockType[,] e_SmallList = new Enum_BlockType[i_NewBlocks_Height, i_NewBlocks_Width];
+        for(int y_ = 0; y_ < i_NewBlocks_Width; ++y_)
+        {
+            for(int x_ = 0; x_ < i_NewBlocks_Width; ++x_)
+            {
+                e_SmallList[y_, x_] = e_NextBlockList[(y_ * i_NewBlocks_Width) + x_];
+            }
+        }
+
+        GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Set_NewBlocks(e_SmallList, e_BlockSize, new IntVector2((int)v2_ActiveBlockLocation.x, (int)v2_ActiveBlockLocation.y));
+        #endregion
 
         ShiftNewBlockList( i_NumToShift );
     }
@@ -410,6 +432,10 @@ public class Cs_BoardLogic : MonoBehaviour
         }
         #endregion
 
+        #region Send movement to BoardDisplay
+        GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().ShiftBlocks(Enum_Direction.Down, e_BlockSize, v2_BottomLeft);
+        #endregion
+
         // Move the CurrentBlockLocation 'y'
         --v2_ActiveBlockLocation.y;
     }
@@ -506,6 +532,10 @@ public class Cs_BoardLogic : MonoBehaviour
         }
         #endregion
 
+        #region Send movement to BoardDisplay
+        GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().ShiftBlocks(Enum_Direction.Left, e_BlockSize, v2_BottomLeft);
+        #endregion
+
         --v2_ActiveBlockLocation.x;
     }
 
@@ -582,6 +612,10 @@ public class Cs_BoardLogic : MonoBehaviour
         // 0, 0 -> CLEAR
         SetBlock((int)v2_BottomLeft.x + 0, (int)v2_BottomLeft.y + 0, Enum_BlockType.Empty);
 
+        #endregion
+
+        #region Send movement to BoardDisplay
+        GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().ShiftBlocks(Enum_Direction.Right, e_BlockSize, v2_BottomLeft);
         #endregion
 
         ++v2_ActiveBlockLocation.x;
@@ -800,8 +834,13 @@ public class Cs_BoardLogic : MonoBehaviour
                     // Set the previous block position to empty
                     SetBlock(x_, y_, Enum_BlockType.Empty);
 
+                    #region Send movement to BoardDisplay
+                    GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().MoveBlock_Dir(Enum_Direction.Down, new IntVector2(x_, y_));
+                    #endregion
+
                     // Reset and re-loop
                     y_ = 0;
+
 
                     continue;
                 }
