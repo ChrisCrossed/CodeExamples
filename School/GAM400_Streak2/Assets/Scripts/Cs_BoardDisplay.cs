@@ -407,14 +407,38 @@ public class Cs_BoardDisplay : MonoBehaviour
     public void RotateBlocks(Enum_Direction e_RotDir_, Enum_BlockSize e_BlockSize_, IntVector2 iv2_BottomLeft_)
     {
         // Store Bottom Left
-        Enum_BlockType e_BotLeftBlock = BlockArray[iv2_BottomLeft_.y, iv2_BottomLeft_.x];
+        Enum_BlockType e_BotLeftBlock = DisplayArray[iv2_BottomLeft_.y, iv2_BottomLeft_.x];
+        GameObject go_BotLeftBlock = DisplayArray_Blocks[iv2_BottomLeft_.y, iv2_BottomLeft_.x];
 
         if (e_RotDir_ == Enum_Direction.Left)
         {
             #region Shift Left (Counter-clockwise)
             if(e_BlockSize_ == Enum_BlockSize.size_2w_2h)
             {
+                // Top left -> Down
+                // MoveBlock_Dir(Enum_Direction.Down, new IntVector2(iv2_BottomLeft_.x + 0, iv2_BottomLeft_.y + 1));
+                print("Yooo: " + (iv2_BottomLeft_.x + 0).ToString() + ", " + (iv2_BottomLeft_.y + 1).ToString());
+                DisplayArray_Blocks[iv2_BottomLeft_.x + 0, iv2_BottomLeft_.y + 1].GetComponent<Cs_BlockOnBoardLogic>().Set_MoveDown();
+                DisplayArray_Blocks[iv2_BottomLeft_.x + 0, iv2_BottomLeft_.y + 0] = DisplayArray_Blocks[iv2_BottomLeft_.x + 0, iv2_BottomLeft_.y + 1];
+                DisplayArray[iv2_BottomLeft_.x + 0, iv2_BottomLeft_.y + 0] = DisplayArray[iv2_BottomLeft_.x + 0, iv2_BottomLeft_.y + 1];
 
+                // Top Right -> Left
+                //MoveBlock_Dir(Enum_Direction.Left, new IntVector2(iv2_BottomLeft_.x + 1, iv2_BottomLeft_.y + 1));
+                DisplayArray_Blocks[iv2_BottomLeft_.x + 1, iv2_BottomLeft_.y + 1].GetComponent<Cs_BlockOnBoardLogic>().Set_MoveLeft();
+                DisplayArray_Blocks[iv2_BottomLeft_.x + 0, iv2_BottomLeft_.y + 1] = DisplayArray_Blocks[iv2_BottomLeft_.x + 1, iv2_BottomLeft_.y + 1];
+                DisplayArray[iv2_BottomLeft_.x + 0, iv2_BottomLeft_.y + 1] = DisplayArray[iv2_BottomLeft_.x + 1, iv2_BottomLeft_.y + 1];
+
+                // Bottom Right -> Up
+                //MoveBlock_Dir(Enum_Direction.Up, new IntVector2(iv2_BottomLeft_.x + 1, iv2_BottomLeft_.y + 0));
+                DisplayArray_Blocks[iv2_BottomLeft_.x + 1, iv2_BottomLeft_.y + 0].GetComponent<Cs_BlockOnBoardLogic>().Set_MoveUp();
+                DisplayArray_Blocks[iv2_BottomLeft_.x + 1, iv2_BottomLeft_.y + 1] = DisplayArray_Blocks[iv2_BottomLeft_.x + 1, iv2_BottomLeft_.y + 0];
+                DisplayArray[iv2_BottomLeft_.x + 1, iv2_BottomLeft_.y + 1] = DisplayArray[iv2_BottomLeft_.x + 1, iv2_BottomLeft_.y + 0];
+
+                // Bottom Left -> Right
+                //MoveBlock_Dir(Enum_Direction.Right, new IntVector2(iv2_BottomLeft_.x + 0, iv2_BottomLeft_.y + 0));
+                DisplayArray_Blocks[iv2_BottomLeft_.x + 0, iv2_BottomLeft_.y + 0].GetComponent<Cs_BlockOnBoardLogic>().Set_MoveRight();
+                DisplayArray_Blocks[iv2_BottomLeft_.x + 1, iv2_BottomLeft_.y + 0] = go_BotLeftBlock;
+                DisplayArray[iv2_BottomLeft_.x + 1, iv2_BottomLeft_.y + 0] = e_BotLeftBlock;
             }
             #endregion
         }

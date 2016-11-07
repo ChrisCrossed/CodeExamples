@@ -759,6 +759,8 @@ public class Cs_BoardLogic : MonoBehaviour
 
         // (1,0) becomes Temporary
         SetBlock((int)v2_BottomLeft.x + 1, (int)v2_BottomLeft.y + 0, e_TempBlockType_);
+
+        GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().RotateBlocks( Enum_Direction.Left, e_BlockSize, v2_BottomLeft );
     }
 
     void SetBlock(int x_Pos_, int y_Pos_, Enum_BlockType blockType_)

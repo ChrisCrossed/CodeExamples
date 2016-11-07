@@ -104,6 +104,18 @@ public class Cs_BlockOnBoardLogic : MonoBehaviour
         f_LerpTimer_Vert = 0.0f;
     }
 
+    public void Set_MoveUp()
+    {
+        // Increment Y position by 1
+        if (f_yPos + 1 >= 0)
+        {
+            f_yPos += 1;
+        }
+
+        // Reset LerpTimer_Vert
+        f_LerpTimer_Vert = 0.0f;
+    }
+
     public void Set_MoveDownToPos( int f_yPos_ )
     {
         // Get current Y position
