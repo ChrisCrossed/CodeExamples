@@ -106,11 +106,6 @@ public class Cs_WallLogic : MonoBehaviour
             mat_CurrColor[i_].color = currColor;
 
         }
-        /*Color clr_CurrColor = gameObject.GetComponent<MeshRenderer>().material.color;
-        clr_CurrColor.a = f_TransparencyTimer;
-        gameObject.GetComponent<MeshRenderer>().material.color = clr_CurrColor;
-        print(clr_CurrColor.ToString());
-        */
     }
 
     public void SetVisibilityState( bool b_GoToTransparent_ )

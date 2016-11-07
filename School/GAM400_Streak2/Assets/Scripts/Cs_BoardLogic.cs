@@ -783,13 +783,23 @@ public class Cs_BoardLogic : MonoBehaviour
         #region Set Left & Right Walls to 'Empty' (Done BEFORE scoring)
         for (int y_ = 0; y_ < i_ArrayHeight; ++y_)
         {
+            // Tell the board model to destroy the block
+            if (GetBlock(0, y_) != Enum_BlockType.Empty)
+            {
+                GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().DestroyBlockAt(new IntVector2(0, y_));
+            }
+
             // Set Left Wall to be 'Empty'
             SetBlock(0, y_, Enum_BlockType.Empty);
 
+            // Tell the board model to destroy the block
+            if (GetBlock(i_ArrayWidth - 1, y_) != Enum_BlockType.Empty)
+            {
+                GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().DestroyBlockAt(new IntVector2(i_ArrayWidth - 1, y_));
+            }
+
             // Set Right Wall to be 'Empty'
             SetBlock(i_ArrayWidth - 1, y_, Enum_BlockType.Empty);
-
-
         }
         #endregion
 
@@ -878,6 +888,12 @@ public class Cs_BoardLogic : MonoBehaviour
                 if (i_ExtraBlankRow > 0 &&
                     i_ExtraBlankRow < i_ArrayWidth)
                 {
+                    // Destroy the block model on screen
+                    if (GetBlock(0, y_) != Enum_BlockType.Empty)
+                    {
+                        GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().DestroyBlockAt(new IntVector2(i_ExtraBlankRow, y_));
+                    }
+
                     SetBlock(i_ExtraBlankRow, y_, Enum_BlockType.Empty);
                 }
             }
@@ -924,11 +940,13 @@ public class Cs_BoardLogic : MonoBehaviour
         for(int y_ = 0; y_ < i_ArrayHeight; ++y_)
         {
             print("Checking: " + i_LeftBound + ", " + y_);
+            print("Curr Block: " + e_CurrBlockType);
+            print("New Block: " + GetBlock(i_LeftBound, y_));
 
             // If the previous checked block differs than the current block && isn't empty
             if(e_CurrBlockType != GetBlock(i_LeftBound, y_) && GetBlock(i_LeftBound, y_) != Enum_BlockType.Empty)
             {
-                print("Current: " + e_CurrBlockType.ToString() + ", GetBlock: " + GetBlock(1, y_).ToString());
+                print("Current: " + e_CurrBlockType.ToString() + ", GetBlock: " + GetBlock(i_LeftBound, y_).ToString());
 
                 // Store the new block
                 e_CurrBlockType = GetBlock(i_LeftBound, y_);
@@ -958,7 +976,8 @@ public class Cs_BoardLogic : MonoBehaviour
                     {
                         print("FAILED");
 
-                        return false;
+                        // Continue since we need to check the other blocks in the column, regardless of the outcome of this one
+                        continue;
                     }
                 }
                 #endregion 
@@ -1233,7 +1252,6 @@ public class Cs_BoardLogic : MonoBehaviour
     #region Print Array To Console
     void PrintArrayToConsole()
     {
-        /*
         // The 'y' is reversed (top to bottom) to compensate for printing
         for(int j = i_ArrayHeight - 1; j >= 0 ; j--)
         {
@@ -1261,7 +1279,6 @@ public class Cs_BoardLogic : MonoBehaviour
             print(tempString);
         }
         print("Active Block: " + v2_ActiveBlockLocation + "\n-----------------------------------------------------------------\n");
-        */
     }
     #endregion
 

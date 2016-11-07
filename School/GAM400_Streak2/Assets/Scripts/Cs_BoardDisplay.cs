@@ -482,9 +482,17 @@ public class Cs_BoardDisplay : MonoBehaviour
         RotateBlocks(e_RotDir_, e_BlockSize_, iv2_Temp);
     }
 
-    void DestroyBlockAt( IntVector2 iv2_DestroyLoc_ )
+    public void DestroyBlockAt( IntVector2 iv2_DestroyLoc_ )
     {
+        // Set the DisplayArray position to be empty
+        DisplayArray[iv2_DestroyLoc_.y, iv2_DestroyLoc_.x] = Enum_BlockType.Empty;
 
+        // Set the DisplayArray_Blocks block to destroy itself visually
+        DisplayArray_Blocks[iv2_DestroyLoc_.y, iv2_DestroyLoc_.x].GetComponent<Cs_BlockOnBoardLogic>().Set_DeleteBlock();
+
+        // Separate the DisplayArray_Blocks block by making it into an empty object
+        DisplayArray_Blocks[iv2_DestroyLoc_.y, iv2_DestroyLoc_.x] = Instantiate(go_Empty);
+        DisplayArray_Blocks[iv2_DestroyLoc_.y, iv2_DestroyLoc_.x].transform.SetParent(GameObject.Find("EmptyBlocks").transform);
     }
 
     public void Set_BoardState(Enum_BlockType[,] BlockArray_ )
@@ -538,7 +546,6 @@ public class Cs_BoardDisplay : MonoBehaviour
                 // Initialize this block
                 int i_NewX = x_ + iv2_BottomLeft_.x;
                 int i_NewY = y_ + iv2_BottomLeft_.y;
-                print("Possss: " + i_NewX + ", " + i_NewY);
                 if(go_BlockTemp.GetComponent<Cs_BlockOnBoardLogic>())
                 {
 
