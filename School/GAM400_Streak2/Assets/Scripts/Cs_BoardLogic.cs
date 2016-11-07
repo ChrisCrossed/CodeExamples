@@ -82,6 +82,8 @@ public struct IntVector2
 
 public class Cs_BoardLogic : MonoBehaviour
 {
+    int i_Score;
+
     public int i_ArrayWidth;
     public int i_ArrayHeight;
 
@@ -778,8 +780,47 @@ public class Cs_BoardLogic : MonoBehaviour
         SetBlock((int)blockPos_.x, (int)blockPos_.y, blockType_);
     }
 
+    float f_PullTimer;
+    float f_PullTimer_Max = 0.1f;
+    void PullBlocksDown()
+    {
+        // Run through the array and pull blocks down to their lowest point
+        for (int x_ = 0; x_ < i_ArrayWidth; ++x_)
+        {
+            // The y begins at 1 since we can't move a block down at y = 0
+            for (int y_ = 1; y_ < i_ArrayHeight; ++y_)
+            {
+                // Get the current block type
+                Enum_BlockType thisBlock = GetBlock(x_, y_);
+
+                // Get the current block type beneath us
+                Enum_BlockType lowerBlock = GetBlock(x_, y_ - 1);
+
+                if (thisBlock != Enum_BlockType.Empty && lowerBlock == Enum_BlockType.Empty)
+                {
+                    // If a static block is found with an open spot beneath it, shift it down one spot
+                    SetBlock(x_, y_ - 1, thisBlock);
+
+                    // Set the previous block position to empty
+                    SetBlock(x_, y_, Enum_BlockType.Empty);
+
+                    #region Send movement to BoardDisplay
+                    GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().MoveBlock_Dir(Enum_Direction.Down, new IntVector2(x_, y_));
+                    #endregion
+
+                    // Reset and re-loop
+                    y_ = 0;
+                    
+                    continue;
+                }
+            }
+        }
+    }
+
     void AllBlocksStatic()
     {
+        bool b_RunAgain = false;
+
         #region Set Left & Right Walls to 'Empty' (Done BEFORE scoring)
         for (int y_ = 0; y_ < i_ArrayHeight; ++y_)
         {
@@ -828,43 +869,13 @@ public class Cs_BoardLogic : MonoBehaviour
         #endregion
 
         #region Pull Blocks Down
-        // Run through the array and pull blocks down to their lowest point
-        for (int x_ = 0; x_ < i_ArrayWidth; ++x_)
-        {
-            // The y begins at 1 since we can't move a block down at y = 0
-            for (int y_ = 1; y_ < i_ArrayHeight; ++y_)
-            {
-                // Get the current block type
-                Enum_BlockType thisBlock = GetBlock(x_, y_);
-
-                // Get the current block type beneath us
-                Enum_BlockType lowerBlock = GetBlock(x_, y_ - 1);
-
-                if(thisBlock != Enum_BlockType.Empty && lowerBlock == Enum_BlockType.Empty)
-                {
-                    // If a static block is found with an open spot beneath it, shift it down one spot
-                    SetBlock(x_, y_ - 1, thisBlock);
-
-                    // Set the previous block position to empty
-                    SetBlock(x_, y_, Enum_BlockType.Empty);
-
-                    #region Send movement to BoardDisplay
-                    GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().MoveBlock_Dir(Enum_Direction.Down, new IntVector2(x_, y_));
-                    #endregion
-
-                    // Reset and re-loop
-                    y_ = 0;
-
-
-                    continue;
-                }
-            }
-        }
+        PullBlocksDown();
         #endregion
 
         // TODO: RUN SCORE CODE HERE FIRST
-        if(Load_ScoreLine())
+        if (Load_ScoreLine())
         {
+            #region Print Scoreline to console
             string s_ScoreLine = "LINE REACHED: (" + iv2_ScoreLine.Count + "):";
             for (int i_ = 0; i_ < iv2_ScoreLine.Count; ++i_)
             {
@@ -878,8 +889,32 @@ public class Cs_BoardLogic : MonoBehaviour
                 }
             }
             print(s_ScoreLine);
+            #endregion
+
+            b_RunAgain = true;
+
+            // Attach player's score
+            i_Score += iv2_ScoreLine.Count;
+
+            // Destroy the blocks in the scoreline
+            for(int i_ = 0; i_ < iv2_ScoreLine.Count; ++i_)
+            {
+                // Set the block in BlockArray to empty
+                SetBlock(iv2_ScoreLine[i_].x, iv2_ScoreLine[i_].y, Enum_BlockType.Empty);
+
+                // Destroy the block model on the screen
+                GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().DestroyBlockAt(iv2_ScoreLine[i_]);
+            }
+
+            print("Player earned " + iv2_ScoreLine.Count + " to earn a new score of " + i_Score);
+
+            // Clear the ScoreLine list
+            iv2_ScoreLine = new List<IntVector2>();
+
+            // 'PullBlocksDown' to update the board
+            PullBlocksDown();
         }
-        
+
         #region Set 'Mid Empty' row to empty (Done AFTER scoring)
         for (int y_ = 0; y_ < i_ArrayHeight; ++y_)
         {
@@ -903,7 +938,16 @@ public class Cs_BoardLogic : MonoBehaviour
         // Set the next block size to be whatever we found
         e_BlockSize = e_NextBlockSize;
 
-        CreateNewBlock();
+        if(b_RunAgain)
+        {
+            AllBlocksStatic();
+        }
+        else
+        {
+            CreateNewBlock();
+        }
+
+        print("Current Score: " + i_Score);
     }
 
     Enum_BlockType GetBlock(float x_Pos_, float y_Pos_)
@@ -939,14 +983,14 @@ public class Cs_BoardLogic : MonoBehaviour
         // Begin checking for a scoreline only if the left-most column (X = 1) has a block in it
         for(int y_ = 0; y_ < i_ArrayHeight; ++y_)
         {
-            print("Checking: " + i_LeftBound + ", " + y_);
-            print("Curr Block: " + e_CurrBlockType);
-            print("New Block: " + GetBlock(i_LeftBound, y_));
+            //print("Checking: " + i_LeftBound + ", " + y_);
+            //print("Curr Block: " + e_CurrBlockType);
+            //print("New Block: " + GetBlock(i_LeftBound, y_));
 
             // If the previous checked block differs than the current block && isn't empty
             if(e_CurrBlockType != GetBlock(i_LeftBound, y_) && GetBlock(i_LeftBound, y_) != Enum_BlockType.Empty)
             {
-                print("Current: " + e_CurrBlockType.ToString() + ", GetBlock: " + GetBlock(i_LeftBound, y_).ToString());
+                // print("Current: " + e_CurrBlockType.ToString() + ", GetBlock: " + GetBlock(i_LeftBound, y_).ToString());
 
                 // Store the new block
                 e_CurrBlockType = GetBlock(i_LeftBound, y_);
@@ -974,7 +1018,7 @@ public class Cs_BoardLogic : MonoBehaviour
                     // If we didn't find the specific block in this column, we can't have a completed line. Break out.
                     if (!b_RowHasBlockType)
                     {
-                        print("FAILED");
+                        // print("FAILED");
 
                         // Continue since we need to check the other blocks in the column, regardless of the outcome of this one
                         continue;
@@ -1006,12 +1050,12 @@ public class Cs_BoardLogic : MonoBehaviour
 
     bool ScoreLine( Enum_Direction e_Dir_ )
     {
-        string s_Curr = "Current List: ";
-        for(int i_ = 0; i_ < iv2_PathfindLine.Count; ++i_)
-        {
-            s_Curr += iv2_PathfindLine[i_] + ", ";
-        }
-        print(s_Curr);
+        //string s_Curr = "Current List: ";
+        //for(int i_ = 0; i_ < iv2_PathfindLine.Count; ++i_)
+        //{
+        //    s_Curr += iv2_PathfindLine[i_] + ", ";
+        //}
+        // print(s_Curr);
 
         // Continue from the last-populated position in the list
         IntVector2 iv2_CurrPos = iv2_PathfindLine[iv2_PathfindLine.Count - 1];
@@ -1287,6 +1331,9 @@ public class Cs_BoardLogic : MonoBehaviour
     float f_Test;
     void Update ()
     {
+        // Pull Blocks Down 'queue'
+        f_PullTimer -= Time.deltaTime;
+
         if (Input.GetKeyDown(KeyCode.S))
         {
             MoveActiveBlocks_Down(v2_ActiveBlockLocation, e_BlockSize);
