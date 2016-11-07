@@ -689,6 +689,8 @@ public class Cs_BoardLogic : MonoBehaviour
 
         // (0,1) becomes Temporary
         SetBlock((int)v2_BottomLeft.x + 0, (int)v2_BottomLeft.y + 1, e_TempBlockType_);
+
+        GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().RotateBlocks(Enum_Direction.Right, e_BlockSize, v2_BottomLeft);
     }
 
     // Complete
@@ -1231,6 +1233,7 @@ public class Cs_BoardLogic : MonoBehaviour
     #region Print Array To Console
     void PrintArrayToConsole()
     {
+        /*
         // The 'y' is reversed (top to bottom) to compensate for printing
         for(int j = i_ArrayHeight - 1; j >= 0 ; j--)
         {
@@ -1258,6 +1261,7 @@ public class Cs_BoardLogic : MonoBehaviour
             print(tempString);
         }
         print("Active Block: " + v2_ActiveBlockLocation + "\n-----------------------------------------------------------------\n");
+        */
     }
     #endregion
 

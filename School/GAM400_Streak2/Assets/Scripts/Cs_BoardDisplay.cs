@@ -300,6 +300,27 @@ public class Cs_BoardDisplay : MonoBehaviour
             DisplayArray_Blocks[iv2_Pos_.y - 1, iv2_Pos_.x + 0] = DisplayArray_Blocks[iv2_Pos_.y + 0, iv2_Pos_.x - 0];
             DisplayArray_Blocks[iv2_Pos_.y + 0, iv2_Pos_.x - 0] = go_TempBlock;
         }
+        else if(e_MoveDir_ == Enum_Direction.Up )
+        {
+            // Push indicated block up
+            if (DisplayArray_Blocks[iv2_Pos_.y + 0, iv2_Pos_.x + 0].GetComponent<Cs_BlockOnBoardLogic>())
+            {
+                DisplayArray_Blocks[iv2_Pos_.y + 0, iv2_Pos_.x - 0].GetComponent<Cs_BlockOnBoardLogic>().Set_MoveUp();
+            }
+
+            // Store block above this block
+            Enum_BlockType e_TempBlock = DisplayArray[iv2_Pos_.y + 1, iv2_Pos_.x + 0];
+
+            // Swap Blocks in Array
+            DisplayArray[iv2_Pos_.y + 1, iv2_Pos_.x + 0] = DisplayArray[iv2_Pos_.y + 0, iv2_Pos_.x - 0];
+            DisplayArray[iv2_Pos_.y + 0, iv2_Pos_.x - 0] = e_TempBlock;
+
+            // Swap DisplayArray_Blocks in same manner
+            GameObject go_TempBlock = DisplayArray_Blocks[iv2_Pos_.y + 1, iv2_Pos_.x + 0];
+
+            DisplayArray_Blocks[iv2_Pos_.y + 1, iv2_Pos_.x + 0] = DisplayArray_Blocks[iv2_Pos_.y + 0, iv2_Pos_.x - 0];
+            DisplayArray_Blocks[iv2_Pos_.y + 0, iv2_Pos_.x - 0] = go_TempBlock;
+        }
     }
 
     public void ShiftBlocks( Enum_Direction e_MoveDir_, Enum_BlockSize e_BlockSize_, IntVector2 iv2_BottomLeft_)
@@ -413,33 +434,45 @@ public class Cs_BoardDisplay : MonoBehaviour
         if (e_RotDir_ == Enum_Direction.Left)
         {
             #region Shift Left (Counter-clockwise)
-            if(e_BlockSize_ == Enum_BlockSize.size_2w_2h)
-            {
-                // Top left -> Down
-                // MoveBlock_Dir(Enum_Direction.Down, new IntVector2(iv2_BottomLeft_.x + 0, iv2_BottomLeft_.y + 1));
-                print("Yooo: " + (iv2_BottomLeft_.x + 0).ToString() + ", " + (iv2_BottomLeft_.y + 1).ToString());
-                DisplayArray_Blocks[iv2_BottomLeft_.x + 0, iv2_BottomLeft_.y + 1].GetComponent<Cs_BlockOnBoardLogic>().Set_MoveDown();
-                DisplayArray_Blocks[iv2_BottomLeft_.x + 0, iv2_BottomLeft_.y + 0] = DisplayArray_Blocks[iv2_BottomLeft_.x + 0, iv2_BottomLeft_.y + 1];
-                DisplayArray[iv2_BottomLeft_.x + 0, iv2_BottomLeft_.y + 0] = DisplayArray[iv2_BottomLeft_.x + 0, iv2_BottomLeft_.y + 1];
+            // Move Blocks Visually
+            DisplayArray_Blocks[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 0].GetComponent<Cs_BlockOnBoardLogic>().Set_MoveDown();
+            DisplayArray_Blocks[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 1].GetComponent<Cs_BlockOnBoardLogic>().Set_MoveLeft();
+            DisplayArray_Blocks[iv2_BottomLeft_.y + 0, iv2_BottomLeft_.x + 1].GetComponent<Cs_BlockOnBoardLogic>().Set_MoveUp();
+            DisplayArray_Blocks[iv2_BottomLeft_.y + 0, iv2_BottomLeft_.x + 0].GetComponent<Cs_BlockOnBoardLogic>().Set_MoveRight();
 
-                // Top Right -> Left
-                //MoveBlock_Dir(Enum_Direction.Left, new IntVector2(iv2_BottomLeft_.x + 1, iv2_BottomLeft_.y + 1));
-                DisplayArray_Blocks[iv2_BottomLeft_.x + 1, iv2_BottomLeft_.y + 1].GetComponent<Cs_BlockOnBoardLogic>().Set_MoveLeft();
-                DisplayArray_Blocks[iv2_BottomLeft_.x + 0, iv2_BottomLeft_.y + 1] = DisplayArray_Blocks[iv2_BottomLeft_.x + 1, iv2_BottomLeft_.y + 1];
-                DisplayArray[iv2_BottomLeft_.x + 0, iv2_BottomLeft_.y + 1] = DisplayArray[iv2_BottomLeft_.x + 1, iv2_BottomLeft_.y + 1];
+            // Re-arrange the blocks in the DisplayArray_Blocks to match
+            DisplayArray_Blocks[iv2_BottomLeft_.y + 0, iv2_BottomLeft_.x + 0] = DisplayArray_Blocks[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 0];
+            DisplayArray_Blocks[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 0] = DisplayArray_Blocks[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 1];
+            DisplayArray_Blocks[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 1] = DisplayArray_Blocks[iv2_BottomLeft_.y + 0, iv2_BottomLeft_.x + 1];
+            DisplayArray_Blocks[iv2_BottomLeft_.y + 0, iv2_BottomLeft_.x + 1] = go_BotLeftBlock;
 
-                // Bottom Right -> Up
-                //MoveBlock_Dir(Enum_Direction.Up, new IntVector2(iv2_BottomLeft_.x + 1, iv2_BottomLeft_.y + 0));
-                DisplayArray_Blocks[iv2_BottomLeft_.x + 1, iv2_BottomLeft_.y + 0].GetComponent<Cs_BlockOnBoardLogic>().Set_MoveUp();
-                DisplayArray_Blocks[iv2_BottomLeft_.x + 1, iv2_BottomLeft_.y + 1] = DisplayArray_Blocks[iv2_BottomLeft_.x + 1, iv2_BottomLeft_.y + 0];
-                DisplayArray[iv2_BottomLeft_.x + 1, iv2_BottomLeft_.y + 1] = DisplayArray[iv2_BottomLeft_.x + 1, iv2_BottomLeft_.y + 0];
+            // Re-arrange the blocks in the Display Array to match
+            DisplayArray[iv2_BottomLeft_.y + 0, iv2_BottomLeft_.x + 0] = DisplayArray[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 0];
+            DisplayArray[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 0] = DisplayArray[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 1];
+            DisplayArray[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 1] = DisplayArray[iv2_BottomLeft_.y + 0, iv2_BottomLeft_.x + 1];
+            DisplayArray[iv2_BottomLeft_.y + 0, iv2_BottomLeft_.x + 1] = e_BotLeftBlock;
+            #endregion
+        }
+        else if( e_RotDir_ == Enum_Direction.Right )
+        {
+            #region Shift Right (Clockwise)
+            // Move Blocks Visually
+            DisplayArray_Blocks[iv2_BottomLeft_.y + 0, iv2_BottomLeft_.x + 0].GetComponent<Cs_BlockOnBoardLogic>().Set_MoveUp();
+            DisplayArray_Blocks[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 0].GetComponent<Cs_BlockOnBoardLogic>().Set_MoveRight();
+            DisplayArray_Blocks[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 1].GetComponent<Cs_BlockOnBoardLogic>().Set_MoveDown();
+            DisplayArray_Blocks[iv2_BottomLeft_.y + 0, iv2_BottomLeft_.x + 1].GetComponent<Cs_BlockOnBoardLogic>().Set_MoveLeft();
 
-                // Bottom Left -> Right
-                //MoveBlock_Dir(Enum_Direction.Right, new IntVector2(iv2_BottomLeft_.x + 0, iv2_BottomLeft_.y + 0));
-                DisplayArray_Blocks[iv2_BottomLeft_.x + 0, iv2_BottomLeft_.y + 0].GetComponent<Cs_BlockOnBoardLogic>().Set_MoveRight();
-                DisplayArray_Blocks[iv2_BottomLeft_.x + 1, iv2_BottomLeft_.y + 0] = go_BotLeftBlock;
-                DisplayArray[iv2_BottomLeft_.x + 1, iv2_BottomLeft_.y + 0] = e_BotLeftBlock;
-            }
+            // Re-arrange the blocks in the DisplayArray_Blocks to match
+            DisplayArray_Blocks[iv2_BottomLeft_.y + 0, iv2_BottomLeft_.x + 0] = DisplayArray_Blocks[iv2_BottomLeft_.y + 0, iv2_BottomLeft_.x + 1];
+            DisplayArray_Blocks[iv2_BottomLeft_.y + 0, iv2_BottomLeft_.x + 1] = DisplayArray_Blocks[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 1];
+            DisplayArray_Blocks[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 1] = DisplayArray_Blocks[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 0];
+            DisplayArray_Blocks[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 0] = go_BotLeftBlock;
+
+            // Re-arrange the blocks in the Display Array to match
+            DisplayArray[iv2_BottomLeft_.y + 0, iv2_BottomLeft_.x + 0] = DisplayArray[iv2_BottomLeft_.y + 0, iv2_BottomLeft_.x + 1];
+            DisplayArray[iv2_BottomLeft_.y + 0, iv2_BottomLeft_.x + 1] = DisplayArray[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 1];
+            DisplayArray[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 1] = DisplayArray[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 0];
+            DisplayArray[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 0] = e_BotLeftBlock;
             #endregion
         }
     }
@@ -518,5 +551,29 @@ public class Cs_BoardDisplay : MonoBehaviour
                 DisplayArray_Blocks[i_NewY, i_NewX] = go_BlockTemp;
             }
         }
+    }
+
+    void PrintArrayToConsole()
+    {
+        // The 'y' is reversed (top to bottom) to compensate for printing
+        for(int j = i_Height - 1; j >= 0 ; j--)
+        {
+            string tempString = "";
+
+            for(int i = 0; i < i_Width; ++i)
+            {
+                // Left & Right 'Walls'
+                if((i == 0 || i == i_Width - 1) && (DisplayArray[j, i] == Enum_BlockType.Empty))
+                {
+                    tempString += "{!!} ";
+                }
+                // Normal empty block position
+                else if (DisplayArray[j, i] == Enum_BlockType.Empty) tempString += "[__] ";
+                // Print a populated block
+                else tempString += "[" + (int)BlockArray[j, i] + "] ";
+            }
+            print(tempString);
+        }
+        // print("Active Block: " + v2_ActiveBlockLocation + "\n-----------------------------------------------------------------\n");
     }
 }
