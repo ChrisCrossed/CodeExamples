@@ -10,6 +10,13 @@ public enum Enum_Tutorial
     LookHoriz
 }
 
+public enum Enum_SFX
+{
+    Jetpack,
+    Grass,
+    Wind
+}
+
 public class Cs_SkiingPlayerController : MonoBehaviour
 {
     GameObject go_RaycastPoint_1;
@@ -33,6 +40,19 @@ public class Cs_SkiingPlayerController : MonoBehaviour
     bool b_LookHorizontalAllowed_Tutorial = false;
 
     // Voiceovers
+    public GameObject go_SFX_Wind;
+    AudioSource sfx_Wind;
+    public GameObject go_SFX_Jetpack;
+    AudioSource sfx_Jetpack;
+    public GameObject go_SFX_Grass;
+    AudioSource sfx_Grass;
+    float f_VolumeWind = 0.0f;
+    float f_VolumeWind_Max = 0.5f;
+    float f_VolumeJetpack = 0.0f;
+    float f_VolumeJetpack_Max = 0.5f;
+    float f_VolumeGrass = 0.0f;
+    float f_VolumeGrass_Max = 0.5f;
+
     AudioSource audioSource;
     public AudioClip ac_Intro_1 = new AudioClip();
     public AudioClip ac_SuitLocked_2 = new AudioClip();
@@ -69,7 +89,16 @@ public class Cs_SkiingPlayerController : MonoBehaviour
 
         Cursor.lockState = CursorLockMode.Locked;
 
-        audioSource = gameObject.GetComponent<AudioSource>();
+        // Set Audio Sources
+        audioSource = gameObject.GetComponent<AudioSource>(); // Music
+        sfx_Grass = go_SFX_Grass.GetComponent<AudioSource>(); // Grass
+        sfx_Jetpack = go_SFX_Jetpack.GetComponent<AudioSource>(); // Jetpack
+        sfx_Wind = go_SFX_Wind.GetComponent<AudioSource>(); // Wind
+
+        // TODO: Remove
+        sfx_Wind.volume = 0.0f;
+        sfx_Jetpack.volume = 0.0f;
+        sfx_Grass.volume = 0.0f;
     }
 
     Vector3 v3_Velocity;
@@ -190,6 +219,9 @@ public class Cs_SkiingPlayerController : MonoBehaviour
                 gameObject.GetComponent<Collider>().material = physMat_Walk;
 
                 PlayerInput();
+
+                // Decrease skiing volume
+                SetVolume( Enum_SFX.Grass, false );
             }
 
             // GrappleHook();
@@ -601,6 +633,65 @@ public class Cs_SkiingPlayerController : MonoBehaviour
         }
     }
 
+    // void SetVolume
+    void SetVolume( Enum_SFX e_SFX_, bool b_VolumeUp_ )
+    {
+        if(e_SFX_ == Enum_SFX.Grass)
+        {
+            if( b_VolumeUp_ )
+            {
+                f_VolumeGrass += Time.deltaTime;
+
+                if ( f_VolumeGrass > f_VolumeGrass_Max ) f_VolumeGrass = f_VolumeGrass_Max;
+            }
+            else
+            {
+                f_VolumeGrass -= Time.deltaTime;
+
+                if ( f_VolumeGrass < 0 ) f_VolumeGrass = 0.0f;
+            }
+
+            // Connect to the AudioSource and set the volume
+            sfx_Grass.volume = f_VolumeGrass;
+        }
+        else if(e_SFX_ == Enum_SFX.Jetpack)
+        {
+            if (b_VolumeUp_)
+            {
+                f_VolumeJetpack += Time.deltaTime;
+
+                if (f_VolumeJetpack > f_VolumeJetpack_Max) f_VolumeJetpack = f_VolumeJetpack_Max;
+            }
+            else
+            {
+                f_VolumeJetpack -= Time.deltaTime;
+
+                if (f_VolumeJetpack < 0) f_VolumeJetpack = 0.0f;
+            }
+
+            // Connect to the AudioSource and set the volume
+            sfx_Jetpack.volume = f_VolumeJetpack;
+        }
+        else if(e_SFX_ == Enum_SFX.Wind)
+        {
+            if (b_VolumeUp_)
+            {
+                f_VolumeWind += Time.deltaTime;
+
+                if (f_VolumeWind > f_VolumeWind_Max) f_VolumeWind = f_VolumeWind_Max;
+            }
+            else
+            {
+                f_VolumeWind -= Time.deltaTime;
+
+                if (f_VolumeWind < 0) f_VolumeWind = 0.0f;
+            }
+
+            // Connect to the AudioSource and set the volume
+            sfx_Wind.volume = f_VolumeWind;
+        }
+    }
+
     float f_Jetpack_Curr = 0;
     float f_Jetpack_Max = 10f;
     GameObject go_JetpackUI;
@@ -612,6 +703,9 @@ public class Cs_SkiingPlayerController : MonoBehaviour
             {
                 if(f_Jetpack_Curr >= 0.1f)
                 {
+                    // Increase Jetpack volume
+                    SetVolume(Enum_SFX.Jetpack, true);
+
                     f_Jetpack_Curr -= Time.deltaTime * 2;
 
                     Vector3 v3_CurrVelocity = gameObject.GetComponent<Rigidbody>().velocity;
@@ -629,10 +723,18 @@ public class Cs_SkiingPlayerController : MonoBehaviour
 
                     gameObject.GetComponent<Rigidbody>().velocity = v3_CurrVelocity;
                 }
+                else
+                {
+                    // Decrease Jetpack volume
+                    SetVolume(Enum_SFX.Jetpack, false);
+                }
             }
             else
             {
-                if(b_JetpackAllowed_Tutorial)
+                // Decrease Jetpack volume
+                SetVolume(Enum_SFX.Jetpack, false);
+
+                if (b_JetpackAllowed_Tutorial)
                 {
                     f_Jetpack_Curr += Time.deltaTime;
 
@@ -750,6 +852,7 @@ public class Cs_SkiingPlayerController : MonoBehaviour
                 // Set PhysicsMaterial
                 gameObject.GetComponent<Collider>().material = physMat_Ski;
 
+                // If f_MaxSpeed > 0 (Why did I do this?!)
                 if (!(f_MaxSpeed <= 0))
                 {
                     // v3_Velocity = gameObject.GetComponent<Rigidbody>().velocity;
@@ -758,16 +861,24 @@ public class Cs_SkiingPlayerController : MonoBehaviour
                     v3_Velocity.Normalize();
                     v3_Velocity *= f_MaxSpeed;
                 }
-                else
-                {
-                    v3_Velocity = gameObject.GetComponent<Rigidbody>().velocity;
-                }
             }
+            else
+            {
+                v3_Velocity = gameObject.GetComponent<Rigidbody>().velocity;
+            }
+
+            // Increase grass skiing volume
+            SetVolume( Enum_SFX.Grass, true );
 
             if (gameObject.GetComponent<Rigidbody>().velocity.magnitude <= v3_Velocity.magnitude)
             {
                 gameObject.GetComponent<Rigidbody>().velocity = v3_Velocity;
             }
+        }
+        else
+        {
+            // Decrease grass skiing volume
+            SetVolume( Enum_SFX.Grass, false );
         }
         #endregion
     }
