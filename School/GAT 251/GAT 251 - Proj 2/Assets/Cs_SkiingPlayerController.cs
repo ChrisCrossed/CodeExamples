@@ -43,11 +43,17 @@ public class Cs_SkiingPlayerController : MonoBehaviour
     public AudioClip ac_SpaceJumps_7 = new AudioClip();
     public AudioClip ac_HighWall_8 = new AudioClip();
     public AudioClip ac_WindowContinue_9 = new AudioClip();
-    public AudioClip ac_Music = new AudioClip();
 
     // Use this for initialization
     void Start ()
     {
+        go_JetpackUI = GameObject.Find("Jetpack");
+
+        if (go_JetpackUI.GetComponent<Cs_JetpackHud>())
+        {
+            go_JetpackUI.GetComponent<Cs_JetpackHud>().Set_HUDPercentage(f_Jetpack_Curr / f_Jetpack_Max);
+        }
+
         f_xRot = transform.eulerAngles.y;
         f_xRot_Curr = f_xRot;
 
@@ -71,6 +77,9 @@ public class Cs_SkiingPlayerController : MonoBehaviour
 
     // Update is called once per frame
     bool b_JumpUnlocked;
+    bool b_UI_Jump;
+    bool b_UI_Jetpack;
+    bool b_UI_LookHoriz;
     void Update ()
     {
         UnlockSuit_Tutorial();
@@ -79,7 +88,76 @@ public class Cs_SkiingPlayerController : MonoBehaviour
         {
             UnlockSuit_Jump();
         }
-        
+
+        #region UI Lerping
+        if(b_UI_Jetpack)
+        {
+            GameObject go_LookJetpack = GameObject.Find("Jetpack_Color");
+
+            Color clr_Curr = go_LookJetpack.GetComponent<Image>().color;
+
+            if (clr_Curr.r > 0)
+            {
+                clr_Curr.r -= Time.deltaTime;
+                clr_Curr.g += Time.deltaTime;
+
+                if (clr_Curr.r < 0)
+                {
+                    clr_Curr.r = 0;
+                    clr_Curr.g = 1;
+
+                    b_UI_Jetpack = false;
+                }
+            }
+
+            go_LookJetpack.GetComponent<Image>().color = clr_Curr;
+        }
+        if(b_UI_Jump)
+        {
+            GameObject go_LookJump = GameObject.Find("Jump_Color");
+
+            Color clr_Curr = go_LookJump.GetComponent<Image>().color;
+
+            if (clr_Curr.r > 0)
+            {
+                clr_Curr.r -= Time.deltaTime;
+                clr_Curr.g += Time.deltaTime;
+
+                if (clr_Curr.r < 0)
+                {
+                    clr_Curr.r = 0;
+                    clr_Curr.g = 1;
+
+                    b_UI_Jump = false;
+                }
+            }
+
+            go_LookJump.GetComponent<Image>().color = clr_Curr;
+        }
+        if(b_UI_LookHoriz)
+        {
+            GameObject go_LookHoriz = GameObject.Find("Look_Color");
+
+            Color clr_Curr = go_LookHoriz.GetComponent<Image>().color;
+            
+            if(clr_Curr.r > 0)
+            {
+                clr_Curr.r -= Time.deltaTime;
+                clr_Curr.g += Time.deltaTime;
+
+                if(clr_Curr.r < 0)
+                {
+                    clr_Curr.r = 0;
+                    clr_Curr.g = 1;
+
+                    b_UI_LookHoriz = false;
+                }
+            }
+
+            go_LookHoriz.GetComponent<Image>().color = clr_Curr;
+        }
+        #endregion
+
         //print("Current speed: " + gameObject.GetComponent<Rigidbody>().velocity.magnitude);
         if (Input.GetKeyDown(KeyCode.Escape)) Application.Quit();
 
@@ -88,11 +166,8 @@ public class Cs_SkiingPlayerController : MonoBehaviour
             // Update mouse look
             MouseInput();
 
-            if(b_JetpackAllowed_Tutorial)
-            {
-                Jetpack();
-            }
-
+            Jetpack();
+            
             #region PlayerSliding
 
             // On the first moment the spacebar is pressed, jump
@@ -214,6 +289,9 @@ public class Cs_SkiingPlayerController : MonoBehaviour
 
                             b_JumpAllowed_Tutorial = true;
                             b_LookHorizontalAllowed_Tutorial = true;
+
+                            b_UI_Jump = true;
+                            b_UI_LookHoriz = true;
                             break;
 
                         case 9:
@@ -368,6 +446,13 @@ public class Cs_SkiingPlayerController : MonoBehaviour
         if( e_Tutorial_ == Enum_Tutorial.Jetpack )
         {
             b_JetpackAllowed_Tutorial = true;
+
+            b_UI_Jetpack = true;
+
+            if(gameObject.GetComponent<Cs_TextHint>())
+            {
+                gameObject.GetComponent<Cs_TextHint>().Set_TextHint("Press 'Spacebar' to jump and immediately hold 'Right Mouse' to jumpjet\nPress W/A/S/D to push yourself in that direction");
+            }
         }
         else if( e_Tutorial_ == Enum_Tutorial.Jump )
         {
@@ -516,40 +601,44 @@ public class Cs_SkiingPlayerController : MonoBehaviour
         }
     }
 
-    float f_Jetpack_Curr = 10f;
+    float f_Jetpack_Curr = 0;
     float f_Jetpack_Max = 10f;
     GameObject go_JetpackUI;
     void Jetpack()
     {
-        go_JetpackUI = GameObject.Find("Jetpack");
-
-        if (Input.GetMouseButton(1))
+        if (b_JetpackAllowed_Tutorial)
         {
-            if(f_Jetpack_Curr >= 0.1f)
+            if (Input.GetMouseButton(1))
             {
-                f_Jetpack_Curr -= Time.deltaTime * 2;
-
-                Vector3 v3_CurrVelocity = gameObject.GetComponent<Rigidbody>().velocity;
-                v3_CurrVelocity.y += (f_MaxJumpMagnitude * Time.deltaTime * 2) / 5;
-
-                if (v3_CurrVelocity.y < 1.5f)
+                if(f_Jetpack_Curr >= 0.1f)
                 {
-                    v3_CurrVelocity.y += 1.5f * Time.deltaTime;
-                }
+                    f_Jetpack_Curr -= Time.deltaTime * 2;
 
-                if(b_LookHorizontalAllowed_Tutorial)
-                {
-                    AirPush();
-                }
+                    Vector3 v3_CurrVelocity = gameObject.GetComponent<Rigidbody>().velocity;
+                    v3_CurrVelocity.y += (f_MaxJumpMagnitude * Time.deltaTime * 2) / 5;
 
-                gameObject.GetComponent<Rigidbody>().velocity = v3_CurrVelocity;
+                    if (v3_CurrVelocity.y < 1.5f)
+                    {
+                        v3_CurrVelocity.y += 1.5f * Time.deltaTime;
+                    }
+
+                    if(b_LookHorizontalAllowed_Tutorial)
+                    {
+                        AirPush();
+                    }
+
+                    gameObject.GetComponent<Rigidbody>().velocity = v3_CurrVelocity;
+                }
             }
-        }
-        else
-        {
-            f_Jetpack_Curr += Time.deltaTime;
+            else
+            {
+                if(b_JetpackAllowed_Tutorial)
+                {
+                    f_Jetpack_Curr += Time.deltaTime;
 
-            if (f_Jetpack_Curr > f_Jetpack_Max) f_Jetpack_Curr = f_Jetpack_Max;
+                    if (f_Jetpack_Curr > f_Jetpack_Max) f_Jetpack_Curr = f_Jetpack_Max;
+                }
+            }
         }
 
         if(go_JetpackUI.GetComponent<Cs_JetpackHud>())

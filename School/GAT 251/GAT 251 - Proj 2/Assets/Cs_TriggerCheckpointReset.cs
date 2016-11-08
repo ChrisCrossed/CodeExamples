@@ -5,31 +5,31 @@ using UnityEngine.SceneManagement;
 public class Cs_TriggerCheckpointReset : MonoBehaviour
 {
     [SerializeField] int i_CheckpointPos;
-    [SerializeField] bool b_StartEnabled = true;
+    [SerializeField] bool b_Enabled = true;
 
-    void Start()
+    public void Set_Active( bool b_IsActive_ )
     {
-        if(!b_StartEnabled)
-        {
-            print("Turning off: " + gameObject.name);
+        print("Activated");
 
-            gameObject.SetActive(false);
-        }
+        b_Enabled = b_IsActive_;
     }
     
-    void OnTriggerEnter( Collider collider_ )
+    void OnTriggerStay( Collider collider_ )
     {
-        if(collider_.gameObject.tag == "Player")
+        if(b_Enabled)
         {
-            if(i_CheckpointPos == 0)
+            if(collider_.gameObject.tag == "Player")
             {
-                // Reset level
-                SceneManager.LoadScene(i_CheckpointPos);
-            }
-            else
-            {
-                // Move player to position based on i_CheckpointPos
+                if(i_CheckpointPos == 0)
+                {
+                    // Reset level (TODO: Fix with fade)
+                    SceneManager.LoadScene(i_CheckpointPos);
+                }
+                else
+                {
+                    // Move player to position based on i_CheckpointPos
 
+                }
             }
         }
     }

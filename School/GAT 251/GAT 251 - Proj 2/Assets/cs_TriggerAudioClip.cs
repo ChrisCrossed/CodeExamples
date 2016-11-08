@@ -5,7 +5,7 @@ public class cs_TriggerAudioClip : MonoBehaviour
 {
     [SerializeField] int i_Clip;
 
-    [SerializeField] bool b_ActivateTriggerSoon;
+    bool b_ActivateTriggerSoon;
 
     [SerializeField] GameObject go_TriggerToActivate;
 
@@ -16,9 +16,18 @@ public class cs_TriggerAudioClip : MonoBehaviour
         {
             f_Timer += Time.deltaTime;
 
-            if(f_Timer > 5.0f)
+            print("Got here");
+
+            if (f_Timer > 10.0f)
             {
-                go_TriggerToActivate.SetActive(true);
+                if(go_TriggerToActivate != null)
+                {
+                    if(go_TriggerToActivate.GetComponent<Cs_TriggerCheckpointReset>())
+                    {
+                        go_TriggerToActivate.GetComponent<Cs_TriggerCheckpointReset>().Set_Active(true);
+
+                    }
+                }
             }
         }
     }
@@ -29,9 +38,17 @@ public class cs_TriggerAudioClip : MonoBehaviour
         {
             collider_.gameObject.GetComponent<Cs_SkiingPlayerController>().PlayAudioClip(i_Clip);
 
-            b_ActivateTriggerSoon = true;
-
-            GameObject.Destroy(gameObject);
+            if (go_TriggerToActivate != null)
+            {
+                if (go_TriggerToActivate.GetComponent<Cs_TriggerCheckpointReset>())
+                {
+                    b_ActivateTriggerSoon = true;
+                }
+            }
+            else
+            {
+                GameObject.Destroy(gameObject);
+            }
         }
     }
 }
