@@ -9,8 +9,6 @@ public class Cs_TriggerCheckpointReset : MonoBehaviour
 
     public void Set_Active( bool b_IsActive_ )
     {
-        print("Activated");
-
         b_Enabled = b_IsActive_;
     }
     
@@ -28,8 +26,20 @@ public class Cs_TriggerCheckpointReset : MonoBehaviour
                 else
                 {
                     // Move player to position based on i_CheckpointPos
+                    if(i_CheckpointPos == 1)
+                    {
+                        GameObject go_NewPos = GameObject.Find("Checkpoint_1");
 
+                        collider_.gameObject.GetComponent<Cs_SkiingPlayerController>().Set_ResetVelocity( go_NewPos );
+                    }
+                    else if(i_CheckpointPos == 2)
+                    {
+                        GameObject go_NewPos = GameObject.Find("Camera_Render_1");
+
+                        collider_.gameObject.GetComponent<Cs_SkiingPlayerController>().Set_ResetVelocity(go_NewPos);
+                    }
                 }
+
             }
         }
     }

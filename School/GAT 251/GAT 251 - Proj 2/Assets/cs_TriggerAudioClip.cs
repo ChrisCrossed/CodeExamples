@@ -16,8 +16,6 @@ public class cs_TriggerAudioClip : MonoBehaviour
         {
             f_Timer += Time.deltaTime;
 
-            print("Got here");
-
             if (f_Timer > 10.0f)
             {
                 if(go_TriggerToActivate != null)

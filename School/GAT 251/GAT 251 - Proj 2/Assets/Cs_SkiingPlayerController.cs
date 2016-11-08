@@ -845,6 +845,18 @@ public class Cs_SkiingPlayerController : MonoBehaviour
         return outHit;
     }
 
+    public void Set_ResetVelocity( GameObject go_TeleportObj_ )
+    {
+        gameObject.GetComponent<Rigidbody>().velocity = new Vector3();
+
+        gameObject.transform.position = go_TeleportObj_.transform.position;
+
+        f_xRot_Curr = go_TeleportObj_.transform.eulerAngles.y;
+        f_xRot = go_TeleportObj_.transform.eulerAngles.y;
+        f_yRot_Curr = 0;
+        f_yRot = 0;
+    }
+
     void OnCollisionEnter( Collision collision_ )
     {
         if(!b_CanJump)
