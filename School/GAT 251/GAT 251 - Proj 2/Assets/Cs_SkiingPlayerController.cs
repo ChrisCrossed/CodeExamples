@@ -43,6 +43,7 @@ public class Cs_SkiingPlayerController : MonoBehaviour
     public AudioClip ac_SpaceJumps_7 = new AudioClip();
     public AudioClip ac_HighWall_8 = new AudioClip();
     public AudioClip ac_WindowContinue_9 = new AudioClip();
+    public AudioClip ac_Music = new AudioClip();
 
     // Use this for initialization
     void Start ()
