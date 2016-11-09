@@ -111,6 +111,21 @@ public class Cs_SkiingPlayerController : MonoBehaviour
     bool b_UI_LookHoriz;
     void Update ()
     {
+        #region Cheat Codes
+        if(Input.GetKeyDown(KeyCode.P))
+        {
+            Set_TutorialState(Enum_Tutorial.Jetpack);
+            Set_TutorialState(Enum_Tutorial.Jump);
+            Set_TutorialState(Enum_Tutorial.LookHoriz);
+            Set_TutorialState(Enum_Tutorial.Startup);
+            
+        }
+        if(Input.GetKeyDown(KeyCode.Y))
+        {
+            Set_ResetVelocity(GameObject.Find("Camera_Render_1"));
+        }
+        #endregion
+
         UnlockSuit_Tutorial();
 
         if(b_JumpUnlocked)
@@ -242,6 +257,16 @@ public class Cs_SkiingPlayerController : MonoBehaviour
 
             // Particle Speed: 5.0f to 20.0f
             go_Particle.GetComponent<ParticleSystem>().startSpeed = (f_Percent * 12f) + 3.0f;
+
+            // Set wind sfx volume
+            if(f_VolumeWind < 0.15f)
+            {
+                SetVolume( Enum_SFX.Wind, true );
+            }
+            else
+            {
+                SetVolume( Enum_SFX.Wind, f_Percent * 0.75f );
+            }
         }
         else
         {
@@ -250,6 +275,9 @@ public class Cs_SkiingPlayerController : MonoBehaviour
 
             // Particle Speed: 5.0f to 20.0f
             go_Particle.GetComponent<ParticleSystem>().startSpeed = 0f;
+
+            // Set wind sfx volume
+            SetVolume(Enum_SFX.Wind, false);
         }
 
         // Camera FOV: 60f to 75f
@@ -633,7 +661,34 @@ public class Cs_SkiingPlayerController : MonoBehaviour
         }
     }
 
-    // void SetVolume
+    void SetVolume( Enum_SFX e_SFX_, float f_Percent_ )
+    {
+        // Cap volume percent
+        if (f_Percent_ > 1.0f) f_Percent_ = 1.0f;
+        else if (f_Percent_ < 0.0f) f_Percent_ = 0.0f;
+
+        if (e_SFX_ == Enum_SFX.Grass)
+        {
+            f_VolumeGrass = f_Percent_ * f_VolumeGrass_Max;
+
+            // Connect to the AudioSource and set the volume
+            sfx_Grass.volume = f_VolumeGrass;
+        }
+        else if (e_SFX_ == Enum_SFX.Jetpack)
+        {
+            f_VolumeJetpack = f_Percent_ * f_VolumeJetpack_Max;
+
+            // Connect to the AudioSource and set the volume
+            sfx_Jetpack.volume = f_VolumeJetpack;
+        }
+        else if (e_SFX_ == Enum_SFX.Wind)
+        {
+            f_VolumeWind = f_Percent_;
+            
+            // Connect to the AudioSource and set the volume
+            sfx_Wind.volume = f_VolumeWind * f_VolumeWind_Max;
+        }
+    }
     void SetVolume( Enum_SFX e_SFX_, bool b_VolumeUp_ )
     {
         if(e_SFX_ == Enum_SFX.Grass)
@@ -877,6 +932,15 @@ public class Cs_SkiingPlayerController : MonoBehaviour
         }
         else
         {
+            // Checks the player's current speed while flying. Soft-caps & reduces their horizontal speed
+            if (gameObject.GetComponent<Rigidbody>().velocity.magnitude > f_MaxSpeed)
+            {
+                Vector3 v3_CurrVelocity_ = gameObject.GetComponent<Rigidbody>().velocity;
+                v3_CurrVelocity_.x *= 0.98f;
+                v3_CurrVelocity_.z *= 0.98f;
+                gameObject.GetComponent<Rigidbody>().velocity = v3_CurrVelocity_;
+            }
+
             // Decrease grass skiing volume
             SetVolume( Enum_SFX.Grass, false );
         }
@@ -891,22 +955,16 @@ public class Cs_SkiingPlayerController : MonoBehaviour
         {
             // Apply left movement
             v3_AirPush.x = -1;
-            // gameObject.GetComponent<Rigidbody>().AddForce(-gameObject.transform.right * 2f);
-
-            print("Pushing: Left");
         }
         else if (Input.GetKey(KeyCode.D) && !Input.GetKey(KeyCode.A))
         {
-            // gameObject.GetComponent<Rigidbody>().AddForce(gameObject.transform.right * 2f);
+            // Apply right movement
             v3_AirPush.x = 1;
-            print("Pushing: Right");
         }
 
         if (Input.GetKey(KeyCode.S) && !Input.GetKey(KeyCode.W))
         {
-            // gameObject.GetComponent<Rigidbody>().AddForce(-gameObject.transform.forward * 3f);
             v3_AirPush.z = -2;
-            print("Pushing: Back");
         }
         else if(Input.GetKey(KeyCode.W) && !Input.GetKey(KeyCode.S))
         {

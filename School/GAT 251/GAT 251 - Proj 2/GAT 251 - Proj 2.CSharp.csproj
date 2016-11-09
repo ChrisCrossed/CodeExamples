@@ -78,6 +78,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Cs_FanLogic.cs" />
     <Compile Include="Assets\Cs_IconLogic.cs" />
     <Compile Include="Assets\Cs_JetpackHud.cs" />
     <Compile Include="Assets\Cs_PortalLogic.cs" />
@@ -85,6 +86,7 @@
     <Compile Include="Assets\Cs_TextHint.cs" />
     <Compile Include="Assets\Cs_TriggerAbilityEnable.cs" />
     <Compile Include="Assets\Cs_TriggerCheckpointReset.cs" />
+    <Compile Include="Assets\Cs_TriggerPrintText.cs" />
     <Compile Include="Assets\ProCore\ProBuilder\API Examples\Icosphere FFT\Scripts\CameraControls.cs" />
     <Compile Include="Assets\ProCore\ProBuilder\API Examples\Icosphere FFT\Scripts\IcoBumpin.cs" />
     <Compile Include="Assets\ProCore\ProBuilder\API Examples\Misc\HueCube.cs" />

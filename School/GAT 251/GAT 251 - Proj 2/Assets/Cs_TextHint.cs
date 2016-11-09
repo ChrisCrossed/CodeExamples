@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
+using System;
+using System.Runtime.InteropServices;
 
 public class Cs_TextHint : MonoBehaviour
 {
@@ -37,6 +40,8 @@ public class Cs_TextHint : MonoBehaviour
         // Reset timer
         f_Timer = 0f;
 
-        go_TextHint.GetComponent<Text>().text = s_TextHint_;
+        s_TextHint = s_TextHint_.Replace("//", "\n");
+
+        go_TextHint.GetComponent<Text>().text = s_TextHint;
     }
 }
