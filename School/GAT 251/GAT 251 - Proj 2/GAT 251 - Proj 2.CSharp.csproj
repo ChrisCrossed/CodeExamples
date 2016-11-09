@@ -78,9 +78,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Cs_EndGame.cs" />
     <Compile Include="Assets\Cs_FanLogic.cs" />
     <Compile Include="Assets\Cs_IconLogic.cs" />
     <Compile Include="Assets\Cs_JetpackHud.cs" />
+    <Compile Include="Assets\Cs_MenuSystem.cs" />
     <Compile Include="Assets\Cs_PortalLogic.cs" />
     <Compile Include="Assets\Cs_SkiingPlayerController.cs" />
     <Compile Include="Assets\Cs_TextHint.cs" />

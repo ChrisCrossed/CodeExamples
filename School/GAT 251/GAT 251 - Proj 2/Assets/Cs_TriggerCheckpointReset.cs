@@ -21,7 +21,7 @@ public class Cs_TriggerCheckpointReset : MonoBehaviour
                 if(i_CheckpointPos == 0)
                 {
                     // Reset level (TODO: Fix with fade)
-                    SceneManager.LoadScene(i_CheckpointPos);
+                    SceneManager.LoadScene(2);
                 }
                 else
                 {
@@ -36,10 +36,15 @@ public class Cs_TriggerCheckpointReset : MonoBehaviour
                     {
                         GameObject go_NewPos = GameObject.Find("Camera_Render_1");
 
+                        collider_.gameObject.GetComponent<Cs_SkiingPlayerController>().Set_ResetVelocity( go_NewPos );
+                    }
+                    else if (i_CheckpointPos == 3)
+                    {
+                        GameObject go_NewPos = GameObject.Find("RespawnPoint_3");
+
                         collider_.gameObject.GetComponent<Cs_SkiingPlayerController>().Set_ResetVelocity(go_NewPos);
                     }
                 }
-
             }
         }
     }

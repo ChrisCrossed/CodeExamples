@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public enum Enum_Tutorial
 {
@@ -122,7 +123,15 @@ public class Cs_SkiingPlayerController : MonoBehaviour
         }
         if(Input.GetKeyDown(KeyCode.Y))
         {
+            Set_ResetVelocity(GameObject.Find("Checkpoint_1"));
+        }
+        if (Input.GetKeyDown(KeyCode.U))
+        {
             Set_ResetVelocity(GameObject.Find("Camera_Render_1"));
+        }
+        if (Input.GetKeyDown(KeyCode.I))
+        {
+            Set_ResetVelocity(GameObject.Find("RespawnPoint_3"));
         }
         #endregion
 
@@ -284,6 +293,34 @@ public class Cs_SkiingPlayerController : MonoBehaviour
         float f_FOV = (f_Percent * 15f) + 60f;
         if (f_FOV > 80) f_FOV = 80f;
         go_Camera.GetComponent<Camera>().fieldOfView = f_FOV;
+
+        if(b_GameOver)
+        {
+            UnlockSuit_GameOver();
+
+            f_GameOverTimer += Time.deltaTime;
+
+            if(f_GameOverTimer >= 10.0f)
+            {
+                Application.Quit();
+
+                print("WE QUIT");
+            }
+
+            // Increment alpha of overlay
+            #region Alpha Overlay
+            Color clr_FadeInOut = GameObject.Find("UI_FadeInOut").GetComponent<Image>().color;
+
+            if(clr_FadeInOut.a < 1.0f)
+            {
+                clr_FadeInOut.a += Time.deltaTime * 0.25f;
+
+                if (clr_FadeInOut.a > 1.0f) clr_FadeInOut.a = 1.0f;
+
+                GameObject.Find("UI_FadeInOut").GetComponent<Image>().color = clr_FadeInOut;
+            }
+            #endregion
+        }
     }
 
     float f_TutTimer_Jump;
@@ -397,6 +434,107 @@ public class Cs_SkiingPlayerController : MonoBehaviour
         }
     }
 
+    float f_TutTimer_GameOver;
+    float f_TutTimer_GameOver_Minimum = 0f;
+    float f_TutTimer_GameOver_Difference = 0.5f;
+    int i_TutCounter_GameOver;
+    const int i_GameOverCounter_Max = 20;
+    bool b_TutCompleted_GameOver = false;
+    void UnlockSuit_GameOver()
+    {
+        if (!b_TutCompleted_GameOver)
+        {
+            string s_TextToPrint = "";
+
+            if (f_TutTimer_GameOver <= f_TutTimer_GameOver_Minimum)
+            {
+                f_TutTimer_GameOver += Time.deltaTime;
+
+                if (f_TutTimer_GameOver > f_TutTimer_GameOver_Minimum)
+                {
+                    // Increment counter
+                    ++i_TutCounter_GameOver;
+
+                    // Decrement timer by difference
+                    f_TutTimer_GameOver -= f_TutTimer_GameOver_Difference;
+
+                    #region Switch
+                    // Set text to print
+                    switch (i_TutCounter_GameOver)
+                    {
+                        case 1:
+                            s_TextToPrint = "***BIOS_ACTIVE***\n";
+                            break;
+
+                        case 2:
+                            s_TextToPrint = "\n";
+                            break;
+
+                        case 3:
+                            s_TextToPrint = "INIT_STASIS() ";
+                            break;
+
+                        case 4:
+                            s_TextToPrint = ". ";
+                            break;
+
+                        case 5:
+                            s_TextToPrint = ". ";
+                            break;
+
+                        case 6:
+                            s_TextToPrint = ". ";
+                            break;
+
+                        case 7:
+                            s_TextToPrint = " ";
+                            break;
+
+                        case 8:
+                            s_TextToPrint = "SUCCESS";
+                            break;
+
+                        case 9:
+                            s_TextToPrint = "\n";
+                            b_CanJump = true;
+                            break;
+
+                        case 10:
+                            s_TextToPrint = "\nHEV DISABLED...";
+                            break;
+
+                        case 13:
+                            break;
+
+                        case 11:
+                            s_TextToPrint = "";
+                            break;
+
+                        case i_Counter_Max:
+                            s_TextToPrint = " ";
+                            break;
+
+                        default:
+                            break;
+                    }
+                    #endregion
+
+                    // Call Set_HUDTest
+                    if (i_TutCounter_GameOver < i_GameOverCounter_Max)
+                    {
+                        Set_HUDTest(s_TextToPrint);
+                    }
+                    else
+                    {
+                        b_TutCompleted_GameOver = true;
+
+                        Set_HUDTest(s_TextToPrint, true);
+                    }
+                }
+            }
+        }
+    }
+
     float f_Timer;
     float f_Timer_Minimum = 2f;
     float f_Timer_Difference = 0.5f;
@@ -501,26 +639,29 @@ public class Cs_SkiingPlayerController : MonoBehaviour
         }
     }
 
-    public void Set_TutorialState( Enum_Tutorial e_Tutorial_ )
+    public void Set_TutorialState(Enum_Tutorial e_Tutorial_, bool b_State_ = true)
     {
         if( e_Tutorial_ == Enum_Tutorial.Jetpack )
         {
-            b_JetpackAllowed_Tutorial = true;
+            b_JetpackAllowed_Tutorial = b_State_;
 
-            b_UI_Jetpack = true;
+            b_UI_Jetpack = b_State_;
 
-            if(gameObject.GetComponent<Cs_TextHint>())
+            if(b_State_)
             {
-                gameObject.GetComponent<Cs_TextHint>().Set_TextHint("Press 'Spacebar' to jump and immediately hold 'Right Mouse' to jumpjet\nPress W/A/S/D to push yourself in that direction");
+                if(gameObject.GetComponent<Cs_TextHint>())
+                {
+                    gameObject.GetComponent<Cs_TextHint>().Set_TextHint("Press 'Spacebar' to jump and immediately hold 'Right Mouse' to jumpjet\nPress W/A/S/D to push yourself in that direction");
+                }
             }
         }
         else if( e_Tutorial_ == Enum_Tutorial.Jump )
         {
-            b_JumpUnlocked = true;
+            b_JumpUnlocked = b_State_;
         }
         else if( e_Tutorial_ == Enum_Tutorial.Startup)
         {
-            b_Startup_Tutorial = true;
+            b_Startup_Tutorial = b_State_;
         }
     }
 
@@ -933,7 +1074,16 @@ public class Cs_SkiingPlayerController : MonoBehaviour
         else
         {
             // Checks the player's current speed while flying. Soft-caps & reduces their horizontal speed
-            if (gameObject.GetComponent<Rigidbody>().velocity.magnitude > f_MaxSpeed)
+            if( gameObject.GetComponent<Rigidbody>().velocity.magnitude > 50f)
+            {
+                float f_yVel = gameObject.GetComponent<Rigidbody>().velocity.y;
+
+                Vector3 v3_CurrVelocity_ = gameObject.GetComponent<Rigidbody>().velocity;
+                v3_CurrVelocity_.Normalize();
+                v3_CurrVelocity_ *= 50f;
+                gameObject.GetComponent<Rigidbody>().velocity = v3_CurrVelocity_;
+            }
+            else if (gameObject.GetComponent<Rigidbody>().velocity.magnitude > f_MaxSpeed)
             {
                 Vector3 v3_CurrVelocity_ = gameObject.GetComponent<Rigidbody>().velocity;
                 v3_CurrVelocity_.x *= 0.98f;
@@ -944,6 +1094,8 @@ public class Cs_SkiingPlayerController : MonoBehaviour
             // Decrease grass skiing volume
             SetVolume( Enum_SFX.Grass, false );
         }
+
+        print("Speed: " + gameObject.GetComponent<Rigidbody>().velocity.magnitude);
         #endregion
     }
 
@@ -977,7 +1129,7 @@ public class Cs_SkiingPlayerController : MonoBehaviour
 
             Vector3 v3_FinalAirPush = gameObject.transform.rotation * v3_AirPush;
 
-            gameObject.GetComponent<Rigidbody>().AddForce(v3_FinalAirPush * 3f);
+            gameObject.GetComponent<Rigidbody>().AddForce(v3_FinalAirPush * 7.5f);
         }
     }
 
@@ -1110,5 +1262,21 @@ public class Cs_SkiingPlayerController : MonoBehaviour
                 // audioSource.PlayOneShot(ac_Intro_1);
                 break;
         }
+    }
+
+    bool b_GameOver;
+    float f_GameOverTimer;
+    public void Set_EndGame()
+    {
+        b_GameOver = true;
+
+        // Take control away from player
+        Set_TutorialState(Enum_Tutorial.Jetpack, false);
+        Set_TutorialState(Enum_Tutorial.Jump, false);
+        Set_TutorialState(Enum_Tutorial.LookHoriz, false);
+        Set_TutorialState(Enum_Tutorial.Startup, false);
+
+        // Run HUD text
+        UnlockSuit_GameOver();
     }
 }
