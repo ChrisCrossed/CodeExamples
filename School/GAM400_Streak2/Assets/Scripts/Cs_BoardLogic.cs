@@ -19,6 +19,11 @@ public enum Enum_BlockSize
     size_3w_2h,
     size_3w_3h
 }
+public enum Enum_PauseEffect
+{
+    Unpause,
+    ScoreLine,
+}
 
 #region Scoring Line Tools
 public enum Enum_Direction
@@ -82,6 +87,8 @@ public struct IntVector2
 
 public class Cs_BoardLogic : MonoBehaviour
 {
+    Enum_PauseEffect e_PauseEffect = Enum_PauseEffect.Unpause;
+
     int i_Score;
     [Range(-1, 5)] [SerializeField] int i_TimeToDrop_Max = 3;
     float f_TimeToDrop = -3f;
@@ -832,9 +839,11 @@ public class Cs_BoardLogic : MonoBehaviour
         }
     }
 
+    int i_ScoreLine_Counter;
+    bool b_RunAgain = false;
     void AllBlocksStatic()
     {
-        bool b_RunAgain = false;
+        b_RunAgain = false;
 
         #region Set Left & Right Walls to 'Empty' (Done BEFORE scoring)
         for (int y_ = 0; y_ < i_ArrayHeight; ++y_)
@@ -908,26 +917,11 @@ public class Cs_BoardLogic : MonoBehaviour
 
             b_RunAgain = true;
 
-            // Attach player's score
-            i_Score += iv2_ScoreLine.Count;
+            e_PauseEffect = Enum_PauseEffect.ScoreLine;
 
-            // Destroy the blocks in the scoreline
-            for(int i_ = 0; i_ < iv2_ScoreLine.Count; ++i_)
-            {
-                // Set the block in BlockArray to empty
-                SetBlock(iv2_ScoreLine[i_].x, iv2_ScoreLine[i_].y, Enum_BlockType.Empty);
+            i_ScoreLine_Counter = 0;
 
-                // Destroy the block model on the screen
-                GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().DestroyBlockAt(iv2_ScoreLine[i_]);
-            }
-
-            print("Player earned " + iv2_ScoreLine.Count + " to earn a new score of " + i_Score);
-
-            // Clear the ScoreLine list
-            iv2_ScoreLine = new List<IntVector2>();
-
-            // 'PullBlocksDown' to update the board
-            PullBlocksDown();
+            return;
         }
 
         #region Set 'Mid Empty' row to empty (Done AFTER scoring)
@@ -1347,69 +1341,140 @@ public class Cs_BoardLogic : MonoBehaviour
     // Update is called once per frame
     List<IntVector2> iv2_Test = new List<IntVector2>();
     float f_Test;
+    float f_ScoreLine_Timer;
+    static float f_ScoreLine_Timer_Max = 0.075f;
+    float f_ScoreLine_Timer_Conclusion; // A timer that continues to run after the last block's visual begins
+    float f_ScoreLine_Timer_Conclusion_Max = 1.0f; // After the above timer completes, we set the pause state to continue
     void Update ()
     {
-        // Decrement timer for next time to move blocks down
-        if(i_TimeToDrop_Max > 0)
+        if(e_PauseEffect == Enum_PauseEffect.Unpause)
         {
-            f_TimeToDrop += Time.deltaTime;
-
-            if(f_TimeToDrop > i_TimeToDrop_Max)
+            #region Drop Block timer
+            // Decrement timer for next time to move blocks down
+            if (i_TimeToDrop_Max > 0)
             {
-                // Reset timer
+                f_TimeToDrop += Time.deltaTime;
+
+                if(f_TimeToDrop > i_TimeToDrop_Max)
+                {
+                    // Reset timer
+                    f_TimeToDrop = 0;
+
+                    // Drop blocks down manually
+                    MoveActiveBlocks_Down(v2_ActiveBlockLocation, e_BlockSize);
+                }
+            }
+            #endregion
+
+            #region Key Input
+            if (Input.GetKeyDown(KeyCode.S))
+            {
+                MoveActiveBlocks_Down(v2_ActiveBlockLocation, e_BlockSize);
+
+                // Reset timer to drop blocks
                 f_TimeToDrop = 0;
 
-                // Drop blocks down manually
-                MoveActiveBlocks_Down(v2_ActiveBlockLocation, e_BlockSize);
+                PrintArrayToConsole();
             }
+
+            if (Input.GetKeyDown(KeyCode.A))
+            {
+                MoveActiveBlocks_Left(v2_ActiveBlockLocation, e_BlockSize);
+
+                PrintArrayToConsole();
+            }
+
+            if (Input.GetKeyDown(KeyCode.D))
+            {
+                MoveActiveBlocks_Right(v2_ActiveBlockLocation, e_BlockSize);
+
+                PrintArrayToConsole();
+            }
+
+            if(Input.GetKeyDown(KeyCode.Q))
+            {
+                RotateBlocks_CounterClock(v2_ActiveBlockLocation, e_BlockSize);
+
+                PrintArrayToConsole();
+            }
+
+            if(Input.GetKeyDown(KeyCode.E))
+            {
+                RotateBlocks_Clockwise(v2_ActiveBlockLocation, e_BlockSize);
+
+                PrintArrayToConsole();
+            }
+
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                AllBlocksStatic();
+
+                // Reset timer to drop blocks
+                f_TimeToDrop = -1f;
+
+                PrintArrayToConsole();
+            }
+            #endregion
         }
-
-        if (Input.GetKeyDown(KeyCode.S))
+        else if(e_PauseEffect == Enum_PauseEffect.ScoreLine)
         {
-            MoveActiveBlocks_Down(v2_ActiveBlockLocation, e_BlockSize);
+            // Run through the Scoreline array and have them destroy themselves
+            f_ScoreLine_Timer += Time.deltaTime;
 
-            // Reset timer to drop blocks
-            f_TimeToDrop = 0;
+            if(f_ScoreLine_Timer > f_ScoreLine_Timer_Max)
+            {
+                if(i_ScoreLine_Counter < iv2_ScoreLine.Count)
+                {
+                    // Set the block in BlockArray to empty
+                    SetBlock(iv2_ScoreLine[i_ScoreLine_Counter].x, iv2_ScoreLine[i_ScoreLine_Counter].y, Enum_BlockType.Empty);
 
-            PrintArrayToConsole();
-        }
+                    // Score the block model on the screen
+                    GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().ScoreBlockAt(iv2_ScoreLine[i_ScoreLine_Counter]);
 
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            MoveActiveBlocks_Left(v2_ActiveBlockLocation, e_BlockSize);
+                    // Increment player's score
+                    // i_Score += iv2_ScoreLine.Count;
+                    ++i_Score;
 
-            PrintArrayToConsole();
-        }
+                    // Increment i_ScoreLine_Counter
+                    ++i_ScoreLine_Counter;
+                }
+                // Scoreline is finished, reset and move on
+                else
+                {
+                    // f_ScoreLine_Timer_Max gets added here cause I'm lazy. This line doesn't hit until the above timer breaches f_ScoreLine_Timer_Max.
+                    f_ScoreLine_Timer_Conclusion += Time.deltaTime + f_ScoreLine_Timer_Max;
 
-        if (Input.GetKeyDown(KeyCode.D))
-        {
-            MoveActiveBlocks_Right(v2_ActiveBlockLocation, e_BlockSize);
+                    print(f_ScoreLine_Timer_Conclusion);
 
-            PrintArrayToConsole();
-        }
+                    if(f_ScoreLine_Timer_Conclusion > f_ScoreLine_Timer_Conclusion_Max)
+                    {
+                        // Reset the ScoreLine timer
+                        f_ScoreLine_Timer_Conclusion = 0.0f;
 
-        if(Input.GetKeyDown(KeyCode.Q))
-        {
-            RotateBlocks_CounterClock(v2_ActiveBlockLocation, e_BlockSize);
+                        // Reset the counter for the next cycle
+                        i_ScoreLine_Counter = 0;
 
-            PrintArrayToConsole();
-        }
+                        // Clear the ScoreLine list
+                        iv2_ScoreLine = new List<IntVector2>();
 
-        if(Input.GetKeyDown(KeyCode.E))
-        {
-            RotateBlocks_Clockwise(v2_ActiveBlockLocation, e_BlockSize);
+                        b_RunAgain = true;
 
-            PrintArrayToConsole();
-        }
+                        print("Player earned " + iv2_ScoreLine.Count + " to earn a new score of " + i_Score);
 
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            AllBlocksStatic();
+                        // 'PullBlocksDown' to update the board
+                        PullBlocksDown();
 
-            // Reset timer to drop blocks
-            f_TimeToDrop = -1f;
+                        // Make a new block
+                        CreateNewBlock();
 
-            PrintArrayToConsole();
+                        // Gameplay resumes
+                        e_PauseEffect = Enum_PauseEffect.Unpause;
+                    }
+                }
+
+                // Reset the float timer
+                f_ScoreLine_Timer = 0.0f;
+            }
         }
     }
 }

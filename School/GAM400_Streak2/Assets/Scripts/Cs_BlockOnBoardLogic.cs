@@ -13,10 +13,18 @@ public class Cs_BlockOnBoardLogic : MonoBehaviour
     float f_BlockScale;
     int i_BoardWidth;
 
+    // Variables - Block Gets Killed
     bool b_IsDead;
     float f_TransparencyTimer = 0.5f;
     [SerializeField] float f_TimeToTransparent = .5f;
     [SerializeField] float f_LowestTransparencyPoint = 0.05f;
+
+    // Variables - Block Gets Scored
+    bool b_IsScored;
+    float f_Timer_SinWave; // Incremental timer
+    static float f_Timer_SinWave_Max = 5; // Max timer
+    float f_Timer_SinWave_Speed = 5; // Multiples against Delta Time to speed/slow the rate of movement
+    float f_Timer_SinWave_MaxDist = 1; // Multiplies against the f_Timer_SinWave when applied to the Z position
 
     // Use this for initialization
     void Start ()
@@ -34,11 +42,14 @@ public class Cs_BlockOnBoardLogic : MonoBehaviour
 
         gameObject.transform.position = new Vector3(f_xPos * f_BlockScale, f_yPos * f_BlockScale, 0);
     }
-	
-	// Update is called once per frame
+
+    // Update is called once per frame
+    float f_SpinTimer;
 	void Update ()
     {
-        #region Update X & Y position
+        if(!(b_IsDead || b_IsScored))
+        {
+            #region Update X & Y position
         if (gameObject.transform.position != new Vector3(f_xPos * f_BlockScale, f_yPos * f_BlockScale, 0))
         {
             float f_xPos_Temp;
@@ -73,6 +84,7 @@ public class Cs_BlockOnBoardLogic : MonoBehaviour
             gameObject.transform.position = new Vector3(f_xPos_Temp, f_yPos_Temp, 0);
         }
         #endregion
+        }
 
         #region Fade Out (When Destroyed)
         if(b_IsDead)
@@ -89,6 +101,47 @@ public class Cs_BlockOnBoardLogic : MonoBehaviour
             }
         }
         #endregion
+
+        if(b_IsScored)
+        {
+            float f_zPos;
+            Vector3 v3_CurrPos = gameObject.transform.position;
+
+            // Between 0 & 1, position the block toward, then away from the player
+            f_Timer_SinWave += (Time.deltaTime * f_Timer_SinWave_Speed);
+
+            if(f_Timer_SinWave < Mathf.PI)
+            {
+                f_zPos = Mathf.Sin(f_Timer_SinWave) * -f_Timer_SinWave_MaxDist;
+            }
+            else
+            {
+                // Continue moving the z Position backward rather than loop through the Sine Wave
+                f_zPos = (f_Timer_SinWave - Mathf.PI) * f_Timer_SinWave_MaxDist;
+
+                // After the amount of time has passed, fade out the block
+                if(f_Timer_SinWave > f_Timer_SinWave_Max)
+                {
+                    // Set the block to 'die' so it fades out
+                    b_IsDead = true;
+                }
+            }
+
+            // Multiplying by -1 since the block needs to head toward the player before regressing
+            v3_CurrPos.z = f_zPos;
+
+            // Set final position
+            gameObject.transform.position = v3_CurrPos;
+
+            // Rotate the block
+            if(f_SpinTimer < 3)
+            {
+                f_SpinTimer += Time.deltaTime * 3;
+            }
+            Vector3 v3_CurrRot = gameObject.transform.eulerAngles;
+            v3_CurrRot.z -= Time.deltaTime * 360 * f_SpinTimer;
+            gameObject.transform.eulerAngles = v3_CurrRot;
+        }
     }
 
     public void Set_MoveLeft()
@@ -155,6 +208,11 @@ public class Cs_BlockOnBoardLogic : MonoBehaviour
     {
         // Set state to 'dead'
         b_IsDead = true;
+    }
+
+    public void Set_ScoreBlock()
+    {
+        b_IsScored = true;
     }
 
     void SetMaterialsVisibility(float f_Transparency_)

@@ -664,6 +664,19 @@ public class Cs_BoardDisplay : MonoBehaviour
         DisplayArray_Blocks[iv2_DestroyLoc_.y, iv2_DestroyLoc_.x] = Instantiate(go_Empty);
         DisplayArray_Blocks[iv2_DestroyLoc_.y, iv2_DestroyLoc_.x].transform.SetParent(GameObject.Find("EmptyBlocks").transform);
     }
+
+    public void ScoreBlockAt( IntVector2  iv2_ScoreLoc_ )
+    {
+        // Set the DisplayArray position to be empty
+        DisplayArray[iv2_ScoreLoc_.y, iv2_ScoreLoc_.x] = Enum_BlockType.Empty;
+
+        // Set the DisplayArray_Blocks block to destroy itself visually
+        DisplayArray_Blocks[iv2_ScoreLoc_.y, iv2_ScoreLoc_.x].GetComponent<Cs_BlockOnBoardLogic>().Set_ScoreBlock();
+
+        // Separate the DisplayArray_Blocks block by making it into an empty object
+        DisplayArray_Blocks[iv2_ScoreLoc_.y, iv2_ScoreLoc_.x] = Instantiate(go_Empty);
+        DisplayArray_Blocks[iv2_ScoreLoc_.y, iv2_ScoreLoc_.x].transform.SetParent(GameObject.Find("EmptyBlocks").transform);
+    }
     
     public void Set_NewBlocks( Enum_BlockType[,] e_NewBlockTypeArray_, Enum_BlockSize e_BlockSize_, IntVector2 iv2_BottomLeft_ )
     {
