@@ -169,7 +169,7 @@ public class Cs_BoardLogic : MonoBehaviour
         BlockArray = new Enum_BlockType[i_ArrayHeight, i_ArrayWidth];
         Initialize_BlockArray();
         
-        PrintArrayToConsole();
+        // PrintArrayToConsole();
     }
 
     #region Block Creation
@@ -1437,7 +1437,7 @@ public class Cs_BoardLogic : MonoBehaviour
         {
             for( int y_ = 0; y_ < i_Height; ++y_ )
             {
-                print("Checking: " + (int)(v2_ActiveBlockLocation.x + x_) + ", " + (int)(v2_ActiveBlockLocation.y + y_));
+                // print("Checking: " + (int)(v2_ActiveBlockLocation.x + x_) + ", " + (int)(v2_ActiveBlockLocation.y + y_));
 
                 if(x_ < i_ArrayWidth && y_ < i_ArrayHeight)
                 {
@@ -1450,6 +1450,42 @@ public class Cs_BoardLogic : MonoBehaviour
         }
 
         return false;
+    }
+
+    public void Input_MoveLeft()
+    {
+        MoveActiveBlocks_Left(v2_ActiveBlockLocation, e_BlockSize);
+    }
+
+    public void Input_MoveRight()
+    {
+        MoveActiveBlocks_Right(v2_ActiveBlockLocation, e_BlockSize);
+    }
+
+    public void Input_MoveDown()
+    {
+        MoveActiveBlocks_Down(v2_ActiveBlockLocation, e_BlockSize);
+
+        // Reset timer to drop blocks
+        f_TimeToDrop = 0;
+    }
+
+    public void Input_Drop()
+    {
+        AllBlocksStatic();
+
+        // Reset timer to drop blocks
+        f_TimeToDrop = -1f;
+    }
+
+    public void Input_RotateCounterclock()
+    {
+        RotateBlocks_CounterClock(v2_ActiveBlockLocation, e_BlockSize);
+    }
+
+    public void Input_RotateClockwise()
+    {
+        RotateBlocks_Clockwise(v2_ActiveBlockLocation, e_BlockSize);
     }
 
     // Update is called once per frame
@@ -1481,56 +1517,6 @@ public class Cs_BoardLogic : MonoBehaviour
                     // Drop blocks down manually
                     MoveActiveBlocks_Down(v2_ActiveBlockLocation, e_BlockSize);
                 }
-            }
-            #endregion
-
-            #region Key Input
-            if (Input.GetKeyDown(KeyCode.S))
-            {
-                MoveActiveBlocks_Down(v2_ActiveBlockLocation, e_BlockSize);
-
-                // Reset timer to drop blocks
-                f_TimeToDrop = 0;
-
-                PrintArrayToConsole();
-            }
-
-            if (Input.GetKeyDown(KeyCode.A))
-            {
-                MoveActiveBlocks_Left(v2_ActiveBlockLocation, e_BlockSize);
-
-                PrintArrayToConsole();
-            }
-
-            if (Input.GetKeyDown(KeyCode.D))
-            {
-                MoveActiveBlocks_Right(v2_ActiveBlockLocation, e_BlockSize);
-
-                PrintArrayToConsole();
-            }
-
-            if(Input.GetKeyDown(KeyCode.Q))
-            {
-                RotateBlocks_CounterClock(v2_ActiveBlockLocation, e_BlockSize);
-
-                PrintArrayToConsole();
-            }
-
-            if(Input.GetKeyDown(KeyCode.E))
-            {
-                RotateBlocks_Clockwise(v2_ActiveBlockLocation, e_BlockSize);
-
-                PrintArrayToConsole();
-            }
-
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                AllBlocksStatic();
-
-                // Reset timer to drop blocks
-                f_TimeToDrop = -1f;
-
-                PrintArrayToConsole();
             }
             #endregion
         }
