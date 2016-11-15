@@ -119,8 +119,26 @@ public class Cs_BoardLogic : MonoBehaviour
 	// Use this for initialization
 	void Start ()
     {
+        Enum_BlockSize e_MaxBlockSize = Enum_BlockSize.size_2w_2h;
+        if(  b_3w_3h_Allowed ||
+            (b_2w_3h_Allowed && b_3w_2h_Allowed) )
+        {
+            e_MaxBlockSize = Enum_BlockSize.size_3w_3h;
+        }
+        else
+        {
+            if(b_3w_2h_Allowed)
+            {
+                e_MaxBlockSize = Enum_BlockSize.size_3w_2h;
+            }
+            else if(b_2w_3h_Allowed)
+            {
+                e_MaxBlockSize = Enum_BlockSize.size_2w_3h;
+            }
+        }
+
         // Initialize Board
-        GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Init_Board(i_ArrayWidth, i_ArrayHeight);
+        GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Init_Board( i_ArrayWidth, i_ArrayHeight, 0, e_MaxBlockSize );
 
         // Set i_TimeToDrop_Max to be -1 if it starts at 0, to make sure we aren't dropping infinitely
         if (i_TimeToDrop_Max == 0) i_TimeToDrop_Max = -1;

@@ -10,6 +10,7 @@ public class Cs_BoardDisplay : MonoBehaviour
 
     GameObject go_GridBlock;
     GameObject go_GridWall;
+    GameObject go_GridWarning;
 
     GameObject go_Block_A;
     GameObject go_Block_B;
@@ -31,6 +32,7 @@ public class Cs_BoardDisplay : MonoBehaviour
     {
         go_GridBlock = Resources.Load("GridBlock") as GameObject;
         go_GridWall = Resources.Load("GridBlock_Edge") as GameObject;
+        go_GridWarning = Resources.Load("GridBlock_Warning") as GameObject;
 
         go_Block_A = Resources.Load("Block_X") as GameObject;
         go_Block_B = Resources.Load("Block_O") as GameObject;
@@ -43,7 +45,7 @@ public class Cs_BoardDisplay : MonoBehaviour
     List<List<GameObject>> Grid_Columns = new List<List<GameObject>>();
     List<GameObject> Grid_Row = new List<GameObject>();
     // When called from BoardLogic, create the grid background
-    public void Init_Board(int i_Width_, int i_Height_, int i_MidWall_ = -1)
+    public void Init_Board(int i_Width_, int i_Height_, int i_MidWall_ = -1, Enum_BlockSize e_BlockSize_ = Enum_BlockSize.size_2w_2h)
     {
         i_Height = i_Height_;
         i_Width = i_Width_;
@@ -65,6 +67,9 @@ public class Cs_BoardDisplay : MonoBehaviour
 
                 for (int x_ = 0; x_ < i_Width_; ++x_)
                 {
+                    // Instantiate the object
+                    go_WallTemp = Instantiate(go_GridBlock);
+
                     // Add a GridWall
                     if (x_ == 0 || x_ == i_Width_ - 1)
                     {
@@ -73,8 +78,53 @@ public class Cs_BoardDisplay : MonoBehaviour
                     }
                     else
                     {
-                        // Instantiate the object
-                        go_WallTemp = Instantiate(go_GridBlock);
+                        #region 2 Wide
+                        // Check for initial block positions
+                        if(e_BlockSize_ == Enum_BlockSize.size_2w_2h || e_BlockSize_ == Enum_BlockSize.size_2w_3h)
+                        {
+                            // Left side
+                            int i_xPos = (i_Width - 1) / 2;
+                            if (x_ == i_xPos || x_ == i_xPos + 1)
+                            {
+                                if(e_BlockSize_ == Enum_BlockSize.size_2w_2h)
+                                {
+                                    if( y_ >= i_Height - 2)
+                                    {
+                                        go_WallTemp = Instantiate(go_GridWarning);
+                                    }
+                                }
+                                else // 2x3
+                                {
+                                    if( y_ >= i_Height - 3)
+                                    {
+                                        go_WallTemp = Instantiate(go_GridWarning);
+                                    }
+                                }
+                            }
+                        }
+                        #endregion
+                        else if(e_BlockSize_ == Enum_BlockSize.size_3w_2h || e_BlockSize_ == Enum_BlockSize.size_3w_3h)
+                        {
+                            // Left side
+                            int i_xPos = ((i_Width - 1) / 2) - 1;
+                            if (x_ == i_xPos || x_ == i_xPos + 1 || x_ == i_xPos + 2 )
+                            {
+                                if (e_BlockSize_ == Enum_BlockSize.size_3w_2h)
+                                {
+                                    if (y_ >= i_Height - 2)
+                                    {
+                                        go_WallTemp = Instantiate(go_GridWarning);
+                                    }
+                                }
+                                else // 2x3
+                                {
+                                    if (y_ >= i_Height - 3)
+                                    {
+                                        go_WallTemp = Instantiate(go_GridWarning);
+                                    }
+                                }
+                            }
+                        }
                     }
                     Grid_Row.Add(go_WallTemp);
 
