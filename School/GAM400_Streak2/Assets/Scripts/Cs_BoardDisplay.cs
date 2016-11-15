@@ -594,6 +594,7 @@ public class Cs_BoardDisplay : MonoBehaviour
                 Set_BackdropColor(DisplayArray[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 2], new IntVector2(iv2_BottomLeft_.x + 2, iv2_BottomLeft_.y + 1));
                 Set_BackdropColor(DisplayArray[iv2_BottomLeft_.y + 0, iv2_BottomLeft_.x + 2], new IntVector2(iv2_BottomLeft_.x + 2, iv2_BottomLeft_.y + 0));
                 Set_BackdropColor(DisplayArray[iv2_BottomLeft_.y + 0, iv2_BottomLeft_.x + 1], new IntVector2(iv2_BottomLeft_.x + 1, iv2_BottomLeft_.y + 0));
+                Set_BackdropColor(DisplayArray[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 1], new IntVector2(iv2_BottomLeft_.x + 1, iv2_BottomLeft_.y + 1));
             }
             #endregion
         }
@@ -735,6 +736,7 @@ public class Cs_BoardDisplay : MonoBehaviour
                 Set_BackdropColor(DisplayArray[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 2], new IntVector2(iv2_BottomLeft_.x + 2, iv2_BottomLeft_.y + 1));
                 Set_BackdropColor(DisplayArray[iv2_BottomLeft_.y + 0, iv2_BottomLeft_.x + 2], new IntVector2(iv2_BottomLeft_.x + 2, iv2_BottomLeft_.y + 0));
                 Set_BackdropColor(DisplayArray[iv2_BottomLeft_.y + 0, iv2_BottomLeft_.x + 1], new IntVector2(iv2_BottomLeft_.x + 1, iv2_BottomLeft_.y + 0));
+                Set_BackdropColor(DisplayArray[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 1], new IntVector2(iv2_BottomLeft_.x + 1, iv2_BottomLeft_.y + 1));
             }
             #endregion
         }
@@ -865,13 +867,16 @@ public class Cs_BoardDisplay : MonoBehaviour
         {
             for(int x_ = 0; x_ < i_Width; ++x_)
             {
-                Set_BackdropColor( Enum_BlockType.Empty, new IntVector2(x_, y_), true);
+                if(x_ < i_Width && y_ < i_Height)
+                {
+                    Set_BackdropColor( Enum_BlockType.Empty, new IntVector2(x_, y_), true);
+                }
             }
         }
     }
     
     // Set the x Position of the array to run through, and find the first open position. Stack blocks vertically from there.
-    public void Set_ShowPotentialBlockVisual(int i_xPos_, Enum_BlockType[] e_VertBlockArray_ )
+    public void Set_ShowPotentialBlockVisual(int i_xPos_, int i_CurrY_, Enum_BlockType[] e_VertBlockArray_ )
     {
         // Initialize the yPosition to start from
         int i_yPos = 0;
@@ -880,7 +885,8 @@ public class Cs_BoardDisplay : MonoBehaviour
         for( int y_ = 0; y_ < i_Height; ++y_ )
         {
             // When we find the first open block position, step out.
-            if(DisplayArray[y_, i_xPos_] == Enum_BlockType.Empty)
+            if( DisplayArray[y_, i_xPos_] == Enum_BlockType.Empty &&
+                y_ <= i_CurrY_ )
             {
                 i_yPos = y_;
 

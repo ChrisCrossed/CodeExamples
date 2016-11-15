@@ -21,11 +21,13 @@ public enum Enum_BlockSize
 }
 public enum Enum_PauseEffect
 {
+    StartGame,
     Unpause,
     ScoreLine,
+    GameOver
 }
 
-#region Scoring Line Tools
+#region Tools
 public enum Enum_Direction
 {
     Right,
@@ -87,7 +89,7 @@ public struct IntVector2
 
 public class Cs_BoardLogic : MonoBehaviour
 {
-    Enum_PauseEffect e_PauseEffect = Enum_PauseEffect.Unpause;
+    Enum_PauseEffect e_PauseEffect = Enum_PauseEffect.StartGame;
 
     int i_Score;
     [Range(-1, 5)] [SerializeField] int i_TimeToDrop_Max = 3;
@@ -167,7 +169,7 @@ public class Cs_BoardLogic : MonoBehaviour
         BlockArray = new Enum_BlockType[i_ArrayHeight, i_ArrayWidth];
         Initialize_BlockArray();
         
-        PrintArrayToConsole();
+        // PrintArrayToConsole();
     }
 
     #region Block Creation
@@ -265,6 +267,15 @@ public class Cs_BoardLogic : MonoBehaviour
         // (3 high)
         else v2_ActiveBlockLocation.y = i_ArrayHeight - 3;
 
+        // Check for GameOver based on new ActiveBlockLocation information. Returns true if the game's over.
+        if (GameOverCheck())
+        {
+            // PauseState is set to Game Over
+            e_PauseEffect = Enum_PauseEffect.GameOver;
+
+            return;
+        }
+
         // Set the number of blocks to shift afterward
         if (e_BlockSize == Enum_BlockSize.size_2w_2h)                                                   i_NumToShift = 4;
         else if (e_BlockSize == Enum_BlockSize.size_2w_3h || e_BlockSize == Enum_BlockSize.size_3w_2h)  i_NumToShift = 6;
@@ -343,7 +354,7 @@ public class Cs_BoardLogic : MonoBehaviour
     void PotentialBlockVisual()
     {
         // Clear Backdrops before positioning new stuff
-        GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Set_ClearBackdrops();
+        // GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Set_ClearBackdrops();
 
         // Reset SmallList_Vert
         int i_BlockHeight = 2;
@@ -359,13 +370,15 @@ public class Cs_BoardLogic : MonoBehaviour
         {
             for(int y_ = 0; y_ < i_BlockHeight; ++y_)
             {
-                e_SmallList_Vert[y_] = GetBlock((int)v2_ActiveBlockLocation.x + x_, (int)v2_ActiveBlockLocation.y + y_);
-                print("STUFF: " + (int)v2_ActiveBlockLocation.x + x_ + ", " + (int)v2_ActiveBlockLocation.y + y_);
-                print("COUNT: " + e_SmallList_Vert.Length);
+                // When the active blocks reach the bottom, the blocks used to apply the visual blocks above the active blocks. This prevents that.
+                if((int)v2_ActiveBlockLocation.y > 0)
+                {
+                    e_SmallList_Vert[y_] = GetBlock((int)v2_ActiveBlockLocation.x + x_, (int)v2_ActiveBlockLocation.y + y_);
+                }
             }
             
             // Send to Set_ShowPotentialBlockVisual
-            GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Set_ShowPotentialBlockVisual((int)v2_ActiveBlockLocation.x + x_, e_SmallList_Vert);
+            GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Set_ShowPotentialBlockVisual((int)v2_ActiveBlockLocation.x + x_, (int)v2_ActiveBlockLocation.y, e_SmallList_Vert);
         }
     }
 
@@ -415,6 +428,8 @@ public class Cs_BoardLogic : MonoBehaviour
             if (GetBlock((int)v2_BottomLeft.x + 2, (int)v2_BottomLeft.y - 1) != Enum_BlockType.Empty) { AllBlocksStatic(); return; }
         }
         #endregion
+
+        GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Set_ClearBackdrops();
 
         #region Default 2x2
         // (0,0) -> (0, -1)
@@ -497,7 +512,7 @@ public class Cs_BoardLogic : MonoBehaviour
 
         // Move the CurrentBlockLocation 'y'
         --v2_ActiveBlockLocation.y;
-        
+
         // Show new block drop positions
         PotentialBlockVisual();
     }
@@ -518,6 +533,8 @@ public class Cs_BoardLogic : MonoBehaviour
             if (GetBlock((int)v2_BottomLeft.x - 1, (int)v2_BottomLeft.y + 2) != Enum_BlockType.Empty) { return; }
         }
         #endregion
+
+        GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Set_ClearBackdrops();
 
         #region Default 2x2
         // (0,0) -> (-1, 0)
@@ -630,8 +647,10 @@ public class Cs_BoardLogic : MonoBehaviour
             if (GetBlock((int)v2_BottomLeft.x + 3, (int)v2_BottomLeft.y + 1) != Enum_BlockType.Empty) { return; }
         }
 
+        GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Set_ClearBackdrops();
+
         #region Run the check from the top right, backward
-        if(BlockSize_ == Enum_BlockSize.size_3w_3h)
+        if (BlockSize_ == Enum_BlockSize.size_3w_3h)
         {
             // 2, 2 -> 3, 2
             SetBlock((int)v2_BottomLeft.x + 3, (int)v2_BottomLeft.y + 2, GetBlock((int)v2_BottomLeft.x + 2, (int)v2_BottomLeft.y + 2));
@@ -692,6 +711,8 @@ public class Cs_BoardLogic : MonoBehaviour
     // Complete
     void RotateBlocks_Clockwise(Vector2 v2_BottomLeft, Enum_BlockSize BlockSize_)
     {
+        GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Set_ClearBackdrops();
+
         // Store Bottom Left (Temporary)
         Enum_BlockType e_TempBlockType_ = GetBlock((int)v2_BottomLeft.x, (int)v2_BottomLeft.y);
 
@@ -767,6 +788,8 @@ public class Cs_BoardLogic : MonoBehaviour
     // Complete
     void RotateBlocks_CounterClock(Vector2 v2_BottomLeft, Enum_BlockSize BlockSize_)
     {
+        GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Set_ClearBackdrops();
+
         // Store Bottom Left (Temporary)
         Enum_BlockType e_TempBlockType_ = GetBlock((int)v2_BottomLeft.x, (int)v2_BottomLeft.y);
 
@@ -967,7 +990,7 @@ public class Cs_BoardLogic : MonoBehaviour
             #endregion
 
             // Clear backdrops
-            GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Set_ClearBackdrops();
+            // GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Set_ClearBackdrops();
 
             b_RunAgain = true;
 
@@ -1002,17 +1025,17 @@ public class Cs_BoardLogic : MonoBehaviour
         e_BlockSize = e_NextBlockSize;
 
         // Clear all backdrops now. Creating new blocks will reset the new backdrop colors
-        GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Set_ClearBackdrops();
+        // GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Set_ClearBackdrops();
 
         if(b_RunAgain)
         {
             AllBlocksStatic();
 
-            GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Set_ClearBackdrops();
+            // GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Set_ClearBackdrops();
         }
         else
         {
-            GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Set_ClearBackdrops();
+            // GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Set_ClearBackdrops();
 
             CreateNewBlock();
 
@@ -1112,6 +1135,8 @@ public class Cs_BoardLogic : MonoBehaviour
                     // Begins the iterative check
                     if(ScoreLine(Enum_Direction.Right))
                     {
+                        GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Set_ClearBackdrops();
+
                         return true;
                     }
                 }
@@ -1399,6 +1424,34 @@ public class Cs_BoardLogic : MonoBehaviour
     }
     #endregion
 
+    // Returns true if the game is over
+    bool GameOverCheck()
+    {
+        int i_Width = 2;
+        int i_Height = 2;
+
+        if (e_BlockSize == Enum_BlockSize.size_3w_2h || e_BlockSize == Enum_BlockSize.size_3w_3h) i_Width = 3;
+        if (e_BlockSize == Enum_BlockSize.size_2w_3h || e_BlockSize == Enum_BlockSize.size_3w_3h) i_Height = 3;
+
+        for (int x_ = 0; x_ < i_Width; ++x_ )
+        {
+            for( int y_ = 0; y_ < i_Height; ++y_ )
+            {
+                print("Checking: " + (int)(v2_ActiveBlockLocation.x + x_) + ", " + (int)(v2_ActiveBlockLocation.y + y_));
+
+                if(x_ < i_ArrayWidth && y_ < i_ArrayHeight)
+                {
+                    if(GetBlock((v2_ActiveBlockLocation.x + x_), (v2_ActiveBlockLocation.y + y_)) != Enum_BlockType.Empty)
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
     // Update is called once per frame
     List<IntVector2> iv2_Test = new List<IntVector2>();
     float f_ScoreLine_Timer;
@@ -1407,18 +1460,6 @@ public class Cs_BoardLogic : MonoBehaviour
     float f_ScoreLine_Timer_Conclusion_Max = 1.0f; // After the above timer completes, we set the pause state to continue
     void Update ()
     {
-        // TODO: Replace this temporary StartGame system. 
-        if(f_StartGameTimer > 0)
-        {
-            f_StartGameTimer -= Time.deltaTime;
-
-            if(f_StartGameTimer < 0)
-            {
-                GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Set_ClearBackdrops();
-                CreateNewBlock();
-            }
-        }
-
         if(e_PauseEffect == Enum_PauseEffect.Unpause)
         {
             #region Drop Block timer
@@ -1446,35 +1487,35 @@ public class Cs_BoardLogic : MonoBehaviour
                 // Reset timer to drop blocks
                 f_TimeToDrop = 0;
 
-                PrintArrayToConsole();
+                // PrintArrayToConsole();
             }
 
             if (Input.GetKeyDown(KeyCode.A))
             {
                 MoveActiveBlocks_Left(v2_ActiveBlockLocation, e_BlockSize);
 
-                PrintArrayToConsole();
+                // PrintArrayToConsole();
             }
 
             if (Input.GetKeyDown(KeyCode.D))
             {
                 MoveActiveBlocks_Right(v2_ActiveBlockLocation, e_BlockSize);
 
-                PrintArrayToConsole();
+                // PrintArrayToConsole();
             }
 
             if(Input.GetKeyDown(KeyCode.Q))
             {
                 RotateBlocks_CounterClock(v2_ActiveBlockLocation, e_BlockSize);
 
-                PrintArrayToConsole();
+                // PrintArrayToConsole();
             }
 
             if(Input.GetKeyDown(KeyCode.E))
             {
                 RotateBlocks_Clockwise(v2_ActiveBlockLocation, e_BlockSize);
 
-                PrintArrayToConsole();
+                // PrintArrayToConsole();
             }
 
             if (Input.GetKeyDown(KeyCode.Space))
@@ -1484,12 +1525,13 @@ public class Cs_BoardLogic : MonoBehaviour
                 // Reset timer to drop blocks
                 f_TimeToDrop = -1f;
 
-                PrintArrayToConsole();
+                // PrintArrayToConsole();
             }
             #endregion
         }
         else if(e_PauseEffect == Enum_PauseEffect.ScoreLine)
         {
+            #region Scoreline Pause
             // Run through the Scoreline array and have them destroy themselves
             f_ScoreLine_Timer += Time.deltaTime;
 
@@ -1515,8 +1557,6 @@ public class Cs_BoardLogic : MonoBehaviour
                     // f_ScoreLine_Timer_Max gets added here cause I'm lazy. This line doesn't hit until the above timer breaches f_ScoreLine_Timer_Max.
                     f_ScoreLine_Timer_Conclusion += Time.deltaTime + f_ScoreLine_Timer_Max;
 
-                    print(f_ScoreLine_Timer_Conclusion);
-
                     if(f_ScoreLine_Timer_Conclusion > f_ScoreLine_Timer_Conclusion_Max)
                     {
                         // Reset the ScoreLine timer
@@ -1525,18 +1565,18 @@ public class Cs_BoardLogic : MonoBehaviour
                         // Reset the counter for the next cycle
                         i_ScoreLine_Counter = 0;
 
-                        // Clear the ScoreLine list
-                        iv2_ScoreLine = new List<IntVector2>();
-
                         b_RunAgain = true;
 
                         print("Player earned " + iv2_ScoreLine.Count + " to earn a new score of " + i_Score);
+
+                        // Clear the ScoreLine list
+                        iv2_ScoreLine = new List<IntVector2>();
 
                         // 'PullBlocksDown' to update the board
                         PullBlocksDown();
 
                         // Make a new block
-                        GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Set_ClearBackdrops();
+                        // GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Set_ClearBackdrops();
                         CreateNewBlock();
 
                         // Gameplay resumes
@@ -1547,6 +1587,28 @@ public class Cs_BoardLogic : MonoBehaviour
                 // Reset the float timer
                 f_ScoreLine_Timer = 0.0f;
             }
+            #endregion
+        }
+        else if(e_PauseEffect == Enum_PauseEffect.StartGame)
+        {
+            #region Start Game
+            // Creates a new block after a couple seconds at the beginning of the game
+            if (f_StartGameTimer > 0)
+            {
+                f_StartGameTimer -= Time.deltaTime;
+
+                if (f_StartGameTimer < 0)
+                {
+                    // GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Set_ClearBackdrops();
+                    CreateNewBlock();
+                    e_PauseEffect = Enum_PauseEffect.Unpause;
+                }
+            }
+            #endregion
+        }
+        else if(e_PauseEffect == Enum_PauseEffect.GameOver)
+        {
+
         }
     }
 }
