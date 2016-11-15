@@ -1188,13 +1188,6 @@ public class Cs_BoardLogic : MonoBehaviour
 
     bool ScoreLine( Enum_Direction e_Dir_ )
     {
-        //string s_Curr = "Current List: ";
-        //for(int i_ = 0; i_ < iv2_PathfindLine.Count; ++i_)
-        //{
-        //    s_Curr += iv2_PathfindLine[i_] + ", ";
-        //}
-        // print(s_Curr);
-
         // Continue from the last-populated position in the list
         IntVector2 iv2_CurrPos = iv2_PathfindLine[iv2_PathfindLine.Count - 1];
 
@@ -1590,28 +1583,41 @@ public class Cs_BoardLogic : MonoBehaviour
 
                     if(f_ScoreLine_Timer_Conclusion > f_ScoreLine_Timer_Conclusion_Max)
                     {
+                        if (Load_ScoreLine())
+                        {
+                            b_RunAgain = true;
+
+                            e_PauseEffect = Enum_PauseEffect.ScoreLine;
+
+                            i_ScoreLine_Counter = 0;
+
+                            f_ScoreLine_Timer_Conclusion = 0.0f;
+
+                            return;
+                        }
+                        else
+                        {
+                            f_ScoreLine_Timer_Conclusion = 0.0f;
+
+                            // Reset the counter for the next cycle
+                            i_ScoreLine_Counter = 0;
+
+                            b_RunAgain = true;
+
+                            // Clear the ScoreLine list
+                            iv2_ScoreLine = new List<IntVector2>();
+
+                            // 'PullBlocksDown' to update the board
+                            PullBlocksDown();
+
+                            // Make a new block
+                            CreateNewBlock();
+
+                            // Gameplay resumes
+                            e_PauseEffect = Enum_PauseEffect.Unpause;
+                        }
+
                         // Reset the ScoreLine timer
-                        f_ScoreLine_Timer_Conclusion = 0.0f;
-
-                        // Reset the counter for the next cycle
-                        i_ScoreLine_Counter = 0;
-
-                        b_RunAgain = true;
-
-                        print("Player earned " + iv2_ScoreLine.Count + " to earn a new score of " + i_Score);
-
-                        // Clear the ScoreLine list
-                        iv2_ScoreLine = new List<IntVector2>();
-
-                        // 'PullBlocksDown' to update the board
-                        PullBlocksDown();
-
-                        // Make a new block
-                        // GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Set_ClearBackdrops();
-                        CreateNewBlock();
-
-                        // Gameplay resumes
-                        e_PauseEffect = Enum_PauseEffect.Unpause;
                     }
                 }
 
