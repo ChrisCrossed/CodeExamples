@@ -11,6 +11,7 @@ public class Cs_BlockOnBoardLogic : MonoBehaviour
     float f_xPos;
 
     float f_BlockScale;
+    float f_InitialScale;
     int i_BoardWidth;
 
     // Variables - Block Gets Killed
@@ -21,6 +22,7 @@ public class Cs_BlockOnBoardLogic : MonoBehaviour
 
     // Variables - Block Gets Scored
     bool b_IsScored;
+    bool b_GameOver;
     float f_Timer_SinWave; // Incremental timer
     static float f_Timer_SinWave_Max = 5; // Max timer
     float f_Timer_SinWave_Speed = 5; // Multiples against Delta Time to speed/slow the rate of movement
@@ -32,15 +34,18 @@ public class Cs_BlockOnBoardLogic : MonoBehaviour
         // Init_BlockModel(5, 5, 3, 20);
 	}
 
-    public void Init_BlockModel( int i_xPos_, int i_yPos_, float f_BlockScale_, int i_BoardWidth_ )
+    public void Init_BlockModel( int i_xPos_, int i_yPos_, float f_BlockScale_, float f_InitialScale_, int i_BoardWidth_ )
     {
         f_xPos = i_xPos_;
         f_yPos = i_yPos_;
 
         f_BlockScale = f_BlockScale_;
+        f_InitialScale = f_InitialScale_;
         i_BoardWidth = i_BoardWidth_;
 
-        gameObject.transform.position = new Vector3(f_xPos * f_BlockScale, f_yPos * f_BlockScale, 0);
+        gameObject.transform.position = new Vector3( f_xPos * f_BlockScale, f_yPos * f_BlockScale, 0 );
+
+        gameObject.transform.localScale = new Vector3( f_InitialScale_, f_InitialScale_, f_InitialScale_ );
     }
 
     // Update is called once per frame
@@ -142,6 +147,25 @@ public class Cs_BlockOnBoardLogic : MonoBehaviour
             v3_CurrRot.z -= Time.deltaTime * 360 * f_SpinTimer;
             gameObject.transform.eulerAngles = v3_CurrRot;
         }
+
+        // Scale Increase
+        if(gameObject.transform.localScale.x < 1.0f)
+        {
+            Vector3 v3_NewScale = gameObject.transform.localScale;
+
+            v3_NewScale.x += Time.deltaTime * 1.0f;
+            v3_NewScale.y += Time.deltaTime * 1.0f;
+            v3_NewScale.z += Time.deltaTime * 1.0f;
+
+            if(v3_NewScale.x > f_BlockScale)
+            {
+                v3_NewScale.x = 1.0f;
+                v3_NewScale.y = 1.0f;
+                v3_NewScale.z = 1.0f;
+            }
+
+            gameObject.transform.localScale = v3_NewScale;
+        }
     }
 
     public void Set_MoveLeft()
@@ -213,6 +237,11 @@ public class Cs_BlockOnBoardLogic : MonoBehaviour
     public void Set_ScoreBlock()
     {
         b_IsScored = true;
+    }
+
+    public void Set_GameOverBlock()
+    {
+        b_GameOver = true;
     }
 
     void SetMaterialsVisibility(float f_Transparency_)

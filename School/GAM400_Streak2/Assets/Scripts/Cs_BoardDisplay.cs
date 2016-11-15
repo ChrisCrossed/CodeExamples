@@ -13,6 +13,7 @@ public class Cs_BoardDisplay : MonoBehaviour
 
     GameObject go_Block_A;
     GameObject go_Block_B;
+    GameObject go_Block_C;
     GameObject go_Empty;
 
     int i_Height;
@@ -33,6 +34,7 @@ public class Cs_BoardDisplay : MonoBehaviour
 
         go_Block_A = Resources.Load("Block_X") as GameObject;
         go_Block_B = Resources.Load("Block_O") as GameObject;
+        go_Block_C = Resources.Load("Block_Tri") as GameObject;
 
         go_Empty = Resources.Load("Block_Empty") as GameObject;
     }
@@ -749,18 +751,21 @@ public class Cs_BoardDisplay : MonoBehaviour
 
     public void DestroyBlockAt( IntVector2 iv2_DestroyLoc_ )
     {
-        // Set the DisplayArray position to be empty
-        DisplayArray[iv2_DestroyLoc_.y, iv2_DestroyLoc_.x] = Enum_BlockType.Empty;
+        if(DisplayArray[iv2_DestroyLoc_.y, iv2_DestroyLoc_.x] != Enum_BlockType.Empty)
+        {
+            // Set the DisplayArray position to be empty
+            DisplayArray[iv2_DestroyLoc_.y, iv2_DestroyLoc_.x] = Enum_BlockType.Empty;
 
-        // Set the DisplayArray_Blocks block to destroy itself visually
-        DisplayArray_Blocks[iv2_DestroyLoc_.y, iv2_DestroyLoc_.x].GetComponent<Cs_BlockOnBoardLogic>().Set_DeleteBlock();
+            // Set the DisplayArray_Blocks block to destroy itself visually
+            DisplayArray_Blocks[iv2_DestroyLoc_.y, iv2_DestroyLoc_.x].GetComponent<Cs_BlockOnBoardLogic>().Set_DeleteBlock();
 
-        // Separate the DisplayArray_Blocks block by making it into an empty object
-        DisplayArray_Blocks[iv2_DestroyLoc_.y, iv2_DestroyLoc_.x] = Instantiate(go_Empty);
-        DisplayArray_Blocks[iv2_DestroyLoc_.y, iv2_DestroyLoc_.x].transform.SetParent(GameObject.Find("EmptyBlocks").transform);
+            // Separate the DisplayArray_Blocks block by making it into an empty object
+            DisplayArray_Blocks[iv2_DestroyLoc_.y, iv2_DestroyLoc_.x] = Instantiate(go_Empty);
+            DisplayArray_Blocks[iv2_DestroyLoc_.y, iv2_DestroyLoc_.x].transform.SetParent(GameObject.Find("EmptyBlocks").transform);
 
-        // Reset Backdrop Color
-        Set_BackdropColor( Enum_BlockType.Empty, new IntVector2(iv2_DestroyLoc_.x, iv2_DestroyLoc_.y) );
+            // Reset Backdrop Color
+            Set_BackdropColor( Enum_BlockType.Empty, new IntVector2(iv2_DestroyLoc_.x, iv2_DestroyLoc_.y) );
+        }
     }
 
     public void ScoreBlockAt( IntVector2  iv2_ScoreLoc_ )
@@ -805,14 +810,12 @@ public class Cs_BoardDisplay : MonoBehaviour
                 {
                     go_BlockTemp = Instantiate(go_Block_B);
                     go_BlockTemp.transform.SetParent(GameObject.Find("DisplayBlockList").transform);
-
-                    
                 }
                 else if (e_NewBlockTypeArray_[y_, x_] == Enum_BlockType.Block_3_Active)
                 {
                     print("TODO: ADD BLOCK 3 TO CS_BOARDDISPLAY");
-                    go_BlockTemp = Instantiate(go_Empty);
-                    go_BlockTemp.transform.SetParent(GameObject.Find("EmptyBlocks").transform);
+                    go_BlockTemp = Instantiate(go_Block_C);
+                    go_BlockTemp.transform.SetParent(GameObject.Find("DisplayBlockList").transform);
                 }
                 else
                 {
@@ -826,7 +829,7 @@ public class Cs_BoardDisplay : MonoBehaviour
                 int i_NewY = y_ + iv2_BottomLeft_.y;
                 if(go_BlockTemp.GetComponent<Cs_BlockOnBoardLogic>())
                 {
-                    go_BlockTemp.GetComponent<Cs_BlockOnBoardLogic>().Init_BlockModel(i_NewX, i_NewY, 3.0f, i_Width);
+                    go_BlockTemp.GetComponent<Cs_BlockOnBoardLogic>().Init_BlockModel(i_NewX, i_NewY, 3.0f, 0.75f, i_Width);
                 }
 
                 // Set the Backdrop Color
@@ -899,6 +902,46 @@ public class Cs_BoardDisplay : MonoBehaviour
         {
             Set_BackdropColor( e_VertBlockArray_[i_], new IntVector2(i_xPos_, i_yPos + i_), true );
         }
+    }
+
+    public void Set_GameOverBlock( int i_xPos_, int i_yPos_, Enum_BlockType e_BlockType_ )
+    {
+        GameObject go_BlockTemp;
+
+        // Create a new block based on the position within NewBlockTypeArray
+        if (e_BlockType_ == Enum_BlockType.Block_1_Active)
+        {
+            // go_BlockTemp is Instantiated as above by default
+            go_BlockTemp = Instantiate(go_Block_A);
+            go_BlockTemp.transform.SetParent(GameObject.Find("DisplayBlockList").transform);
+        }
+        else if (e_BlockType_ == Enum_BlockType.Block_2_Active)
+        {
+            go_BlockTemp = Instantiate(go_Block_B);
+            go_BlockTemp.transform.SetParent(GameObject.Find("DisplayBlockList").transform);
+        }
+        else if (e_BlockType_ == Enum_BlockType.Block_3_Active)
+        {
+            print("TODO: ADD BLOCK 3 TO CS_BOARDDISPLAY");
+            go_BlockTemp = Instantiate(go_Block_C);
+            go_BlockTemp.transform.SetParent(GameObject.Find("DisplayBlockList").transform);
+        }
+        else
+        {
+            print("INVALID BLOCK ADDED TO CS_BOARDDISPLAY");
+            go_BlockTemp = Instantiate(go_Empty);
+            go_BlockTemp.transform.SetParent(GameObject.Find("EmptyBlocks").transform);
+        }
+
+        // Initialize this block
+        if (go_BlockTemp.GetComponent<Cs_BlockOnBoardLogic>())
+        {
+            go_BlockTemp.GetComponent<Cs_BlockOnBoardLogic>().Init_BlockModel(i_xPos_, i_yPos_, 3.0f, 0.001f, i_Width);
+            go_BlockTemp.GetComponent<Cs_BlockOnBoardLogic>().Set_GameOverBlock();
+        }
+
+        // Set the Backdrop Color
+        Set_BackdropColor(e_BlockType_, new IntVector2(i_xPos_, i_yPos_));
     }
 
     void PrintArrayToConsole()

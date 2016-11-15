@@ -169,7 +169,7 @@ public class Cs_BoardLogic : MonoBehaviour
         BlockArray = new Enum_BlockType[i_ArrayHeight, i_ArrayWidth];
         Initialize_BlockArray();
         
-        // PrintArrayToConsole();
+        PrintArrayToConsole();
     }
 
     #region Block Creation
@@ -1458,6 +1458,11 @@ public class Cs_BoardLogic : MonoBehaviour
     static float f_ScoreLine_Timer_Max = 0.075f;
     float f_ScoreLine_Timer_Conclusion; // A timer that continues to run after the last block's visual begins
     float f_ScoreLine_Timer_Conclusion_Max = 1.0f; // After the above timer completes, we set the pause state to continue
+    int i_GameOver_X = 0;
+    int i_GameOver_Y = 0;
+    float f_GameOver_Timer;
+    float f_GameOver_Timer_Max = 0.025f;
+    Enum_BlockType e_GameOverBlock = Enum_BlockType.Block_1_Static;
     void Update ()
     {
         if(e_PauseEffect == Enum_PauseEffect.Unpause)
@@ -1487,35 +1492,35 @@ public class Cs_BoardLogic : MonoBehaviour
                 // Reset timer to drop blocks
                 f_TimeToDrop = 0;
 
-                // PrintArrayToConsole();
+                PrintArrayToConsole();
             }
 
             if (Input.GetKeyDown(KeyCode.A))
             {
                 MoveActiveBlocks_Left(v2_ActiveBlockLocation, e_BlockSize);
 
-                // PrintArrayToConsole();
+                PrintArrayToConsole();
             }
 
             if (Input.GetKeyDown(KeyCode.D))
             {
                 MoveActiveBlocks_Right(v2_ActiveBlockLocation, e_BlockSize);
 
-                // PrintArrayToConsole();
+                PrintArrayToConsole();
             }
 
             if(Input.GetKeyDown(KeyCode.Q))
             {
                 RotateBlocks_CounterClock(v2_ActiveBlockLocation, e_BlockSize);
 
-                // PrintArrayToConsole();
+                PrintArrayToConsole();
             }
 
             if(Input.GetKeyDown(KeyCode.E))
             {
                 RotateBlocks_Clockwise(v2_ActiveBlockLocation, e_BlockSize);
 
-                // PrintArrayToConsole();
+                PrintArrayToConsole();
             }
 
             if (Input.GetKeyDown(KeyCode.Space))
@@ -1525,7 +1530,7 @@ public class Cs_BoardLogic : MonoBehaviour
                 // Reset timer to drop blocks
                 f_TimeToDrop = -1f;
 
-                // PrintArrayToConsole();
+                PrintArrayToConsole();
             }
             #endregion
         }
@@ -1608,7 +1613,89 @@ public class Cs_BoardLogic : MonoBehaviour
         }
         else if(e_PauseEffect == Enum_PauseEffect.GameOver)
         {
+            f_GameOver_Timer += Time.deltaTime;
 
+            if(f_GameOver_Timer > f_GameOver_Timer_Max)
+            {
+                // Set block position
+                if( i_GameOver_X < i_ArrayWidth - 1 &&
+                    i_GameOver_Y < i_ArrayHeight )
+                {
+                    // Destroy the old. Set the new. All visual, no board array manipulation.
+                    GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().DestroyBlockAt(new IntVector2(i_GameOver_X, i_GameOver_Y));
+                    GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Set_GameOverBlock( i_GameOver_X, i_GameOver_Y, e_GameOverBlock );
+                }
+
+                // Set next block type
+                #region Next Block Type
+                // Ensure that we're an odd number. Forces a checkerboard pattern.
+                if(i_GameOver_X < i_ArrayWidth - 1)
+                {
+                    if (e_GameOverBlock == Enum_BlockType.Block_1_Active)
+                    {
+                        e_GameOverBlock = Enum_BlockType.Block_2_Active;
+                    }
+                    else if (e_GameOverBlock == Enum_BlockType.Block_2_Active)
+                    {
+                        if (b_ThreeBlockColors)
+                        {
+                            e_GameOverBlock = Enum_BlockType.Block_3_Active;
+                        }
+                        else
+                        {
+                            e_GameOverBlock = Enum_BlockType.Block_1_Active;
+                        }
+                    }
+                    else // Block 3
+                    {
+                        e_GameOverBlock = Enum_BlockType.Block_1_Active;
+                    }
+                }
+                else
+                {
+                    if (i_ArrayWidth % 2 == 0)
+                    {
+                        if (e_GameOverBlock == Enum_BlockType.Block_1_Active)
+                        {
+                            e_GameOverBlock = Enum_BlockType.Block_2_Active;
+                        }
+                        else if (e_GameOverBlock == Enum_BlockType.Block_2_Active)
+                        {
+                            if (b_ThreeBlockColors)
+                            {
+                                print("Hi Chris");
+                                e_GameOverBlock = Enum_BlockType.Block_3_Active;
+                            }
+                            else
+                            {
+                                e_GameOverBlock = Enum_BlockType.Block_1_Active;
+                            }
+                        }
+                        else
+                        {
+                            e_GameOverBlock = Enum_BlockType.Block_1_Active;
+                        }
+                    }
+                }
+
+                #endregion
+
+                // Reset timer
+                f_GameOver_Timer = 0f;
+
+                // Increment X/Y
+                ++i_GameOver_X;
+
+                // When the GameOver_X position is greater than the inner walls...
+                if(i_GameOver_X > i_ArrayWidth - 1)
+                {
+                    // Reset the X position
+                    i_GameOver_X = 1;
+
+                    // Increments the Y.
+                    ++i_GameOver_Y;
+                }
+            }
         }
     }
 }
