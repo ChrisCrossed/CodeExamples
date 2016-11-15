@@ -8,27 +8,83 @@ public enum Enum_FadeState
     FadeOut
 }
 
+public enum Enum_ColorState
+{
+    Original,
+    Red,
+    Blue
+}
+
 public class Cs_GridBlockLogic : MonoBehaviour
 {
     float f_FadeTimer = 0.0f;
     float f_FadeTimer_Max = 0.5f;
     float f_FadePercent = 0.0f;
+
+    // Store original colors
+    Color clr_OriginalColor;
+    Color clr_Red;
+    Color clr_Blue;
+
+    // The color the block will lerp to when set within Set_ColorState
+    GameObject go_Backdrop;
+    Color clr_CurrentColor;
+    float f_ColorTimer;
+    float f_ColorTimer_Max = 0.5f;
+    float f_ColorPercent = 0.0f;
     
     Enum_FadeState e_FadeState;
+    Enum_ColorState e_ColorState;
 
 	// Use this for initialization
 	void Start ()
     {
+        go_Backdrop = transform.Find("Grid_Backdrop").gameObject;
+
         Color clr_CurrMat = gameObject.GetComponent<MeshRenderer>().material.color;
         clr_CurrMat.a = 0;
         gameObject.GetComponent<MeshRenderer>().material.color = clr_CurrMat;
 
-        Set_FadeState(Enum_FadeState.Stay);
+        // Tells the block to stay invisible so external forces can fade them in manually
+        Set_FadeState( Enum_FadeState.Stay );
+
+        // Set colors for the block
+        clr_OriginalColor = new Color(0, 0, 0, 0);
+        clr_Blue = new Color(0, 0, 1, 0.15f);
+        clr_Red = new Color(1, 0, 0, 0.15f);
     }
 
     public void Set_FadeState( Enum_FadeState e_FadeState_ )
     {
         e_FadeState = e_FadeState_;
+    }
+
+    public void Set_ColorState( Enum_ColorState e_ColorState_, bool b_IsInstant_ )
+    {
+        if( e_ColorState_ == Enum_ColorState.Original )
+        {
+            // Set the current color to be original. Gets lerped to within Update
+            clr_CurrentColor = clr_OriginalColor;
+        }
+        else if( e_ColorState_ == Enum_ColorState.Red )
+        {
+            clr_CurrentColor = clr_Red;
+        }
+        else if( e_ColorState_ == Enum_ColorState.Blue )
+        {
+            clr_CurrentColor = clr_Blue;
+        }
+
+        if(b_IsInstant_)
+        {
+            f_ColorTimer = f_ColorTimer_Max;
+            f_ColorPercent = 1.0f;
+        }
+        else
+        {
+            f_ColorTimer = 0.0f;
+            f_ColorPercent = 0.0f;
+        }
     }
 
     void UpdateFadeTimers()
@@ -77,6 +133,23 @@ public class Cs_GridBlockLogic : MonoBehaviour
             gameObject.GetComponent<MeshRenderer>().material.color = clr_CurrMat;
         }
     }
+
+    void UpdateBlockColor()
+    {
+        if(f_ColorTimer < f_ColorTimer_Max)
+        {
+            f_ColorTimer += Time.deltaTime;
+
+            if (f_ColorTimer > f_ColorTimer_Max) f_ColorTimer = f_ColorTimer_Max;
+
+            f_ColorPercent = f_ColorTimer / f_ColorTimer_Max;
+        }
+
+        // Fade from old color into current color
+        Color clr_OldColor = go_Backdrop.GetComponent<MeshRenderer>().material.color;
+        clr_OldColor = Color.Lerp(clr_OldColor, clr_CurrentColor, f_ColorPercent);
+        go_Backdrop.GetComponent<MeshRenderer>().material.color = clr_OldColor;
+    }
 	
 	// Update is called once per frame
 	void Update ()
@@ -84,5 +157,7 @@ public class Cs_GridBlockLogic : MonoBehaviour
         UpdateBlockAlpha();
 
         UpdateFadeTimers();
+
+        UpdateBlockColor();
 	}
 }

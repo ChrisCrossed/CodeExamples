@@ -23,7 +23,7 @@ public class Cs_BoardDisplay : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        // Init_Board(10, 10);
+        
     }
 
     void LoadResources()
@@ -235,7 +235,7 @@ public class Cs_BoardDisplay : MonoBehaviour
     {
         if( e_MoveDir_ == Enum_Direction.Left )
         {
-            // Push indicated block to the left
+            // Push indicated block model to the left
             if (DisplayArray_Blocks[iv2_Pos_.y, iv2_Pos_.x].GetComponent<Cs_BlockOnBoardLogic>())
             {
                 DisplayArray_Blocks[iv2_Pos_.y, iv2_Pos_.x].GetComponent<Cs_BlockOnBoardLogic>().Set_MoveLeft();
@@ -253,6 +253,14 @@ public class Cs_BoardDisplay : MonoBehaviour
 
             DisplayArray_Blocks[iv2_Pos_.y + 0, iv2_Pos_.x - 1] = DisplayArray_Blocks[iv2_Pos_.y + 0, iv2_Pos_.x + 0];
             DisplayArray_Blocks[iv2_Pos_.y + 0, iv2_Pos_.x + 0] = go_TempBlock;
+
+            // Set the Backdrop Color
+            Set_BackdropColor(DisplayArray[iv2_Pos_.y + 0, iv2_Pos_.x - 1], new IntVector2( iv2_Pos_.x - 1, iv2_Pos_.y + 0 ));
+            Set_BackdropColor(DisplayArray[iv2_Pos_.y + 0, iv2_Pos_.x + 0], new IntVector2(iv2_Pos_.x + 0, iv2_Pos_.y + 0));
+            if(iv2_Pos_.x + 1 < i_Width)
+            {
+                Set_BackdropColor(Enum_BlockType.Empty, new IntVector2(iv2_Pos_.x + 1, iv2_Pos_.y + 0));
+            }
         }
         else if( e_MoveDir_ == Enum_Direction.Right )
         {
@@ -274,6 +282,14 @@ public class Cs_BoardDisplay : MonoBehaviour
 
             DisplayArray_Blocks[iv2_Pos_.y + 0, iv2_Pos_.x + 1] = DisplayArray_Blocks[iv2_Pos_.y + 0, iv2_Pos_.x - 0];
             DisplayArray_Blocks[iv2_Pos_.y + 0, iv2_Pos_.x - 0] = go_TempBlock;
+
+            // Set the Backdrop Color
+            Set_BackdropColor(DisplayArray[iv2_Pos_.y + 0, iv2_Pos_.x + 1], new IntVector2(iv2_Pos_.x + 1, iv2_Pos_.y + 0));
+            Set_BackdropColor(DisplayArray[iv2_Pos_.y + 0, iv2_Pos_.x + 0], new IntVector2(iv2_Pos_.x + 0, iv2_Pos_.y + 0));
+            if (iv2_Pos_.x - 1 > 0)
+            {
+                Set_BackdropColor(Enum_BlockType.Empty, new IntVector2(iv2_Pos_.x - 1, iv2_Pos_.y + 0));
+            }
         }
         else if( e_MoveDir_ == Enum_Direction.Down )
         {
@@ -295,6 +311,14 @@ public class Cs_BoardDisplay : MonoBehaviour
 
             DisplayArray_Blocks[iv2_Pos_.y - 1, iv2_Pos_.x + 0] = DisplayArray_Blocks[iv2_Pos_.y + 0, iv2_Pos_.x - 0];
             DisplayArray_Blocks[iv2_Pos_.y + 0, iv2_Pos_.x - 0] = go_TempBlock;
+
+            // Set the Backdrop Color
+            Set_BackdropColor(DisplayArray[iv2_Pos_.y - 1, iv2_Pos_.x + 0], new IntVector2(iv2_Pos_.x + 0, iv2_Pos_.y - 1));
+            Set_BackdropColor(DisplayArray[iv2_Pos_.y + 0, iv2_Pos_.x + 0], new IntVector2(iv2_Pos_.x + 0, iv2_Pos_.y + 0));
+            if(iv2_Pos_.y + 1 < i_Height)
+            {
+                Set_BackdropColor(Enum_BlockType.Empty, new IntVector2(iv2_Pos_.x + 0, iv2_Pos_.y + 1));
+            }
         }
         else if(e_MoveDir_ == Enum_Direction.Up )
         {
@@ -316,6 +340,11 @@ public class Cs_BoardDisplay : MonoBehaviour
 
             DisplayArray_Blocks[iv2_Pos_.y + 1, iv2_Pos_.x + 0] = DisplayArray_Blocks[iv2_Pos_.y + 0, iv2_Pos_.x - 0];
             DisplayArray_Blocks[iv2_Pos_.y + 0, iv2_Pos_.x - 0] = go_TempBlock;
+
+            // Set the Backdrop Color
+            Set_BackdropColor(DisplayArray[iv2_Pos_.y + 1, iv2_Pos_.x + 0], new IntVector2(iv2_Pos_.x + 0, iv2_Pos_.y + 1));
+            Set_BackdropColor(DisplayArray[iv2_Pos_.y + 0, iv2_Pos_.x + 0], new IntVector2(iv2_Pos_.x + 0, iv2_Pos_.y + 0));
+            Set_BackdropColor(Enum_BlockType.Empty, new IntVector2(iv2_Pos_.x + 0, iv2_Pos_.y - 1));
         }
     }
 
@@ -449,6 +478,12 @@ public class Cs_BoardDisplay : MonoBehaviour
                 DisplayArray[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 0] = DisplayArray[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 1];
                 DisplayArray[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 1] = DisplayArray[iv2_BottomLeft_.y + 0, iv2_BottomLeft_.x + 1];
                 DisplayArray[iv2_BottomLeft_.y + 0, iv2_BottomLeft_.x + 1] = e_BotLeftBlock;
+
+                // Change the Grid_Backdrop
+                Set_BackdropColor(DisplayArray[iv2_BottomLeft_.y + 0, iv2_BottomLeft_.x + 0], new IntVector2(iv2_BottomLeft_.x + 0, iv2_BottomLeft_.y + 0));
+                Set_BackdropColor(DisplayArray[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 0], new IntVector2(iv2_BottomLeft_.x + 0, iv2_BottomLeft_.y + 1));
+                Set_BackdropColor(DisplayArray[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 1], new IntVector2(iv2_BottomLeft_.x + 1, iv2_BottomLeft_.y + 1));
+                Set_BackdropColor(DisplayArray[iv2_BottomLeft_.y + 0, iv2_BottomLeft_.x + 1], new IntVector2(iv2_BottomLeft_.x + 1, iv2_BottomLeft_.y + 0));
             }
             else if( e_BlockSize_ == Enum_BlockSize.size_3w_2h )
             {
@@ -475,6 +510,14 @@ public class Cs_BoardDisplay : MonoBehaviour
                 DisplayArray[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 2] = DisplayArray[iv2_BottomLeft_.y + 0, iv2_BottomLeft_.x + 2];
                 DisplayArray[iv2_BottomLeft_.y + 0, iv2_BottomLeft_.x + 2] = DisplayArray[iv2_BottomLeft_.y + 0, iv2_BottomLeft_.x + 1];
                 DisplayArray[iv2_BottomLeft_.y + 0, iv2_BottomLeft_.x + 1] = e_BotLeftBlock;
+
+                // Change the Grid_Backdrop
+                Set_BackdropColor(DisplayArray[iv2_BottomLeft_.y + 0, iv2_BottomLeft_.x + 0], new IntVector2(iv2_BottomLeft_.x + 0, iv2_BottomLeft_.y + 0));
+                Set_BackdropColor(DisplayArray[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 0], new IntVector2(iv2_BottomLeft_.x + 0, iv2_BottomLeft_.y + 1));
+                Set_BackdropColor(DisplayArray[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 1], new IntVector2(iv2_BottomLeft_.x + 1, iv2_BottomLeft_.y + 1));
+                Set_BackdropColor(DisplayArray[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 2], new IntVector2(iv2_BottomLeft_.x + 2, iv2_BottomLeft_.y + 1));
+                Set_BackdropColor(DisplayArray[iv2_BottomLeft_.y + 0, iv2_BottomLeft_.x + 2], new IntVector2(iv2_BottomLeft_.x + 2, iv2_BottomLeft_.y + 0));
+                Set_BackdropColor(DisplayArray[iv2_BottomLeft_.y + 0, iv2_BottomLeft_.x + 1], new IntVector2(iv2_BottomLeft_.x + 1, iv2_BottomLeft_.y + 0));
             }
             else if( e_BlockSize_ == Enum_BlockSize.size_2w_3h )
             {
@@ -501,6 +544,14 @@ public class Cs_BoardDisplay : MonoBehaviour
                 DisplayArray[iv2_BottomLeft_.y + 2, iv2_BottomLeft_.x + 1] = DisplayArray[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 1];
                 DisplayArray[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 1] = DisplayArray[iv2_BottomLeft_.y + 0, iv2_BottomLeft_.x + 1];
                 DisplayArray[iv2_BottomLeft_.y + 0, iv2_BottomLeft_.x + 1] = e_BotLeftBlock;
+
+                // Change the Grid_Backdrop
+                Set_BackdropColor(DisplayArray[iv2_BottomLeft_.y + 0, iv2_BottomLeft_.x + 0], new IntVector2(iv2_BottomLeft_.x + 0, iv2_BottomLeft_.y + 0));
+                Set_BackdropColor(DisplayArray[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 0], new IntVector2(iv2_BottomLeft_.x + 0, iv2_BottomLeft_.y + 1));
+                Set_BackdropColor(DisplayArray[iv2_BottomLeft_.y + 2, iv2_BottomLeft_.x + 0], new IntVector2(iv2_BottomLeft_.x + 0, iv2_BottomLeft_.y + 2));
+                Set_BackdropColor(DisplayArray[iv2_BottomLeft_.y + 2, iv2_BottomLeft_.x + 1], new IntVector2(iv2_BottomLeft_.x + 1, iv2_BottomLeft_.y + 2));
+                Set_BackdropColor(DisplayArray[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 1], new IntVector2(iv2_BottomLeft_.x + 1, iv2_BottomLeft_.y + 1));
+                Set_BackdropColor(DisplayArray[iv2_BottomLeft_.y + 0, iv2_BottomLeft_.x + 1], new IntVector2(iv2_BottomLeft_.x + 1, iv2_BottomLeft_.y + 0));
             }
             else if( e_BlockSize_ == Enum_BlockSize.size_3w_3h )
             {
@@ -533,6 +584,16 @@ public class Cs_BoardDisplay : MonoBehaviour
                 DisplayArray[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 2] = DisplayArray[iv2_BottomLeft_.y + 0, iv2_BottomLeft_.x + 2];
                 DisplayArray[iv2_BottomLeft_.y + 0, iv2_BottomLeft_.x + 2] = DisplayArray[iv2_BottomLeft_.y + 0, iv2_BottomLeft_.x + 1];
                 DisplayArray[iv2_BottomLeft_.y + 0, iv2_BottomLeft_.x + 1] = e_BotLeftBlock;
+
+                // Change the Grid_Backdrop
+                Set_BackdropColor(DisplayArray[iv2_BottomLeft_.y + 0, iv2_BottomLeft_.x + 0], new IntVector2(iv2_BottomLeft_.x + 0, iv2_BottomLeft_.y + 0));
+                Set_BackdropColor(DisplayArray[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 0], new IntVector2(iv2_BottomLeft_.x + 0, iv2_BottomLeft_.y + 1));
+                Set_BackdropColor(DisplayArray[iv2_BottomLeft_.y + 2, iv2_BottomLeft_.x + 0], new IntVector2(iv2_BottomLeft_.x + 0, iv2_BottomLeft_.y + 2));
+                Set_BackdropColor(DisplayArray[iv2_BottomLeft_.y + 2, iv2_BottomLeft_.x + 1], new IntVector2(iv2_BottomLeft_.x + 1, iv2_BottomLeft_.y + 2));
+                Set_BackdropColor(DisplayArray[iv2_BottomLeft_.y + 2, iv2_BottomLeft_.x + 2], new IntVector2(iv2_BottomLeft_.x + 2, iv2_BottomLeft_.y + 2));
+                Set_BackdropColor(DisplayArray[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 2], new IntVector2(iv2_BottomLeft_.x + 2, iv2_BottomLeft_.y + 1));
+                Set_BackdropColor(DisplayArray[iv2_BottomLeft_.y + 0, iv2_BottomLeft_.x + 2], new IntVector2(iv2_BottomLeft_.x + 2, iv2_BottomLeft_.y + 0));
+                Set_BackdropColor(DisplayArray[iv2_BottomLeft_.y + 0, iv2_BottomLeft_.x + 1], new IntVector2(iv2_BottomLeft_.x + 1, iv2_BottomLeft_.y + 0));
             }
             #endregion
         }
@@ -558,6 +619,12 @@ public class Cs_BoardDisplay : MonoBehaviour
                 DisplayArray[iv2_BottomLeft_.y + 0, iv2_BottomLeft_.x + 1] = DisplayArray[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 1];
                 DisplayArray[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 1] = DisplayArray[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 0];
                 DisplayArray[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 0] = e_BotLeftBlock;
+
+                // Change the Grid_Backdrop
+                Set_BackdropColor(DisplayArray[iv2_BottomLeft_.y + 0, iv2_BottomLeft_.x + 0], new IntVector2(iv2_BottomLeft_.x + 0, iv2_BottomLeft_.y + 0));
+                Set_BackdropColor(DisplayArray[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 0], new IntVector2(iv2_BottomLeft_.x + 0, iv2_BottomLeft_.y + 1));
+                Set_BackdropColor(DisplayArray[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 1], new IntVector2(iv2_BottomLeft_.x + 1, iv2_BottomLeft_.y + 1));
+                Set_BackdropColor(DisplayArray[iv2_BottomLeft_.y + 0, iv2_BottomLeft_.x + 1], new IntVector2(iv2_BottomLeft_.x + 1, iv2_BottomLeft_.y + 0));
             }
             else if( e_BlockSize_ == Enum_BlockSize.size_3w_2h )
             {
@@ -584,6 +651,14 @@ public class Cs_BoardDisplay : MonoBehaviour
                 DisplayArray[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 2] = DisplayArray[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 1];
                 DisplayArray[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 1] = DisplayArray[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 0];
                 DisplayArray[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 0] = e_BotLeftBlock;
+
+                // Change the Grid_Backdrop
+                Set_BackdropColor(DisplayArray[iv2_BottomLeft_.y + 0, iv2_BottomLeft_.x + 0], new IntVector2(iv2_BottomLeft_.x + 0, iv2_BottomLeft_.y + 0));
+                Set_BackdropColor(DisplayArray[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 0], new IntVector2(iv2_BottomLeft_.x + 0, iv2_BottomLeft_.y + 1));
+                Set_BackdropColor(DisplayArray[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 1], new IntVector2(iv2_BottomLeft_.x + 1, iv2_BottomLeft_.y + 1));
+                Set_BackdropColor(DisplayArray[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 2], new IntVector2(iv2_BottomLeft_.x + 2, iv2_BottomLeft_.y + 1));
+                Set_BackdropColor(DisplayArray[iv2_BottomLeft_.y + 0, iv2_BottomLeft_.x + 2], new IntVector2(iv2_BottomLeft_.x + 2, iv2_BottomLeft_.y + 0));
+                Set_BackdropColor(DisplayArray[iv2_BottomLeft_.y + 0, iv2_BottomLeft_.x + 1], new IntVector2(iv2_BottomLeft_.x + 1, iv2_BottomLeft_.y + 0));
             }
             else if( e_BlockSize_ == Enum_BlockSize.size_2w_3h )
             {
@@ -610,6 +685,14 @@ public class Cs_BoardDisplay : MonoBehaviour
                 DisplayArray[iv2_BottomLeft_.y + 2, iv2_BottomLeft_.x + 1] = DisplayArray[iv2_BottomLeft_.y + 2, iv2_BottomLeft_.x + 0];
                 DisplayArray[iv2_BottomLeft_.y + 2, iv2_BottomLeft_.x + 0] = DisplayArray[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 0];
                 DisplayArray[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 0] = e_BotLeftBlock;
+
+                // Change the Grid_Backdrop
+                Set_BackdropColor(DisplayArray[iv2_BottomLeft_.y + 0, iv2_BottomLeft_.x + 0], new IntVector2(iv2_BottomLeft_.x + 0, iv2_BottomLeft_.y + 0));
+                Set_BackdropColor(DisplayArray[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 0], new IntVector2(iv2_BottomLeft_.x + 0, iv2_BottomLeft_.y + 1));
+                Set_BackdropColor(DisplayArray[iv2_BottomLeft_.y + 2, iv2_BottomLeft_.x + 0], new IntVector2(iv2_BottomLeft_.x + 0, iv2_BottomLeft_.y + 2));
+                Set_BackdropColor(DisplayArray[iv2_BottomLeft_.y + 2, iv2_BottomLeft_.x + 1], new IntVector2(iv2_BottomLeft_.x + 1, iv2_BottomLeft_.y + 2));
+                Set_BackdropColor(DisplayArray[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 1], new IntVector2(iv2_BottomLeft_.x + 1, iv2_BottomLeft_.y + 1));
+                Set_BackdropColor(DisplayArray[iv2_BottomLeft_.y + 0, iv2_BottomLeft_.x + 1], new IntVector2(iv2_BottomLeft_.x + 1, iv2_BottomLeft_.y + 0));
             }
             else if( e_BlockSize_ == Enum_BlockSize.size_3w_3h )
             {
@@ -642,6 +725,16 @@ public class Cs_BoardDisplay : MonoBehaviour
                 DisplayArray[iv2_BottomLeft_.y + 2, iv2_BottomLeft_.x + 1] = DisplayArray[iv2_BottomLeft_.y + 2, iv2_BottomLeft_.x + 0];
                 DisplayArray[iv2_BottomLeft_.y + 2, iv2_BottomLeft_.x + 0] = DisplayArray[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 0];
                 DisplayArray[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 0] = e_BotLeftBlock;
+
+                // Change the Grid_Backdrop
+                Set_BackdropColor(DisplayArray[iv2_BottomLeft_.y + 0, iv2_BottomLeft_.x + 0], new IntVector2(iv2_BottomLeft_.x + 0, iv2_BottomLeft_.y + 0));
+                Set_BackdropColor(DisplayArray[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 0], new IntVector2(iv2_BottomLeft_.x + 0, iv2_BottomLeft_.y + 1));
+                Set_BackdropColor(DisplayArray[iv2_BottomLeft_.y + 2, iv2_BottomLeft_.x + 0], new IntVector2(iv2_BottomLeft_.x + 0, iv2_BottomLeft_.y + 2));
+                Set_BackdropColor(DisplayArray[iv2_BottomLeft_.y + 2, iv2_BottomLeft_.x + 1], new IntVector2(iv2_BottomLeft_.x + 1, iv2_BottomLeft_.y + 2));
+                Set_BackdropColor(DisplayArray[iv2_BottomLeft_.y + 2, iv2_BottomLeft_.x + 2], new IntVector2(iv2_BottomLeft_.x + 2, iv2_BottomLeft_.y + 2));
+                Set_BackdropColor(DisplayArray[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 2], new IntVector2(iv2_BottomLeft_.x + 2, iv2_BottomLeft_.y + 1));
+                Set_BackdropColor(DisplayArray[iv2_BottomLeft_.y + 0, iv2_BottomLeft_.x + 2], new IntVector2(iv2_BottomLeft_.x + 2, iv2_BottomLeft_.y + 0));
+                Set_BackdropColor(DisplayArray[iv2_BottomLeft_.y + 0, iv2_BottomLeft_.x + 1], new IntVector2(iv2_BottomLeft_.x + 1, iv2_BottomLeft_.y + 0));
             }
             #endregion
         }
@@ -663,6 +756,9 @@ public class Cs_BoardDisplay : MonoBehaviour
         // Separate the DisplayArray_Blocks block by making it into an empty object
         DisplayArray_Blocks[iv2_DestroyLoc_.y, iv2_DestroyLoc_.x] = Instantiate(go_Empty);
         DisplayArray_Blocks[iv2_DestroyLoc_.y, iv2_DestroyLoc_.x].transform.SetParent(GameObject.Find("EmptyBlocks").transform);
+
+        // Reset Backdrop Color
+        Set_BackdropColor( Enum_BlockType.Empty, new IntVector2(iv2_DestroyLoc_.x, iv2_DestroyLoc_.y) );
     }
 
     public void ScoreBlockAt( IntVector2  iv2_ScoreLoc_ )
@@ -696,8 +792,6 @@ public class Cs_BoardDisplay : MonoBehaviour
             {
                 GameObject go_BlockTemp;
 
-                print("Receiving: " + e_NewBlockTypeArray_[y_, x_].ToString());
-
                 // Create a new block based on the position within NewBlockTypeArray
                 if (e_NewBlockTypeArray_[y_, x_] == Enum_BlockType.Block_1_Active)
                 {
@@ -709,6 +803,8 @@ public class Cs_BoardDisplay : MonoBehaviour
                 {
                     go_BlockTemp = Instantiate(go_Block_B);
                     go_BlockTemp.transform.SetParent(GameObject.Find("DisplayBlockList").transform);
+
+                    
                 }
                 else if (e_NewBlockTypeArray_[y_, x_] == Enum_BlockType.Block_3_Active)
                 {
@@ -728,15 +824,74 @@ public class Cs_BoardDisplay : MonoBehaviour
                 int i_NewY = y_ + iv2_BottomLeft_.y;
                 if(go_BlockTemp.GetComponent<Cs_BlockOnBoardLogic>())
                 {
-
                     go_BlockTemp.GetComponent<Cs_BlockOnBoardLogic>().Init_BlockModel(i_NewX, i_NewY, 3.0f, i_Width);
                 }
+
+                // Set the Backdrop Color
+                Set_BackdropColor(e_NewBlockTypeArray_[y_, x_], new IntVector2( i_NewX, i_NewY ));
 
                 // Add this block type to the proper position within Display Array
                 DisplayArray[i_NewY, i_NewX] = e_NewBlockTypeArray_[y_, x_];
 
                 DisplayArray_Blocks[i_NewY, i_NewX] = go_BlockTemp;
             }
+        }
+    }
+
+    void Set_BackdropColor( Enum_BlockType e_BlockType_, IntVector2 iv2_Pos_, bool b_IsInstant_ = false )
+    {
+        // Set Grid_Backdrop Color
+        if (e_BlockType_ == Enum_BlockType.Block_1_Active)
+        {
+            Grid_Columns[iv2_Pos_.y][iv2_Pos_.x].GetComponent<Cs_GridBlockLogic>().Set_ColorState(Enum_ColorState.Red, b_IsInstant_);
+        }
+        else if (e_BlockType_ == Enum_BlockType.Block_2_Active)
+        {
+            Grid_Columns[iv2_Pos_.y][iv2_Pos_.x].GetComponent<Cs_GridBlockLogic>().Set_ColorState(Enum_ColorState.Blue, b_IsInstant_);
+        }
+        else if (e_BlockType_ == Enum_BlockType.Block_2_Active)
+        {
+            // TODO: Block 3
+        }
+        else if( e_BlockType_ == Enum_BlockType.Empty )
+        {
+            Grid_Columns[iv2_Pos_.y][iv2_Pos_.x].GetComponent<Cs_GridBlockLogic>().Set_ColorState(Enum_ColorState.Original, b_IsInstant_);
+        }
+    }
+
+    public void Set_ClearBackdrops()
+    {
+        for(int y_ = 0; y_ < i_Height; ++y_)
+        {
+            for(int x_ = 0; x_ < i_Width; ++x_)
+            {
+                Set_BackdropColor( Enum_BlockType.Empty, new IntVector2(x_, y_), true);
+            }
+        }
+    }
+    
+    // Set the x Position of the array to run through, and find the first open position. Stack blocks vertically from there.
+    public void Set_ShowPotentialBlockVisual(int i_xPos_, Enum_BlockType[] e_VertBlockArray_ )
+    {
+        // Initialize the yPosition to start from
+        int i_yPos = 0;
+
+        // Search for the first open position.
+        for( int y_ = 0; y_ < i_Height; ++y_ )
+        {
+            // When we find the first open block position, step out.
+            if(DisplayArray[y_, i_xPos_] == Enum_BlockType.Empty)
+            {
+                i_yPos = y_;
+
+                break;
+            }
+        }
+
+        // Begin setting the new positions vertically
+        for( int i_ = 0; i_ < e_VertBlockArray_.Length; ++i_ )
+        {
+            Set_BackdropColor( e_VertBlockArray_[i_], new IntVector2(i_xPos_, i_yPos + i_), true );
         }
     }
 
