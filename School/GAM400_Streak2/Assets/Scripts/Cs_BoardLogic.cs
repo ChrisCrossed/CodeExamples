@@ -203,9 +203,10 @@ public class Cs_BoardLogic : MonoBehaviour
             else i_FirstOpenPosition = j_;
         }
 
-        // Numbers to randomize from. 0, 1, 2
-        int i_NumBlockTypes = 2;
-        if (b_ThreeBlockColors) i_NumBlockTypes = 3;
+        // Changing the system. 0/1/2 = Block 1, 3/4/5 = Block 2, 6 = Block 3.
+        // If 'b_ThreeBlockColors', a 1-in-7 chance to have a black block
+        int i_NumBlockTypes = 6;
+        if (b_ThreeBlockColors) i_NumBlockTypes = 7;
 
         // Start from the first open position & populate all remaining positions
         for(int i_ = i_FirstOpenPosition; i_ < e_NextBlockList.Length; ++i_)
@@ -214,17 +215,17 @@ public class Cs_BoardLogic : MonoBehaviour
             int i_RandBlock = Random.Range(0, i_NumBlockTypes);
 
             // Block 'One'
-            if(i_RandBlock == 0)
+            if( i_RandBlock == 0 || i_RandBlock == 1 || i_RandBlock == 2 )
             {
                 e_NextBlockList[i_] = Enum_BlockType.Block_1_Active;
             }
             // Block 'Two'
-            else if(i_RandBlock == 1)
+            else if( i_RandBlock == 3 || i_RandBlock == 4 || i_RandBlock == 5 )
             {
                 e_NextBlockList[i_] = Enum_BlockType.Block_2_Active;
             }
             // Block 'Three'
-            else if (i_RandBlock == 2)
+            else if ( i_RandBlock == 6 )
             {
                 e_NextBlockList[i_] = Enum_BlockType.Block_3_Active;
             }
@@ -931,6 +932,25 @@ public class Cs_BoardLogic : MonoBehaviour
         }
     }
 
+    void DestroyBlackBlocks()
+    {
+        for(int y_ = 0; y_ < i_ArrayHeight; ++y_)
+        {
+            for(int x_ = 0; x_ < i_ArrayWidth; ++x_)
+            {
+                if(BlockArray[y_, x_] == Enum_BlockType.Block_3_Active || BlockArray[y_, x_] == Enum_BlockType.Block_3_Static)
+                {
+                    // TODO: Destroy Block at Location
+                    // Tell the board model to destroy the block
+                    GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().DestroyBlockAt(new IntVector2(x_, y_));
+
+                    // Set Position to be 'Empty'
+                    SetBlock(x_, y_, Enum_BlockType.Empty);
+                }
+            }
+        }
+    }
+
     int i_ScoreLine_Counter;
     bool b_RunAgain = false;
     void AllBlocksStatic()
@@ -1007,8 +1027,11 @@ public class Cs_BoardLogic : MonoBehaviour
             print(s_ScoreLine);
             #endregion
 
-            // Clear backdrops
-            // GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Set_ClearBackdrops();
+            // Destroy all Black Blocks
+            if(b_ThreeBlockColors)
+            {
+                DestroyBlackBlocks();
+            }
 
             b_RunAgain = true;
 
@@ -1060,8 +1083,6 @@ public class Cs_BoardLogic : MonoBehaviour
             // Reset time for new block to be created
             f_TimeToDrop = -1f;
         }
-
-        print("Current Score: " + i_Score);
     }
 
     Enum_BlockType GetBlock(float x_Pos_, float y_Pos_)
@@ -1101,11 +1122,12 @@ public class Cs_BoardLogic : MonoBehaviour
             //print("Curr Block: " + e_CurrBlockType);
             //print("New Block: " + GetBlock(i_LeftBound, y_));
 
-            // If the previous checked block differs than the current block && isn't empty
-            if(e_CurrBlockType != GetBlock(i_LeftBound, y_) && GetBlock(i_LeftBound, y_) != Enum_BlockType.Empty)
+            // If the previous checked block differs than the current block && isn't empty && isn't Block 3
+            if( e_CurrBlockType != GetBlock(i_LeftBound, y_) &&
+                GetBlock(i_LeftBound, y_) != Enum_BlockType.Empty &&
+                GetBlock(i_LeftBound, y_) != Enum_BlockType.Block_3_Static)
             {
-                // print("Current: " + e_CurrBlockType.ToString() + ", GetBlock: " + GetBlock(i_LeftBound, y_).ToString());
-
+                
                 // Store the new block
                 e_CurrBlockType = GetBlock(i_LeftBound, y_);
 
