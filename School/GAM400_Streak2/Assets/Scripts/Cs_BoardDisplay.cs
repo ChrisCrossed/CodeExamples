@@ -820,15 +820,18 @@ public class Cs_BoardDisplay : MonoBehaviour
 
     public void ScoreBlockAt( IntVector2  iv2_ScoreLoc_ )
     {
-        // Set the DisplayArray position to be empty
-        DisplayArray[iv2_ScoreLoc_.y, iv2_ScoreLoc_.x] = Enum_BlockType.Empty;
+        if(DisplayArray[iv2_ScoreLoc_.y, iv2_ScoreLoc_.x] != Enum_BlockType.Empty)
+        {
+            // Set the DisplayArray position to be empty
+            DisplayArray[iv2_ScoreLoc_.y, iv2_ScoreLoc_.x] = Enum_BlockType.Empty;
 
-        // Set the DisplayArray_Blocks block to destroy itself visually
-        DisplayArray_Blocks[iv2_ScoreLoc_.y, iv2_ScoreLoc_.x].GetComponent<Cs_BlockOnBoardLogic>().Set_ScoreBlock();
+            // Set the DisplayArray_Blocks block to destroy itself visually
+            DisplayArray_Blocks[iv2_ScoreLoc_.y, iv2_ScoreLoc_.x].GetComponent<Cs_BlockOnBoardLogic>().Set_ScoreBlock();
 
-        // Separate the DisplayArray_Blocks block by making it into an empty object
-        DisplayArray_Blocks[iv2_ScoreLoc_.y, iv2_ScoreLoc_.x] = Instantiate(go_Empty);
-        DisplayArray_Blocks[iv2_ScoreLoc_.y, iv2_ScoreLoc_.x].transform.SetParent(GameObject.Find("EmptyBlocks").transform);
+            // Separate the DisplayArray_Blocks block by making it into an empty object
+            DisplayArray_Blocks[iv2_ScoreLoc_.y, iv2_ScoreLoc_.x] = Instantiate(go_Empty);
+            DisplayArray_Blocks[iv2_ScoreLoc_.y, iv2_ScoreLoc_.x].transform.SetParent(GameObject.Find("EmptyBlocks").transform);
+        }
     }
     
     public void Set_NewBlocks( Enum_BlockType[,] e_NewBlockTypeArray_, Enum_BlockSize e_BlockSize_, IntVector2 iv2_BottomLeft_ )
@@ -992,6 +995,54 @@ public class Cs_BoardDisplay : MonoBehaviour
 
         // Set the Backdrop Color
         Set_BackdropColor(e_BlockType_, new IntVector2(i_xPos_, i_yPos_));
+    }
+
+    // Used for cheating.
+    public void Set_OneBlock( int i_xPos_, int i_yPos_, Enum_BlockType e_BlockType_ )
+    {
+        // Clear prior block first
+        ScoreBlockAt(new IntVector2(i_xPos_, i_yPos_));
+
+        // Set new Temp Block
+        GameObject go_BlockTemp;
+
+        // Create a new block based on the position within NewBlockTypeArray
+        if (e_BlockType_ == Enum_BlockType.Block_1_Static)
+        {
+            // go_BlockTemp is Instantiated as above by default
+            go_BlockTemp = Instantiate(go_Block_A);
+            go_BlockTemp.transform.SetParent(GameObject.Find("DisplayBlockList").transform);
+        }
+        else if (e_BlockType_ == Enum_BlockType.Block_2_Static)
+        {
+            go_BlockTemp = Instantiate(go_Block_B);
+            go_BlockTemp.transform.SetParent(GameObject.Find("DisplayBlockList").transform);
+        }
+        else if (e_BlockType_ == Enum_BlockType.Block_3_Static)
+        {
+            go_BlockTemp = Instantiate(go_Block_C);
+            go_BlockTemp.transform.SetParent(GameObject.Find("DisplayBlockList").transform);
+        }
+        else
+        {
+            print("INVALID BLOCK ADDED TO CS_BOARDDISPLAY");
+            go_BlockTemp = Instantiate(go_Empty);
+            go_BlockTemp.transform.SetParent(GameObject.Find("EmptyBlocks").transform);
+        }
+
+        // Initialize this block
+        if (go_BlockTemp.GetComponent<Cs_BlockOnBoardLogic>())
+        {
+            go_BlockTemp.GetComponent<Cs_BlockOnBoardLogic>().Init_BlockModel(i_xPos_, i_yPos_, 3.0f, 0.75f, i_Width);
+        }
+
+        // Set the Backdrop Color
+        Set_BackdropColor(e_BlockType_, new IntVector2(i_xPos_, i_yPos_));
+
+        // Add this block type to the proper position within Display Array
+        DisplayArray[i_yPos_, i_xPos_] = e_BlockType_;
+
+        DisplayArray_Blocks[i_yPos_, i_xPos_] = go_BlockTemp;
     }
 
     void PrintArrayToConsole()

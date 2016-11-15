@@ -1078,6 +1078,8 @@ public class Cs_BoardLogic : MonoBehaviour
         {
             // GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Set_ClearBackdrops();
 
+            Load_ScoreLine();
+
             CreateNewBlock();
 
             // Reset time for new block to be created
@@ -1521,6 +1523,119 @@ public class Cs_BoardLogic : MonoBehaviour
         RotateBlocks_Clockwise(v2_ActiveBlockLocation, e_BlockSize);
     }
 
+    void Cheat_SetDoubleLine()
+    {
+        // 1,0
+        SetBlock(1, 0, Enum_BlockType.Block_1_Static);
+        GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Set_OneBlock(1, 0, Enum_BlockType.Block_1_Static);
+
+        // 1,1
+        SetBlock(1, 1, Enum_BlockType.Block_2_Static);
+        GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Set_OneBlock(1, 1, Enum_BlockType.Block_2_Static);
+
+        // 2,0
+        SetBlock(2, 0, Enum_BlockType.Block_1_Static);
+        GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Set_OneBlock(2, 0, Enum_BlockType.Block_1_Static);
+
+        // 2,1
+        SetBlock(2, 1, Enum_BlockType.Block_2_Static);
+        GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Set_OneBlock(2, 1, Enum_BlockType.Block_2_Static);
+
+        // 3,0
+        SetBlock(3, 0, Enum_BlockType.Block_1_Static);
+        GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Set_OneBlock(3, 0, Enum_BlockType.Block_1_Static);
+
+        // 3,1
+        SetBlock(3, 1, Enum_BlockType.Block_2_Static);
+        GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Set_OneBlock(3, 1, Enum_BlockType.Block_2_Static);
+
+        // 4,0
+        SetBlock(4, 0, Enum_BlockType.Block_1_Static);
+        GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Set_OneBlock(4, 0, Enum_BlockType.Block_1_Static);
+
+        // 4,1
+        SetBlock(4, 1, Enum_BlockType.Block_2_Static);
+        GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Set_OneBlock(4, 1, Enum_BlockType.Block_2_Static);
+
+        // 5,0
+        SetBlock(5, 0, Enum_BlockType.Block_1_Static);
+        GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Set_OneBlock(5, 0, Enum_BlockType.Block_1_Static);
+
+        // 5,1
+        SetBlock(5, 1, Enum_BlockType.Block_2_Static);
+        GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Set_OneBlock(5, 1, Enum_BlockType.Block_2_Static);
+
+        // 6,0
+        SetBlock(6, 0, Enum_BlockType.Block_1_Static);
+        GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Set_OneBlock(6, 0, Enum_BlockType.Block_1_Static);
+
+        // 6,1
+        SetBlock(6, 1, Enum_BlockType.Block_2_Static);
+        GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Set_OneBlock(6, 1, Enum_BlockType.Block_2_Static);
+
+        // 7,0
+        SetBlock(7, 0, Enum_BlockType.Block_1_Static);
+        GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Set_OneBlock(7, 0, Enum_BlockType.Block_1_Static);
+        
+        // 8,0
+        SetBlock(8, 0, Enum_BlockType.Block_2_Static);
+        GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Set_OneBlock(8, 0, Enum_BlockType.Block_2_Static);
+
+        // 7,1
+        SetBlock(7, 1, Enum_BlockType.Block_1_Static);
+        GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Set_OneBlock(7, 1, Enum_BlockType.Block_1_Static);
+
+        // 7,2
+        SetBlock(7, 2, Enum_BlockType.Block_2_Static);
+        GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Set_OneBlock(7, 2, Enum_BlockType.Block_2_Static);
+
+        // 8,1
+        SetBlock(8, 1, Enum_BlockType.Block_1_Static);
+        GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Set_OneBlock(8, 1, Enum_BlockType.Block_1_Static);
+
+        // 8,2
+        SetBlock(8, 2, Enum_BlockType.Block_1_Static);
+        GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Set_OneBlock(8, 2, Enum_BlockType.Block_1_Static);
+
+        // ---------------
+
+        // 1,2
+        SetBlock(1, 2, Enum_BlockType.Block_1_Static);
+        GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Set_OneBlock(1, 2, Enum_BlockType.Block_1_Static);
+        
+        // 2,2
+        SetBlock(2, 2, Enum_BlockType.Block_1_Static);
+        GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Set_OneBlock(2, 2, Enum_BlockType.Block_1_Static);
+
+        // 3,2
+        SetBlock(3, 2, Enum_BlockType.Block_1_Static);
+        GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Set_OneBlock(3, 2, Enum_BlockType.Block_1_Static);
+
+        // 4,2
+        SetBlock(4, 2, Enum_BlockType.Block_1_Static);
+        GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Set_OneBlock(4, 2, Enum_BlockType.Block_1_Static);
+
+        // 5,2
+        SetBlock(5, 2, Enum_BlockType.Block_1_Static);
+        GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Set_OneBlock(5, 2, Enum_BlockType.Block_1_Static);
+
+        // 6,2
+        SetBlock(6, 2, Enum_BlockType.Block_1_Static);
+        GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Set_OneBlock(6, 2, Enum_BlockType.Block_1_Static);
+
+        // 6,3
+        SetBlock(6, 3, Enum_BlockType.Block_1_Static);
+        GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Set_OneBlock(6, 3, Enum_BlockType.Block_1_Static);
+
+        // 7,3
+        SetBlock(7, 3, Enum_BlockType.Block_1_Static);
+        GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Set_OneBlock(7, 3, Enum_BlockType.Block_1_Static);
+
+        // 8,3
+        SetBlock(8, 3, Enum_BlockType.Block_1_Static);
+        GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Set_OneBlock(8, 3, Enum_BlockType.Block_1_Static);
+    }
+
     // Update is called once per frame
     List<IntVector2> iv2_Test = new List<IntVector2>();
     float f_ScoreLine_Timer;
@@ -1534,6 +1649,11 @@ public class Cs_BoardLogic : MonoBehaviour
     Enum_BlockType e_GameOverBlock = Enum_BlockType.Block_1_Static;
     void Update ()
     {
+        if(Input.GetKeyDown(KeyCode.P))
+        {
+            Cheat_SetDoubleLine();
+        }
+
         if(e_PauseEffect == Enum_PauseEffect.Unpause)
         {
             #region Drop Block timer
@@ -1610,6 +1730,19 @@ public class Cs_BoardLogic : MonoBehaviour
                             // 'PullBlocksDown' to update the board
                             PullBlocksDown();
 
+                            if(Load_ScoreLine())
+                            {
+                                b_RunAgain = true;
+
+                                e_PauseEffect = Enum_PauseEffect.ScoreLine;
+
+                                i_ScoreLine_Counter = 0;
+
+                                f_ScoreLine_Timer_Conclusion = 0.0f;
+
+                                return;
+                            }
+
                             // Make a new block
                             CreateNewBlock();
 
@@ -1645,6 +1778,7 @@ public class Cs_BoardLogic : MonoBehaviour
         }
         else if(e_PauseEffect == Enum_PauseEffect.GameOver)
         {
+            #region End Game
             f_GameOver_Timer += Time.deltaTime;
 
             if(f_GameOver_Timer > f_GameOver_Timer_Max)
@@ -1728,6 +1862,7 @@ public class Cs_BoardLogic : MonoBehaviour
                     ++i_GameOver_Y;
                 }
             }
+            #endregion
         }
     }
 }
