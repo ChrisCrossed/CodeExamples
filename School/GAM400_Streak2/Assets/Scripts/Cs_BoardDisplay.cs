@@ -813,7 +813,6 @@ public class Cs_BoardDisplay : MonoBehaviour
                 }
                 else if (e_NewBlockTypeArray_[y_, x_] == Enum_BlockType.Block_3_Active)
                 {
-                    print("TODO: ADD BLOCK 3 TO CS_BOARDDISPLAY");
                     go_BlockTemp = Instantiate(go_Block_C);
                     go_BlockTemp.transform.SetParent(GameObject.Find("DisplayBlockList").transform);
                 }
@@ -854,9 +853,10 @@ public class Cs_BoardDisplay : MonoBehaviour
         {
             Grid_Columns[iv2_Pos_.y][iv2_Pos_.x].GetComponent<Cs_GridBlockLogic>().Set_ColorState(Enum_ColorState.Blue, b_IsInstant_);
         }
-        else if (e_BlockType_ == Enum_BlockType.Block_2_Active)
+        else if (e_BlockType_ == Enum_BlockType.Block_3_Active)
         {
             // TODO: Block 3
+            Grid_Columns[iv2_Pos_.y][iv2_Pos_.x].GetComponent<Cs_GridBlockLogic>().Set_ColorState(Enum_ColorState.White, b_IsInstant_);
         }
         else if( e_BlockType_ == Enum_BlockType.Empty )
         {

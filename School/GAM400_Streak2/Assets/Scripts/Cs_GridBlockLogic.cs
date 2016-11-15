@@ -12,7 +12,8 @@ public enum Enum_ColorState
 {
     Original,
     Red,
-    Blue
+    Blue,
+    White
 }
 
 public class Cs_GridBlockLogic : MonoBehaviour
@@ -25,6 +26,7 @@ public class Cs_GridBlockLogic : MonoBehaviour
     Color clr_OriginalColor;
     Color clr_Red;
     Color clr_Blue;
+    Color clr_White;
 
     // The color the block will lerp to when set within Set_ColorState
     GameObject go_Backdrop;
@@ -52,6 +54,7 @@ public class Cs_GridBlockLogic : MonoBehaviour
         clr_OriginalColor = new Color(0, 0, 0, 0);
         clr_Blue = new Color(0, 0, 1, 0.15f);
         clr_Red = new Color(1, 0, 0, 0.15f);
+        clr_White = new Color(1, 1, 1, 0.15f);
     }
 
     public void Set_FadeState( Enum_FadeState e_FadeState_ )
@@ -73,6 +76,10 @@ public class Cs_GridBlockLogic : MonoBehaviour
         else if( e_ColorState_ == Enum_ColorState.Blue )
         {
             clr_CurrentColor = clr_Blue;
+        }
+        else if( e_ColorState_ == Enum_ColorState.White )
+        {
+            clr_CurrentColor = clr_White;
         }
 
         if(b_IsInstant_)
