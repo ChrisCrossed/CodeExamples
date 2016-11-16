@@ -951,6 +951,28 @@ public class Cs_BoardLogic : MonoBehaviour
         }
     }
 
+    void CheckScoreLineLeftWall()
+    {
+        // Run through all of the ScoreLine Blocks and remove duplicate 'y = LeftWall' Blocks
+        for (int i_ = 0; i_ < iv2_ScoreLine.Count; ++i_)
+        {
+            // If the 'second' block in the list is also along the left wall...
+            if (iv2_ScoreLine[i_ + 1].x == 1)
+            {
+                // Remove the 'first' block
+                iv2_ScoreLine.RemoveAt(0);
+
+                // Reset the i_ position to loop again
+                i_ = 0; // Since the next loop increments i_
+            }
+            else
+            {
+                // Break out
+                break;
+            }
+        }
+    }
+
     int i_ScoreLine_Counter;
     bool b_RunAgain = false;
     void AllBlocksStatic()
@@ -1027,8 +1049,10 @@ public class Cs_BoardLogic : MonoBehaviour
             print(s_ScoreLine);
             #endregion
 
+            CheckScoreLineLeftWall();
+
             // Destroy all Black Blocks
-            if(b_ThreeBlockColors)
+            if (b_ThreeBlockColors)
             {
                 DestroyBlackBlocks();
             }
@@ -1079,6 +1103,8 @@ public class Cs_BoardLogic : MonoBehaviour
             // GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Set_ClearBackdrops();
 
             Load_ScoreLine();
+
+            CheckScoreLineLeftWall();
 
             CreateNewBlock();
 
@@ -1705,6 +1731,8 @@ public class Cs_BoardLogic : MonoBehaviour
                     {
                         if (Load_ScoreLine())
                         {
+                            CheckScoreLineLeftWall();
+
                             b_RunAgain = true;
 
                             e_PauseEffect = Enum_PauseEffect.ScoreLine;
@@ -1732,6 +1760,8 @@ public class Cs_BoardLogic : MonoBehaviour
 
                             if(Load_ScoreLine())
                             {
+                                CheckScoreLineLeftWall();
+
                                 b_RunAgain = true;
 
                                 e_PauseEffect = Enum_PauseEffect.ScoreLine;
