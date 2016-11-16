@@ -16,7 +16,10 @@ public class Cs_EnemyVisionLogic : MonoBehaviour
     {
         go_Player = GameObject.Find("Player");
         go_Root = gameObject.transform.root.gameObject;
-        go_RaycastPoint = go_Root.transform.Find("VisionRaycast").gameObject;
+        if(go_Root.transform.Find("VisionRaycast"))
+        {
+            go_RaycastPoint = go_Root.transform.Find("VisionRaycast").gameObject;
+        }
 
         #region PRESENTATION STUFF
         gameObject.GetComponent<MeshRenderer>().enabled = false;
@@ -60,68 +63,68 @@ public class Cs_EnemyVisionLogic : MonoBehaviour
         int i_LayerMask = LayerMask.GetMask("Player", "Wall");
 
         // Find the vector between the raycast point & the player
-        Vector3 v3_Vector = new Vector3(go_Player.transform.position.x - go_RaycastPoint.transform.position.x,
-                                        go_Player.transform.position.y - go_RaycastPoint.transform.position.y,
-                                        go_Player.transform.position.z - go_RaycastPoint.transform.position.z);
-
-        // Normalize the vector
-        v3_Vector.Normalize();
-
-        // Store the raycast information
-        RaycastHit hit;
-
-        // If a ray from the enemy, toward the player, hits *any* object specified, continue through
-        if (Physics.Raycast(go_RaycastPoint.transform.position, v3_Vector, out hit, float.PositiveInfinity, i_LayerMask))
+        if(go_RaycastPoint != null)
         {
-            // Show the angle in the editor
-            Debug.DrawRay(go_RaycastPoint.transform.position, v3_Vector * hit.distance, Color.red);
+            Vector3 v3_Vector = new Vector3(go_Player.transform.position.x - go_RaycastPoint.transform.position.x,
+                                            go_Player.transform.position.y - go_RaycastPoint.transform.position.y,
+                                            go_Player.transform.position.z - go_RaycastPoint.transform.position.z);
 
-            // This intentionally blocks here so that objects (like walls) can interfere with spotting the player.
-            if (hit.collider.gameObject.layer != LayerMask.NameToLayer("Player"))
+            // Normalize the vector
+            v3_Vector.Normalize();
+
+            // Store the raycast information
+            RaycastHit hit;
+
+            // If a ray from the enemy, toward the player, hits *any* object specified, continue through
+            if (Physics.Raycast(go_RaycastPoint.transform.position, v3_Vector, out hit, float.PositiveInfinity, i_LayerMask))
             {
-                f_ChasePlayerTimer += Time.deltaTime;
-                if(f_ChasePlayerTimer >= f_ChasePlayerTimer_Max && b_PlayerInCollider)
-                {
-                    b_PlayerInCollider = false;
+                // Show the angle in the editor
+                Debug.DrawRay(go_RaycastPoint.transform.position, v3_Vector * hit.distance, Color.red);
 
-                    go_Root.GetComponent<Cs_EnemyLogic_Grunt>().GoToState_InvestigateLocation(v3_LastKnownLocation);
+                // This intentionally blocks here so that objects (like walls) can interfere with spotting the player.
+                if (hit.collider.gameObject.layer != LayerMask.NameToLayer("Player"))
+                {
+                    f_ChasePlayerTimer += Time.deltaTime;
+                    if(f_ChasePlayerTimer >= f_ChasePlayerTimer_Max && b_PlayerInCollider)
+                    {
+                        b_PlayerInCollider = false;
+
+                        go_Root.GetComponent<Cs_EnemyLogic_Grunt>().GoToState_InvestigateLocation(v3_LastKnownLocation);
+
+                        // Find the 'LevelLogic' object and grab all the 'LevelLogic' scripts within it
+                        Cs_LevelLogic[] lvlLogic = GameObject.Find("LevelLogic").GetComponents<Cs_LevelLogic>();
+                        for(int i_ = 0; i_ < lvlLogic.Length; ++i_)
+                        {
+                            // Call each script's Investigate State
+                            lvlLogic[i_].Set_InvestigateState(go_Root);
+                        }
+                    }
+                
+                    return;
+                }
+                // Otherwise, we hit the player.
+                else
+                {
+                    // Reset the timer 
+                    f_ChasePlayerTimer = 0.0f;
+
+                    b_PlayerInCollider = true;
+
+                    v3_LastKnownLocation = go_Player.transform.position;
+
+                    go_Root.GetComponent<Cs_EnemyLogic_Grunt>().GoToState_ChasePlayer(v3_LastKnownLocation, true);
+
+                    // print("Calling state: CHASE");
 
                     // Find the 'LevelLogic' object and grab all the 'LevelLogic' scripts within it
                     Cs_LevelLogic[] lvlLogic = GameObject.Find("LevelLogic").GetComponents<Cs_LevelLogic>();
-                    for(int i_ = 0; i_ < lvlLogic.Length; ++i_)
+                    for (int i_ = 0; i_ < lvlLogic.Length; ++i_)
                     {
-                        // Call each script's Investigate State
-                        lvlLogic[i_].Set_InvestigateState(go_Root);
+                        // Call each script's Chase State
+                        lvlLogic[i_].Set_ChaseState(go_Root);
                     }
-
-                    // GameObject.Find("LevelLogic").GetComponent<Cs_LevelLogic>().Set_InvestigateState(go_Root);
-                    
+                    // GameObject.Find("LevelLogic").GetComponent<Cs_LevelLogic>().Set_ChaseState(go_Root);
                 }
-                
-                return;
-            }
-            // Otherwise, we hit the player.
-            else
-            {
-                // Reset the timer 
-                f_ChasePlayerTimer = 0.0f;
-
-                b_PlayerInCollider = true;
-
-                v3_LastKnownLocation = go_Player.transform.position;
-
-                go_Root.GetComponent<Cs_EnemyLogic_Grunt>().GoToState_ChasePlayer(v3_LastKnownLocation, true);
-
-                // print("Calling state: CHASE");
-
-                // Find the 'LevelLogic' object and grab all the 'LevelLogic' scripts within it
-                Cs_LevelLogic[] lvlLogic = GameObject.Find("LevelLogic").GetComponents<Cs_LevelLogic>();
-                for (int i_ = 0; i_ < lvlLogic.Length; ++i_)
-                {
-                    // Call each script's Chase State
-                    lvlLogic[i_].Set_ChaseState(go_Root);
-                }
-                // GameObject.Find("LevelLogic").GetComponent<Cs_LevelLogic>().Set_ChaseState(go_Root);
             }
         }
     }

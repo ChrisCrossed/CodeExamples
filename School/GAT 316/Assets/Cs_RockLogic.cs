@@ -137,7 +137,6 @@ public class Cs_RockLogic : MonoBehaviour
     {
         if(f_HitTimer >= 1f)
         {
-            print(f_HitTimer);
             gameObject.transform.Find("Sound_Collider").GetComponent<Cs_RockSoundLogic>().MakeSound();
         }
     }
