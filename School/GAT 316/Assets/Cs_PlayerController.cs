@@ -1,7 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
 using XInputDotNetPure;
+#if UNITY_EDITOR
 using UnityEditor.Rendering;
+#endif
+
 
 public enum Enum_CameraState
 {
