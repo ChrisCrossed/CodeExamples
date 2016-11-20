@@ -41,7 +41,10 @@ public class Cs_GridBlockLogic : MonoBehaviour
 	// Use this for initialization
 	void Start ()
     {
-        go_Backdrop = transform.Find("Grid_Backdrop").gameObject;
+        if(transform.Find("Grid_Backdrop"))
+        {
+            go_Backdrop = transform.Find("Grid_Backdrop").gameObject;
+        }
 
         Color clr_CurrMat = gameObject.GetComponent<MeshRenderer>().material.color;
         clr_CurrMat.a = 0;
@@ -153,14 +156,22 @@ public class Cs_GridBlockLogic : MonoBehaviour
         }
 
         // Fade from old color into current color
-        Color clr_OldColor = go_Backdrop.GetComponent<MeshRenderer>().material.color;
-        clr_OldColor = Color.Lerp(clr_OldColor, clr_CurrentColor, f_ColorPercent);
-        go_Backdrop.GetComponent<MeshRenderer>().material.color = clr_OldColor;
+        if(go_Backdrop)
+        {
+            Color clr_OldColor = go_Backdrop.GetComponent<MeshRenderer>().material.color;
+            clr_OldColor = Color.Lerp(clr_OldColor, clr_CurrentColor, f_ColorPercent);
+            go_Backdrop.GetComponent<MeshRenderer>().material.color = clr_OldColor;
+        }
     }
 	
 	// Update is called once per frame
 	void Update ()
     {
+        if(Input.GetKeyDown(KeyCode.M))
+        {
+            Set_ColorState(Enum_ColorState.Red, false);
+        }
+
         UpdateBlockAlpha();
 
         UpdateFadeTimers();

@@ -78,6 +78,7 @@ public class Cs_BoardDisplay : MonoBehaviour
                     if (x_ == 0 || x_ == i_Width_ - 1)
                     {
                         // Instantiate the object
+                        GameObject.Destroy(go_WallTemp); // Destroys the previous block that was created
                         go_WallTemp = Instantiate(go_GridWall);
                     }
                     else
@@ -117,6 +118,7 @@ public class Cs_BoardDisplay : MonoBehaviour
                                 {
                                     if (y_ >= i_Height - 2)
                                     {
+                                        GameObject.Destroy(go_WallTemp); // Destroys the previous block that was created
                                         go_WallTemp = Instantiate(go_GridWarning);
                                     }
                                 }
@@ -124,6 +126,7 @@ public class Cs_BoardDisplay : MonoBehaviour
                                 {
                                     if (y_ >= i_Height - 3)
                                     {
+                                        GameObject.Destroy(go_WallTemp); // Destroys the previous block that was created
                                         go_WallTemp = Instantiate(go_GridWarning);
                                     }
                                 }
@@ -138,6 +141,7 @@ public class Cs_BoardDisplay : MonoBehaviour
                 }
                 // Add the current Row to the Column List
                 Grid_Columns.Add(Grid_Row);
+
             }
 
             // Reset the Row
