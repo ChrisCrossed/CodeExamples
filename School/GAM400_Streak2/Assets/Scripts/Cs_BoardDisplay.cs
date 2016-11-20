@@ -17,6 +17,8 @@ public class Cs_BoardDisplay : MonoBehaviour
     GameObject go_Block_C;
     GameObject go_Empty;
 
+    GameObject go_Camera;
+
     int i_Height;
     int i_Width;
 
@@ -39,6 +41,8 @@ public class Cs_BoardDisplay : MonoBehaviour
         go_Block_C = Resources.Load("Block_Tri") as GameObject;
 
         go_Empty = Resources.Load("Block_Empty") as GameObject;
+
+        go_Camera = GameObject.Find("Main Camera");
     }
 
     // Create a row of Grid objects
@@ -161,6 +165,9 @@ public class Cs_BoardDisplay : MonoBehaviour
         }
 
         #endregion
+
+        // Set camera position
+        go_Camera.GetComponent<Cs_CameraController>().Init_CameraPosition(i_Width_, i_Height_, 3.0f);
     }
 
     // Update is called once per frame

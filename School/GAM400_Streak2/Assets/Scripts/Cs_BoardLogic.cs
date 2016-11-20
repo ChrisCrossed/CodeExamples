@@ -95,8 +95,8 @@ public class Cs_BoardLogic : MonoBehaviour
     [Range(-1, 5)] [SerializeField] int i_TimeToDrop_Max = 3;
     float f_TimeToDrop = -3f;
 
-    public int i_ArrayWidth;
-    public int i_ArrayHeight;
+    [SerializeField] [Range(10, 20)] int i_ArrayWidth;
+    [SerializeField] [Range(10, 20)] int i_ArrayHeight;
 
     Enum_BlockType[,] BlockArray;
 
