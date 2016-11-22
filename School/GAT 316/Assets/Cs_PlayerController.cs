@@ -142,7 +142,9 @@ public class Cs_PlayerController : MonoBehaviour
         v3_CurrentVelocity = Vector3.Lerp(v3_PreviousVelocity, v3_NewVelocity, ACCELERATION * Time.deltaTime);
 
         // Receive the ramp angle below the player
-        RaycastHit rayHit = EvaluateGroundVector();
+        RaycastHit rayHit = EvaluateGroundVector( LayerMask.GetMask("Ground", "Wall") );
+
+        print("HIT: " + rayHit.collider.name);
 
         Vector3 v3_FinalVelocity = Vector3.ProjectOnPlane( v3_CurrentVelocity, rayHit.normal );
 
@@ -453,11 +455,18 @@ public class Cs_PlayerController : MonoBehaviour
         }
     }
 
-    RaycastHit EvaluateGroundVector()
+    RaycastHit EvaluateGroundVector( LayerMask layerMask_ )
     {
         RaycastHit hit;
 
-        Physics.Raycast(go_SlopeRaycast.transform.position, -transform.up, out hit);
+        if( layerMask_ != new LayerMask())
+        {
+            Physics.Raycast(go_SlopeRaycast.transform.position, -transform.up, out hit, float.PositiveInfinity, layerMask_ );
+        }
+        else
+        {
+            Physics.Raycast(go_SlopeRaycast.transform.position, -transform.up, out hit);
+        }
 
         return hit;
     }

@@ -97,7 +97,10 @@ public class Cs_EnemyLogic_Grunt : MonoBehaviour
         f_PatrolWaitTimer = 0f;
 
         // Set next wait timer
-        f_MAX_WAIT_TIME = go_PatrolPath[i_PatrolPoint].GetComponent<Cs_PatrolPointLogic>().GetWaitTime();
+        if(go_PatrolPath[i_PatrolPoint])
+        {
+            f_MAX_WAIT_TIME = go_PatrolPath[i_PatrolPoint].GetComponent<Cs_PatrolPointLogic>().GetWaitTime();
+        }
         #endregion
 
         // Go To State
@@ -182,7 +185,12 @@ public class Cs_EnemyLogic_Grunt : MonoBehaviour
             // If within a set distance of the patrol point, increment the Wait Timer
             if (gameObject.GetComponent<NavMeshAgent>().enabled)
             {
-                Vector3 v3_PatrolPos = go_PatrolPath[i_PatrolPoint].transform.position;
+                Vector3 v3_PatrolPos = gameObject.transform.position;
+
+                if (go_PatrolPath[i_PatrolPoint])
+                {
+                    v3_PatrolPos = go_PatrolPath[i_PatrolPoint].transform.position;
+                }
 
                 gameObject.GetComponent<NavMeshAgent>().destination = v3_PatrolPos;
                 gameObject.GetComponent<NavMeshAgent>().stoppingDistance = 0.1f;
@@ -225,7 +233,10 @@ public class Cs_EnemyLogic_Grunt : MonoBehaviour
                         }
 
                         // Set next wait timer
-                        f_MAX_WAIT_TIME = go_PatrolPath[i_PatrolPoint].GetComponent<Cs_PatrolPointLogic>().GetWaitTime();
+                        if(go_PatrolPath[i_PatrolPoint])
+                        {
+                            f_MAX_WAIT_TIME = go_PatrolPath[i_PatrolPoint].GetComponent<Cs_PatrolPointLogic>().GetWaitTime();
+                        }
 
                         // Reset timer
                         f_PatrolWaitTimer = 0f;
