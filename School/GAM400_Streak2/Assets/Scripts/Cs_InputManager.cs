@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using XInputDotNetPure;
+using UnityEngine.SceneManagement;
 
 public class Cs_InputManager : MonoBehaviour
 {
@@ -16,6 +17,7 @@ public class Cs_InputManager : MonoBehaviour
     public KeyCode key_RotClock;
     public KeyCode key_RotCounter;
     public KeyCode key_Drop;
+    public KeyCode key_Quit;
     float f_KeyTimer;
     float f_KeyTimer_TimeToReactivate = 0.5f;
     float f_KeyTimer_TimeToReduce = 0.1f;
@@ -45,7 +47,8 @@ public class Cs_InputManager : MonoBehaviour
             Input.GetKey(key_Right_2) ||
             Input.GetKey(key_RotClock) ||
             Input.GetKey(key_RotCounter) ||
-            Input.GetKey(key_Drop))
+            Input.GetKey(key_Drop) ||
+            Input.GetKey(key_Quit))
         {
             return true;
         }
@@ -55,8 +58,10 @@ public class Cs_InputManager : MonoBehaviour
 
     void KeyboardInput()
     {
+        if(Input.GetKey(key_Quit)) Application.Quit();
+
         #region Left Input
-        if( (Input.GetKeyDown(key_Left) || Input.GetKeyDown(key_Left_2)) &&
+        if ( (Input.GetKeyDown(key_Left) || Input.GetKeyDown(key_Left_2)) &&
            !(Input.GetKey(key_Right) || Input.GetKey(key_Right_2)) )
         {
             f_KeyTimer = 0.0f;
@@ -141,6 +146,11 @@ public class Cs_InputManager : MonoBehaviour
     float f_ControllerInputTimer = 0.0f;
     void ControllerInput()
     {
+        if(state_p1.Buttons.Start == ButtonState.Pressed && prevState_p1.Buttons.Start == ButtonState.Released)
+        {
+            SceneManager.LoadScene(0);
+        }
+
         #region Move Left
         if ((state_p1.DPad.Left == ButtonState.Pressed && prevState_p1.DPad.Left == ButtonState.Released) || // DPad Left was Pressed
             (state_p1.ThumbSticks.Left.X < -0.5f && prevState_p1.ThumbSticks.Left.X > -0.5f))                // Analog Left was Pressed

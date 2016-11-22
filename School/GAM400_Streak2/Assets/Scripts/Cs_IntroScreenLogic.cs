@@ -1,0 +1,60 @@
+﻿using UnityEngine;
+using System.Collections;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+
+public class Cs_IntroScreenLogic : MonoBehaviour
+{
+    [SerializeField] GameObject go_Graphic;
+    [SerializeField] int i_LevelToGoTo;
+
+    float f_LevelTimer = -1f;
+    static float f_LevelTimer_Max = 6.0f; // The overall amount of time until the next scene loads
+
+    float f_LerpPerc;
+    static float f_LerpPerc_Max = 2.0f; // The amount of seconds it takes to lerp between 0% and 100%
+
+	// Update is called once per frame
+	void Update ()
+    {
+        UpdateLerpTimer();
+
+        // Lerp from the previous graphic's alpha value to its new alpha
+        if(go_Graphic != null)
+        {
+            Color clr_Curr = go_Graphic.GetComponent<Image>().color;
+            clr_Curr.a = f_LerpPerc;
+            go_Graphic.GetComponent<Image>().color = clr_Curr;
+        }
+	}
+
+    void UpdateLerpTimer()
+    {
+        f_LevelTimer += Time.deltaTime;
+
+        if (f_LevelTimer < 0) return;
+
+        // If the timer is less than the time needed to reach 100%...
+        if (f_LevelTimer < f_LerpPerc_Max)
+        {
+            // Store that percent
+            f_LerpPerc = f_LevelTimer / f_LerpPerc_Max;
+        }
+        // Otherwise, if we're greater than the minimum threshold, we begin to revert from 100% back to 0%
+        else if (f_LevelTimer > f_LevelTimer_Max - f_LerpPerc_Max && f_LevelTimer < f_LevelTimer_Max)
+        {
+            // Store that percent
+            f_LerpPerc = (f_LevelTimer_Max - f_LevelTimer) / f_LerpPerc_Max;
+        }
+        // Just switch scenes
+        else if(f_LevelTimer >= f_LevelTimer_Max + 1)
+        {
+            SceneManager.LoadScene(i_LevelToGoTo);
+        }
+    }
+
+    void ApplyNewAlpha()
+    {
+
+    }
+}

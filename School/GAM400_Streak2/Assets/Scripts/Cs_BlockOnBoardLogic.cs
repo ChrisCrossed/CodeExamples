@@ -45,7 +45,7 @@ public class Cs_BlockOnBoardLogic : MonoBehaviour
 
         gameObject.transform.position = new Vector3( f_xPos * f_BlockScale, f_yPos * f_BlockScale, 0 );
 
-        gameObject.transform.localScale = new Vector3( f_InitialScale_, f_InitialScale_, f_InitialScale_ );
+        gameObject.transform.localScale = new Vector3( f_InitialScale, f_InitialScale, f_InitialScale );
     }
 
     // Update is called once per frame

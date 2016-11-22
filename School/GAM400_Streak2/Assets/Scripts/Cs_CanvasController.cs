@@ -17,17 +17,17 @@ public class Cs_CanvasController : MonoBehaviour
     void Awake ()
     {
         #region Set GameObjects
-        go_TopLeft = transform.Find("HUD_TopLeft").gameObject;
-        go_TopCenter = transform.Find("HUD_TopMiddle").gameObject;
-        go_TopRight = transform.Find("HUD_TopRight").gameObject;
+        go_TopLeft = GameObject.Find("HUD_TopLeft").gameObject;
+        go_TopCenter = GameObject.Find("HUD_TopMiddle").gameObject;
+        go_TopRight = GameObject.Find("HUD_TopRight").gameObject;
 
-        go_MiddleLeft = transform.Find("HUD_CenterLeft").gameObject;
-        go_MiddleCenter = transform.Find("HUD_CenterMiddle").gameObject;
-        go_MiddleRight = transform.Find("HUD_CenterRight").gameObject;
+        go_MiddleLeft = GameObject.Find("HUD_CenterLeft").gameObject;
+        go_MiddleCenter = GameObject.Find("HUD_CenterMiddle").gameObject;
+        go_MiddleRight = GameObject.Find("HUD_CenterRight").gameObject;
 
-        go_BottomLeft = transform.Find("HUD_BottomLeft").gameObject;
-        go_BottomCenter = transform.Find("HUD_BottomMiddle").gameObject;
-        go_BottomRight = transform.Find("HUD_BottomRight").gameObject;
+        go_BottomLeft = GameObject.Find("HUD_BottomLeft").gameObject;
+        go_BottomCenter = GameObject.Find("HUD_BottomMiddle").gameObject;
+        go_BottomRight = GameObject.Find("HUD_BottomRight").gameObject;
         #endregion
         
         Set_ScreenResolution( Screen.currentResolution );
@@ -98,8 +98,10 @@ public class Cs_CanvasController : MonoBehaviour
 
     void Set_BlockScale( float f_BlockScale_ )
     {
-        Vector2 v2_Scale = new Vector2(f_BlockScale_, f_BlockScale_);
+        // Vector2 v2_Scale = new Vector2(f_BlockScale_, f_BlockScale_);
 
+        // go_TopLeft.transform.localScale = v2_Scale;
+        /*
         go_TopLeft.GetComponent<RectTransform>().sizeDelta = v2_Scale;
         go_TopCenter.GetComponent<RectTransform>().sizeDelta = v2_Scale;
         go_TopRight.GetComponent<RectTransform>().sizeDelta = v2_Scale;
@@ -109,12 +111,12 @@ public class Cs_CanvasController : MonoBehaviour
         go_BottomLeft.GetComponent<RectTransform>().sizeDelta = v2_Scale;
         go_BottomCenter.GetComponent<RectTransform>().sizeDelta = v2_Scale;
         go_BottomRight.GetComponent<RectTransform>().sizeDelta = v2_Scale;
+        */
     }
-
     
-
     void Set_BlockPosition( float f_BlockScale_ , float f_Buffer_ )
     {
+        /*
         float f_LeftColumn = f_BlockScale_ + f_Buffer_;
         float f_CenterColumn = f_LeftColumn + f_BlockScale_ + f_Buffer_;
         float f_RightColumn = f_CenterColumn + f_BlockScale_ + f_Buffer_;
@@ -124,8 +126,8 @@ public class Cs_CanvasController : MonoBehaviour
         float f_BottomRow = f_MiddleRow - f_BlockScale_ - f_Buffer_;
 
         go_MiddleLeft.transform.position = new Vector3(f_LeftColumn, f_MiddleRow, 0);
-        GameObject go_Test = Instantiate(Resources.Load("Block_X_mdl") as GameObject);
-        go_Test.transform.position = go_MiddleLeft.transform.position;
+        // GameObject go_Test = Instantiate(Resources.Load("Block_X_mdl") as GameObject);
+        // go_Test.transform.position = go_MiddleLeft.transform.position;
 
         go_MiddleCenter.transform.position = new Vector3(f_CenterColumn, f_MiddleRow, 0);
         go_MiddleRight.transform.position = new Vector3(f_RightColumn, f_MiddleRow, 0);
@@ -137,10 +139,16 @@ public class Cs_CanvasController : MonoBehaviour
         go_BottomLeft.transform.position = new Vector3(f_LeftColumn, f_BottomRow, 0);
         go_BottomCenter.transform.position = new Vector3(f_CenterColumn, f_BottomRow, 0);
         go_BottomRight.transform.position = new Vector3(f_RightColumn, f_BottomRow, 0);
+        */
     }
 
     public void Set_NextBlockArray( Enum_BlockType[,] e_BlockType_, Enum_BlockSize e_BlockSize_, IntVector2 iv2_BottomLeft_ )
     {
+        if(e_BlockSize_ == Enum_BlockSize.size_2w_2h)
+        {
+
+        }
+
         //float f_LeftColumn = f_BlockScale_ + f_Buffer_;
         //float f_CenterColumn = f_LeftColumn + f_BlockScale_ + f_Buffer_;
         //float f_RightColumn = f_CenterColumn + f_BlockScale_ + f_Buffer_;

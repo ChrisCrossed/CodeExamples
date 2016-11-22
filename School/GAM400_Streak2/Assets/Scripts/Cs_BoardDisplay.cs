@@ -18,6 +18,7 @@ public class Cs_BoardDisplay : MonoBehaviour
     GameObject go_Empty;
 
     GameObject go_Camera;
+    GameObject go_ThemeManager;
 
     int i_Height;
     int i_Width;
@@ -43,6 +44,7 @@ public class Cs_BoardDisplay : MonoBehaviour
         go_Empty = Resources.Load("Block_Empty") as GameObject;
 
         go_Camera = GameObject.Find("Main Camera");
+        go_ThemeManager = GameObject.Find("ThemeManager");
     }
 
     // Create a row of Grid objects
@@ -179,7 +181,7 @@ public class Cs_BoardDisplay : MonoBehaviour
     int i_Y;
     int i_CurrMax;
     float f_InitBoardTimer;
-    float f_InitBoardTimer_Max = 0.1f;
+    float f_InitBoardTimer_Max = 0.05f;
     void Update()
     {
         // print(DisplayArray[4, 8].ToString());
@@ -505,6 +507,9 @@ public class Cs_BoardDisplay : MonoBehaviour
             }
             #endregion
         }
+
+        // Play Sound Effect
+        go_ThemeManager.GetComponent<Cs_AudioManager>().Play_SoundEffect(Enum_SoundEffect.Move);
     }
     public void ShiftBlocks( Enum_Direction e_MoveDir_, Enum_BlockSize e_BlockSize_, Vector2 v2_BottomLeft_ )
     {
@@ -518,6 +523,9 @@ public class Cs_BoardDisplay : MonoBehaviour
         // Store Bottom Left
         Enum_BlockType e_BotLeftBlock = DisplayArray[iv2_BottomLeft_.y, iv2_BottomLeft_.x];
         GameObject go_BotLeftBlock = DisplayArray_Blocks[iv2_BottomLeft_.y, iv2_BottomLeft_.x];
+
+        // Only continue if a block exists
+        if(DisplayArray[iv2_BottomLeft_.y, iv2_BottomLeft_.x] == Enum_BlockType.Empty) return;
 
         if (e_RotDir_ == Enum_Direction.Left)
         {
@@ -659,6 +667,9 @@ public class Cs_BoardDisplay : MonoBehaviour
                 Set_BackdropColor(DisplayArray[iv2_BottomLeft_.y + 0, iv2_BottomLeft_.x + 1], new IntVector2(iv2_BottomLeft_.x + 1, iv2_BottomLeft_.y + 0));
                 Set_BackdropColor(DisplayArray[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 1], new IntVector2(iv2_BottomLeft_.x + 1, iv2_BottomLeft_.y + 1));
             }
+
+            // Play Sound Effect
+            go_ThemeManager.GetComponent<Cs_AudioManager>().Play_SoundEffect(Enum_SoundEffect.RotateCounterclock);
             #endregion
         }
         else if( e_RotDir_ == Enum_Direction.Right )
@@ -802,6 +813,9 @@ public class Cs_BoardDisplay : MonoBehaviour
                 Set_BackdropColor(DisplayArray[iv2_BottomLeft_.y + 1, iv2_BottomLeft_.x + 1], new IntVector2(iv2_BottomLeft_.x + 1, iv2_BottomLeft_.y + 1));
             }
             #endregion
+            
+            // Play Sound Effect
+            go_ThemeManager.GetComponent<Cs_AudioManager>().Play_SoundEffect(Enum_SoundEffect.RotateClockwise);
         }
     }
     public void RotateBlocks(Enum_Direction e_RotDir_, Enum_BlockSize e_BlockSize_, Vector2 v2_BottomLeft_)

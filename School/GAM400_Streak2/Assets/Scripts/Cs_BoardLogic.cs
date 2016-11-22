@@ -26,6 +26,14 @@ public enum Enum_PauseEffect
     ScoreLine,
     GameOver
 }
+enum Enum_WhiteBlockChance
+{
+    OneInThree,
+    OneInFive,
+    OneInSeven,
+    OneInNine,
+    OneInEleven,
+}
 
 #region Tools
 public enum Enum_Direction
@@ -91,6 +99,8 @@ public class Cs_BoardLogic : MonoBehaviour
 {
     Enum_PauseEffect e_PauseEffect = Enum_PauseEffect.StartGame;
 
+    bool b_DemoGame_InputReceived = false;
+
     int i_Score;
     [Range(-1, 5)] [SerializeField] int i_TimeToDrop_Max = 3;
     float f_TimeToDrop = -3f;
@@ -108,11 +118,13 @@ public class Cs_BoardLogic : MonoBehaviour
     [SerializeField] bool b_3w_2h_Allowed = true;
     [SerializeField] bool b_3w_3h_Allowed = true;
     [SerializeField] bool b_ThreeBlockColors = false;
+    [SerializeField] Enum_WhiteBlockChance e_WhiteBlockChance = Enum_WhiteBlockChance.OneInSeven;
+    int i_WhiteBlockChance;
 
     Enum_BlockType[] e_NextBlockList = new Enum_BlockType[27];
 
-    [SerializeField] bool b_MidRowBlank = false;
-    [Range(1, 10)] [SerializeField] int i_ExtraBlankRow = 1;
+    // [SerializeField] bool b_MidRowBlank = false;
+    // [Range(1, 10)] [SerializeField] int i_ExtraBlankRow = 1;
 
     float f_StartGameTimer = 2.0f;
 
@@ -205,8 +217,16 @@ public class Cs_BoardLogic : MonoBehaviour
 
         // Changing the system. 0/1/2 = Block 1, 3/4/5 = Block 2, 6 = Block 3.
         // If 'b_ThreeBlockColors', a 1-in-7 chance to have a black block
-        int i_NumBlockTypes = 6;
-        if (b_ThreeBlockColors) i_NumBlockTypes = 7;
+        int i_NumBlockTypes = 2;
+
+        if(b_ThreeBlockColors)
+        {
+            if(e_WhiteBlockChance == Enum_WhiteBlockChance.OneInThree)      i_NumBlockTypes = 3;
+            else if (e_WhiteBlockChance == Enum_WhiteBlockChance.OneInFive) i_NumBlockTypes = 5;
+            else if (e_WhiteBlockChance == Enum_WhiteBlockChance.OneInSeven) i_NumBlockTypes = 7;
+            else if (e_WhiteBlockChance == Enum_WhiteBlockChance.OneInNine) i_NumBlockTypes = 9;
+            else if (e_WhiteBlockChance == Enum_WhiteBlockChance.OneInEleven) i_NumBlockTypes = 11;
+        }
 
         // Start from the first open position & populate all remaining positions
         for(int i_ = i_FirstOpenPosition; i_ < e_NextBlockList.Length; ++i_)
@@ -215,19 +235,27 @@ public class Cs_BoardLogic : MonoBehaviour
             int i_RandBlock = Random.Range(0, i_NumBlockTypes);
 
             // Block 'One'
-            if( i_RandBlock == 0 || i_RandBlock == 1 || i_RandBlock == 2 )
+            if( i_RandBlock < i_NumBlockTypes / 2 )
             {
                 e_NextBlockList[i_] = Enum_BlockType.Block_1_Active;
             }
             // Block 'Two'
-            else if( i_RandBlock == 3 || i_RandBlock == 4 || i_RandBlock == 5 )
+            else if( i_RandBlock >= i_NumBlockTypes / 2 && i_RandBlock != i_NumBlockTypes - 1 )
             {
                 e_NextBlockList[i_] = Enum_BlockType.Block_2_Active;
             }
             // Block 'Three'
-            else if ( i_RandBlock == 6 )
+            else
             {
-                e_NextBlockList[i_] = Enum_BlockType.Block_3_Active;
+                if(b_ThreeBlockColors)
+                {
+                    e_NextBlockList[i_] = Enum_BlockType.Block_3_Active;
+                }
+                // Special probability case since we need to hit a 0 or 1 if we're not checking for three block types
+                else
+                {
+                    e_NextBlockList[i_] = Enum_BlockType.Block_2_Active;
+                }
             }
         }
 
@@ -1067,23 +1095,23 @@ public class Cs_BoardLogic : MonoBehaviour
         }
 
         #region Set 'Mid Empty' row to empty (Done AFTER scoring)
-        for (int y_ = 0; y_ < i_ArrayHeight; ++y_)
-        {
-            if (b_MidRowBlank)
-            {
-                if (i_ExtraBlankRow > 0 &&
-                    i_ExtraBlankRow < i_ArrayWidth)
-                {
-                    // Destroy the block model on screen
-                    if (GetBlock(0, y_) != Enum_BlockType.Empty)
-                    {
-                        GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().DestroyBlockAt(new IntVector2(i_ExtraBlankRow, y_));
-                    }
+        //for (int y_ = 0; y_ < i_ArrayHeight; ++y_)
+        //{
+        //    if (b_MidRowBlank)
+        //    {
+        //        if (i_ExtraBlankRow > 0 &&
+        //            i_ExtraBlankRow < i_ArrayWidth)
+        //        {
+        //            // Destroy the block model on screen
+        //            if (GetBlock(0, y_) != Enum_BlockType.Empty)
+        //            {
+        //                GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().DestroyBlockAt(new IntVector2(i_ExtraBlankRow, y_));
+        //            }
 
-                    SetBlock(i_ExtraBlankRow, y_, Enum_BlockType.Empty);
-                }
-            }
-        }
+        //            SetBlock(i_ExtraBlankRow, y_, Enum_BlockType.Empty);
+        //        }
+        //    }
+        //}
         #endregion
 
         // Set the next block size to be whatever we found
@@ -1127,16 +1155,12 @@ public class Cs_BoardLogic : MonoBehaviour
     
     List<IntVector2> iv2_ScoreLine    = new List<IntVector2>();
     List<IntVector2> iv2_PathfindLine = new List<IntVector2>();
-    bool b_FoundSolution = false;
     Enum_BlockType e_CurrBlockType;
     bool Load_ScoreLine()
     {
         // Reset v2_ScoreLine
         iv2_ScoreLine = new List<IntVector2>();
-
-        // Reset b_FoundSolution
-        b_FoundSolution = false;
-
+        
         // Reset storage of current block color
         e_CurrBlockType = Enum_BlockType.Empty;
 
@@ -1467,13 +1491,13 @@ public class Cs_BoardLogic : MonoBehaviour
                 {
                     tempString += "{!!} ";
                 }
-                else if( b_MidRowBlank && // The option is set for a mid row empty region
-                         i_ExtraBlankRow < i_ArrayWidth && // Extra Blank Row is Set
-                         i == i_ExtraBlankRow && // This row is the one that's been set
-                        (BlockArray[j, i] == Enum_BlockType.Empty)) // The block position is empty
-                {
-                    tempString += "{!!} ";
-                }
+                //else if( b_MidRowBlank && // The option is set for a mid row empty region
+                //         i_ExtraBlankRow < i_ArrayWidth && // Extra Blank Row is Set
+                //         i == i_ExtraBlankRow && // This row is the one that's been set
+                //        (BlockArray[j, i] == Enum_BlockType.Empty)) // The block position is empty
+                //{
+                //    tempString += "{!!} ";
+                //}
                 // Normal empty block position
                 else if (BlockArray[j, i] == Enum_BlockType.Empty) tempString += "[__] ";
                 // Print a populated block
@@ -1515,38 +1539,65 @@ public class Cs_BoardLogic : MonoBehaviour
 
     public void Input_MoveLeft()
     {
+        if (e_PauseEffect == Enum_PauseEffect.GameOver) return;
+
         MoveActiveBlocks_Left(v2_ActiveBlockLocation, e_BlockSize);
+
+        b_DemoGame_InputReceived = true;
     }
 
     public void Input_MoveRight()
     {
+        if (e_PauseEffect == Enum_PauseEffect.GameOver) return;
+
         MoveActiveBlocks_Right(v2_ActiveBlockLocation, e_BlockSize);
+
+        b_DemoGame_InputReceived = true;
     }
 
     public void Input_MoveDown()
     {
+        if (e_PauseEffect == Enum_PauseEffect.GameOver) return;
+
         MoveActiveBlocks_Down(v2_ActiveBlockLocation, e_BlockSize);
 
         // Reset timer to drop blocks
         f_TimeToDrop = 0;
+
+        b_DemoGame_InputReceived = true;
     }
 
     public void Input_Drop()
     {
+        if (e_PauseEffect == Enum_PauseEffect.GameOver) return;
+
         AllBlocksStatic();
 
         // Reset timer to drop blocks
-        f_TimeToDrop = -1f;
+        // f_TimeToDrop = -1f;
+        f_TimeToDrop = 0f;
+
+        GameObject.Find("ThemeManager").GetComponent<Cs_AudioManager>().Play_SoundEffect(Enum_SoundEffect.DropBlock);
+
+        b_DemoGame_InputReceived = true;
     }
 
     public void Input_RotateCounterclock()
     {
+        if (e_PauseEffect == Enum_PauseEffect.GameOver) return;
+
         RotateBlocks_CounterClock(v2_ActiveBlockLocation, e_BlockSize);
+
+        b_DemoGame_InputReceived = true;
     }
 
     public void Input_RotateClockwise()
     {
+        if (e_PauseEffect == Enum_PauseEffect.GameOver) return;
+
         RotateBlocks_Clockwise(v2_ActiveBlockLocation, e_BlockSize);
+
+        b_DemoGame_InputReceived = true;
     }
 
     void Cheat_SetDoubleLine()
@@ -1663,7 +1714,6 @@ public class Cs_BoardLogic : MonoBehaviour
     }
 
     // Update is called once per frame
-    List<IntVector2> iv2_Test = new List<IntVector2>();
     float f_ScoreLine_Timer;
     static float f_ScoreLine_Timer_Max = 0.075f;
     float f_ScoreLine_Timer_Conclusion; // A timer that continues to run after the last block's visual begins
@@ -1682,7 +1732,9 @@ public class Cs_BoardLogic : MonoBehaviour
 
         if(e_PauseEffect == Enum_PauseEffect.Unpause)
         {
-            #region Drop Block timer
+            if(b_DemoGame_InputReceived)
+            {
+                #region Drop Block timer
             // Decrement timer for next time to move blocks down
             if (i_TimeToDrop_Max > 0)
             {
@@ -1698,6 +1750,7 @@ public class Cs_BoardLogic : MonoBehaviour
                 }
             }
             #endregion
+            }
         }
         else if(e_PauseEffect == Enum_PauseEffect.ScoreLine)
         {
