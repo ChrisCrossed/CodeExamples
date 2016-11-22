@@ -10,6 +10,12 @@ public class Cs_RockSoundLogic : MonoBehaviour
     {
         print("Making a sound...");
 
+        // Run visualizer
+        if (transform.root.gameObject.GetComponent<Cs_RockLogic>())
+        {
+            transform.root.gameObject.GetComponent<Cs_RockLogic>().Run_Visualizer();
+        }
+
         for (int i = 0; i < go_EnemyList.Count; ++i)
         {
             if(go_EnemyList[i].GetComponent<Cs_EnemyLogic_Grunt>())

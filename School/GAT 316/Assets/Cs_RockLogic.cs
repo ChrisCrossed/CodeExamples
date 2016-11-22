@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Cs_RockLogic : MonoBehaviour
 {
@@ -10,14 +11,52 @@ public class Cs_RockLogic : MonoBehaviour
     bool b_HasMadeSound;
     float f_HitTimer;
 
+    // Visualizer
+    int i_NumVisualizePoints = 20;
+    List<GameObject> go_ArrayPoints = new List<GameObject>();
+    float f_Radius = 0;
+
     void Start()
     {
-        
+        #region Visualizer Logic
+        // Create a series of empty game objects, add to a list
+        for (int i_ = 0; i_ < i_NumVisualizePoints; ++i_)
+        {
+            GameObject go_Point = new GameObject();
+
+            go_Point.name = "go_Point_" + i_;
+
+            go_Point.transform.SetParent(gameObject.transform);
+
+            go_ArrayPoints.Add(go_Point);
+        }
+
+        Update_VisualizerRotation();
+        #endregion
+
+        SetLineRenderer();
+    }
+
+    void Update_VisualizerRotation()
+    {
+        float f_Angle = 360f / i_NumVisualizePoints;
+
+        // Go through the series of empty game objects & set their rotation based on the number of Visual Points
+        for (int j_ = 0; j_ < go_ArrayPoints.Count; ++j_)
+        {
+            go_ArrayPoints[j_].transform.rotation = Quaternion.Euler(0, f_Angle * j_, 0);
+
+            go_ArrayPoints[j_].transform.position = gameObject.transform.position;
+        }
     }
 
     // Update is called once per frame
-	void Update ()
+    void Update ()
     {
+        gameObject.transform.Find("Sound_Collider").transform.rotation = Quaternion.Euler(transform.up);
+
+        Update_VisualizerRotation();
+
         // if(gameObject.GetComponent<MeshCollider>().isTrigger)
         if (!b_HasMadeSound)
         {
@@ -33,10 +72,47 @@ public class Cs_RockLogic : MonoBehaviour
             FadeToOblivion();
         }
 
+        if(b_RunVisual)
+        {
+            UpdateVisualizer();
+        }
+
         UpdateLiveTimer();
 
         if (f_HitTimer > 0) f_HitTimer += Time.deltaTime;
 	}
+
+    bool b_RunVisual = false;
+    public void Run_Visualizer()
+    {
+        b_RunVisual = true;
+    }
+
+    float f_VisualizerTimer;
+    void UpdateVisualizer()
+    {
+        f_VisualizerTimer += Time.deltaTime;
+
+        print("Got here: " + f_VisualizerTimer);
+
+        if (f_VisualizerTimer > 0.25f)
+        {
+            f_VisualizerTimer = 0f;
+
+            b_RunVisual = false;
+        }
+
+        for (int i_ = 0; i_ < go_ArrayPoints.Count; ++i_)
+        {
+            Vector3 v3_yPos = transform.Find("Sound_Collider").transform.position;
+
+            v3_yPos = (go_ArrayPoints[i_].transform.forward * f_VisualizerTimer * 5);
+
+            go_ArrayPoints[i_].transform.position = v3_yPos;
+        }
+
+        SetLineRenderer();
+    }
 
     void UpdateRaycast()
     {
@@ -130,6 +206,25 @@ public class Cs_RockLogic : MonoBehaviour
         if (f_LiveTimer >= 10.0f)
         {
             b_IsDead = true;
+        }
+    }
+
+    void SetLineRenderer()
+    {
+        // Tell the line renderer how many positions will exist
+        gameObject.GetComponent<LineRenderer>().SetVertexCount(go_ArrayPoints.Count + 1);
+
+        for (int i_ = 0; i_ < go_ArrayPoints.Count + 1; ++i_)
+        {
+            if (i_ != go_ArrayPoints.Count)
+            {
+                // Apply lines to each point in the line renderer
+                gameObject.GetComponent<LineRenderer>().SetPosition(i_, go_ArrayPoints[i_].transform.position + gameObject.transform.position);
+            }
+            else
+            {
+                gameObject.GetComponent<LineRenderer>().SetPosition(i_, go_ArrayPoints[0].transform.position + gameObject.transform.position);
+            }
         }
     }
 
