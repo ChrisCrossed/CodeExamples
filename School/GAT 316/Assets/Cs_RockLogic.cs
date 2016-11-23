@@ -93,8 +93,6 @@ public class Cs_RockLogic : MonoBehaviour
     {
         f_VisualizerTimer += Time.deltaTime;
 
-        print("Got here: " + f_VisualizerTimer);
-
         if (f_VisualizerTimer > 0.25f)
         {
             f_VisualizerTimer = 0f;

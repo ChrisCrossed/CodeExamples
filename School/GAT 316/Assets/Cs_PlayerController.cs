@@ -78,13 +78,34 @@ public class Cs_PlayerController : MonoBehaviour
         // Abilities/Projectile
         v3_TargetLocation = go_TargetObject.transform.position;
 
+        // Sound Effects
+        as_SFXSource = gameObject.GetComponent<AudioSource>();
+        ac_Grass_Light = Resources.Load("SFX_Step_Light") as AudioClip;
+        ac_Grass_Heavy = Resources.Load("SFX_Step_Heavy") as AudioClip;
+        ac_Gravel = Resources.Load("SFX_Gravel") as AudioClip;
+        ac_Gravel_2 = Resources.Load("SFX_Gravel_2") as AudioClip;
+        ac_Gravel_3 = Resources.Load("SFX_Gravel_3") as AudioClip;
+
         Set_CameraPosition();
     }
-	
-	// Update is called once per frame
+
+    // Update is called once per frame
+    float f_WalkSFX_Timer = 0.5f;
+    static float f_WalkSFX_Max = 0.6f;
+    float f_WalkSFX_Multiplier;
 	void Update ()
     {
         if (Input.GetKeyDown(KeyCode.Escape)) Application.Quit();
+
+        #region Play Movement SFX
+        f_WalkSFX_Timer += Time.deltaTime * f_WalkSFX_Multiplier;
+
+        if(f_WalkSFX_Timer >= f_WalkSFX_Max)
+        {
+            Play_WalkSFX( f_WalkSFX_Multiplier );
+            f_WalkSFX_Timer = 0.0f;
+        }
+        #endregion
 
         // Stop player movement while touching specific triggers
         if (f_DisableTimer > 0)
@@ -144,8 +165,6 @@ public class Cs_PlayerController : MonoBehaviour
         // Receive the ramp angle below the player
         RaycastHit rayHit = EvaluateGroundVector( LayerMask.GetMask("Ground", "Wall") );
 
-        print("HIT: " + rayHit.collider.name);
-
         Vector3 v3_FinalVelocity = Vector3.ProjectOnPlane( v3_CurrentVelocity, rayHit.normal );
 
         if(rayHit.distance >= 0.265f)
@@ -194,6 +213,13 @@ public class Cs_PlayerController : MonoBehaviour
             if (b_IsSprinting)   f_Magnitude = f_Magnitude_Sprint;
 
         }
+        #endregion
+
+        #region Play Walk/Run SFX
+        if      (f_Magnitude == f_Magnitude_Sneak)  f_WalkSFX_Multiplier = 1.0f;
+        else if (f_Magnitude == f_Magnitude_Brisk)  f_WalkSFX_Multiplier = 1.5f;
+        else if (f_Magnitude == f_Magnitude_Sprint) f_WalkSFX_Multiplier = 2.0f;
+        else if (f_Magnitude == 0)                  f_WalkSFX_Multiplier = 0.0f;
         #endregion
 
         #region Update Aim/Fire
@@ -553,5 +579,85 @@ public class Cs_PlayerController : MonoBehaviour
         Color clr_CurrColor = go_FadeInOutObj.GetComponent<CanvasRenderer>().GetColor();
         clr_CurrColor.a = f_Transparency;
         go_FadeInOutObj.GetComponent<CanvasRenderer>().SetColor(clr_CurrColor);
+    }
+
+    AudioClip ac_Grass_Light;
+    AudioClip ac_Grass_Heavy;
+    AudioClip ac_Gravel;
+    AudioClip ac_Gravel_2;
+    AudioClip ac_Gravel_3;
+    AudioSource as_SFXSource;
+    float f_PrevMult;
+    void Play_WalkSFX( float f_SFXMultiplier_ )
+    {
+        if(f_SFXMultiplier_ != f_PrevMult)
+        {
+            f_WalkSFX_Timer = f_WalkSFX_Max - 0.05f;
+        }
+
+        bool b_IsGrass = true;
+        LayerMask i_LayerMask = LayerMask.GetMask("Ground");
+        RaycastHit hit;
+        Physics.Raycast(gameObject.transform.position, -transform.up, out hit, float.PositiveInfinity, i_LayerMask);
+
+        if ( f_SFXMultiplier_ == 1.0f )
+        {
+            as_SFXSource.volume = 0.6f;
+            as_SFXSource.pitch = 1.0f;
+
+            if(hit.collider.tag == "Gravel")
+            {
+                as_SFXSource.pitch = Random.Range(0.8f, 0.9f);
+                int i_RandomPick = Random.Range(0, 3);
+
+                if      (i_RandomPick == 0) gameObject.GetComponent<AudioSource>().PlayOneShot(ac_Gravel);
+                else if (i_RandomPick == 1) gameObject.GetComponent<AudioSource>().PlayOneShot(ac_Gravel_2);
+                else if (i_RandomPick == 2) gameObject.GetComponent<AudioSource>().PlayOneShot(ac_Gravel_3);
+            }
+            else
+            {
+                gameObject.GetComponent<AudioSource>().PlayOneShot(ac_Grass_Light);
+            }
+        }
+        else if ( f_SFXMultiplier_ == 1.5f )
+        {
+            as_SFXSource.volume = 0.4f;
+            as_SFXSource.pitch = 1.0f;
+
+            if (hit.collider.tag == "Gravel")
+            {
+                as_SFXSource.pitch = Random.Range(0.9f, 1.0f);
+                int i_RandomPick = Random.Range(0, 3);
+
+                if (i_RandomPick == 0) gameObject.GetComponent<AudioSource>().PlayOneShot(ac_Gravel);
+                else if (i_RandomPick == 1) gameObject.GetComponent<AudioSource>().PlayOneShot(ac_Gravel_2);
+                else if (i_RandomPick == 2) gameObject.GetComponent<AudioSource>().PlayOneShot(ac_Gravel_3);
+            }
+            else
+            {
+                gameObject.GetComponent<AudioSource>().PlayOneShot(ac_Grass_Heavy);
+            }
+        }
+        else if ( f_SFXMultiplier_ == 2.0f )
+        {
+            as_SFXSource.volume = 1.0f;
+            as_SFXSource.pitch = 1.1f;
+
+            if (hit.collider.tag == "Gravel")
+            {
+                as_SFXSource.pitch = Random.Range(1.0f, 1.1f);
+                int i_RandomPick = Random.Range(0, 3);
+
+                if (i_RandomPick == 0) gameObject.GetComponent<AudioSource>().PlayOneShot(ac_Gravel);
+                else if (i_RandomPick == 1) gameObject.GetComponent<AudioSource>().PlayOneShot(ac_Gravel_2);
+                else if (i_RandomPick == 2) gameObject.GetComponent<AudioSource>().PlayOneShot(ac_Gravel_3);
+            }
+            else
+            {
+                gameObject.GetComponent<AudioSource>().PlayOneShot(ac_Grass_Heavy);
+            }
+        }
+
+        f_PrevMult = f_SFXMultiplier_;
     }
 }

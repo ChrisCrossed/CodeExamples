@@ -23,13 +23,23 @@ public class Cs_EnemyLogic_Grunt : MonoBehaviour
 
     [SerializeField] int i_StartPatrolPoint = 0;
 
+    // Audio & SFX
+    AudioSource as_SFXSource;
+    AudioClip ac_Grass_Light;
+    AudioClip ac_Grass_Heavy;
+
     // Use this for initialization
     void Start ()
     {
         go_LevelLogic = GameObject.Find("LevelLogic");
 
+        // Load SFX
+        as_SFXSource = gameObject.GetComponent<AudioSource>();
+        ac_Grass_Light = Resources.Load("SFX_Step_Light") as AudioClip;
+        ac_Grass_Heavy = Resources.Load("SFX_Step_Heavy") as AudioClip;
+
         // If there's a custom start position...
-        if(i_StartPatrolPoint > 0)
+        if (i_StartPatrolPoint > 0)
         {
             // Check to see the patrol position exists
             if(go_PatrolPath[i_StartPatrolPoint] != null)
@@ -177,8 +187,29 @@ public class Cs_EnemyLogic_Grunt : MonoBehaviour
     }
 
     // Update is called once per frame
+    float f_WalkSFX_Timer = 0.5f;
+    static float f_WalkSFX_Max = 0.75f;
 	void Update ()
     {
+        #region SFX
+        f_WalkSFX_Timer += Time.deltaTime * (gameObject.GetComponent<NavMeshAgent>().speed / f_BasicMoveSpeed);
+
+        if(f_WalkSFX_Timer > 0.75f)
+        {
+            // Reset the timer
+            f_WalkSFX_Timer = 0.0f;
+
+            if(gameObject.GetComponent<NavMeshAgent>().speed == 4)
+            {
+                as_SFXSource.PlayOneShot(ac_Grass_Light);
+            }
+            else
+            {
+                as_SFXSource.PlayOneShot(ac_Grass_Heavy);
+            }
+        }
+        #endregion
+
         #region Patrol
         if (e_EnemyState == Enum_EnemyState.Patrol)
         {

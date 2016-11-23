@@ -24,11 +24,13 @@ public class Cs_LevelLogic : MonoBehaviour
     Enum_EnemyState e_EnemiesState = Enum_EnemyState.Patrol;
 
     GameObject go_Player;
+    GameObject go_MusicManager;
 
     // Use this for initialization
     void Start ()
     {
         go_Player = GameObject.Find("Player");
+        go_MusicManager = GameObject.Find("MusicManager");
 	}
 
     bool CheckEnemyInList( GameObject go_EnemyObject_ )
@@ -81,6 +83,8 @@ public class Cs_LevelLogic : MonoBehaviour
 
         // Disable appropriate objects for 'Chase' state
         DisableObjectsInList(DisableObjectsOnChase);
+
+        go_MusicManager.GetComponent<Cs_MusicManager>().Set_MusicState(Enum_EnemyState.ChasePlayer);
     }
 
     public void Set_InvestigateState( GameObject go_EnemyObject_ = null)
@@ -93,44 +97,30 @@ public class Cs_LevelLogic : MonoBehaviour
                 return;
             }
 
-        // Reset timer
-        f_Timer_FromInvestigateToPatrol = f_MaxTimer_FromInvestigateToPatrol;
+            // Reset timer
+            f_Timer_FromInvestigateToPatrol = f_MaxTimer_FromInvestigateToPatrol;
 
-        // Set the state of the enemies involved
-        e_EnemiesState = Enum_EnemyState.InvestigateLocation;
+            // Set the state of the enemies involved
+            e_EnemiesState = Enum_EnemyState.InvestigateLocation;
 
-        for (int i_ = 0; i_ < EnemiesToControl.Length; ++i_)
-        {
-            if(EnemiesToControl[i_] != null)
+            for (int i_ = 0; i_ < EnemiesToControl.Length; ++i_)
             {
-                if (EnemiesToControl[i_].GetComponent<Cs_EnemyLogic_Grunt>())
+                if(EnemiesToControl[i_] != null)
                 {
-                    EnemiesToControl[i_].GetComponent<Cs_EnemyLogic_Grunt>().GoToState_InvestigateLocation(go_Player.transform.position);
-                }
-
-                /*
-                if (EnemiesToControl[i_].GetComponent<Cs_EnemyLogic_Grunt>())
-                {
-                    if(b_InvestigatePlayerLocation_)
+                    if (EnemiesToControl[i_].GetComponent<Cs_EnemyLogic_Grunt>())
                     {
                         EnemiesToControl[i_].GetComponent<Cs_EnemyLogic_Grunt>().GoToState_InvestigateLocation(go_Player.transform.position);
                     }
-                    else
-                    {
-                        // Goes to their last known investigation point
-                        EnemiesToControl[i_].GetComponent<Cs_EnemyLogic_Grunt>().GoToState_InvestigateLocation(v3_InvestigateLocation);
-                    }
                 }
-                */
             }
-        }
         
-        // Enable appropriate objects for 'Investigate' state
-        EnableObjectsInList( EnableObjectsOnInvestigate );
+            // Enable appropriate objects for 'Investigate' state
+            EnableObjectsInList( EnableObjectsOnInvestigate );
 
-        // Disable appropriate objects for 'Investigate' state
-        DisableObjectsInList( DisableObjectsOnInvestigate );
+            // Disable appropriate objects for 'Investigate' state
+            DisableObjectsInList( DisableObjectsOnInvestigate );
 
+            go_MusicManager.GetComponent<Cs_MusicManager>().Set_MusicState(Enum_EnemyState.InvestigateLocation);
         }
     }
 
@@ -169,6 +159,8 @@ public class Cs_LevelLogic : MonoBehaviour
 
         // Disable appropriate objects for 'Patrol' state
         DisableObjectsInList( DisableObjectsOnPatrol );
+
+        go_MusicManager.GetComponent<Cs_MusicManager>().Set_MusicState(Enum_EnemyState.Patrol);
     }
 
     public float Get_CurrentTimer(Enum_EnemyState e_EnemyState_, bool b_GetMaxTimer = false, GameObject go_EnemyObject_ = null )
