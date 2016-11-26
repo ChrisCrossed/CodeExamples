@@ -13,11 +13,13 @@
     <TargetFrameworkIdentifier>.NETFramework</TargetFrameworkIdentifier>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>Unity Subset v3.5</TargetFrameworkProfile>
-    <CompilerResponseFile></CompilerResponseFile>
+    <CompilerResponseFile>
+    </CompilerResponseFile>
     <UnityProjectType>Game:1</UnityProjectType>
     <UnityBuildTarget>StandaloneWindows:5</UnityBuildTarget>
     <UnityVersion>5.4.1f1</UnityVersion>
-    <RootNamespace></RootNamespace>
+    <RootNamespace>
+    </RootNamespace>
     <LangVersion Condition=" '$(VisualStudioVersion)' != '10.0' ">4</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -64,20 +66,21 @@
     <Reference Include="ProBuilderCore-Unity5">
       <HintPath>Assets\ProCore\ProBuilder\Classes\ProBuilderCore-Unity5.dll</HintPath>
     </Reference>
-    <Reference Include="pb_Stl">
-      <HintPath>Assets\ProCore\ProBuilder\Classes\ClassesLib\pb_Stl.dll</HintPath>
+    <Reference Include="ProBuilderMeshOps-Unity5">
+      <HintPath>Assets\ProCore\ProBuilder\Classes\ProBuilderMeshOps-Unity5.dll</HintPath>
     </Reference>
     <Reference Include="KDTree">
       <HintPath>Assets\ProCore\ProBuilder\Classes\ClassesLib\KDTree.dll</HintPath>
     </Reference>
-    <Reference Include="ProBuilderMeshOps-Unity5">
-      <HintPath>Assets\ProCore\ProBuilder\Classes\ProBuilderMeshOps-Unity5.dll</HintPath>
+    <Reference Include="pb_Stl">
+      <HintPath>Assets\ProCore\ProBuilder\Classes\ClassesLib\pb_Stl.dll</HintPath>
     </Reference>
     <Reference Include="Triangle">
       <HintPath>Assets\ProCore\ProBuilder\Classes\ClassesLib\Triangle.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Cs_KeyboardLogic.cs" />
     <Compile Include="Assets\Cs_PlayerController.cs" />
     <Compile Include="Assets\ProCore\ProBuilder\API Examples\Icosphere FFT\Scripts\CameraControls.cs" />
     <Compile Include="Assets\ProCore\ProBuilder\API Examples\Icosphere FFT\Scripts\IcoBumpin.cs" />

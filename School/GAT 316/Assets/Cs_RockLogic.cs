@@ -16,8 +16,15 @@ public class Cs_RockLogic : MonoBehaviour
     List<GameObject> go_ArrayPoints = new List<GameObject>();
     float f_Radius = 0;
 
+    // Audio
+    AudioSource as_AudioSource;
+    AudioClip ac_Thud;
+
     void Start()
     {
+        as_AudioSource = gameObject.GetComponent<AudioSource>();
+        ac_Thud = Resources.Load("SFX_Thud") as AudioClip;
+
         #region Visualizer Logic
         // Create a series of empty game objects, add to a list
         for (int i_ = 0; i_ < i_NumVisualizePoints; ++i_)
@@ -127,6 +134,10 @@ public class Cs_RockLogic : MonoBehaviour
             // Tell 'sound collider' to inform enemies (Occurs as a trigger BEFORE making the change to 'IsTrigger = true'
             if (!b_HasMadeSound)
             {
+                float f_Pitch = Random.Range(0.8f, 1.21f);
+                as_AudioSource.pitch = f_Pitch;
+                as_AudioSource.PlayOneShot(ac_Thud);
+
                 gameObject.transform.Find("Sound_Collider").GetComponent<Cs_RockSoundLogic>().MakeSound();
 
                 f_HitTimer += Time.deltaTime;
@@ -142,6 +153,10 @@ public class Cs_RockLogic : MonoBehaviour
             // Tell 'sound collider' to inform enemies (Occurs as a trigger BEFORE making the change to 'IsTrigger = true'
             if (!b_HasMadeSound)
             {
+                float f_Pitch = Random.Range(0.8f, 1.21f);
+                as_AudioSource.pitch = f_Pitch;
+                as_AudioSource.PlayOneShot(ac_Thud);
+
                 gameObject.transform.Find("Sound_Collider").GetComponent<Cs_RockSoundLogic>().MakeSound();
 
                 f_HitTimer += Time.deltaTime;

@@ -594,9 +594,8 @@ public class Cs_PlayerController : MonoBehaviour
         {
             f_WalkSFX_Timer = f_WalkSFX_Max - 0.05f;
         }
-
-        bool b_IsGrass = true;
-        LayerMask i_LayerMask = LayerMask.GetMask("Ground");
+        
+        LayerMask i_LayerMask = LayerMask.GetMask("Ground", "Wall");
         RaycastHit hit;
         Physics.Raycast(gameObject.transform.position, -transform.up, out hit, float.PositiveInfinity, i_LayerMask);
 
