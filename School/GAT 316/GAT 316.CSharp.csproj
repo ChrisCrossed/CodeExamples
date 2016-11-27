@@ -81,6 +81,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Cs_BriefcaseLogic.cs" />
     <Compile Include="Assets\Cs_CameraLogic.cs" />
     <Compile Include="Assets\Cs_CameraTrigger.cs" />
     <Compile Include="Assets\Cs_EndGame.cs" />
@@ -91,6 +92,7 @@
     <Compile Include="Assets\Cs_LevelLogic.cs" />
     <Compile Include="Assets\Cs_LockPosRot.cs" />
     <Compile Include="Assets\Cs_MusicManager.cs" />
+    <Compile Include="Assets\Cs_ObjectiveLogic.cs" />
     <Compile Include="Assets\Cs_PatrolPointLogic.cs" />
     <Compile Include="Assets\Cs_PlayerController.cs" />
     <Compile Include="Assets\Cs_RockLogic.cs" />
