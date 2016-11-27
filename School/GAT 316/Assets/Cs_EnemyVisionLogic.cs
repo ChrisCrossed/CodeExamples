@@ -60,7 +60,7 @@ public class Cs_EnemyVisionLogic : MonoBehaviour
     void CheckToSeePlayer( Collider collider_ )
     {
         // Clarify which objects we want to cast to, specifically the player & objects they can hide behind.
-        int i_LayerMask = LayerMask.GetMask("Player", "Wall", "Trigger");
+        int i_LayerMask = LayerMask.GetMask("Player", "Wall", "Trigger", "Ground");
 
         // Find the vector between the raycast point & the player
         if(go_RaycastPoint != null)
