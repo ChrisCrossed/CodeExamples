@@ -115,7 +115,11 @@ public class Cs_GateScript : MonoBehaviour
 
             b_PreviousDoorState = !b_IsOpen;
         }
+    }
 
+    public bool Get_DoorOpen()
+    {
+        return b_IsOpen;
     }
 
     public void Set_ObjectiveActive( bool b_IsActive_ )
