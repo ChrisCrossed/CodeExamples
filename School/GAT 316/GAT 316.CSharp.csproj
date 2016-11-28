@@ -97,6 +97,7 @@
     <Compile Include="Assets\Cs_PlayerController.cs" />
     <Compile Include="Assets\Cs_RockLogic.cs" />
     <Compile Include="Assets\Cs_RockSoundLogic.cs" />
+    <Compile Include="Assets\Cs_Tutorial.cs" />
     <Compile Include="Assets\Cs_VisualDisplay.cs" />
     <Compile Include="Assets\Cs_VisualRadius.cs" />
     <Compile Include="Assets\Cs_WallLogic.cs" />

@@ -8,6 +8,8 @@ public class Cs_ObjectiveLogic : MonoBehaviour
 	// Use this for initialization
 	void Start ()
     {
+        gameObject.GetComponent<MeshRenderer>().enabled = false;
+
         mdl_Briefcase = transform.Find("mdl_Briefcase").gameObject;
 	}
 

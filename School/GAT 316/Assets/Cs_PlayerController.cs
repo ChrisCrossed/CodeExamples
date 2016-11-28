@@ -67,6 +67,9 @@ public class Cs_PlayerController : MonoBehaviour
     // Use this for initialization
     void Start ()
     {
+        // Load resources to reduce hiccups
+        Resources.Load("Icosphere");
+
         GameObject.Find("Canvas").GetComponent<Canvas>().enabled = true;
 
         go_SlopeRaycast = transform.FindChild("SlopeRaycast").gameObject;

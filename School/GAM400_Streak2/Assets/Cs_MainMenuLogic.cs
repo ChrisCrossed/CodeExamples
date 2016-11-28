@@ -17,7 +17,7 @@ public class Cs_MainMenuLogic : MonoBehaviour
         if(go_GameSettings)
         {
             go_GameSettings.GetComponent<Cs_MainMenu_GameSettings>().Set_GameSettings(true, true, false, false, true, 10, 15, 1);
-            SceneManager.LoadScene(3);
+            // SceneManager.LoadScene(3);
         }
 	}
 	
