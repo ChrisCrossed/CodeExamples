@@ -10,7 +10,7 @@ public class Cs_IntroScreenLogic : MonoBehaviour
     [SerializeField] int i_LevelToGoTo;
 
     float f_LevelTimer = -1f;
-    [SerializeField] float f_LevelTimer_Max = 6.0f; // The overall amount of time until the next scene loads
+    [SerializeField] float f_LevelTimer_Max = 8.0f; // The overall amount of time until the next scene loads
 
     float f_LerpPerc;
     static float f_LerpPerc_Max = 2.0f; // The amount of seconds it takes to lerp between 0% and 100%

@@ -128,8 +128,6 @@ public class Cs_Intro_BrickLogic : MonoBehaviour
             if (f_Perc > 1.0f) f_Perc = 1.0f;
             else if (f_Perc < 0.0f) f_Perc = 0.0f;
 
-            print(f_Perc);
-
             if(f_Perc > 0.1f)
             {
                 SetMaterialsVisibility(f_Perc);

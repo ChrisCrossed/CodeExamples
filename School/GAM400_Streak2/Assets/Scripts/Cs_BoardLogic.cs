@@ -97,40 +97,70 @@ public struct IntVector2
 
 public class Cs_BoardLogic : MonoBehaviour
 {
+    GameObject go_GameSettings;
+
     Enum_PauseEffect e_PauseEffect = Enum_PauseEffect.StartGame;
 
     bool b_DemoGame_InputReceived = false;
 
     int i_Score;
-    [Range(-1, 5)] [SerializeField] int i_TimeToDrop_Max = 3;
     float f_TimeToDrop = -3f;
-
-    [SerializeField] [Range(10, 20)] int i_ArrayWidth;
-    [SerializeField] [Range(10, 20)] int i_ArrayHeight;
 
     Enum_BlockType[,] BlockArray;
 
     // Current Active Block Information
     Vector2 v2_ActiveBlockLocation;
     Enum_BlockSize e_BlockSize;
+    [SerializeField] Enum_WhiteBlockChance e_WhiteBlockChance = Enum_WhiteBlockChance.OneInSeven;
+    int i_WhiteBlockChance;
+    Enum_BlockType[] e_NextBlockList = new Enum_BlockType[27];
+
+    // Game Settings
     [SerializeField] bool b_2w_2h_Allowed = true;
     [SerializeField] bool b_2w_3h_Allowed = true;
     [SerializeField] bool b_3w_2h_Allowed = true;
     [SerializeField] bool b_3w_3h_Allowed = true;
     [SerializeField] bool b_ThreeBlockColors = false;
-    [SerializeField] Enum_WhiteBlockChance e_WhiteBlockChance = Enum_WhiteBlockChance.OneInSeven;
-    int i_WhiteBlockChance;
-
-    Enum_BlockType[] e_NextBlockList = new Enum_BlockType[27];
-
-    // [SerializeField] bool b_MidRowBlank = false;
-    // [Range(1, 10)] [SerializeField] int i_ExtraBlankRow = 1;
-
+    [SerializeField] [Range(10, 20)] int i_ArrayWidth;
+    [SerializeField] [Range(10, 20)] int i_ArrayHeight;
+    [Range(-1, 5)] [SerializeField] int i_TimeToDrop_Max = 3;
+    
     float f_StartGameTimer = 2.0f;
+    
+    // Used to begin gameplay
+    public void Init_Gameplay()
+    {
+        print("************** DID THE THING **************");
+    }
+
+    void Awake()
+    {
+        // Find GameSettings Object and pull in information
+        if (GameObject.Find("GameSettings"))
+        {
+            go_GameSettings = GameObject.Find("GameSettings");
+
+            Cs_MainMenu_GameSettings gameSettings = go_GameSettings.GetComponent<Cs_MainMenu_GameSettings>();
+
+            b_2w_2h_Allowed = gameSettings.b_2w_2h;
+            b_2w_3h_Allowed = gameSettings.b_2w_3h;
+            b_3w_2h_Allowed = gameSettings.b_3w_2h;
+            b_3w_3h_Allowed = gameSettings.b_3w_3h;
+
+            b_ThreeBlockColors = gameSettings.b_ThreeBlocks;
+
+            i_ArrayWidth = gameSettings.i_BoardWidth;
+            i_ArrayHeight = gameSettings.i_BoardHeight;
+
+            i_TimeToDrop_Max = gameSettings.i_DropTimer;
+        }
+    }
 
 	// Use this for initialization
 	void Start ()
     {
+        
+
         Enum_BlockSize e_MaxBlockSize = Enum_BlockSize.size_2w_2h;
         if(  b_3w_3h_Allowed ||
             (b_2w_3h_Allowed && b_3w_2h_Allowed) )
