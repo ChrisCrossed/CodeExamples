@@ -84,7 +84,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Cs_IntroBlockLogic.cs" />
+    <Compile Include="Assets\Cs_Intro_TextLogic.cs" />
     <Compile Include="Assets\ProCore\ProBuilder\API Examples\Icosphere FFT\Scripts\CameraControls.cs" />
     <Compile Include="Assets\ProCore\ProBuilder\API Examples\Icosphere FFT\Scripts\IcoBumpin.cs" />
     <Compile Include="Assets\ProCore\ProBuilder\API Examples\Misc\HueCube.cs" />
@@ -99,6 +99,7 @@
     <Compile Include="Assets\Scripts\Cs_HUDBlockLogic.cs" />
     <Compile Include="Assets\Scripts\Cs_InputManager.cs" />
     <Compile Include="Assets\Scripts\Cs_IntroScreenLogic.cs" />
+    <Compile Include="Assets\Scripts\Cs_Intro_BrickLogic.cs" />
     <Compile Include="Assets\XInputDotNet\Examples\XInputTestCS.cs" />
     <Compile Include="Assets\XInputDotNetPure\GamePad.cs" />
     <Compile Include="Assets\XInputDotNetPure\Properties\AssemblyInfo.cs" />

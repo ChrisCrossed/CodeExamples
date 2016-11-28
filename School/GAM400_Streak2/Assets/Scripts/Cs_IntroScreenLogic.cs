@@ -2,6 +2,7 @@
 using System.Collections;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using XInputDotNetPure;
 
 public class Cs_IntroScreenLogic : MonoBehaviour
 {
@@ -9,14 +10,33 @@ public class Cs_IntroScreenLogic : MonoBehaviour
     [SerializeField] int i_LevelToGoTo;
 
     float f_LevelTimer = -1f;
-    static float f_LevelTimer_Max = 6.0f; // The overall amount of time until the next scene loads
+    [SerializeField] float f_LevelTimer_Max = 6.0f; // The overall amount of time until the next scene loads
 
     float f_LerpPerc;
     static float f_LerpPerc_Max = 2.0f; // The amount of seconds it takes to lerp between 0% and 100%
 
-	// Update is called once per frame
-	void Update ()
+    // Controller Input
+    PlayerIndex pad_PlayerOne = PlayerIndex.One;
+    GamePadState state_p1;
+    GamePadState prevState_p1;
+
+    // Update is called once per frame
+    void Update ()
     {
+        #region Update Controller State
+        prevState_p1 = state_p1;
+        state_p1 = GamePad.GetState(pad_PlayerOne);
+        #endregion
+
+        if( Input.GetKeyDown(KeyCode.Space) ||
+            Input.GetKeyDown(KeyCode.Escape) ||
+            state_p1.Buttons.A == ButtonState.Pressed || 
+            state_p1.Buttons.Start == ButtonState.Pressed ||
+            state_p1.Buttons.Back == ButtonState.Pressed)
+        {
+            f_LevelTimer = f_LevelTimer_Max + 1f;
+        }
+
         UpdateLerpTimer();
 
         // Lerp from the previous graphic's alpha value to its new alpha
@@ -47,7 +67,7 @@ public class Cs_IntroScreenLogic : MonoBehaviour
             f_LerpPerc = (f_LevelTimer_Max - f_LevelTimer) / f_LerpPerc_Max;
         }
         // Just switch scenes
-        else if(f_LevelTimer >= f_LevelTimer_Max + 1)
+        else if(f_LevelTimer >= f_LevelTimer_Max + 1f)
         {
             SceneManager.LoadScene(i_LevelToGoTo);
         }
@@ -56,5 +76,10 @@ public class Cs_IntroScreenLogic : MonoBehaviour
     void ApplyNewAlpha()
     {
 
+    }
+
+    public float Get_SceneMaxTime()
+    {
+        return f_LevelTimer_Max;
     }
 }

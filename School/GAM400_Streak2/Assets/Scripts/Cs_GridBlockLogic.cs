@@ -167,11 +167,6 @@ public class Cs_GridBlockLogic : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
     {
-        if(Input.GetKeyDown(KeyCode.M))
-        {
-            Set_ColorState(Enum_ColorState.Red, false);
-        }
-
         UpdateBlockAlpha();
 
         UpdateFadeTimers();
