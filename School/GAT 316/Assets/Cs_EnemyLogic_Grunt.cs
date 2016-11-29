@@ -138,7 +138,11 @@ public class Cs_EnemyLogic_Grunt : MonoBehaviour
         // f_InvestigateTimer = 0.0f;
         f_InvestigateTimer = f_MAX_INVESTIGATE_TIME;
 
-        gameObject.GetComponent<NavMeshAgent>().destination = v3_InvestigateLocation_;
+        // Adds 0.5f to the height position so the enemy can reach it
+        Vector3 v3_InvestigateLocation = v3_InvestigateLocation_;
+        v3_InvestigateLocation.y += 0.5f;
+
+        gameObject.GetComponent<NavMeshAgent>().destination = v3_InvestigateLocation;
         gameObject.GetComponent<NavMeshAgent>().stoppingDistance = f_StoppingDistance;
         gameObject.GetComponent<NavMeshAgent>().speed = f_SprintMoveSpeed;
         gameObject.GetComponent<NavMeshAgent>().acceleration = 5.0f;
@@ -280,6 +284,8 @@ public class Cs_EnemyLogic_Grunt : MonoBehaviour
         #region Investigate
         else if (e_EnemyState == Enum_EnemyState.InvestigateLocation)
         {
+            print(f_InvestigateTimer);
+
             // if (Vector3.Distance(gameObject.transform.position, v3_InvestigateLocation) <= gameObject.GetComponent<NavMeshAgent>().radius + 0.15f)
             if (gameObject.GetComponent<NavMeshAgent>().remainingDistance <= 0.15f)
             {
@@ -292,9 +298,10 @@ public class Cs_EnemyLogic_Grunt : MonoBehaviour
                     // GoToState_Patrol();
                     if(gameObject != null)
                     {
-                        if(go_LevelLogic.GetComponent<Cs_LevelLogic>())
+                        Cs_LevelLogic[] levelLogic = go_LevelLogic.GetComponents<Cs_LevelLogic>();
+                        for(int i_ = 0; i_ < levelLogic.Length; ++i_)
                         {
-                            go_LevelLogic.GetComponent<Cs_LevelLogic>().Set_PatrolState(gameObject);
+                            levelLogic[i_].Set_PatrolState(gameObject);
                         }
                     }
                 }

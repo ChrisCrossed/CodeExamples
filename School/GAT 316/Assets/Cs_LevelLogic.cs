@@ -97,6 +97,8 @@ public class Cs_LevelLogic : MonoBehaviour
                 return;
             }
 
+            print("Got Here");
+
             // Reset timer
             f_Timer_FromInvestigateToPatrol = f_MaxTimer_FromInvestigateToPatrol;
 
@@ -134,6 +136,8 @@ public class Cs_LevelLogic : MonoBehaviour
                 return;
             }
         }
+
+        print("HERE");
 
         // Set appropriate timers
         f_Timer_FromChaseToInvestigate = f_MaxTimer_FromChaseToInvestigate;
@@ -236,6 +240,8 @@ public class Cs_LevelLogic : MonoBehaviour
         else if(e_EnemiesState == Enum_EnemyState.InvestigateLocation)
         {
             f_Timer_FromInvestigateToPatrol -= Time.deltaTime;
+
+            print(f_Timer_FromInvestigateToPatrol);
 
             if(f_Timer_FromInvestigateToPatrol <= 0)
             {
