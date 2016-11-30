@@ -202,6 +202,12 @@ public class Cs_LevelLogic : MonoBehaviour
                 {
                     go_EnableList_[i_].GetComponent<Cs_GateScript>().Set_DoorOpen(true);
                 }
+
+                // Sirens
+                if(go_EnableList_[i_].GetComponent<Cs_Siren>())
+                {
+                    go_EnableList_[i_].GetComponent<Cs_Siren>().Set_Enabled = true;
+                }
             }
         }
     }
@@ -216,6 +222,12 @@ public class Cs_LevelLogic : MonoBehaviour
                 if (go_DisableList_[i_].GetComponent<Cs_GateScript>())
                 {
                     go_DisableList_[i_].GetComponent<Cs_GateScript>().Set_DoorOpen(false);
+                }
+
+                // Sirens
+                if (go_DisableList_[i_].GetComponent<Cs_Siren>())
+                {
+                    go_DisableList_[i_].GetComponent<Cs_Siren>().Set_Enabled = false;
                 }
             }
         }

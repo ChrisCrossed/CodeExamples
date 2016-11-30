@@ -19,7 +19,7 @@ public class Cs_PlayerController : MonoBehaviour
     // PLAYER STATS & INFORMATION
     public float MAX_PLAYER_SPEED;
     public float ACCELERATION;
-    [Range( 0, 1 )]
+    [Range(0, 1)]
     public float f_Magnitude_Sneak;
     [Range(0, 1)]
     public float f_Magnitude_Brisk;
@@ -28,7 +28,7 @@ public class Cs_PlayerController : MonoBehaviour
 
     [SerializeField]
     public float currSpeedReadOnly;
-    
+
     // Player variables
     Vector3 v3_CurrentVelocity;
     bool b_IsSprinting = false;
@@ -65,7 +65,7 @@ public class Cs_PlayerController : MonoBehaviour
     float f_DisableTimer;
 
     // Use this for initialization
-    void Start ()
+    void Start()
     {
         // Load resources to reduce hiccups
         Resources.Load("Icosphere");
@@ -96,16 +96,16 @@ public class Cs_PlayerController : MonoBehaviour
     float f_WalkSFX_Timer = 0.5f;
     static float f_WalkSFX_Max = 0.6f;
     float f_WalkSFX_Multiplier;
-	void Update ()
+    void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape)) Application.Quit();
 
         #region Play Movement SFX
         f_WalkSFX_Timer += Time.deltaTime * f_WalkSFX_Multiplier;
 
-        if(f_WalkSFX_Timer >= f_WalkSFX_Max)
+        if (f_WalkSFX_Timer >= f_WalkSFX_Max)
         {
-            Play_WalkSFX( f_WalkSFX_Multiplier );
+            Play_WalkSFX(f_WalkSFX_Multiplier);
             f_WalkSFX_Timer = 0.0f;
         }
         #endregion
@@ -131,7 +131,7 @@ public class Cs_PlayerController : MonoBehaviour
         }
 
         currSpeedReadOnly = gameObject.GetComponent<Rigidbody>().velocity.magnitude;
-	}
+    }
 
     void LateUpdate()
     {
@@ -157,7 +157,7 @@ public class Cs_PlayerController : MonoBehaviour
         return false;
     }
 
-    void PlayerMovement( Vector3 v3_InputVector_, float f_Magnitude_ )
+    void PlayerMovement(Vector3 v3_InputVector_, float f_Magnitude_)
     {
         // Grab previous velocity to compare against
         Vector3 v3_PreviousVelocity = gameObject.GetComponent<Rigidbody>().velocity;
@@ -166,11 +166,11 @@ public class Cs_PlayerController : MonoBehaviour
         v3_CurrentVelocity = Vector3.Lerp(v3_PreviousVelocity, v3_NewVelocity, ACCELERATION * Time.deltaTime);
 
         // Receive the ramp angle below the player
-        RaycastHit rayHit = EvaluateGroundVector( LayerMask.GetMask("Ground", "Wall") );
+        RaycastHit rayHit = EvaluateGroundVector(LayerMask.GetMask("Ground", "Wall"));
 
-        Vector3 v3_FinalVelocity = Vector3.ProjectOnPlane( v3_CurrentVelocity, rayHit.normal );
+        Vector3 v3_FinalVelocity = Vector3.ProjectOnPlane(v3_CurrentVelocity, rayHit.normal);
 
-        if(rayHit.distance >= 0.265f)
+        if (rayHit.distance >= 0.265f)
         {
             v3_FinalVelocity.y = v3_PreviousVelocity.y - (Time.deltaTime * 50);
         }
@@ -197,7 +197,7 @@ public class Cs_PlayerController : MonoBehaviour
         #region Sprinting
         float f_Magnitude = 0f;
 
-        if( !b_IsSprinting)
+        if (!b_IsSprinting)
         {
             if (state.Buttons.LeftStick == ButtonState.Pressed && prevState.Buttons.LeftStick == ButtonState.Released) b_IsSprinting = true;
         }
@@ -209,20 +209,20 @@ public class Cs_PlayerController : MonoBehaviour
         // If the player speed isn't 0, apply preset speeds
         if (v3_InputVector.magnitude != float.Epsilon)
         {
-            if      (v3_InputVector.magnitude < 0.15f)   f_Magnitude = 0;
-            else if (v3_InputVector.magnitude < 0.82f)   f_Magnitude = f_Magnitude_Sneak; // 0.82 is the minimum magnitude reachable when the analog stick is pushed in one direction
-            else    f_Magnitude = f_Magnitude_Brisk;
+            if (v3_InputVector.magnitude < 0.15f) f_Magnitude = 0;
+            else if (v3_InputVector.magnitude < 0.82f) f_Magnitude = f_Magnitude_Sneak; // 0.82 is the minimum magnitude reachable when the analog stick is pushed in one direction
+            else f_Magnitude = f_Magnitude_Brisk;
 
-            if (b_IsSprinting)   f_Magnitude = f_Magnitude_Sprint;
+            if (b_IsSprinting) f_Magnitude = f_Magnitude_Sprint;
 
         }
         #endregion
 
         #region Play Walk/Run SFX
-        if      (f_Magnitude == f_Magnitude_Sneak)  f_WalkSFX_Multiplier = 1.0f;
-        else if (f_Magnitude == f_Magnitude_Brisk)  f_WalkSFX_Multiplier = 1.5f;
+        if (f_Magnitude == f_Magnitude_Sneak) f_WalkSFX_Multiplier = 1.0f;
+        else if (f_Magnitude == f_Magnitude_Brisk) f_WalkSFX_Multiplier = 1.5f;
         else if (f_Magnitude == f_Magnitude_Sprint) f_WalkSFX_Multiplier = 2.0f;
-        else if (f_Magnitude == 0)                  f_WalkSFX_Multiplier = 0.0f;
+        else if (f_Magnitude == 0) f_WalkSFX_Multiplier = 0.0f;
         #endregion
 
         #region Update Aim/Fire
@@ -247,8 +247,8 @@ public class Cs_PlayerController : MonoBehaviour
 
         #region Use Ability
         // Throw Rock
-        if( state.Buttons.RightShoulder == ButtonState.Pressed && prevState.Buttons.RightShoulder == ButtonState.Released &&
-            b_AllowedToFire_ReticleMagnitude )
+        if (state.Buttons.RightShoulder == ButtonState.Pressed && prevState.Buttons.RightShoulder == ButtonState.Released &&
+            b_AllowedToFire_ReticleMagnitude)
         {
             float f_StickMagnitude = Vector2.SqrMagnitude(new Vector2(state.ThumbSticks.Right.X, state.ThumbSticks.Right.Y));
             Vector3 v3_ThrowVector = CalculateThrow(f_StickMagnitude);
@@ -259,15 +259,19 @@ public class Cs_PlayerController : MonoBehaviour
 
         // Normalize
         v3_InputVector.Normalize();
-        
+
         // Pass information into PlayerMovement()
         PlayerMovement(v3_InputVector, f_Magnitude);
     }
 
     public float f_AimingDistance = 5.0f;
     float f_ReticleFadeTimer;
-    void UpdateReticle( Vector2 v2_Vector_, float f_Magnitude )
+    private Vector3 velocity = Vector3.zero;
+    void UpdateReticle(Vector2 v2_Vector_, float f_Magnitude)
     {
+        // Capture previous reticle position
+        Vector3 v3_PreviousLocation = gameObject.transform.position;
+
         // Reposition the Reticle's X/Z in comparison to the player's position
         Vector3 v3_ReticlePosition = gameObject.transform.position;
         Vector3 v3_ConvertedVector = new Vector3(v2_Vector_.x, 0, v2_Vector_.y);
@@ -292,7 +296,7 @@ public class Cs_PlayerController : MonoBehaviour
 
         if (f_Magnitude >= 0.4f)
         {
-            if(f_ReticleFadeTimer < 1.0f)
+            if (f_ReticleFadeTimer < 1.0f)
             {
                 f_ReticleFadeTimer += Time.deltaTime * 10;
 
@@ -343,7 +347,7 @@ public class Cs_PlayerController : MonoBehaviour
         #region Shift Key
         if (!b_IsSprinting)
         {
-            if (Input.GetKeyDown( KeyCode.LeftShift )) b_IsSprinting = true;
+            if (Input.GetKeyDown(KeyCode.LeftShift)) b_IsSprinting = true;
         }
         else
         {
@@ -357,7 +361,7 @@ public class Cs_PlayerController : MonoBehaviour
         float f_TIME_ALLOWANCE = 0.4f;
 
         // Decrement the timer if it's currently 'active'
-        if( f_DoubleTapForSprintTimer > 0.0f)
+        if (f_DoubleTapForSprintTimer > 0.0f)
         {
             // Decrement
             f_DoubleTapForSprintTimer -= Time.deltaTime;
@@ -367,13 +371,13 @@ public class Cs_PlayerController : MonoBehaviour
         }
 
         // If the player pressed a button, evaluate if we BEGIN sprinting
-        if( Input.GetKeyDown( KeyCode.W ) ||
-            Input.GetKeyDown( KeyCode.S ) ||
-            Input.GetKeyDown( KeyCode.A ) ||
-            Input.GetKeyDown( KeyCode.D ))
+        if (Input.GetKeyDown(KeyCode.W) ||
+            Input.GetKeyDown(KeyCode.S) ||
+            Input.GetKeyDown(KeyCode.A) ||
+            Input.GetKeyDown(KeyCode.D))
         {
             // First press
-            if( f_DoubleTapForSprintTimer == 0.0f )
+            if (f_DoubleTapForSprintTimer == 0.0f)
             {
                 // Set timer to the Alloted Time to wait
                 f_DoubleTapForSprintTimer = f_TIME_ALLOWANCE;
@@ -386,9 +390,9 @@ public class Cs_PlayerController : MonoBehaviour
         }
 
         // If we're already sprinting and are holding a directional key down, keep the sprint timer up. Allows walking into sprinting.
-        if(b_IsSprinting)
+        if (b_IsSprinting)
         {
-            if ( Input.GetKey(KeyCode.W) ||
+            if (Input.GetKey(KeyCode.W) ||
                  Input.GetKey(KeyCode.S) ||
                  Input.GetKey(KeyCode.A) ||
                  Input.GetKey(KeyCode.D))
@@ -423,7 +427,7 @@ public class Cs_PlayerController : MonoBehaviour
         if (cameraState == Enum_CameraState.Lerp_FromPlayer || cameraState == Enum_CameraState.Lerp_ToPlayer)
         {
             // Camera timer increments as it travels to the temp location
-            if(cameraState == Enum_CameraState.Lerp_FromPlayer)
+            if (cameraState == Enum_CameraState.Lerp_FromPlayer)
             {
                 cameraLerpTime_Curr += Time.deltaTime;
 
@@ -437,7 +441,7 @@ public class Cs_PlayerController : MonoBehaviour
             {
                 cameraLerpTime_Curr -= (Time.deltaTime * 2);
 
-                if(cameraLerpTime_Curr <= 0)
+                if (cameraLerpTime_Curr <= 0)
                 {
                     cameraLerpTime_Curr = 0;
                 }
@@ -446,7 +450,7 @@ public class Cs_PlayerController : MonoBehaviour
             // Lerp calculations
             float perc = cameraLerpTime_Curr / cameraLerpTime;
 
-            if(go_Camera_TempPos != null && go_Camera_DefaultPos != null)
+            if (go_Camera_TempPos != null && go_Camera_DefaultPos != null)
             {
                 Vector3 v3_Vector = go_Camera_TempPos.transform.position - go_Camera_DefaultPos.transform.position;
                 // go_Camera_TempPos.transform.rotation - go_Camera_DefaultPos.transform.rotation;
@@ -457,26 +461,26 @@ public class Cs_PlayerController : MonoBehaviour
                 // go_Camera.transform.eulerAngles = go_Camera_DefaultPos.transform.eulerAngles + (v3_Rotation * perc);
                 // go_Camera.transform.position = go_Camera_DefaultPos.transform.rotation + (q_Rot * perc);
                 go_Camera.transform.rotation = Quaternion.Lerp(go_Camera_DefaultPos.transform.rotation, go_Camera_TempPos.transform.rotation, perc);
-            }   
+            }
         }
     }
 
     GameObject go_PreviousCameraPos;
-    public void Set_CameraPosition( GameObject go_CameraPos_ = null )
+    public void Set_CameraPosition(GameObject go_CameraPos_ = null)
     {
         // Only change away from the previous camera once we've already changed to the new one (Stops camera errors from differing, close-by triggers)
-        if(go_PreviousCameraPos != go_Camera_TempPos)
+        if (go_PreviousCameraPos != go_Camera_TempPos)
         {
             go_PreviousCameraPos = go_Camera_TempPos;
         }
 
-        if(go_CameraPos_ == null)
+        if (go_CameraPos_ == null)
         {
             cameraState = Enum_CameraState.Lerp_ToPlayer;
         }
         else
         {
-            if(cameraLerpTime_Curr == 0)
+            if (cameraLerpTime_Curr == 0)
             {
                 go_Camera_TempPos = go_CameraPos_;
                 cameraState = Enum_CameraState.Lerp_FromPlayer;
@@ -484,13 +488,13 @@ public class Cs_PlayerController : MonoBehaviour
         }
     }
 
-    RaycastHit EvaluateGroundVector( LayerMask layerMask_ )
+    RaycastHit EvaluateGroundVector(LayerMask layerMask_)
     {
         RaycastHit hit;
 
-        if( layerMask_ != new LayerMask())
+        if (layerMask_ != new LayerMask())
         {
-            Physics.Raycast(go_SlopeRaycast.transform.position, -transform.up, out hit, float.PositiveInfinity, layerMask_ );
+            Physics.Raycast(go_SlopeRaycast.transform.position, -transform.up, out hit, float.PositiveInfinity, layerMask_);
         }
         else
         {
@@ -500,7 +504,7 @@ public class Cs_PlayerController : MonoBehaviour
         return hit;
     }
 
-    Vector3 CalculateThrow( float f_AnalogStickMagnitude_ )
+    Vector3 CalculateThrow(float f_AnalogStickMagnitude_)
     {
         f_Gravity = Physics.gravity.magnitude;
         float f_Angle = (f_FiringAngle * f_AnalogStickMagnitude_) * Mathf.Deg2Rad;
@@ -518,9 +522,9 @@ public class Cs_PlayerController : MonoBehaviour
         float f_AngleBetweenObjects = Vector3.Angle(Vector3.forward, v3_HorizontalTarget - v3_HorizontalPosition);
 
         Vector3 v3_FinalVelocity = Quaternion.AngleAxis(f_AngleBetweenObjects, Vector3.up) * v3_Velocity;
-       
 
-        if(v3_HorizontalTarget.x < v3_HorizontalPosition.x)
+
+        if (v3_HorizontalTarget.x < v3_HorizontalPosition.x)
         {
             v3_FinalVelocity.x *= -1;
         }
@@ -532,7 +536,7 @@ public class Cs_PlayerController : MonoBehaviour
     {
         GameObject go_Rock = (GameObject)Instantiate(prefab_Rock, go_FireLocation.transform.position, gameObject.transform.rotation);
 
-        if(v3_Velocity_ != new Vector3())
+        if (v3_Velocity_ != new Vector3())
         {
             // Applies a velocity on the object as it's thrown
             go_Rock.GetComponent<Rigidbody>().velocity = v3_Velocity_;
@@ -542,13 +546,13 @@ public class Cs_PlayerController : MonoBehaviour
         }
     }
 
-    public void Set_PlayerDisableTimer( float f_DisableTimer_ )
+    public void Set_PlayerDisableTimer(float f_DisableTimer_)
     {
         f_DisableTimer = f_DisableTimer_;
     }
 
     bool b_FadeToBlack = false;
-    public void Set_FadeState( bool b_FadeToBlack_ )
+    public void Set_FadeState(bool b_FadeToBlack_)
     {
         b_FadeToBlack = b_FadeToBlack_;
     }
@@ -556,14 +560,15 @@ public class Cs_PlayerController : MonoBehaviour
     float f_FadeTimer = 3.0f;
     float f_FadeTimer_Max = 1.5f;
     float f_Transparency;
-    [SerializeField] GameObject go_FadeInOutObj;
+    [SerializeField]
+    GameObject go_FadeInOutObj;
     void FadeState()
     {
         // 0 timer = 0 opacity (completely transparent). full timer = full opacity.
         // Not fading to black, we go transparent.
-        if(b_FadeToBlack)
+        if (b_FadeToBlack)
         {
-            if(f_FadeTimer < f_FadeTimer_Max) f_FadeTimer += Time.deltaTime;
+            if (f_FadeTimer < f_FadeTimer_Max) f_FadeTimer += Time.deltaTime;
 
             if (f_FadeTimer > f_FadeTimer_Max) f_FadeTimer = f_FadeTimer_Max;
         }
@@ -591,28 +596,28 @@ public class Cs_PlayerController : MonoBehaviour
     AudioClip ac_Gravel_3;
     AudioSource as_SFXSource;
     float f_PrevMult;
-    void Play_WalkSFX( float f_SFXMultiplier_ )
+    void Play_WalkSFX(float f_SFXMultiplier_)
     {
-        if(f_SFXMultiplier_ != f_PrevMult)
+        if (f_SFXMultiplier_ != f_PrevMult)
         {
             f_WalkSFX_Timer = f_WalkSFX_Max - 0.05f;
         }
-        
+
         LayerMask i_LayerMask = LayerMask.GetMask("Ground", "Wall");
         RaycastHit hit;
         Physics.Raycast(gameObject.transform.position, -transform.up, out hit, float.PositiveInfinity, i_LayerMask);
 
-        if ( f_SFXMultiplier_ == 1.0f )
+        if (f_SFXMultiplier_ == 1.0f)
         {
             as_SFXSource.volume = 0.6f;
             as_SFXSource.pitch = 1.0f;
 
-            if(hit.collider.tag == "Gravel")
+            if (hit.collider.tag == "Gravel")
             {
                 as_SFXSource.pitch = Random.Range(0.8f, 0.9f);
                 int i_RandomPick = Random.Range(0, 3);
 
-                if      (i_RandomPick == 0) gameObject.GetComponent<AudioSource>().PlayOneShot(ac_Gravel);
+                if (i_RandomPick == 0) gameObject.GetComponent<AudioSource>().PlayOneShot(ac_Gravel);
                 else if (i_RandomPick == 1) gameObject.GetComponent<AudioSource>().PlayOneShot(ac_Gravel_2);
                 else if (i_RandomPick == 2) gameObject.GetComponent<AudioSource>().PlayOneShot(ac_Gravel_3);
             }
@@ -621,7 +626,7 @@ public class Cs_PlayerController : MonoBehaviour
                 gameObject.GetComponent<AudioSource>().PlayOneShot(ac_Grass_Light);
             }
         }
-        else if ( f_SFXMultiplier_ == 1.5f )
+        else if (f_SFXMultiplier_ == 1.5f)
         {
             as_SFXSource.volume = 0.4f;
             as_SFXSource.pitch = 1.0f;
@@ -640,7 +645,7 @@ public class Cs_PlayerController : MonoBehaviour
                 gameObject.GetComponent<AudioSource>().PlayOneShot(ac_Grass_Heavy);
             }
         }
-        else if ( f_SFXMultiplier_ == 2.0f )
+        else if (f_SFXMultiplier_ == 2.0f)
         {
             as_SFXSource.volume = 1.0f;
             as_SFXSource.pitch = 1.1f;

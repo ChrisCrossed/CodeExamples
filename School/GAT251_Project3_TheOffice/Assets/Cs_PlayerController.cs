@@ -1,9 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
 
 public class Cs_PlayerController : MonoBehaviour
 {
     GameObject go_Camera;
+    [SerializeField] GameObject go_RaycastObj_Use;
+    GameObject go_UseObject;
+    GameObject ui_Reticle;
 
     float f_Speed_Curr;
     float f_Speed_Max = 3f;
@@ -19,6 +23,7 @@ public class Cs_PlayerController : MonoBehaviour
 	void Start ()
     {
         go_Camera = gameObject.transform.Find("Main Camera").gameObject;
+        ui_Reticle = GameObject.Find("UI_Raycast").gameObject;
 
         f_yPos_Ground = gameObject.transform.position.y;
         f_yPos_Jump = f_yPos_Ground + f_JumpHeight;
@@ -80,6 +85,11 @@ public class Cs_PlayerController : MonoBehaviour
         else if( Input.GetKey(KeyCode.D) && !Input.GetKey(KeyCode.A) )
         {
             v3_InputVector.x = 1;
+        }
+
+        if(Input.GetKeyDown(KeyCode.E))
+        {
+            Use_InteractObject();
         }
 
         if(Input.GetKey(KeyCode.Space))
@@ -173,13 +183,60 @@ public class Cs_PlayerController : MonoBehaviour
     }
     #endregion
 
+    void RaycastThroughCanvas()
+    {
+        RaycastHit hit;
+        int i_LayerMask = LayerMask.GetMask("Wall", "Boss", "Interact", "Default");
+
+        Physics.Raycast(go_Camera.transform.position, go_Camera.transform.forward, out hit, float.PositiveInfinity, i_LayerMask);
+
+        if(hit.collider)
+        {
+            if(hit.collider.gameObject.layer == LayerMask.NameToLayer("Interact"))
+            {
+                go_UseObject = hit.collider.gameObject;
+
+                // Change color of reticle
+                ui_Reticle.GetComponent<Image>().color = new Color(1, 0, 0);
+            }
+            else
+            {
+                // Reset color of reticle
+                ui_Reticle.GetComponent<Image>().color = new Color(1, 1, 1);
+
+                // Disable the ability to 'use' an object
+                go_UseObject = null;
+            }
+        }
+        else
+        {
+            // Reset color of reticle
+            ui_Reticle.GetComponent<Image>().color = new Color(1, 1, 1);
+
+            // Disable the ability to 'use' an object
+            go_UseObject = null;
+        }
+    }
+
+    void Use_InteractObject()
+    {
+        if(go_UseObject != null)
+        {
+            // Check the object's scripts to see what type of object it is
+            if(go_UseObject.GetComponent<Cs_KeyboardLogic_Key>())
+            {
+                go_UseObject.GetComponent<Cs_KeyboardLogic_Key>().Use();
+            }
+        }
+    }
+
     // Update is called once per frame
     void Update ()
     {
         PlayerInput();
-        
 
-	}
+        RaycastThroughCanvas();
+    }
 
     void LateUpdate()
     {

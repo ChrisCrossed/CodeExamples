@@ -88,6 +88,8 @@
     <Compile Include="Assets\Cs_MainMenuButton_A.cs" />
     <Compile Include="Assets\Cs_MainMenuLogic.cs" />
     <Compile Include="Assets\Cs_MainMenu_GameSettings.cs" />
+    <Compile Include="Assets\MenuSystem.cs" />
+    <Compile Include="Assets\NodeMap.cs" />
     <Compile Include="Assets\ProCore\ProBuilder\API Examples\Icosphere FFT\Scripts\CameraControls.cs" />
     <Compile Include="Assets\ProCore\ProBuilder\API Examples\Icosphere FFT\Scripts\IcoBumpin.cs" />
     <Compile Include="Assets\ProCore\ProBuilder\API Examples\Misc\HueCube.cs" />

@@ -16,6 +16,7 @@ public class Cs_Tutorial : MonoBehaviour
     float f_FadeTimer;
     bool b_DeactivateScript;
     [SerializeField] float f_BeginFadeInAt = 3.0f;
+    float f_FadeOutAt;
 
     // Use this for initialization
     void Start ()
@@ -32,6 +33,13 @@ public class Cs_Tutorial : MonoBehaviour
         go_Sneak.GetComponent<Image>().color = clr_AlphaOff;
         go_Walk.GetComponent<Image>().color = clr_AlphaOff;
         go_Run.GetComponent<Image>().color = clr_AlphaOff;
+
+        f_FadeOutAt = f_BeginFadeInAt + 180f;
+    }
+
+    public void Set_DeactivateTutorial()
+    {
+        f_TutorialTimer = f_FadeOutAt;
     }
 	
 	// Update is called once per frame
@@ -41,7 +49,7 @@ public class Cs_Tutorial : MonoBehaviour
         if(!b_DeactivateScript)
         {
             // If we're within the timer to begin fading in
-            if(f_TutorialTimer < f_BeginFadeInAt + 7f)
+            if(f_TutorialTimer < f_FadeOutAt)
             {
                 f_TutorialTimer += Time.deltaTime;  
 
