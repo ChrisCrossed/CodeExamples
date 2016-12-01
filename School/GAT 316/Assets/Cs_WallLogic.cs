@@ -3,8 +3,7 @@ using System.Collections;
 
 public class Cs_WallLogic : MonoBehaviour
 {
-    // WallLogic does two things: Ensures it is set as a 'Wall' layer, and contains functions to turn itself semi-transparent when told to (by camera colliders)
-
+    // WallLogic does two things: Ensures it is set as a 'Wall' layer, and contains functions to turn itself semi-transparent when told to (by camera raycasting)
     bool b_GoToTransparent;
 
     float f_TransparencyTimer = 1.0f;

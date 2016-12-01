@@ -273,4 +273,16 @@ public class Cs_Tutorial_Trigger : MonoBehaviour
             f_Timer += Time.deltaTime;
         }
     }
+
+    void OnTriggerExit( Collider collider_ )
+    {
+        if (collider_.transform.root.gameObject.name == "Player" )
+        {
+            // If the timer is under the time to fade out, jump the timer forward a bit
+            if ( f_Timer < f_TimeUntilFadeOut - 0.5f )
+            {
+                f_Timer = f_TimeUntilFadeOut - 0.5f;
+            }
+        }
+    }
 }
