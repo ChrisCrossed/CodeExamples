@@ -249,7 +249,7 @@ public class Cs_LevelLogic : MonoBehaviour
         {
             f_Timer_FromInvestigateToPatrol -= Time.deltaTime;
 
-            print(f_Timer_FromInvestigateToPatrol);
+            // print(f_Timer_FromInvestigateToPatrol);
 
             if(f_Timer_FromInvestigateToPatrol <= 0)
             {

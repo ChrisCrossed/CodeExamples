@@ -105,8 +105,12 @@ public class Cs_PlayerController : MonoBehaviour
 
         if (f_WalkSFX_Timer >= f_WalkSFX_Max)
         {
-            Play_WalkSFX(f_WalkSFX_Multiplier);
-            f_WalkSFX_Timer = 0.0f;
+            // Only play if the player is indeed moving
+            if(gameObject.GetComponent<Rigidbody>().velocity.magnitude > 1f)
+            {
+                Play_WalkSFX(f_WalkSFX_Multiplier);
+                f_WalkSFX_Timer = 0.0f;
+            }
         }
         #endregion
 

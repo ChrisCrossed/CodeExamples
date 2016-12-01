@@ -173,7 +173,18 @@ public class Cs_GeneratorLogic : MonoBehaviour
     {
         if(collider_.transform.root.gameObject.name == "Player")
         {
-            b_PlayerInCollider = true;
+            // Raycast to the player model
+            RaycastHit hit;
+            int i_LayerMask = LayerMask.GetMask("Player", "Wall");
+            Vector3 v3_Vector = collider_.transform.root.gameObject.transform.position - gameObject.transform.position;
+
+            if (Physics.Raycast(gameObject.transform.position, v3_Vector, out hit, float.PositiveInfinity, i_LayerMask))
+            {
+                if( hit.collider.gameObject.layer == LayerMask.NameToLayer("Player") )
+                {
+                    b_PlayerInCollider = true;
+                }
+            }
         }
     }
 
