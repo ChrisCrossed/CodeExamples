@@ -10,8 +10,6 @@ public class Cs_DisableTutorial : MonoBehaviour
         {
             if(GameObject.Find("Canvas").GetComponent<Cs_Tutorial>())
             {
-                print("Got Here");
-
                 GameObject.Find("Canvas").GetComponent<Cs_Tutorial>().Set_DeactivateTutorial();
             }
         }

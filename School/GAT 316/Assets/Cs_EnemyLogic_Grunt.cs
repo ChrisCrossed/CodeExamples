@@ -231,7 +231,7 @@ public class Cs_EnemyLogic_Grunt : MonoBehaviour
                 gameObject.GetComponent<NavMeshAgent>().stoppingDistance = 0.1f;
 
                 // if (gameObject.GetComponent<NavMeshAgent>().remainingDistance <= gameObject.GetComponent<NavMeshAgent>().radius + 0.15f)
-                if (Vector3.Distance(gameObject.transform.position, v3_PatrolPos) <= gameObject.GetComponent<NavMeshAgent>().radius + 0.15f)
+                if (Vector3.Distance(gameObject.transform.position, v3_PatrolPos) <= gameObject.GetComponent<NavMeshAgent>().radius + 0.2f)
                 {
                     f_PatrolWaitTimer += Time.deltaTime;
 
@@ -284,10 +284,8 @@ public class Cs_EnemyLogic_Grunt : MonoBehaviour
         #region Investigate
         else if (e_EnemyState == Enum_EnemyState.InvestigateLocation)
         {
-            print(f_InvestigateTimer);
-
             // if (Vector3.Distance(gameObject.transform.position, v3_InvestigateLocation) <= gameObject.GetComponent<NavMeshAgent>().radius + 0.15f)
-            if (gameObject.GetComponent<NavMeshAgent>().remainingDistance <= 0.15f)
+            if (gameObject.GetComponent<NavMeshAgent>().remainingDistance <= 0.2f)
             {
                 // f_InvestigateTimer += Time.deltaTime;
                 f_InvestigateTimer -= Time.deltaTime;

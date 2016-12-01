@@ -16,7 +16,7 @@ public class Cs_Siren : MonoBehaviour
         go_LeftSirenModel = transform.Find("Mdl_SoundVisual_Left").gameObject;
         go_RightSirenModel = transform.Find("Mdl_SoundVisual_Right").gameObject;
 
-        Set_Enabled = true;
+        Set_Enabled = false;
     }
 
     public bool Set_Enabled

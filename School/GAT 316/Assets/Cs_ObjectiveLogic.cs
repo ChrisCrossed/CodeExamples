@@ -18,6 +18,12 @@ public class Cs_ObjectiveLogic : MonoBehaviour
         if (collider_.transform.root.gameObject.name == "Player")
         {
             mdl_Briefcase.GetComponent<Cs_BriefcaseLogic>().Set_PickedUp();
+
+            // 'Destroy' the wall guarding the briefcase
+            GameObject go_Door = GameObject.Find("Gate_Exit");
+            go_Door.GetComponent<BoxCollider>().isTrigger = true;
+            go_Door.GetComponent<Cs_GateScript>().Set_DoorOpen(true);
+            go_Door.GetComponent<Cs_GateScript>().Set_ObjectiveActive(false);
         }
     }
 }

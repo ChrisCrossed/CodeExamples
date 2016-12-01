@@ -270,7 +270,6 @@ public class Cs_Tutorial_Trigger : MonoBehaviour
     {
         if(collider_.transform.root.gameObject.name == "Player")
         {
-            print("Activated");
             f_Timer += Time.deltaTime;
         }
     }

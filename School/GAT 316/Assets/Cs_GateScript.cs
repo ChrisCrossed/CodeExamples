@@ -55,8 +55,6 @@ public class Cs_GateScript : MonoBehaviour
     bool b_PreviousDoorState;
 	void Update ()
     {
-        if (Input.GetKeyDown(KeyCode.U)) Set_DoorOpen(!b_IsOpen);
-
         PositionDoor();
 	}
 

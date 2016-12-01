@@ -97,8 +97,6 @@ public class Cs_LevelLogic : MonoBehaviour
                 return;
             }
 
-            print("Got Here");
-
             // Reset timer
             f_Timer_FromInvestigateToPatrol = f_MaxTimer_FromInvestigateToPatrol;
 
@@ -136,8 +134,6 @@ public class Cs_LevelLogic : MonoBehaviour
                 return;
             }
         }
-
-        print("HERE");
 
         // Set appropriate timers
         f_Timer_FromChaseToInvestigate = f_MaxTimer_FromChaseToInvestigate;
