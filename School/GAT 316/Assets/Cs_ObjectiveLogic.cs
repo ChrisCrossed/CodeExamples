@@ -24,6 +24,10 @@ public class Cs_ObjectiveLogic : MonoBehaviour
             go_Door.GetComponent<BoxCollider>().isTrigger = true;
             go_Door.GetComponent<Cs_GateScript>().Set_DoorOpen(true);
             go_Door.GetComponent<Cs_GateScript>().Set_ObjectiveActive(false);
+
+            // Because I am lazy, set the objectives that need to know that the player's grabbed the objective
+            GameObject.Find("RoadLogic").GetComponent<Cs_RoadLogic>().ObjectiveCollected = true;
+            // TODO: Set the HUD to show the briefcase picked up
         }
     }
 }

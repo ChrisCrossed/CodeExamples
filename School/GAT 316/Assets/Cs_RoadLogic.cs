@@ -3,6 +3,8 @@ using System.Collections;
 
 public class Cs_RoadLogic : MonoBehaviour
 {
+    bool b_ObjectiveCollected;
+
     GameObject go_Car_1;
     GameObject go_Car_2;
     [SerializeField] GameObject go_Limo;
@@ -26,6 +28,12 @@ public class Cs_RoadLogic : MonoBehaviour
         // Enable and initiate the Limo
         go_Limo.SetActive(true);
         go_Limo.GetComponent<Cs_LimoLogic>().Init_Limo();
+    }
+
+    public bool ObjectiveCollected
+    {
+        set { b_ObjectiveCollected = value; }
+        get { return b_ObjectiveCollected; }
     }
 	
 	// Update is called once per frame
