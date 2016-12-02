@@ -31,7 +31,9 @@ public class Cs_LevelLogic : MonoBehaviour
     {
         go_Player = GameObject.Find("Player");
         go_MusicManager = GameObject.Find("MusicManager");
-	}
+
+        HUD_Object = GameObject.Find("Canvas").GetComponent<Cs_HUDController>();
+    }
 
     bool CheckEnemyInList( GameObject go_EnemyObject_ )
     {
@@ -228,13 +230,17 @@ public class Cs_LevelLogic : MonoBehaviour
             }
         }
     }
-	
-	// Update is called once per frame
+
+    // Update is called once per frame
+    Cs_HUDController HUD_Object;
 	void Update ()
     {
 	    if(e_EnemiesState == Enum_EnemyState.ChasePlayer)
         {
             f_Timer_FromChaseToInvestigate -= Time.deltaTime;
+
+            // print("Chase->Invest: " + f_Timer_FromChaseToInvestigate);
+            HUD_Object.Set_ScreenTimer = true;
 
             if(f_Timer_FromChaseToInvestigate <= 0)
             {
@@ -249,7 +255,7 @@ public class Cs_LevelLogic : MonoBehaviour
         {
             f_Timer_FromInvestigateToPatrol -= Time.deltaTime;
 
-            // print(f_Timer_FromInvestigateToPatrol);
+            // print("Invest->Patrol: " + f_Timer_FromInvestigateToPatrol);
 
             if(f_Timer_FromInvestigateToPatrol <= 0)
             {

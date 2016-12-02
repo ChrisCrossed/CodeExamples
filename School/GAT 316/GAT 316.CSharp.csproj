@@ -92,13 +92,16 @@
     <Compile Include="Assets\Cs_EnemyVisionLogic.cs" />
     <Compile Include="Assets\Cs_GateScript.cs" />
     <Compile Include="Assets\Cs_GeneratorLogic.cs" />
+    <Compile Include="Assets\Cs_HUDController.cs" />
     <Compile Include="Assets\Cs_LevelLogic.cs" />
     <Compile Include="Assets\Cs_LimoLogic.cs" />
+    <Compile Include="Assets\Cs_LimoTrigger.cs" />
     <Compile Include="Assets\Cs_LockPosRot.cs" />
     <Compile Include="Assets\Cs_MusicManager.cs" />
     <Compile Include="Assets\Cs_ObjectiveLogic.cs" />
     <Compile Include="Assets\Cs_PatrolPointLogic.cs" />
     <Compile Include="Assets\Cs_PlayerController.cs" />
+    <Compile Include="Assets\Cs_RoadLogic.cs" />
     <Compile Include="Assets\Cs_RockLogic.cs" />
     <Compile Include="Assets\Cs_RockSoundLogic.cs" />
     <Compile Include="Assets\Cs_Siren.cs" />

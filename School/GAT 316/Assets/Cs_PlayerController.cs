@@ -245,8 +245,6 @@ public class Cs_PlayerController : MonoBehaviour
         // Pass information in to the UpdateReticle function
         v3_TargetLocation = go_TargetObject.transform.position;
 
-        print(f_RightStickMagnitude);
-
         if( UpdateReticle(v2_RightStickVector, f_RightStickMagnitude) )
         {
             if ( f_RightStickMagnitude >= 0.4f )

@@ -15,6 +15,8 @@ public class Cs_CarLogic : MonoBehaviour
     Vector3 go_CarStart_1;
     Vector3 go_CarStart_2;
 
+    int i_NumLanes = 2;
+
     // Use this for initialization
     void Start ()
     {
@@ -34,7 +36,7 @@ public class Cs_CarLogic : MonoBehaviour
         navAgent.speed = Random.Range(10f, 25f);
 
         // Set random end position
-        if (Random.Range(0, 2) == 1)
+        if (Random.Range(0, i_NumLanes) == 0)
         {
             gameObject.transform.position = go_CarStart_1;
             navAgent.SetDestination(go_CarGoal_1);
@@ -44,6 +46,11 @@ public class Cs_CarLogic : MonoBehaviour
             gameObject.transform.position = go_CarStart_2;
             navAgent.SetDestination(go_CarGoal_2);
         }
+    }
+
+    public void Set_BottomLaneOnly()
+    {
+        i_NumLanes = 1;
     }
 
 	// Update is called once per frame
