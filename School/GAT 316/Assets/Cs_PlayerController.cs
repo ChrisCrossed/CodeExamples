@@ -244,9 +244,16 @@ public class Cs_PlayerController : MonoBehaviour
 
         // Pass information in to the UpdateReticle function
         v3_TargetLocation = go_TargetObject.transform.position;
-        UpdateReticle(v2_RightStickVector, f_RightStickMagnitude);
 
-        if (f_RightStickMagnitude >= 0.3f) b_AllowedToFire_ReticleMagnitude = true;
+        print(f_RightStickMagnitude);
+
+        if( UpdateReticle(v2_RightStickVector, f_RightStickMagnitude) )
+        {
+            if ( f_RightStickMagnitude >= 0.4f )
+            {
+                b_AllowedToFire_ReticleMagnitude = true;
+            }
+        }
         #endregion
 
         #region Use Ability
@@ -271,11 +278,9 @@ public class Cs_PlayerController : MonoBehaviour
     public float f_AimingDistance = 5.0f;
     float f_ReticleFadeTimer;
     private Vector3 velocity = Vector3.zero;
-    void UpdateReticle(Vector2 v2_Vector_, float f_Magnitude)
+    Vector3 v3_OldPosition;
+    bool UpdateReticle(Vector2 v2_Vector_, float f_Magnitude)
     {
-        // Capture previous reticle position
-        Vector3 v3_PreviousLocation = gameObject.transform.position;
-
         // Reposition the Reticle's X/Z in comparison to the player's position
         Vector3 v3_ReticlePosition = gameObject.transform.position;
         Vector3 v3_ConvertedVector = new Vector3(v2_Vector_.x, 0, v2_Vector_.y);
@@ -288,40 +293,159 @@ public class Cs_PlayerController : MonoBehaviour
         RaycastHit hit;
         Physics.Raycast(new Vector3(v3_ReticlePosition.x, v3_ReticlePosition.y + 5, v3_ReticlePosition.z), -transform.up, out hit, 10.0f, layer_mask);
 
-        Vector3 v3_NewPosition = hit.point;
-        v3_NewPosition.y += 0.1f;
-
-        // Rotate the reticle to match the surface it hits
-        Vector3 v3_FinalRotation = Vector3.ProjectOnPlane(-transform.up + new Vector3(90, 0, 0), hit.normal);
-
-        // Apply final position
-        go_TargetObject.transform.position = v3_NewPosition;
-        go_TargetObject.transform.eulerAngles = v3_FinalRotation;
-
-        if (f_Magnitude >= 0.4f)
+        if(hit.collider)
         {
-            if (f_ReticleFadeTimer < 1.0f)
-            {
-                f_ReticleFadeTimer += Time.deltaTime * 10;
+            Vector3 v3_NewPosition = hit.point;
+            v3_NewPosition.y += 0.1f;
 
-                if (f_ReticleFadeTimer > 1.0f) f_ReticleFadeTimer = 1.0f;
+            // Rotate the reticle to match the surface it hits
+            Vector3 v3_FinalRotation = Vector3.ProjectOnPlane(-transform.up + new Vector3(90, 0, 0), hit.normal);
+
+            // Apply final position
+            // go_TargetObject.transform.position = v3_NewPosition;
+            v3_NewPosition = Vector3.Lerp(v3_OldPosition, v3_NewPosition, Time.deltaTime * 10f);
+            go_TargetObject.transform.position = v3_NewPosition;
+
+            go_TargetObject.transform.eulerAngles = v3_FinalRotation;
+
+            if (f_Magnitude >= 0.4f)
+            {
+                if (f_ReticleFadeTimer < 1.0f)
+                {
+                    f_ReticleFadeTimer += Time.deltaTime * 10;
+
+                    if (f_ReticleFadeTimer > 1.0f) f_ReticleFadeTimer = 1.0f;
+                }
             }
+            else
+            {
+                if (f_ReticleFadeTimer > 0)
+                {
+                    if (f_ReticleFadeTimer > 0.5f) f_ReticleFadeTimer = 0.5f;
+
+                    f_ReticleFadeTimer -= Time.deltaTime;
+
+                    if (f_ReticleFadeTimer < 0.0f) f_ReticleFadeTimer = 0.0f;
+                }
+            }
+
+            Color clr_Fade = go_TargetObject.GetComponent<MeshRenderer>().material.color;
+            clr_Fade.a = f_ReticleFadeTimer;
+            go_TargetObject.GetComponent<MeshRenderer>().material.color = clr_Fade;
+
+            v3_OldPosition = go_TargetObject.transform.position;
         }
+        // The raycast did not hit the wall or ground. Pull the target back toward the player until we find solid ground
         else
         {
-            if (f_ReticleFadeTimer > 0)
+            // Reset details
+            bool b_FoundSpot = false;
+            float f_NewMagnitude = f_Magnitude;
+
+            while(!b_FoundSpot)
             {
-                if (f_ReticleFadeTimer > 0.5f) f_ReticleFadeTimer = 0.5f;
+                if(f_NewMagnitude > 0.41f)
+                {
+                    // Resetting basic details.
+                    v3_ReticlePosition = gameObject.transform.position;
 
-                f_ReticleFadeTimer -= Time.deltaTime;
+                    // Decrementing the magnitude to test with
+                    if(f_NewMagnitude > 0.415f)
+                    {
+                        f_NewMagnitude -= 0.015f;
 
-                if (f_ReticleFadeTimer < 0.0f) f_ReticleFadeTimer = 0.0f;
+                        // Setting new position
+                        v3_ReticlePosition += v3_ConvertedVector * f_NewMagnitude * f_AimingDistance;
+
+                        // Perform a raycast to see if a new position exists
+                        if(Physics.Raycast(new Vector3(v3_ReticlePosition.x, v3_ReticlePosition.y + 5, v3_ReticlePosition.z), -transform.up, out hit, 10.0f, layer_mask))
+                        {
+                            #region Raycast - Same process as above
+                            Vector3 v3_NewPosition = hit.point;
+                            v3_NewPosition.y += 0.1f;
+
+                            // Rotate the reticle to match the surface it hits
+                            Vector3 v3_FinalRotation = Vector3.ProjectOnPlane(-transform.up + new Vector3(90, 0, 0), hit.normal);
+
+                            // Apply final position
+                            v3_NewPosition = Vector3.Lerp(v3_OldPosition, v3_NewPosition, Time.deltaTime * 10f);
+                            go_TargetObject.transform.position = v3_NewPosition;
+
+                            go_TargetObject.transform.eulerAngles = v3_FinalRotation;
+
+                            if (f_Magnitude >= 0.4f)
+                            {
+                                if (f_ReticleFadeTimer < 1.0f)
+                                {
+                                    f_ReticleFadeTimer += Time.deltaTime * 10;
+
+                                    if (f_ReticleFadeTimer > 1.0f) f_ReticleFadeTimer = 1.0f;
+                                }
+                            }
+
+                            Color clr_Fade = go_TargetObject.GetComponent<MeshRenderer>().material.color;
+                            clr_Fade.a = f_ReticleFadeTimer;
+                            go_TargetObject.GetComponent<MeshRenderer>().material.color = clr_Fade;
+
+                            v3_OldPosition = go_TargetObject.transform.position;
+                            #endregion
+
+                            // End while loop
+                            b_FoundSpot = true;
+                            return true;
+                        }
+                    }
+                    // Magnitude is less than the minimum. Set position and break out.
+                    else
+                    {
+                        if (f_ReticleFadeTimer > 0)
+                        {
+                            if (f_ReticleFadeTimer > 0.5f) f_ReticleFadeTimer = 0.5f;
+
+                            f_ReticleFadeTimer -= Time.deltaTime;
+
+                            if (f_ReticleFadeTimer < 0.0f) f_ReticleFadeTimer = 0.0f;
+                        }
+
+                        Color clr_Fade = go_TargetObject.GetComponent<MeshRenderer>().material.color;
+                        clr_Fade.a = f_ReticleFadeTimer;
+                        go_TargetObject.GetComponent<MeshRenderer>().material.color = clr_Fade;
+
+                        // v3_OldPosition = go_TargetObject.transform.position;
+                        go_TargetObject.transform.position = gameObject.transform.position;
+
+                        // Break out so we don't crash
+                        b_FoundSpot = true;
+                        // return false;
+                    }
+                }
+                // Magnitude is less than the minimum. Set position & break out.
+                else
+                {
+                    if (f_ReticleFadeTimer > 0)
+                    {
+                        if (f_ReticleFadeTimer > 0.5f) f_ReticleFadeTimer = 0.5f;
+
+                        f_ReticleFadeTimer -= Time.deltaTime;
+
+                        if (f_ReticleFadeTimer < 0.0f) f_ReticleFadeTimer = 0.0f;
+                    }
+
+                    Color clr_Fade = go_TargetObject.GetComponent<MeshRenderer>().material.color;
+                    clr_Fade.a = f_ReticleFadeTimer;
+                    go_TargetObject.GetComponent<MeshRenderer>().material.color = clr_Fade;
+
+                    // v3_OldPosition = go_TargetObject.transform.position;
+                    go_TargetObject.transform.position = gameObject.transform.position;
+
+                    // Break out so we don't crash
+                    b_FoundSpot = true;
+                    return false;
+                }
             }
         }
 
-        Color clr_Fade = go_TargetObject.GetComponent<MeshRenderer>().material.color;
-        clr_Fade.a = f_ReticleFadeTimer;
-        go_TargetObject.GetComponent<MeshRenderer>().material.color = clr_Fade;
+        return true;
     }
 
     void Input_Keyboard()
