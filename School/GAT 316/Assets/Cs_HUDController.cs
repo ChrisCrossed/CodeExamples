@@ -25,6 +25,9 @@ public class Cs_HUDController : MonoBehaviour
         b_IsCaught = false;
 
         txt_Timer = transform.Find("Text_Timer").gameObject;
+        txt_CaughtText = transform.Find("Text_CaughtCounter").gameObject;
+
+        Set_CaughtText();
     }
 
     void FadeText( bool b_FadeIn_ )
@@ -59,6 +62,7 @@ public class Cs_HUDController : MonoBehaviour
                     b_IsCaught = true;
 
                     ++i_NumTimesCaught;
+                    Set_CaughtText();
                 }
 
                 // Set the text object to show 10:00 Countdown
@@ -119,13 +123,36 @@ public class Cs_HUDController : MonoBehaviour
 
         txt_Timer.GetComponent<Text>().text = string.Format("{0:00}:{1:00}", i_Seconds, f_Milliseconds);
     }
-	
-	// Update is called once per frame
+
+    void Set_CaughtText()
+    {
+        if (i_NumTimesCaught == 0)
+        {
+            txt_CaughtText.GetComponent<Text>().color = Color.blue;
+        }
+        else if( i_NumTimesCaught < 4 )
+        {
+            txt_CaughtText.GetComponent<Text>().color = Color.green;
+        }
+        else if (i_NumTimesCaught < 7)
+        {
+            txt_CaughtText.GetComponent<Text>().color = Color.yellow;
+        }
+        else
+        {
+            txt_CaughtText.GetComponent<Text>().color = Color.red;
+        }
+
+        txt_CaughtText.GetComponent<Text>().text = i_NumTimesCaught.ToString();
+    }
+
+    // Update is called once per frame
+    GameObject txt_CaughtText;
 	void Update ()
     {
         Set_ScreenText(f_Timer);
-
-        if(b_IsCaught)
+        
+        if (b_IsCaught)
         {
             f_Timer -= Time.deltaTime;
 
