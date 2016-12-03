@@ -7,8 +7,6 @@ public class Cs_SetObjective : MonoBehaviour
     {
         if(collider_.transform.root.gameObject.name == "Player")
         {
-            print("Got here");
-
             RaycastHit hit;
             int i_LayerMask = LayerMask.GetMask("Player", "Wall", "Ground");
             Vector3 v3_VectorToPlayer = collider_.transform.root.gameObject.transform.position - gameObject.transform.position;

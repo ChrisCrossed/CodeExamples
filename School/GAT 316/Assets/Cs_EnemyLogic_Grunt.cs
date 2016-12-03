@@ -190,11 +190,61 @@ public class Cs_EnemyLogic_Grunt : MonoBehaviour
         }
     }
 
+    float f_VolumeZeroAtDistance = 25.0f;
+    float f_VolumeFullAtDistance = 5.0f;
+    Vector3 v3_CurrentLocation;
+    Vector3 v3_PreviousLocation;
+    void SetVolume()
+    {
+        // Evaluate distance right now. If not within range, cut out.
+        Vector3 v3_EnemyLocation = gameObject.transform.position;
+        Vector3 v3_PlayerLocation = GameObject.Find("Player").transform.position;
+        float f_DistanceToPlayer = Vector3.Distance(v3_EnemyLocation, v3_PlayerLocation);
+
+        // Used to determine amount of distance moved
+        v3_CurrentLocation = gameObject.transform.position;
+
+        // If we're not even within range, set volume to 0f and move on OR if we haven't moved enough
+        if(f_DistanceToPlayer > f_VolumeZeroAtDistance || Vector3.Distance(v3_CurrentLocation, v3_PreviousLocation) < 0.01f)
+        {
+            as_SFXSource.volume = 0f;
+
+            return;
+        }
+        else
+        {
+            // If this enemy has moved far enough this frame, begin evaluating distance & set volume
+            {
+                // Evaluate distance away and increase volume based on distance
+                if( f_DistanceToPlayer < f_VolumeZeroAtDistance && f_DistanceToPlayer < f_VolumeFullAtDistance )
+                {
+                    float f_Perc = (f_DistanceToPlayer - f_VolumeFullAtDistance) / (f_VolumeZeroAtDistance - f_VolumeFullAtDistance);
+
+                    // Minimum volume
+                    if (f_Perc < 0.3f) f_Perc = 0.3f;
+
+                    // Set volume
+                    as_SFXSource.volume = f_Perc;
+                }
+                else
+                {
+                    // Cap volume
+                    as_SFXSource.volume = 1f;
+                }
+            }
+        }
+
+        // Used to determine amount of distance moved
+        v3_PreviousLocation = v3_CurrentLocation;
+    }
+
     // Update is called once per frame
     float f_WalkSFX_Timer = 0.5f;
     static float f_WalkSFX_Max = 0.75f;
 	void Update ()
     {
+        SetVolume();
+
         #region SFX
         f_WalkSFX_Timer += Time.deltaTime * (gameObject.GetComponent<NavMeshAgent>().speed / f_BasicMoveSpeed);
 
