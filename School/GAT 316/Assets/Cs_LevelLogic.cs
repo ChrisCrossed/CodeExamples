@@ -63,7 +63,10 @@ public class Cs_LevelLogic : MonoBehaviour
         }
 
         // Player was caught, turn off the Objective Window setting
-        GameObject.Find("Canvas").GetComponent<Cs_ObjectiveWindow>().Set_DeactivateGenerator = false;
+        if(!GameObject.Find("Canvas").GetComponent<Cs_ObjectiveWindow>().Set_GrabBriefcase)
+        {
+            GameObject.Find("Canvas").GetComponent<Cs_ObjectiveWindow>().Set_DeactivateGenerator = false;
+        }
 
         // When the player is spotted, reset the f_Timer
         f_Timer_FromChaseToInvestigate = f_MaxTimer_FromChaseToInvestigate;

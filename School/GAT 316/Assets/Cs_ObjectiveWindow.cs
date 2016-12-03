@@ -61,6 +61,7 @@ public class Cs_ObjectiveWindow : MonoBehaviour
         }
     }
 
+    bool b_BriefcaseGrabbed;
     public bool Set_GrabBriefcase
     {
         set
@@ -77,7 +78,11 @@ public class Cs_ObjectiveWindow : MonoBehaviour
                 txt_GrabBriefcase.GetComponent<Text>().text = s_Text + "[X]";
                 txt_GrabBriefcase.GetComponent<Text>().color = Color.yellow;
             }
+
+            b_BriefcaseGrabbed = value;
         }
+
+        get { return b_BriefcaseGrabbed; }
     }
 
     public bool Set_Escape
