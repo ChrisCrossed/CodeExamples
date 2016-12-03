@@ -97,6 +97,7 @@
     <Compile Include="Assets\Cs_LimoLogic.cs" />
     <Compile Include="Assets\Cs_LimoTrigger.cs" />
     <Compile Include="Assets\Cs_LockPosRot.cs" />
+    <Compile Include="Assets\Cs_MissionReport.cs" />
     <Compile Include="Assets\Cs_MusicManager.cs" />
     <Compile Include="Assets\Cs_ObjectiveLogic.cs" />
     <Compile Include="Assets\Cs_PatrolPointLogic.cs" />

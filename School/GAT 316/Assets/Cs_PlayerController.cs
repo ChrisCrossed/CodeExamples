@@ -64,6 +64,9 @@ public class Cs_PlayerController : MonoBehaviour
     // Camera Trigger variables
     float f_DisableTimer;
 
+    // Game End bool
+    bool b_GameOver;
+
     // Use this for initialization
     void Start()
     {
@@ -100,41 +103,44 @@ public class Cs_PlayerController : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape)) Application.Quit();
 
-        #region Play Movement SFX
-        f_WalkSFX_Timer += Time.deltaTime * f_WalkSFX_Multiplier;
-
-        if (f_WalkSFX_Timer >= f_WalkSFX_Max)
+        if(!b_GameOver)
         {
-            // Only play if the player is indeed moving
-            if(gameObject.GetComponent<Rigidbody>().velocity.magnitude > 1f)
+            #region Play Movement SFX
+            f_WalkSFX_Timer += Time.deltaTime * f_WalkSFX_Multiplier;
+
+            if (f_WalkSFX_Timer >= f_WalkSFX_Max)
             {
-                Play_WalkSFX(f_WalkSFX_Multiplier);
-                f_WalkSFX_Timer = 0.0f;
+                // Only play if the player is indeed moving
+                if(gameObject.GetComponent<Rigidbody>().velocity.magnitude > 1f)
+                {
+                    Play_WalkSFX(f_WalkSFX_Multiplier);
+                    f_WalkSFX_Timer = 0.0f;
+                }
             }
-        }
-        #endregion
+            #endregion
 
-        // Stop player movement while touching specific triggers
-        if (f_DisableTimer > 0)
-        {
-            // Reduce the timer back down to 0
-            f_DisableTimer -= Time.deltaTime;
-
-            // Clamp
-            if (f_DisableTimer < 0) f_DisableTimer = 0;
-        }
-        else
-        {
-            b_KeyboardUsedLast = KeyboardCheck(b_KeyboardUsedLast);
-
-            if (b_KeyboardUsedLast)
+            // Stop player movement while touching specific triggers
+            if (f_DisableTimer > 0)
             {
-                // Input_Keyboard();
-            }
-            else Input_Controller();
-        }
+                // Reduce the timer back down to 0
+                f_DisableTimer -= Time.deltaTime;
 
-        currSpeedReadOnly = gameObject.GetComponent<Rigidbody>().velocity.magnitude;
+                // Clamp
+                if (f_DisableTimer < 0) f_DisableTimer = 0;
+            }
+            else
+            {
+                b_KeyboardUsedLast = KeyboardCheck(b_KeyboardUsedLast);
+
+                if (b_KeyboardUsedLast)
+                {
+                    // Input_Keyboard();
+                }
+                else Input_Controller();
+            }
+
+            currSpeedReadOnly = gameObject.GetComponent<Rigidbody>().velocity.magnitude;
+        }
     }
 
     void LateUpdate()
@@ -677,17 +683,35 @@ public class Cs_PlayerController : MonoBehaviour
         f_DisableTimer = f_DisableTimer_;
     }
 
-    bool b_FadeToBlack = false;
-    public void Set_FadeState(bool b_FadeToBlack_)
+    public bool GameOver
     {
+        set
+        {
+            if(value == true)
+            {
+                gameObject.GetComponent<CapsuleCollider>().enabled = false;
+            }
+
+            b_GameOver = value;
+        }
+        get { return b_GameOver; }
+    }
+
+    bool b_FadeToBlack = false;
+    public void Set_FadeState( bool b_FadeToBlack_ )
+    {
+        if(b_FadeToBlack_)
+        {
+            f_FadeTimer = -1.0f;
+        }
+
         b_FadeToBlack = b_FadeToBlack_;
     }
 
     float f_FadeTimer = 3.0f;
     float f_FadeTimer_Max = 1.5f;
     float f_Transparency;
-    [SerializeField]
-    GameObject go_FadeInOutObj;
+    [SerializeField] GameObject go_FadeInOutObj;
     void FadeState()
     {
         // 0 timer = 0 opacity (completely transparent). full timer = full opacity.
@@ -700,14 +724,30 @@ public class Cs_PlayerController : MonoBehaviour
         }
         else // Go transparent
         {
-            if (f_FadeTimer > 0) f_FadeTimer -= Time.deltaTime;
+            if (f_FadeTimer > 0) f_FadeTimer -= Time.deltaTime / 2f;
 
             if (f_FadeTimer < 0) f_FadeTimer = 0;
 
         }
 
         f_Transparency = f_FadeTimer / f_FadeTimer_Max;
-        if (f_Transparency > 1) f_Transparency = 1;
+        
+        if (f_Transparency > 1)
+        {
+            f_Transparency = 1;
+        }
+
+        if(f_Transparency == 1f)
+        {
+            if (b_GameOver)
+            {
+                // Activate Mission Report
+                print("Mission Report");
+                GameObject.Find("Canvas").GetComponent<Cs_MissionReport>().Set_ActivateGrading();
+
+                gameObject.GetComponent<Cs_PlayerController>().enabled = false;
+            }
+        }
 
         // Set fade object's transparency
         Color clr_CurrColor = go_FadeInOutObj.GetComponent<CanvasRenderer>().GetColor();

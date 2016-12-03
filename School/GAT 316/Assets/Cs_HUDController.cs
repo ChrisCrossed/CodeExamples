@@ -5,15 +5,14 @@ using UnityEngine.UI;
 public class Cs_HUDController : MonoBehaviour
 {
     float f_Timer;
-
     float f_HangTime;
-
     int i_NumTimesCaught;
-
     bool b_IsCaught;
 
     bool b_FadeInText = true;
     GameObject txt_Timer;
+
+    float f_TotalGameTimer;
 
 	// Use this for initialization
 	void Start ()
@@ -146,10 +145,22 @@ public class Cs_HUDController : MonoBehaviour
         txt_CaughtText.GetComponent<Text>().text = i_NumTimesCaught.ToString();
     }
 
+    public int TimesCaught
+    {
+        get { return i_NumTimesCaught; }
+    }
+
+    public float TotalGameTime
+    {
+        get { return f_TotalGameTimer; }
+    }
+
     // Update is called once per frame
     GameObject txt_CaughtText;
 	void Update ()
     {
+        f_TotalGameTimer += Time.deltaTime;
+
         Set_ScreenText(f_Timer);
         
         if (b_IsCaught)

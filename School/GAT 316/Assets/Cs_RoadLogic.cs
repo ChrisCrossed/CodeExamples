@@ -42,6 +42,8 @@ public class Cs_RoadLogic : MonoBehaviour
 	    if(Input.GetKeyDown(KeyCode.P))
         {
             Set_SwitchToLimo();
+
+            ObjectiveCollected = true;
         }
 	}
 }
