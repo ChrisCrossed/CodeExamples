@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class Cs_MissionReport : MonoBehaviour
 {
@@ -317,7 +318,7 @@ public class Cs_MissionReport : MonoBehaviour
                 if (f_Timer > 18f)
                 {
                     // Return to menu
-                    // TODO: Menu
+                    SceneManager.LoadScene(0);
                 }
             }
             #endregion

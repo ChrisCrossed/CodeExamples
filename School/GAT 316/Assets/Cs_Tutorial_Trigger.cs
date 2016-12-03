@@ -266,11 +266,25 @@ public class Cs_Tutorial_Trigger : MonoBehaviour
         }
 	}
 
+    bool b_IsPlayer;
     void OnTriggerEnter( Collider collider_ )
     {
         if(collider_.transform.root.gameObject.name == "Player")
         {
-            f_Timer += Time.deltaTime;
+            RaycastHit hit;
+            int i_LayerMask = LayerMask.GetMask("Player", "Wall");
+            Vector3 v3_VectorToPlayer = collider_.transform.root.gameObject.transform.position - gameObject.transform.position;
+
+            if(Physics.Raycast(gameObject.transform.position, v3_VectorToPlayer, out hit, float.PositiveInfinity, i_LayerMask))
+            {
+                if(hit.collider.gameObject.layer == LayerMask.NameToLayer("Player"))
+                {
+                    b_IsPlayer = true;
+
+                    f_Timer += Time.deltaTime;
+                }
+            }
+
         }
     }
 
@@ -278,10 +292,15 @@ public class Cs_Tutorial_Trigger : MonoBehaviour
     {
         if (collider_.transform.root.gameObject.name == "Player" )
         {
-            // If the timer is under the time to fade out, jump the timer forward a bit
-            if ( f_Timer < f_TimeUntilFadeOut - 0.5f )
+            if(b_IsPlayer)
             {
-                f_Timer = f_TimeUntilFadeOut - 0.5f;
+                // If the timer is under the time to fade out, jump the timer forward a bit
+                if ( f_Timer < f_TimeUntilFadeOut - 0.5f )
+                {
+                    f_Timer = f_TimeUntilFadeOut - 0.5f;
+                }
+
+                b_IsPlayer = false;
             }
         }
     }

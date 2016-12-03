@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using XInputDotNetPure;
+using UnityEngine.UI;
 #if UNITY_EDITOR
 using UnityEditor.Rendering;
 #endif
@@ -67,6 +68,11 @@ public class Cs_PlayerController : MonoBehaviour
     // Game End bool
     bool b_GameOver;
 
+    // Rock Timer
+    float f_RockTimer = 10.0f;
+    static float f_RockTimer_Max = 10.0f;
+    GameObject go_RockIcon;
+
     // Use this for initialization
     void Start()
     {
@@ -74,6 +80,8 @@ public class Cs_PlayerController : MonoBehaviour
         Resources.Load("Icosphere");
 
         GameObject.Find("Canvas").GetComponent<Canvas>().enabled = true;
+
+        go_RockIcon = GameObject.Find("RockIcon");
 
         go_SlopeRaycast = transform.FindChild("SlopeRaycast").gameObject;
 
@@ -102,6 +110,21 @@ public class Cs_PlayerController : MonoBehaviour
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape)) Application.Quit();
+
+        // Rock Update
+        if(f_RockTimer < f_RockTimer_Max)
+        {
+            f_RockTimer += Time.deltaTime;
+
+            go_RockIcon.GetComponent<Image>().enabled = false;
+
+            if (f_RockTimer > f_RockTimer_Max)
+            {
+                f_RockTimer = f_RockTimer_Max;
+
+                go_RockIcon.GetComponent<Image>().enabled = true;
+            }
+        }
 
         if(!b_GameOver)
         {
@@ -262,13 +285,18 @@ public class Cs_PlayerController : MonoBehaviour
 
         #region Use Ability
         // Throw Rock
-        if (state.Buttons.RightShoulder == ButtonState.Pressed && prevState.Buttons.RightShoulder == ButtonState.Released &&
-            b_AllowedToFire_ReticleMagnitude)
+        if(f_RockTimer == f_RockTimer_Max)
         {
-            float f_StickMagnitude = Vector2.SqrMagnitude(new Vector2(state.ThumbSticks.Right.X, state.ThumbSticks.Right.Y));
-            Vector3 v3_ThrowVector = CalculateThrow(f_StickMagnitude);
+            if (state.Buttons.RightShoulder == ButtonState.Pressed && prevState.Buttons.RightShoulder == ButtonState.Released &&
+                b_AllowedToFire_ReticleMagnitude)
+            {
+                float f_StickMagnitude = Vector2.SqrMagnitude(new Vector2(state.ThumbSticks.Right.X, state.ThumbSticks.Right.Y));
+                Vector3 v3_ThrowVector = CalculateThrow(f_StickMagnitude);
 
-            ThrowRockAtLocation(v3_ThrowVector);
+                ThrowRockAtLocation(v3_ThrowVector);
+
+                f_RockTimer = 0f;
+            }
         }
         #endregion
 

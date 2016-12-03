@@ -2,6 +2,7 @@
 using System.Collections;
 using XInputDotNetPure;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class Cs_MenuLogic : MonoBehaviour
 {
@@ -13,11 +14,19 @@ public class Cs_MenuLogic : MonoBehaviour
     GamePadState prevState;
     public PlayerIndex playerOne = PlayerIndex.One;
 
+    GameObject go_Title;
+    GameObject go_PressStart;
+    GameObject go_DigiPen;
+
     // Use this for initialization
     void Start ()
     {
         state = GamePad.GetState(playerOne);
-	}
+
+        go_Title = transform.Find("GameName").gameObject;
+        go_PressStart = transform.Find("Press Start").gameObject;
+        go_DigiPen = transform.Find("DigiPen").gameObject;
+    }
 	
 	// Update is called once per frame
 	void Update ()
@@ -37,6 +46,23 @@ public class Cs_MenuLogic : MonoBehaviour
         {
             f_Alpha -= Time.deltaTime;
             if (f_Alpha < 0.0f) f_Alpha = 0.0f;
+        }
+
+        Color clr_CurrAlpha = go_PressStart.GetComponent<Text>().color;
+        clr_CurrAlpha.a = f_Alpha;
+        go_PressStart.GetComponent<Text>().color = clr_CurrAlpha;
+
+        clr_CurrAlpha = go_Title.GetComponent<Text>().color;
+        clr_CurrAlpha.a = f_Alpha;
+        go_Title.GetComponent<Text>().color = clr_CurrAlpha;
+
+        clr_CurrAlpha = go_DigiPen.GetComponent<Text>().color;
+        clr_CurrAlpha.a = f_Alpha;
+        go_DigiPen.GetComponent<Text>().color = clr_CurrAlpha;
+
+        if (b_RunGame && f_Alpha == 0f)
+        {
+            SceneManager.LoadScene(1);
         }
 
         // Run through text and set alpha
