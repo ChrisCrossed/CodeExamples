@@ -13,11 +13,13 @@
     <TargetFrameworkIdentifier>.NETFramework</TargetFrameworkIdentifier>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>Unity Subset v3.5</TargetFrameworkProfile>
-    <CompilerResponseFile></CompilerResponseFile>
+    <CompilerResponseFile>
+    </CompilerResponseFile>
     <UnityProjectType>Game:1</UnityProjectType>
     <UnityBuildTarget>StandaloneWindows:5</UnityBuildTarget>
     <UnityVersion>5.4.1f1</UnityVersion>
-    <RootNamespace></RootNamespace>
+    <RootNamespace>
+    </RootNamespace>
     <LangVersion Condition=" '$(VisualStudioVersion)' != '10.0' ">4</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -101,11 +103,13 @@
     <Compile Include="Assets\Cs_MissionReport.cs" />
     <Compile Include="Assets\Cs_MusicManager.cs" />
     <Compile Include="Assets\Cs_ObjectiveLogic.cs" />
+    <Compile Include="Assets\Cs_ObjectiveWindow.cs" />
     <Compile Include="Assets\Cs_PatrolPointLogic.cs" />
     <Compile Include="Assets\Cs_PlayerController.cs" />
     <Compile Include="Assets\Cs_RoadLogic.cs" />
     <Compile Include="Assets\Cs_RockLogic.cs" />
     <Compile Include="Assets\Cs_RockSoundLogic.cs" />
+    <Compile Include="Assets\Cs_SetObjective.cs" />
     <Compile Include="Assets\Cs_Siren.cs" />
     <Compile Include="Assets\Cs_Tutorial.cs" />
     <Compile Include="Assets\Cs_Tutorial_Trigger.cs" />

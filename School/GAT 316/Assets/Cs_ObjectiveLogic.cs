@@ -35,7 +35,9 @@ public class Cs_ObjectiveLogic : MonoBehaviour
 
                     // Because I am lazy, set the objectives that need to know that the player's grabbed the objective
                     GameObject.Find("RoadLogic").GetComponent<Cs_RoadLogic>().ObjectiveCollected = true;
+
                     // TODO: Set the HUD to show the briefcase picked up
+                    GameObject.Find("Canvas").GetComponent<Cs_ObjectiveWindow>().Set_GrabBriefcase = true;
                 }
             }
         }

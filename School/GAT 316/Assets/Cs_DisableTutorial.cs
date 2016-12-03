@@ -30,6 +30,8 @@ public class Cs_DisableTutorial : MonoBehaviour
 
                 // Disable the player's NavMeshObstacle so the Limo doesn't conflict with it
                 go_Collider.GetComponent<NavMeshObstacle>().enabled = false;
+
+                GameObject.Find("Canvas").GetComponent<Cs_ObjectiveWindow>().Set_Escape = true;
             }
         }
 

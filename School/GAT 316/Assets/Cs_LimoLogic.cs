@@ -18,7 +18,7 @@ public class Cs_LimoLogic : MonoBehaviour
         navMeshAgent = gameObject.GetComponent<NavMeshAgent>();
         navMeshAgent.speed = 15f;
 
-        gameObject.transform.position = GameObject.Find("CarStart_2").transform.position;
+        gameObject.transform.position = GameObject.Find("LimoStart").transform.position;
 
         Set_LimoStop();
     }

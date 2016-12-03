@@ -2,6 +2,7 @@
 using System.Collections;
 using XInputDotNetPure;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 #if UNITY_EDITOR
 using UnityEditor.Rendering;
 #endif
@@ -76,6 +77,9 @@ public class Cs_PlayerController : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+        // Remove mouse cursor
+        Cursor.visible = false;
+
         // Load resources to reduce hiccups
         Resources.Load("Icosphere");
 
@@ -109,7 +113,12 @@ public class Cs_PlayerController : MonoBehaviour
     float f_WalkSFX_Multiplier;
     void Update()
     {
+        // Quit with appropriate input
         if (Input.GetKeyDown(KeyCode.Escape)) Application.Quit();
+        if(state.Buttons.Back == ButtonState.Pressed && prevState.Buttons.Back == ButtonState.Released) Application.Quit();
+
+        // Restart with appropriate input
+        if (state.Buttons.Start == ButtonState.Pressed && prevState.Buttons.Start == ButtonState.Released) SceneManager.LoadScene(0);
 
         // Rock Update
         if(f_RockTimer < f_RockTimer_Max)

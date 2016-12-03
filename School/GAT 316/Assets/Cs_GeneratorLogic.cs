@@ -57,6 +57,9 @@ public class Cs_GeneratorLogic : MonoBehaviour
                         go_Objective.GetComponent<Cs_GateScript>().Set_ObjectiveActive(true);
 
                         go_Objective.GetComponent<Cs_GateScript>().Set_DoorOpen(true);
+
+                        // Player was caught, turn off the Objective Window setting
+                        GameObject.Find("Canvas").GetComponent<Cs_ObjectiveWindow>().Set_DeactivateGenerator = true;
                     }
                 }
             }

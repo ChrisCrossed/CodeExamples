@@ -34,6 +34,12 @@ public class Cs_MenuLogic : MonoBehaviour
         prevState = state;
         state = GamePad.GetState(playerOne);
 
+
+        // Quit with appropriate input
+        if (Input.GetKeyDown(KeyCode.Escape)) Application.Quit();
+        if (state.Buttons.Back == ButtonState.Pressed && prevState.Buttons.Back == ButtonState.Released) Application.Quit();
+        
+        // Run level
         if (state.Buttons.Start == ButtonState.Pressed) b_RunGame = true;
 
         // Cap alpha

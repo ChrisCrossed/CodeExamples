@@ -231,7 +231,7 @@ public class Cs_EnemyLogic_Grunt : MonoBehaviour
                 gameObject.GetComponent<NavMeshAgent>().stoppingDistance = 0.1f;
 
                 // if (gameObject.GetComponent<NavMeshAgent>().remainingDistance <= gameObject.GetComponent<NavMeshAgent>().radius + 0.15f)
-                if (Vector3.Distance(gameObject.transform.position, v3_PatrolPos) <= gameObject.GetComponent<NavMeshAgent>().radius + 0.2f)
+                if (Vector3.Distance(gameObject.transform.position, v3_PatrolPos) <= gameObject.GetComponent<NavMeshAgent>().radius + 0.15f)
                 {
                     f_PatrolWaitTimer += Time.deltaTime;
 
@@ -245,11 +245,6 @@ public class Cs_EnemyLogic_Grunt : MonoBehaviour
                         Quaternion q_CurrRot = gameObject.transform.rotation;
                         q_CurrRot = Quaternion.Lerp(gameObject.transform.rotation, go_PatrolPath[i_PatrolPoint].transform.rotation, 3 * Time.deltaTime);
                         gameObject.transform.rotation = q_CurrRot;
-                        /*
-                        Vector3 v3_CurrRot = gameObject.transform.eulerAngles;
-                        v3_CurrRot.y = Mathf.LerpAngle(gameObject.transform.eulerAngles.y, go_PatrolPath[i_PatrolPoint].transform.eulerAngles.y, 3 * Time.deltaTime);
-                        gameObject.transform.eulerAngles = v3_CurrRot;
-                        */
                     }
 
                     // If the Wait Timer reaches a certain point, go to the next point & reset the timer
@@ -285,7 +280,7 @@ public class Cs_EnemyLogic_Grunt : MonoBehaviour
         else if (e_EnemyState == Enum_EnemyState.InvestigateLocation)
         {
             // if (Vector3.Distance(gameObject.transform.position, v3_InvestigateLocation) <= gameObject.GetComponent<NavMeshAgent>().radius + 0.15f)
-            if (gameObject.GetComponent<NavMeshAgent>().remainingDistance <= 0.2f)
+            if (gameObject.GetComponent<NavMeshAgent>().remainingDistance <= gameObject.GetComponent<NavMeshAgent>().radius + 0.15f)
             {
                 // f_InvestigateTimer += Time.deltaTime;
                 f_InvestigateTimer -= Time.deltaTime;
