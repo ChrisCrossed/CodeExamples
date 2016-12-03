@@ -29,12 +29,26 @@ public class Cs_MusicManager : MonoBehaviour
             // Reduce & Cap the current pitch
             if (f_Pitch_Curr > f_Pitch_Min) f_Pitch_Curr -= Time.deltaTime;
             if (f_Pitch_Curr < f_Pitch_Min) f_Pitch_Curr = f_Pitch_Min;
+
+            // Reduce & cap the volume
+            if( as_MusicSource.volume > 0.3f)
+            {
+                as_MusicSource.volume -= Time.deltaTime;
+                if (as_MusicSource.volume < 0.3f) as_MusicSource.volume = 0.3f;
+            }
         }
         else // State == ChasePlayer
         {
             // Increase & Cap the current pitch
             if (f_Pitch_Curr < f_Pitch_Max) f_Pitch_Curr += Time.deltaTime;
             if (f_Pitch_Curr > f_Pitch_Max) f_Pitch_Curr = f_Pitch_Max;
+
+            // Increase & cap the volume
+            if (as_MusicSource.volume < 0.5f)
+            {
+                as_MusicSource.volume += Time.deltaTime;
+                if (as_MusicSource.volume > 0.5f) as_MusicSource.volume = 0.5f;
+            }
         }
 
         as_MusicSource.pitch = f_Pitch_Curr;

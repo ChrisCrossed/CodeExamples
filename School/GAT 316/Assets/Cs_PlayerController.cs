@@ -823,7 +823,7 @@ public class Cs_PlayerController : MonoBehaviour
 
         if (f_SFXMultiplier_ == 1.0f)
         {
-            as_SFXSource.volume = 0.6f;
+            as_SFXSource.volume = 0.2f;
             as_SFXSource.pitch = 1.0f;
 
             if (hit.collider.tag == "Gravel")

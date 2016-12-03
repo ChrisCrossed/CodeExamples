@@ -4,9 +4,15 @@ using System.Collections;
 public class Cs_Siren : MonoBehaviour
 {
     bool b_IsEnabled;
+    bool b_SoundEnabled;
+    bool b_PreviouslyActivated;
 
     GameObject go_LeftSirenModel;
     GameObject go_RightSirenModel;
+
+    AudioSource as_AudioSource;
+    AudioClip ac_Siren;
+    AudioClip ac_AllClear;
 
     float f_RotSpeed = 135f;
 
@@ -15,6 +21,10 @@ public class Cs_Siren : MonoBehaviour
     {
         go_LeftSirenModel = transform.Find("Mdl_SoundVisual_Left").gameObject;
         go_RightSirenModel = transform.Find("Mdl_SoundVisual_Right").gameObject;
+
+        as_AudioSource = gameObject.GetComponent<AudioSource>();
+        ac_Siren = Resources.Load("SFX_Alarm") as AudioClip;
+        ac_AllClear = Resources.Load("SFX_AllClear") as AudioClip;
 
         Set_Enabled = false;
     }
@@ -28,6 +38,44 @@ public class Cs_Siren : MonoBehaviour
             go_RightSirenModel.GetComponent<MeshRenderer>().enabled = value;
 
             b_IsEnabled = value;
+
+            // Resets the bool so the 'All Clear' plays when appropriate
+            if(!value)
+            {
+                b_PreviouslyActivated = value;
+            }
+
+            // If at least one frame has passed and thus no audio has played yet...
+            if(b_SoundEnabled)
+            {
+                // If the alarm hasn't been playing, play it
+                if(!b_PreviouslyActivated)
+                {
+                    b_PreviouslyActivated = true;
+
+                    // If we've enabled the siren, play the Alarm clip & loop it
+                    if (b_IsEnabled)
+                    {
+                        as_AudioSource.Stop();
+                        as_AudioSource.loop = true;
+                        as_AudioSource.clip = ac_Siren;
+                        as_AudioSource.Play();
+                    }
+                    // Otherwise, we turn off the alarm and play "All Clear" only once.
+                    else
+                    {
+                        as_AudioSource.Stop();
+                        as_AudioSource.loop = false;
+                        as_AudioSource.clip = ac_AllClear;
+                        as_AudioSource.Play();
+
+                        b_PreviouslyActivated = false;
+                    }
+                }
+            }
+
+            // Forces the audio to wait at least one frame.
+            b_SoundEnabled = true;
         }
         get
         {
