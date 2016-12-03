@@ -64,7 +64,8 @@ public class Cs_MissionReport : MonoBehaviour
     int i_NumTimesCaught_Counter;
     float f_TotalPlayTime_Counter;
     char c_Grade;
-	void Update ()
+    float f_Alpha = 1.0f;
+    void Update ()
     {
 	    if(b_IsGrading)
         {
@@ -269,8 +270,54 @@ public class Cs_MissionReport : MonoBehaviour
                     go_MR_GradeEvaluation.GetComponent<Text>().text = c_Grade.ToString();
 
                     // TODO: Play SFX
+                    
+                }
+            }
 
+            // End Mission Rating.
+            if(f_Timer > 15f)
+            {
+                // Go through all text and fade them out
+                // Reduce/Cap Alpha
+                if(f_Alpha > 0f)
+                {
+                    f_Alpha -= Time.deltaTime / 2f;
+                    if(f_Alpha < 0f) f_Alpha = 0f;
+                }
 
+                // Reduce volume based on alpha
+                GameObject.Find("MusicManager").GetComponent<AudioSource>().volume = f_Alpha / 2f;
+
+                #region Set Alpha on all text
+                Color clr_CurrColor = go_MR_CaughtCounter.GetComponent<Text>().color;
+                clr_CurrColor.a = f_Alpha;
+                go_MR_CaughtCounter.GetComponent<Text>().color = clr_CurrColor;
+
+                clr_CurrColor = go_MR_Timer.GetComponent<Text>().color;
+                clr_CurrColor.a = f_Alpha;
+                go_MR_Timer.GetComponent<Text>().color = clr_CurrColor;
+
+                clr_CurrColor = go_MR_GradeEvaluation.GetComponent<Text>().color;
+                clr_CurrColor.a = f_Alpha;
+                go_MR_GradeEvaluation.GetComponent<Text>().color = clr_CurrColor;
+
+                clr_CurrColor = go_MR_CaughtCounter_Text.GetComponent<Text>().color;
+                clr_CurrColor.a = f_Alpha;
+                go_MR_CaughtCounter_Text.GetComponent<Text>().color = clr_CurrColor;
+
+                clr_CurrColor = go_MR_Timer_Text.GetComponent<Text>().color;
+                clr_CurrColor.a = f_Alpha;
+                go_MR_Timer_Text.GetComponent<Text>().color = clr_CurrColor;
+
+                clr_CurrColor = go_MR_GradeEvaluation_Text.GetComponent<Text>().color;
+                clr_CurrColor.a = f_Alpha;
+                go_MR_GradeEvaluation_Text.GetComponent<Text>().color = clr_CurrColor;
+                #endregion
+
+                if (f_Timer > 18f)
+                {
+                    // Return to menu
+                    // TODO: Menu
                 }
             }
             #endregion

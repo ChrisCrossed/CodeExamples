@@ -18,6 +18,9 @@ public class Cs_LimoTrigger : MonoBehaviour
         gameObject.GetComponent<MeshRenderer>().material.color = clr_MeshColor;
 
         go_Player = GameObject.Find("Player");
+
+        // Disable trigger for now
+        gameObject.GetComponent<BoxCollider>().enabled = false;
 	}
 
     // Update is called once per frame
@@ -36,7 +39,12 @@ public class Cs_LimoTrigger : MonoBehaviour
                 {
                     clr_MeshColor.a += Time.deltaTime;
 
-                    if (clr_MeshColor.a > 0.75f) clr_MeshColor.a = 0.75f;
+                    if (clr_MeshColor.a > 0.75f)
+                    {
+                        clr_MeshColor.a = 0.75f;
+
+                        gameObject.GetComponent<BoxCollider>().enabled = true;
+                    }
                 }
             }
             else
