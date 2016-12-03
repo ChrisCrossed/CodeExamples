@@ -111,8 +111,13 @@ public class Cs_PlayerController : MonoBehaviour
     float f_WalkSFX_Timer = 0.5f;
     static float f_WalkSFX_Max = 0.6f;
     float f_WalkSFX_Multiplier;
+    Vector3 v3_PreviousLocation_Speed;
+    Vector3 v3_CurrLocation_Speed;
     void Update()
     {
+        // Grab current location for speed evaluation
+        v3_CurrLocation_Speed = gameObject.transform.position;
+
         // Quit with appropriate input
         if (Input.GetKeyDown(KeyCode.Escape)) Application.Quit();
         if(state.Buttons.Back == ButtonState.Pressed && prevState.Buttons.Back == ButtonState.Released) Application.Quit();
@@ -140,13 +145,17 @@ public class Cs_PlayerController : MonoBehaviour
             #region Play Movement SFX
             f_WalkSFX_Timer += Time.deltaTime * f_WalkSFX_Multiplier;
 
-            if (f_WalkSFX_Timer >= f_WalkSFX_Max)
+            // Evaluate distance travelled
+            if(Vector3.Distance(v3_PreviousLocation_Speed, v3_CurrLocation_Speed) > 0.01f)
             {
-                // Only play if the player is indeed moving
-                if(gameObject.GetComponent<Rigidbody>().velocity.magnitude > 1f)
+                if (f_WalkSFX_Timer >= f_WalkSFX_Max)
                 {
-                    Play_WalkSFX(f_WalkSFX_Multiplier);
-                    f_WalkSFX_Timer = 0.0f;
+                    // Only play if the player is indeed moving
+                    if(gameObject.GetComponent<Rigidbody>().velocity.magnitude > 1f)
+                    {
+                        Play_WalkSFX(f_WalkSFX_Multiplier);
+                        f_WalkSFX_Timer = 0.0f;
+                    }
                 }
             }
             #endregion
@@ -173,6 +182,8 @@ public class Cs_PlayerController : MonoBehaviour
 
             currSpeedReadOnly = gameObject.GetComponent<Rigidbody>().velocity.magnitude;
         }
+
+        v3_PreviousLocation_Speed = v3_CurrLocation_Speed;
     }
 
     void LateUpdate()

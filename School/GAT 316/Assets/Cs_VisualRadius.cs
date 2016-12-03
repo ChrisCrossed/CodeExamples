@@ -116,10 +116,20 @@ public class Cs_VisualRadius : MonoBehaviour
             }
         }
     }
-	
-	// Update is called once per frame
+
+    // Update is called once per frame
+    Vector3 v3_PreviousLocation_Speed;
+    Vector3 v3_CurrentLocation_Speed;
 	void Update ()
     {
-        SetRadius();
+        v3_CurrentLocation_Speed = gameObject.transform.position;
+
+        // Evaluates the distance between the player's current position and where they were last frame. Doesn't allow the visual to show otherwise we've moved.
+        if(Vector3.Distance(v3_PreviousLocation_Speed, v3_CurrentLocation_Speed) > 0.01f)
+        {
+            SetRadius();
+        }
+
+        v3_PreviousLocation_Speed = v3_CurrentLocation_Speed;
 	}
 }
