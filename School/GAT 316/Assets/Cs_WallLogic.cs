@@ -94,10 +94,10 @@ public class Cs_WallLogic : MonoBehaviour
                 mat.renderQueue = 3000;
 
                 // Set transparency for metallic objects only if they are already metallic
-                /*if (mat.GetFloat("_Metallic") > (f_LowestTransparencyPoint - 0.01f))
+                if (mat.GetFloat("_Metallic") > (f_LowestTransparencyPoint - 0.01f))
                 {
                     mat.SetFloat("_Metallic", f_Transparency_);
-                }*/
+                }
             }
 
             // GetComponent<MeshRenderer>().met

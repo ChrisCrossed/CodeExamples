@@ -61,7 +61,7 @@ public class Cs_VisualDisplay : MonoBehaviour
         viewMesh.name = "View Mesh";
         viewMeshFilter.mesh = viewMesh;
 
-        i_ObstacleMask = LayerMask.GetMask("Wall", "Player");
+        i_ObstacleMask = LayerMask.GetMask("Wall", "Player", "Ground");
 	}
 	
 	// Update is called once per frame

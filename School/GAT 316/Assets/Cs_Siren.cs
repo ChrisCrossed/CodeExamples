@@ -29,30 +29,22 @@ public class Cs_Siren : MonoBehaviour
         Set_Enabled = false;
     }
 
+    bool b_PreviousState;
     public bool Set_Enabled
     {
         set
         {
-            // Set the visual siren object
-            go_LeftSirenModel.GetComponent<MeshRenderer>().enabled = value;
-            go_RightSirenModel.GetComponent<MeshRenderer>().enabled = value;
-
             b_IsEnabled = value;
-
-            // Resets the bool so the 'All Clear' plays when appropriate
-            if(!value)
-            {
-                b_PreviouslyActivated = value;
-            }
+            
+            // Set the visual siren object
+            go_LeftSirenModel.GetComponent<MeshRenderer>().enabled = b_IsEnabled;
+            go_RightSirenModel.GetComponent<MeshRenderer>().enabled = b_IsEnabled;
 
             // If at least one frame has passed and thus no audio has played yet...
             if(b_SoundEnabled)
             {
-                // If the alarm hasn't been playing, play it
-                if(!b_PreviouslyActivated)
+                if(b_PreviousState != b_IsEnabled)
                 {
-                    b_PreviouslyActivated = true;
-
                     // If we've enabled the siren, play the Alarm clip & loop it
                     if (b_IsEnabled)
                     {
@@ -68,11 +60,12 @@ public class Cs_Siren : MonoBehaviour
                         as_AudioSource.loop = false;
                         as_AudioSource.clip = ac_AllClear;
                         as_AudioSource.Play();
-
-                        b_PreviouslyActivated = false;
                     }
+
+                    b_PreviousState = value;
                 }
             }
+
 
             // Forces the audio to wait at least one frame.
             b_SoundEnabled = true;

@@ -17,10 +17,18 @@ public class Cs_GeneratorLogic : MonoBehaviour
     GamePadState prevState;
     public PlayerIndex playerOne = PlayerIndex.One;
 
+    AudioSource as_AudioSource;
+    AudioClip ac_LevelPull;
+
     bool b_DoorState = false;
 
     void Start()
     {
+        // Set Audio Source Info
+        as_AudioSource = gameObject.GetComponent<AudioSource>();
+        ac_LevelPull = Resources.Load("Lever_Pull") as AudioClip;
+        as_AudioSource.clip = ac_LevelPull;
+
         // Set Button Information
         go_XButton = transform.Find("Mdl_Button_X").gameObject;
         f_ButtonYPos = go_XButton.transform.position.y;
@@ -60,6 +68,8 @@ public class Cs_GeneratorLogic : MonoBehaviour
 
                         // Player was caught, turn off the Objective Window setting
                         GameObject.Find("Canvas").GetComponent<Cs_ObjectiveWindow>().Set_DeactivateGenerator = true;
+
+                        as_AudioSource.Play();
                     }
                 }
             }
@@ -181,8 +191,12 @@ public class Cs_GeneratorLogic : MonoBehaviour
             int i_LayerMask = LayerMask.GetMask("Player", "Wall");
             Vector3 v3_Vector = collider_.transform.root.gameObject.transform.position - gameObject.transform.position;
 
+            Debug.DrawRay(gameObject.transform.position, v3_Vector, Color.red, 5.0f);
+
             if (Physics.Raycast(gameObject.transform.position, v3_Vector, out hit, float.PositiveInfinity, i_LayerMask))
             {
+                print("Touching: " + hit.collider.name);
+
                 if( hit.collider.gameObject.layer == LayerMask.NameToLayer("Player") )
                 {
                     b_PlayerInCollider = true;
