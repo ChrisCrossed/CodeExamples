@@ -57,7 +57,16 @@ public class Cs_GateScript : MonoBehaviour
         as_AudioSource = gameObject.GetComponent<AudioSource>();
         sfx_GarageOpen = Resources.Load("SFX_GarageOpen") as AudioClip;
 
-        if (b_StartOpen) Set_DoorOpen(!b_IsOpen);
+        /*if (b_StartOpen) Set_DoorOpen(!b_IsOpen);
+        b_PreviousSoundState = !b_IsOpen;*/
+        if (b_StartOpen)
+        {
+            b_IsOpen = true;
+
+            b_PreviousSoundState = !b_IsOpen;
+
+            Set_DoorOpen(b_IsOpen);
+        }
     }
 
     // Update is called once per frame
