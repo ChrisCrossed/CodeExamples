@@ -130,13 +130,19 @@ public class Cs_PlayerController : MonoBehaviour
         {
             f_RockTimer += Time.deltaTime;
 
-            go_RockIcon.GetComponent<Image>().enabled = false;
+            // go_RockIcon.GetComponent<Image>().enabled = false;
 
             if (f_RockTimer > f_RockTimer_Max)
             {
                 f_RockTimer = f_RockTimer_Max;
 
-                go_RockIcon.GetComponent<Image>().enabled = true;
+                // go_RockIcon.GetComponent<Image>().enabled = true;
+
+                GameObject.Find("RockBackdrop").GetComponent<Image>().color = new Color(0.5f, 1f, 0.5f, 1f);
+            }
+            else
+            {
+                GameObject.Find("RockBackdrop").GetComponent<Image>().color = new Color(0.5f, 1f, 0.5f, 0f);
             }
         }
 
