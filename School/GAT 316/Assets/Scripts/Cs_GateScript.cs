@@ -56,6 +56,7 @@ public class Cs_GateScript : MonoBehaviour
 
         as_AudioSource = gameObject.GetComponent<AudioSource>();
         sfx_GarageOpen = Resources.Load("SFX_GarageOpen") as AudioClip;
+        as_AudioSource.clip = sfx_GarageOpen;
 
         /*if (b_StartOpen) Set_DoorOpen(!b_IsOpen);
         b_PreviousSoundState = !b_IsOpen;*/
@@ -91,7 +92,7 @@ public class Cs_GateScript : MonoBehaviour
                 as_AudioSource.Stop();
             }
             as_AudioSource.loop = false;
-            as_AudioSource.clip = sfx_GarageOpen;
+            // as_AudioSource.clip = sfx_GarageOpen;
             as_AudioSource.Play();
 
             b_PreviousSoundState = b_IsOpen;

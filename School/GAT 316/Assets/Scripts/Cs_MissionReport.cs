@@ -318,7 +318,7 @@ public class Cs_MissionReport : MonoBehaviour
                 if (f_Timer > 18f)
                 {
                     // Return to menu
-                    SceneManager.LoadScene(0);
+                    SceneManager.LoadScene(2);
                 }
             }
             #endregion

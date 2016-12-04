@@ -13,6 +13,16 @@ public class Cs_ObjectiveLogic : MonoBehaviour
         mdl_Briefcase = transform.Find("mdl_Briefcase").gameObject;
 	}
 
+    bool b_MakeDoorInvisForever;
+    void Update()
+    {
+        if(b_MakeDoorInvisForever)
+        {
+            go_Door.GetComponent<Cs_WallLogic>().SetVisibilityState(true);
+        }
+    }
+
+    GameObject go_Door;
     void OnTriggerEnter( Collider collider_ )
     {
         if (collider_.transform.root.gameObject.name == "Player")
@@ -28,7 +38,7 @@ public class Cs_ObjectiveLogic : MonoBehaviour
                     mdl_Briefcase.GetComponent<Cs_BriefcaseLogic>().Set_PickedUp();
 
                     // 'Destroy' the wall guarding the briefcase
-                    GameObject go_Door = GameObject.Find("Gate_Exit");
+                    go_Door = GameObject.Find("Gate_Exit");
                     go_Door.GetComponent<BoxCollider>().isTrigger = true;
                     go_Door.GetComponent<Cs_GateScript>().Set_DoorOpen(true);
                     go_Door.GetComponent<Cs_GateScript>().Set_ObjectiveActive(false);
@@ -38,6 +48,8 @@ public class Cs_ObjectiveLogic : MonoBehaviour
 
                     // TODO: Set the HUD to show the briefcase picked up
                     GameObject.Find("Canvas").GetComponent<Cs_ObjectiveWindow>().Set_GrabBriefcase = true;
+
+                    b_MakeDoorInvisForever = true;
                 }
             }
         }

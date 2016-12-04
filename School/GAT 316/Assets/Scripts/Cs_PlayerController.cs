@@ -120,13 +120,14 @@ public class Cs_PlayerController : MonoBehaviour
 
         // Quit with appropriate input
         if (Input.GetKeyDown(KeyCode.Escape)) Application.Quit();
-        if(state.Buttons.Back == ButtonState.Pressed && prevState.Buttons.Back == ButtonState.Released) Application.Quit();
+        // if(state.Buttons.Back == ButtonState.Pressed && prevState.Buttons.Back == ButtonState.Released) Application.Quit();
 
         // Restart with appropriate input
-        if (state.Buttons.Start == ButtonState.Pressed && prevState.Buttons.Start == ButtonState.Released) SceneManager.LoadScene(0);
+        if (state.Buttons.Start == ButtonState.Pressed && prevState.Buttons.Start == ButtonState.Released) SceneManager.LoadScene(3);
+        if (state.Buttons.Back == ButtonState.Pressed && prevState.Buttons.Back == ButtonState.Released) SceneManager.LoadScene(2);
 
         // Rock Update
-        if(f_RockTimer < f_RockTimer_Max)
+        if (f_RockTimer < f_RockTimer_Max)
         {
             f_RockTimer += Time.deltaTime;
 

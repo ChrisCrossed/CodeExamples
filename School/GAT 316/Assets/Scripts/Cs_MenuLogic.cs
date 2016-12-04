@@ -68,7 +68,8 @@ public class Cs_MenuLogic : MonoBehaviour
 
         if (b_RunGame && f_Alpha == 0f)
         {
-            SceneManager.LoadScene(1);
+            // Load game
+            SceneManager.LoadScene(3);
         }
 
         // Run through text and set alpha
