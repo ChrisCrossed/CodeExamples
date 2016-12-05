@@ -130,7 +130,7 @@ public class Cs_BoardLogic : MonoBehaviour
     // Used to begin gameplay
     public void Init_Gameplay()
     {
-        print("************** DID THE THING **************");
+        // print("************** DID THE THING **************");
     }
 
     void Awake()

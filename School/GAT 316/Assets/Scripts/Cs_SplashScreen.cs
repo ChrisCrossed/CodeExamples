@@ -6,7 +6,12 @@ public class Cs_SplashScreen : MonoBehaviour
 {
     float f_Timer = 5.0f;
     [SerializeField] int i_ToScene;
-    
+
+    void Start()
+    {
+        Cursor.visible = false;
+    }
+  
 	// Update is called once per frame
 	void Update ()
     {
