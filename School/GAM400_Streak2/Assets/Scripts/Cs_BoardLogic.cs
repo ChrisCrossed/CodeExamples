@@ -132,6 +132,9 @@ public class Cs_BoardLogic : MonoBehaviour
     float f_GameOver_FadeOut_Timer;
     GameObject go_FadeOut;
 
+    GameObject go_SFX;
+    AudioClip sfx_ScoreEffect;
+
     // Used to begin gameplay
     public void Init_Gameplay()
     {
@@ -166,6 +169,8 @@ public class Cs_BoardLogic : MonoBehaviour
     {
         // Initialization
         go_FadeOut = GameObject.Find("FadeOut");
+        go_SFX = GameObject.Find("AudioSource_SFX");
+        sfx_ScoreEffect = Resources.Load("SFX_Score") as AudioClip;
 
         Enum_BlockSize e_MaxBlockSize = Enum_BlockSize.size_2w_2h;
         if(  b_3w_3h_Allowed ||
@@ -1753,7 +1758,8 @@ public class Cs_BoardLogic : MonoBehaviour
 
     // Update is called once per frame
     float f_ScoreLine_Timer;
-    static float f_ScoreLine_Timer_Max = 0.075f;
+    // static float f_ScoreLine_Timer_Max = 0.075f;
+    static float f_ScoreLine_Timer_Max = 0.1f;
     float f_ScoreLine_Timer_Conclusion; // A timer that continues to run after the last block's visual begins
     float f_ScoreLine_Timer_Conclusion_Max = 1.0f; // After the above timer completes, we set the pause state to continue
     int i_GameOver_X = 0;
@@ -1806,8 +1812,22 @@ public class Cs_BoardLogic : MonoBehaviour
                     // Score the block model on the screen
                     GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().ScoreBlockAt(iv2_ScoreLine[i_ScoreLine_Counter]);
 
-                    // Increment player's score
-                    ++i_Score;
+                    #region Play sound effect
+                    // Store previous pitch
+                    float f_Pitch_Prev = go_SFX.GetComponent<AudioSource>().pitch;
+
+                    // Find pitch
+                    float f_Pitch = 0.4f + ((iv2_ScoreLine[i_ScoreLine_Counter].x / 3f) * 0.2f) + ((iv2_ScoreLine[i_ScoreLine_Counter].y / 3f) * 0.05f);
+                    print("Setting pitch: " + f_Pitch);
+                    go_SFX.GetComponent<AudioSource>().clip = sfx_ScoreEffect;
+                    go_SFX.GetComponent<AudioSource>().pitch = f_Pitch;
+                    go_SFX.GetComponent<AudioSource>().time = 0.09f;
+                    go_SFX.GetComponent<AudioSource>().Play();
+
+                    // Set previous pitch
+                    // go_SFX.GetComponent<AudioSource>().pitch = f_Pitch_Prev;
+                    #endregion
+
 
                     // Increment i_ScoreLine_Counter
                     ++i_ScoreLine_Counter;
