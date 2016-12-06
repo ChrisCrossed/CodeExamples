@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.UI;
 
 public class Cs_BoardDisplay : MonoBehaviour
 {
@@ -25,10 +26,12 @@ public class Cs_BoardDisplay : MonoBehaviour
 
     bool b_IsDone;
 
+    GameObject txt_Score;
+
     // Use this for initialization
     void Start()
     {
-        
+        txt_Score = GameObject.Find("Text_Score");
     }
 
     void LoadResources()
@@ -184,12 +187,12 @@ public class Cs_BoardDisplay : MonoBehaviour
     float f_InitBoardTimer_Max = 0.05f;
     void Update()
     {
-        // print(DisplayArray[4, 8].ToString());
-
         if (!b_IsDone)
         {
             CascadeTiles();
         }
+
+        Set_ScoreTextIncrease();
     }
 
     void CascadeTiles()
@@ -1000,13 +1003,11 @@ public class Cs_BoardDisplay : MonoBehaviour
         }
         else if (e_BlockType_ == Enum_BlockType.Block_3_Active)
         {
-            print("TODO: ADD BLOCK 3 TO CS_BOARDDISPLAY");
             go_BlockTemp = Instantiate(go_Block_C);
             go_BlockTemp.transform.SetParent(GameObject.Find("DisplayBlockList").transform);
         }
         else
         {
-            print("INVALID BLOCK ADDED TO CS_BOARDDISPLAY");
             go_BlockTemp = Instantiate(go_Empty);
             go_BlockTemp.transform.SetParent(GameObject.Find("EmptyBlocks").transform);
         }
@@ -1020,6 +1021,45 @@ public class Cs_BoardDisplay : MonoBehaviour
 
         // Set the Backdrop Color
         Set_BackdropColor(e_BlockType_, new IntVector2(i_xPos_, i_yPos_));
+    }
+
+    int i_Score;
+    int i_Score_Remaining;
+    float f_ScoreTimer;
+    float f_ScoreTimer_Max = 0.25f;
+    public void Set_ScoreTextIncrease(int i_AmountToIncreaseScore_ = 0)
+    {
+        if(i_AmountToIncreaseScore_ > 0)
+        {
+            i_Score_Remaining += i_AmountToIncreaseScore_;
+        }
+        else
+        {
+            if(f_ScoreTimer > 0f)
+            {
+                f_ScoreTimer -= Time.deltaTime;
+                if (f_ScoreTimer <= 0f) f_ScoreTimer = 0f;
+            }
+
+            if(f_ScoreTimer == 0f)
+            {
+                // Check if there's a point to add to the text on screen
+                if(i_Score_Remaining > 0)
+                {
+                    // Reduce amount remaining to score by 1
+                    --i_Score_Remaining;
+
+                    // Increment player's score by 1
+                    ++i_Score;
+
+                    // Reset score timer
+                    f_ScoreTimer = f_ScoreTimer_Max;
+
+                    // Set text on screen
+                    txt_Score.GetComponent<Text>().text = "Score: " + i_Score.ToString();
+                }
+            }
+        }
     }
 
     // Used for cheating.

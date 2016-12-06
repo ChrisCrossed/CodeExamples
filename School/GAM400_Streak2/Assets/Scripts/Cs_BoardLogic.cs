@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public enum Enum_BlockType
 {
@@ -126,7 +128,10 @@ public class Cs_BoardLogic : MonoBehaviour
     [Range(-1, 5)] [SerializeField] int i_TimeToDrop_Max = 3;
     
     float f_StartGameTimer = 2.0f;
-    
+
+    float f_GameOver_FadeOut_Timer;
+    GameObject go_FadeOut;
+
     // Used to begin gameplay
     public void Init_Gameplay()
     {
@@ -159,7 +164,8 @@ public class Cs_BoardLogic : MonoBehaviour
 	// Use this for initialization
 	void Start ()
     {
-        
+        // Initialization
+        go_FadeOut = GameObject.Find("FadeOut");
 
         Enum_BlockSize e_MaxBlockSize = Enum_BlockSize.size_2w_2h;
         if(  b_3w_3h_Allowed ||
@@ -1119,6 +1125,8 @@ public class Cs_BoardLogic : MonoBehaviour
 
             e_PauseEffect = Enum_PauseEffect.ScoreLine;
 
+            GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Set_ScoreTextIncrease(iv2_ScoreLine.Count);
+
             i_ScoreLine_Counter = 0;
 
             return;
@@ -1820,6 +1828,8 @@ public class Cs_BoardLogic : MonoBehaviour
 
                             e_PauseEffect = Enum_PauseEffect.ScoreLine;
 
+                            GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Set_ScoreTextIncrease(iv2_ScoreLine.Count);
+
                             i_ScoreLine_Counter = 0;
 
                             f_ScoreLine_Timer_Conclusion = 0.0f;
@@ -1848,6 +1858,8 @@ public class Cs_BoardLogic : MonoBehaviour
                                 b_RunAgain = true;
 
                                 e_PauseEffect = Enum_PauseEffect.ScoreLine;
+
+                                GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Set_ScoreTextIncrease(iv2_ScoreLine.Count);
 
                                 i_ScoreLine_Counter = 0;
 
@@ -1942,7 +1954,6 @@ public class Cs_BoardLogic : MonoBehaviour
                         {
                             if (b_ThreeBlockColors)
                             {
-                                print("Hi Chris");
                                 e_GameOverBlock = Enum_BlockType.Block_3_Active;
                             }
                             else
@@ -1975,7 +1986,40 @@ public class Cs_BoardLogic : MonoBehaviour
                     ++i_GameOver_Y;
                 }
             }
+            else
+            {
+                if (i_GameOver_X >= i_ArrayWidth - 1 && i_GameOver_Y >= i_ArrayHeight - 1)
+                {
+                    f_GameOver_FadeOut_Timer += Time.deltaTime;
+                }
+            }
             #endregion
+            
+            if(f_GameOver_FadeOut_Timer > 0f)
+            {
+                // Fade to black & return to main menu
+                f_GameOver_FadeOut_Timer += Time.deltaTime;
+
+                print(f_GameOver_FadeOut_Timer);
+
+                if (f_GameOver_FadeOut_Timer > 5.0f)
+                {
+                    // Fade out the screen slowly
+                    Color clr_CurrAlpha = go_FadeOut.GetComponent<Image>().color;
+
+                    clr_CurrAlpha.a += Time.deltaTime / 3f;
+                    float f_Perc = 1f - clr_CurrAlpha.a;
+                    go_FadeOut.GetComponent<Image>().color = clr_CurrAlpha;
+
+                    // Reduce volume to match
+                    GameObject.Find("AudioSource_Music").GetComponent<AudioSource>().volume = f_Perc / 2.0f;
+                }
+
+                if (f_GameOver_FadeOut_Timer > 10f)
+                {
+                    SceneManager.LoadScene(2);
+                }
+            }
         }
     }
 }
