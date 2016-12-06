@@ -191,7 +191,6 @@ public class Cs_MainMenuLogic : MonoBehaviour
             }
             #endregion
         }
-
         else
         {
             #region New Game Options
@@ -284,6 +283,11 @@ public class Cs_MainMenuLogic : MonoBehaviour
 
             Set_ButtonHighlighed(b_OnNewGameMenu, enum_ButtonSelected);
         }
+        else
+        {
+            // Move the Main Menu onto the screen
+            SetButtonPosition(false, true);
+        }
 
         b_PlayerInputAllowed = false;
     }
@@ -293,7 +297,7 @@ public class Cs_MainMenuLogic : MonoBehaviour
     Vector3 v3_NewGame_PrevLoc;
     Vector3 v3_NewGame_CurrLoc;
     float f_LerpTimer;
-    static float f_LerpTimer_Max = 3.0f;
+    static float f_LerpTimer_Max = 2.0f;
     void SetButtonPosition( bool b_NewGameMenu_, bool b_OnScreen_ )
     {
         // Reset f_LerpTimer

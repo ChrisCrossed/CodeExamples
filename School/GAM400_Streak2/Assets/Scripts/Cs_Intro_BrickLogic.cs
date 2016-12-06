@@ -3,6 +3,7 @@ using System.Collections;
 
 public class Cs_Intro_BrickLogic : MonoBehaviour
 {
+    [SerializeField] bool b_IsMainMenu;
     [SerializeField] [Range(0, 3)] int i_BlockNumber;
     [SerializeField] AudioClip ac_SFX;
     float f_TimeToFinalPosition = .3f;
@@ -59,14 +60,26 @@ public class Cs_Intro_BrickLogic : MonoBehaviour
         {
             f_DelayBasedOnNumber += 0.3f + 0.1f + 0.3f;
         }
+
+        if(b_IsMainMenu)
+        {
+            f_DelayBasedOnNumber /= 4;
+        }
         #endregion
 
         #region Set time for when the blocks begin and end fading
-        f_MaxSceneTime = GameObject.Find("Canvas").GetComponent<Cs_IntroScreenLogic>().Get_SceneMaxTime();
-        f_BlockFadeTimer_End = f_MaxSceneTime - 0.5f;
-        f_BlockFadeTimer_Start = f_BlockFadeTimer_End - f_BlockFadeTime;
+        if(GameObject.Find("Canvas").GetComponent<Cs_IntroScreenLogic>())
+        {
+            f_MaxSceneTime = GameObject.Find("Canvas").GetComponent<Cs_IntroScreenLogic>().Get_SceneMaxTime();
+            f_BlockFadeTimer_End = f_MaxSceneTime - 0.5f;
+            f_BlockFadeTimer_Start = f_BlockFadeTimer_End - f_BlockFadeTime;
+        }
         #endregion
 
+        if(b_IsMainMenu)
+        {
+            f_TimeToFinalPosition = 2.0f;
+        }
     }
 
     // Update is called once per frame
