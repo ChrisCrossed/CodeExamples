@@ -272,7 +272,9 @@ public class Cs_MainMenuLogic : MonoBehaviour
 
             int i_DropTimer = 1;
 
+            // Tutoria
             int i_Scene = 3;
+            bool b_IsTutorial = false;
 
             #region Tutorial -> Set game settings, begin game
             if (enum_ButtonSelected == MenuButtonSelected.Button_Zero)
@@ -287,6 +289,7 @@ public class Cs_MainMenuLogic : MonoBehaviour
 
                     // Loads the tutorial instead
                     i_Scene = 4;
+                    b_IsTutorial = true;
                 }
             }
             #endregion
@@ -345,7 +348,7 @@ public class Cs_MainMenuLogic : MonoBehaviour
             }
             #endregion
 
-            go_GameSettings.GetComponent<Cs_MainMenu_GameSettings>().Set_GameSettings( b_2w_2h, b_2w_3h, b_3w_2h, b_3w_3h, b_ThreeBlocks, i_BoardWidth, i_BoardHeight, i_DropTimer );
+            go_GameSettings.GetComponent<Cs_MainMenu_GameSettings>().Set_GameSettings( b_2w_2h, b_2w_3h, b_3w_2h, b_3w_3h, b_ThreeBlocks, i_BoardWidth, i_BoardHeight, i_DropTimer, b_IsTutorial );
             SceneManager.LoadScene(i_Scene);
             #endregion
         }

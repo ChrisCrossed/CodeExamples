@@ -41,7 +41,22 @@ public class Cs_BoardLogic_Tutorial : MonoBehaviour
     [SerializeField] [Range(5, 20)] int i_ArrayWidth;
     [SerializeField] [Range(5, 20)] int i_ArrayHeight;
     [Range(-1, 5)] [SerializeField] int i_TimeToDrop_Max = 3;
-    
+    [SerializeField] bool b_IsTutorial = false;
+
+    // Tutorial Arrows
+    GameObject go_Arrow_Blue_1;
+    GameObject go_Arrow_Blue_2;
+    GameObject go_Arrow_Blue_3;
+    GameObject go_Arrow_Blue_4;
+    GameObject go_Arrow_Blue_5;
+    GameObject go_Arrow_Blue_6;
+    GameObject go_Arrow_Red_1;
+    GameObject go_Arrow_Red_2;
+    GameObject go_Arrow_Red_3;
+    GameObject go_Arrow_Red_4;
+    GameObject go_Arrow_Red_5;
+    GameObject go_Arrow_Red_6;
+
     float f_StartGameTimer = 2.0f;
 
     float f_GameOver_FadeOut_Timer;
@@ -76,6 +91,8 @@ public class Cs_BoardLogic_Tutorial : MonoBehaviour
             i_ArrayHeight = gameSettings.i_BoardHeight;
 
             i_TimeToDrop_Max = gameSettings.i_DropTimer;
+
+            b_IsTutorial = gameSettings.b_IsTutorial;
         }
     }
 
@@ -104,6 +121,20 @@ public class Cs_BoardLogic_Tutorial : MonoBehaviour
                 e_MaxBlockSize = Enum_BlockSize.size_2w_3h;
             }
         }
+
+        // Tutorial Arrows
+        go_Arrow_Blue_1 = GameObject.Find("mdl_Arrow_Blue_1");
+        go_Arrow_Blue_2 = GameObject.Find("mdl_Arrow_Blue_2");
+        go_Arrow_Blue_3 = GameObject.Find("mdl_Arrow_Blue_3");
+        go_Arrow_Blue_4 = GameObject.Find("mdl_Arrow_Blue_4");
+        go_Arrow_Blue_5 = GameObject.Find("mdl_Arrow_Blue_5");
+        go_Arrow_Blue_6 = GameObject.Find("mdl_Arrow_Blue_6");
+        go_Arrow_Red_1 = GameObject.Find("mdl_Arrow_Red_1");
+        go_Arrow_Red_2 = GameObject.Find("mdl_Arrow_Red_2");
+        go_Arrow_Red_3 = GameObject.Find("mdl_Arrow_Red_3");
+        go_Arrow_Red_4 = GameObject.Find("mdl_Arrow_Red_4");
+        go_Arrow_Red_5 = GameObject.Find("mdl_Arrow_Red_5");
+        go_Arrow_Red_6 = GameObject.Find("mdl_Arrow_Red_6");
 
         // Initialize Board
         GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Init_Board( i_ArrayWidth, i_ArrayHeight, 0, e_MaxBlockSize );
@@ -163,84 +194,107 @@ public class Cs_BoardLogic_Tutorial : MonoBehaviour
     // Fills e_NextBlockList with random blocks to push into CreateNewBlock
     void PopulateNextBlockList()
     {
-        // Find the first unpopulated position
-        int i_FirstOpenPosition = 0;
-        for(int j_ = 0; j_ < e_NextBlockList.Length; ++j_)
+        if(b_IsTutorial)
         {
-            if (e_NextBlockList[j_] == Enum_BlockType.Empty) continue;
-            else i_FirstOpenPosition = j_;
-        }
+            for(int i_ = 0; i_ < 3; ++i_)
+            {
+                // Red, Red, Blue, Blue
+                e_NextBlockList[(i_ * 4) + 0] = Enum_BlockType.Block_2_Active;
+                e_NextBlockList[(i_ * 4) + 1] = Enum_BlockType.Block_2_Active;
+                e_NextBlockList[(i_ * 4) + 2] = Enum_BlockType.Block_1_Active;
+                e_NextBlockList[(i_ * 4) + 3] = Enum_BlockType.Block_1_Active;
 
-        // Changing the system. 0/1/2 = Block 1, 3/4/5 = Block 2, 6 = Block 3.
-        // If 'b_ThreeBlockColors', a 1-in-7 chance to have a black block
-        int i_NumBlockTypes = 2;
+                print("Setting four blocks: " + (int)(i_ * 4) + " through " + (int)((i_ * 4) + 3) );
+            }
 
-        if(b_ThreeBlockColors)
-        {
-            if(e_WhiteBlockChance == Enum_WhiteBlockChance.OneInThree)      i_NumBlockTypes = 3;
-            else if (e_WhiteBlockChance == Enum_WhiteBlockChance.OneInFive) i_NumBlockTypes = 5;
-            else if (e_WhiteBlockChance == Enum_WhiteBlockChance.OneInSeven) i_NumBlockTypes = 7;
-            else if (e_WhiteBlockChance == Enum_WhiteBlockChance.OneInNine) i_NumBlockTypes = 9;
-            else if (e_WhiteBlockChance == Enum_WhiteBlockChance.OneInEleven) i_NumBlockTypes = 11;
-        }
-
-        // Start from the first open position & populate all remaining positions
-        for(int i_ = i_FirstOpenPosition; i_ < e_NextBlockList.Length; ++i_)
-        {
-            // Find a random block
-            int i_RandBlock = Random.Range(0, i_NumBlockTypes);
-
-            // Block 'One'
-            if( i_RandBlock < i_NumBlockTypes / 2 )
+            for(int i_ = 3 * 4; i_ < e_NextBlockList.Length; ++i_)
             {
                 e_NextBlockList[i_] = Enum_BlockType.Block_1_Active;
             }
-            // Block 'Two'
-            else if( i_RandBlock >= i_NumBlockTypes / 2 && i_RandBlock != i_NumBlockTypes - 1 )
+
+            b_IsTutorial = false;
+        }
+        else
+        {
+            // Find the first unpopulated position
+            int i_FirstOpenPosition = 0;
+            for(int j_ = 0; j_ < e_NextBlockList.Length; ++j_)
             {
-                e_NextBlockList[i_] = Enum_BlockType.Block_2_Active;
+                if (e_NextBlockList[j_] == Enum_BlockType.Empty) continue;
+                else i_FirstOpenPosition = j_;
             }
-            // Block 'Three'
-            else
+
+            // Changing the system. 0/1/2 = Block 1, 3/4/5 = Block 2, 6 = Block 3.
+            // If 'b_ThreeBlockColors', a 1-in-7 chance to have a black block
+            int i_NumBlockTypes = 2;
+
+            if(b_ThreeBlockColors)
             {
-                if(b_ThreeBlockColors)
+                if(e_WhiteBlockChance == Enum_WhiteBlockChance.OneInThree)      i_NumBlockTypes = 3;
+                else if (e_WhiteBlockChance == Enum_WhiteBlockChance.OneInFive) i_NumBlockTypes = 5;
+                else if (e_WhiteBlockChance == Enum_WhiteBlockChance.OneInSeven) i_NumBlockTypes = 7;
+                else if (e_WhiteBlockChance == Enum_WhiteBlockChance.OneInNine) i_NumBlockTypes = 9;
+                else if (e_WhiteBlockChance == Enum_WhiteBlockChance.OneInEleven) i_NumBlockTypes = 11;
+            }
+
+            // Start from the first open position & populate all remaining positions
+            for(int i_ = i_FirstOpenPosition; i_ < e_NextBlockList.Length; ++i_)
+            {
+                // Find a random block
+                int i_RandBlock = Random.Range(0, i_NumBlockTypes);
+
+                // Block 'One'
+                if( i_RandBlock < i_NumBlockTypes / 2 )
                 {
-                    e_NextBlockList[i_] = Enum_BlockType.Block_3_Active;
+                    e_NextBlockList[i_] = Enum_BlockType.Block_1_Active;
                 }
-                // Special probability case since we need to hit a 0 or 1 if we're not checking for three block types
-                else
+                // Block 'Two'
+                else if( i_RandBlock >= i_NumBlockTypes / 2 && i_RandBlock != i_NumBlockTypes - 1 )
                 {
                     e_NextBlockList[i_] = Enum_BlockType.Block_2_Active;
                 }
+                // Block 'Three'
+                else
+                {
+                    if(b_ThreeBlockColors)
+                    {
+                        e_NextBlockList[i_] = Enum_BlockType.Block_3_Active;
+                    }
+                    // Special probability case since we need to hit a 0 or 1 if we're not checking for three block types
+                    else
+                    {
+                        e_NextBlockList[i_] = Enum_BlockType.Block_2_Active;
+                    }
+                }
             }
-        }
 
-        // Determine the size of the next block to use
-        bool b_FoundNextBlock = false;
-        // While we haven't found the next block, loop
-        while(!b_FoundNextBlock)
-        {
-            int i_RandBlock = Random.Range(0, 4);
+            // Determine the size of the next block to use
+            bool b_FoundNextBlock = false;
+            // While we haven't found the next block, loop
+            while(!b_FoundNextBlock)
+            {
+                int i_RandBlock = Random.Range(0, 4);
 
-            if(i_RandBlock == 0 && b_2w_2h_Allowed)
-            {
-                e_NextBlockSize = Enum_BlockSize.size_2w_2h;
-                b_FoundNextBlock = true;
-            }
-            else if (i_RandBlock == 1 && b_2w_3h_Allowed)
-            {
-                e_NextBlockSize = Enum_BlockSize.size_2w_3h;
-                b_FoundNextBlock = true;
-            }
-            else if (i_RandBlock == 2 && b_3w_2h_Allowed)
-            {
-                e_NextBlockSize = Enum_BlockSize.size_3w_2h;
-                b_FoundNextBlock = true;
-            }
-            else if (i_RandBlock == 3 && b_3w_3h_Allowed)
-            {
-                e_NextBlockSize = Enum_BlockSize.size_3w_3h;
-                b_FoundNextBlock = true;
+                if(i_RandBlock == 0 && b_2w_2h_Allowed)
+                {
+                    e_NextBlockSize = Enum_BlockSize.size_2w_2h;
+                    b_FoundNextBlock = true;
+                }
+                else if (i_RandBlock == 1 && b_2w_3h_Allowed)
+                {
+                    e_NextBlockSize = Enum_BlockSize.size_2w_3h;
+                    b_FoundNextBlock = true;
+                }
+                else if (i_RandBlock == 2 && b_3w_2h_Allowed)
+                {
+                    e_NextBlockSize = Enum_BlockSize.size_3w_2h;
+                    b_FoundNextBlock = true;
+                }
+                else if (i_RandBlock == 3 && b_3w_3h_Allowed)
+                {
+                    e_NextBlockSize = Enum_BlockSize.size_3w_3h;
+                    b_FoundNextBlock = true;
+                }
             }
         }
     }
@@ -1018,6 +1072,7 @@ public class Cs_BoardLogic_Tutorial : MonoBehaviour
         if (Load_ScoreLine())
         {
             #region Print Scoreline to console
+            /*
             string s_ScoreLine = "LINE REACHED: (" + iv2_ScoreLine.Count + "):";
             for (int i_ = 0; i_ < iv2_ScoreLine.Count; ++i_)
             {
@@ -1031,6 +1086,7 @@ public class Cs_BoardLogic_Tutorial : MonoBehaviour
                 }
             }
             print(s_ScoreLine);
+            */
             #endregion
 
             CheckScoreLineLeftWall();
@@ -1671,6 +1727,34 @@ public class Cs_BoardLogic_Tutorial : MonoBehaviour
         GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Set_OneBlock(8, 3, Enum_BlockType.Block_1_Static);
     }
 
+    void Set_ArrowModel( bool b_IsBlock2_, int i_Number_, bool b_IsEnabled_ )
+    {
+        GameObject go_ArrowModel = go_Arrow_Blue_1;
+
+        if (b_IsBlock2_)
+        {
+            if (i_Number_ == 1) go_ArrowModel = go_Arrow_Blue_1;
+            if (i_Number_ == 2) go_ArrowModel = go_Arrow_Blue_2;
+            if (i_Number_ == 3) go_ArrowModel = go_Arrow_Blue_3;
+            if (i_Number_ == 4) go_ArrowModel = go_Arrow_Blue_4;
+            if (i_Number_ == 5) go_ArrowModel = go_Arrow_Blue_5;
+            if (i_Number_ == 6) go_ArrowModel = go_Arrow_Blue_6;
+        }
+        else
+        {
+            if (i_Number_ == 1) go_ArrowModel = go_Arrow_Red_1;
+            if (i_Number_ == 2) go_ArrowModel = go_Arrow_Red_2;
+            if (i_Number_ == 3) go_ArrowModel = go_Arrow_Red_3;
+            if (i_Number_ == 4) go_ArrowModel = go_Arrow_Red_4;
+            if (i_Number_ == 5) go_ArrowModel = go_Arrow_Red_5;
+            if (i_Number_ == 6) go_ArrowModel = go_Arrow_Red_6;
+        }
+
+        go_ArrowModel.GetComponent<MeshRenderer>().enabled = b_IsEnabled_;
+        go_ArrowModel.transform.Find("Pipe").GetComponent<MeshRenderer>().enabled = b_IsEnabled_;
+        go_ArrowModel.transform.Find("V").GetComponent<MeshRenderer>().enabled = b_IsEnabled_;
+    }
+
     // Update is called once per frame
     float f_ScoreLine_Timer;
     // static float f_ScoreLine_Timer_Max = 0.075f;
@@ -1710,6 +1794,35 @@ public class Cs_BoardLogic_Tutorial : MonoBehaviour
             }
             #endregion
             }
+
+            if(i_Score < 13)
+            {
+                for(int i_Y = 0; i_Y < 2; ++i_Y)
+                {
+                    for(int i_X = 1; i_X < 7; ++i_X)
+                    {
+                        if ( BlockArray[0, i_X] == Enum_BlockType.Block_2_Static || BlockArray[0, i_X] == Enum_BlockType.Block_2_Active )
+                        {
+                            if (i_X == 1) Set_ArrowModel(true, 1, false);
+                            if (i_X == 2) Set_ArrowModel(true, 2, false);
+                            if (i_X == 3) Set_ArrowModel(true, 3, false);
+                            if (i_X == 4) Set_ArrowModel(true, 4, false);
+                            if (i_X == 5) Set_ArrowModel(true, 5, false);
+                            if (i_X == 6) Set_ArrowModel(true, 6, false);
+                        }
+
+                        if( BlockArray[1, i_X] ==Enum_BlockType.Block_1_Static || BlockArray[0, i_X] == Enum_BlockType.Block_1_Active )
+                        {
+                            if (i_X == 1) Set_ArrowModel(false, 1, false);
+                            if (i_X == 2) Set_ArrowModel(false, 2, false);
+                            if (i_X == 3) Set_ArrowModel(false, 3, false);
+                            if (i_X == 4) Set_ArrowModel(false, 4, false);
+                            if (i_X == 5) Set_ArrowModel(false, 5, false);
+                            if (i_X == 6) Set_ArrowModel(false, 6, false);
+                        }
+                    }
+                }
+            }
         }
         else if(e_PauseEffect == Enum_PauseEffect.ScoreLine)
         {
@@ -1733,7 +1846,6 @@ public class Cs_BoardLogic_Tutorial : MonoBehaviour
 
                     // Find pitch
                     float f_Pitch = 0.4f + ((iv2_ScoreLine[i_ScoreLine_Counter].x / 3f) * 0.2f) + ((iv2_ScoreLine[i_ScoreLine_Counter].y / 3f) * 0.05f);
-                    print("Setting pitch: " + f_Pitch);
                     go_SFX.GetComponent<AudioSource>().clip = sfx_ScoreEffect;
                     go_SFX.GetComponent<AudioSource>().pitch = f_Pitch;
                     go_SFX.GetComponent<AudioSource>().time = 0.09f;
