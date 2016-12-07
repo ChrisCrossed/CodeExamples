@@ -1,9 +1,16 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+/*********************************
+ * 
+ * Copyright DigiPen Institute of Technology 2016
+ * 
+ * Streak 2 by Christopher Christensen
+ * 
+ * *******************************/
+
 public class Cs_MenuButtonLogic : MonoBehaviour
 {
-
     [SerializeField] Material mat_Deselected;
     [SerializeField] Material mat_Selected;
 

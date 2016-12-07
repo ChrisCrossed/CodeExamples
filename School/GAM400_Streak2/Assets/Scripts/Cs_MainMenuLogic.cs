@@ -4,8 +4,17 @@ using UnityEngine.SceneManagement;
 using XInputDotNetPure;
 using UnityEngine.UI;
 
+/*********************************
+ * 
+ * Copyright DigiPen Institute of Technology 2016
+ * 
+ * Streak 2 by Christopher Christensen
+ * 
+ * *******************************/
+
 enum MenuButtonSelected
 {
+    Button_Zero,
     Button_One,
     Button_Two,
     Button_Three
@@ -31,11 +40,14 @@ public class Cs_MainMenuLogic : MonoBehaviour
 
     bool b_PlayerInputAllowed;
 
-    [SerializeField] GameObject[] go_ButtonList = new GameObject[6];
+    [SerializeField] GameObject[] go_ButtonList = new GameObject[7];
 
     MenuButtonSelected enum_ButtonSelected;
 
     [SerializeField] AnimationCurve animCurve;
+
+    float f_CreditsTimer;
+    static float f_CreditsTimer_Max = 30f;
 
 	// Use this for initialization
 	void Start ()
@@ -113,20 +125,25 @@ public class Cs_MainMenuLogic : MonoBehaviour
         }
         else
         {
-            if (e_ButtonSelected_ == MenuButtonSelected.Button_One)
+            if( e_ButtonSelected_ == MenuButtonSelected.Button_Zero )
+            {
+                // Button Zero (Tutorial)
+                go_ButtonList[3].GetComponent<Cs_MenuButtonLogic>().IsSelected = true;
+            }
+            else if (e_ButtonSelected_ == MenuButtonSelected.Button_One)
             {
                 // Button One
-                go_ButtonList[3].GetComponent<Cs_MenuButtonLogic>().IsSelected = true;
+                go_ButtonList[4].GetComponent<Cs_MenuButtonLogic>().IsSelected = true;
             }
             else if (e_ButtonSelected_ == MenuButtonSelected.Button_Two)
             {
                 // Button Two
-                go_ButtonList[4].GetComponent<Cs_MenuButtonLogic>().IsSelected = true;
+                go_ButtonList[5].GetComponent<Cs_MenuButtonLogic>().IsSelected = true;
             }
             else
             {
                 // Button Three
-                go_ButtonList[5].GetComponent<Cs_MenuButtonLogic>().IsSelected = true;
+                go_ButtonList[6].GetComponent<Cs_MenuButtonLogic>().IsSelected = true;
             }
         }
     }
@@ -145,19 +162,32 @@ public class Cs_MainMenuLogic : MonoBehaviour
 
             Set_ButtonHighlighed(b_OnNewGameMenu, enum_ButtonSelected);
         }
+        // Special Case: Go to button Zero only if in game mode selection
+        else if( b_OnNewGameMenu && enum_ButtonSelected == MenuButtonSelected.Button_One )
+        {
+            enum_ButtonSelected = MenuButtonSelected.Button_Zero;
+
+            Set_ButtonHighlighed(b_OnNewGameMenu, enum_ButtonSelected);
+        }
     }
 
     void Menu_Down()
     {
-        if (enum_ButtonSelected == MenuButtonSelected.Button_Two)
+        if (enum_ButtonSelected == MenuButtonSelected.Button_One)
+        {
+            enum_ButtonSelected = MenuButtonSelected.Button_Two;
+
+            Set_ButtonHighlighed(b_OnNewGameMenu, enum_ButtonSelected);
+        }
+        else if (enum_ButtonSelected == MenuButtonSelected.Button_Two)
         {
             enum_ButtonSelected = MenuButtonSelected.Button_Three;
 
             Set_ButtonHighlighed(b_OnNewGameMenu, enum_ButtonSelected);
         }
-        else if (enum_ButtonSelected == MenuButtonSelected.Button_One)
+        else if( b_OnNewGameMenu && enum_ButtonSelected == MenuButtonSelected.Button_Zero )
         {
-            enum_ButtonSelected = MenuButtonSelected.Button_Two;
+            enum_ButtonSelected = MenuButtonSelected.Button_One;
 
             Set_ButtonHighlighed(b_OnNewGameMenu, enum_ButtonSelected);
         }
@@ -165,6 +195,7 @@ public class Cs_MainMenuLogic : MonoBehaviour
 
     void Menu_Select()
     {
+        // Main Menu List
         if(!b_OnNewGameMenu)
         {
             #region New Game -> Reposition buttons, enable b_OnNewGameMenu
@@ -241,6 +272,25 @@ public class Cs_MainMenuLogic : MonoBehaviour
 
             int i_DropTimer = 1;
 
+            int i_Scene = 3;
+
+            #region Tutorial -> Set game settings, begin game
+            if (enum_ButtonSelected == MenuButtonSelected.Button_Zero)
+            {
+                if (go_GameSettings)
+                {
+                    // 2x2 only, No 3rd block, 15x15 grid size, 2 second drop delay
+                    b_2w_2h = true;
+                    i_BoardWidth = 8;
+                    i_BoardHeight = 10;
+                    i_DropTimer = -1;
+
+                    // Loads the tutorial instead
+                    i_Scene = 4;
+                }
+            }
+            #endregion
+
             #region Normal Difficulty -> Set game settings, begin game
             if (enum_ButtonSelected == MenuButtonSelected.Button_One)
             {
@@ -296,7 +346,7 @@ public class Cs_MainMenuLogic : MonoBehaviour
             #endregion
 
             go_GameSettings.GetComponent<Cs_MainMenu_GameSettings>().Set_GameSettings( b_2w_2h, b_2w_3h, b_3w_2h, b_3w_3h, b_ThreeBlocks, i_BoardWidth, i_BoardHeight, i_DropTimer );
-            SceneManager.LoadScene(3);
+            SceneManager.LoadScene(i_Scene);
             #endregion
         }
 
@@ -384,7 +434,7 @@ public class Cs_MainMenuLogic : MonoBehaviour
     {
         set
         {
-            // f_CreditsLerpTimer = 0f;
+            f_CreditsTimer = 0f;
 
             b_CreditsActive = value;
         }
@@ -547,6 +597,15 @@ public class Cs_MainMenuLogic : MonoBehaviour
         #region Lerp Credits
         if( CreditsActive )
         {
+            f_CreditsTimer += Time.deltaTime;
+
+            if (f_CreditsTimer > f_CreditsTimer_Max)
+            {
+                f_CreditsTimer = 0f;
+
+                Menu_Deselect();
+            }
+
             if (f_CreditsLerpTimer < 1.0f)
             {
                 b_PlayerInputAllowed = false;

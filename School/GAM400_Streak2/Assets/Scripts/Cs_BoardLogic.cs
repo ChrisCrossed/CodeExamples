@@ -4,6 +4,14 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
+/*********************************
+ * 
+ * Copyright DigiPen Institute of Technology 2016
+ * 
+ * Streak 2 by Christopher Christensen
+ * 
+ * *******************************/
+
 public enum Enum_BlockType
 {
     Block_1_Static = 10,

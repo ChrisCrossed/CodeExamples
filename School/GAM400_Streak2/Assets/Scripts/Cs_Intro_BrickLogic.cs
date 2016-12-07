@@ -1,6 +1,14 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+/*********************************
+ * 
+ * Copyright DigiPen Institute of Technology 2016
+ * 
+ * Streak 2 by Christopher Christensen
+ * 
+ * *******************************/
+
 public class Cs_Intro_BrickLogic : MonoBehaviour
 {
     [SerializeField] bool b_IsMainMenu;

@@ -4,6 +4,14 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using XInputDotNetPure;
 
+/*********************************
+ * 
+ * Copyright DigiPen Institute of Technology 2016
+ * 
+ * Streak 2 by Christopher Christensen
+ * 
+ * *******************************/
+
 public class Cs_IntroScreenLogic : MonoBehaviour
 {
     [SerializeField] GameObject go_Graphic;

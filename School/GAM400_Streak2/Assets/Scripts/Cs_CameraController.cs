@@ -1,6 +1,14 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+/*********************************
+ * 
+ * Copyright DigiPen Institute of Technology 2016
+ * 
+ * Streak 2 by Christopher Christensen
+ * 
+ * *******************************/
+
 public class Cs_CameraController : MonoBehaviour
 {
 	public void Init_CameraPosition( float f_BoardWidth_, float f_BoardHeight_, float f_BlockWidth_ )

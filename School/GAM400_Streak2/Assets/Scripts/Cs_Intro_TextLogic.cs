@@ -2,6 +2,14 @@
 using System.Collections;
 using UnityEngine.UI;
 
+/*********************************
+ * 
+ * Copyright DigiPen Institute of Technology 2016
+ * 
+ * Streak 2 by Christopher Christensen
+ * 
+ * *******************************/
+
 public class Cs_Intro_TextLogic : MonoBehaviour
 {
     float f_FadeTimer;

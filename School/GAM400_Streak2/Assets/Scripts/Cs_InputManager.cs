@@ -3,9 +3,18 @@ using System.Collections;
 using XInputDotNetPure;
 using UnityEngine.SceneManagement;
 
+/*********************************
+ * 
+ * Copyright DigiPen Institute of Technology 2016
+ * 
+ * Streak 2 by Christopher Christensen
+ * 
+ * *******************************/
+
 public class Cs_InputManager : MonoBehaviour
 {
     Cs_BoardLogic BoardLogic;
+    Cs_BoardLogic_Tutorial BoardLogic_Tut;
 
     // Keyboard Input
     public KeyCode key_Down;
@@ -32,7 +41,14 @@ public class Cs_InputManager : MonoBehaviour
     // Use this for initialization
     void Start ()
     {
-        BoardLogic = GameObject.Find("BoardLogic").GetComponent<Cs_BoardLogic>();
+        if(GameObject.Find("BoardLogic").GetComponent<Cs_BoardLogic>())
+        {
+            BoardLogic = GameObject.Find("BoardLogic").GetComponent<Cs_BoardLogic>();
+        }
+        else if(GameObject.Find("BoardLogic").GetComponent<Cs_BoardLogic_Tutorial>())
+        {
+            BoardLogic_Tut = GameObject.Find("BoardLogic").GetComponent<Cs_BoardLogic_Tutorial>();
+        }
 	}
 
     bool KeyboardInputCheck()
@@ -66,7 +82,7 @@ public class Cs_InputManager : MonoBehaviour
         {
             f_KeyTimer = 0.0f;
 
-            BoardLogic.Input_MoveLeft();
+            if (BoardLogic) BoardLogic.Input_MoveLeft(); else if (BoardLogic_Tut) BoardLogic_Tut.Input_MoveLeft();
         }
         else if(Input.GetKeyUp(key_Left) || Input.GetKeyUp(key_Left_2))
         {
@@ -80,7 +96,7 @@ public class Cs_InputManager : MonoBehaviour
 
             if(f_KeyTimer >= f_KeyTimer_TimeToReactivate)
             {
-                BoardLogic.Input_MoveLeft();
+                if (BoardLogic) BoardLogic.Input_MoveLeft(); else if (BoardLogic_Tut) BoardLogic_Tut.Input_MoveLeft();
 
                 f_KeyTimer -= f_KeyTimer_TimeToReduce;
             }
@@ -92,8 +108,8 @@ public class Cs_InputManager : MonoBehaviour
             !(Input.GetKey(key_Left) || Input.GetKey(key_Left_2)) )
         {
             f_KeyTimer = 0.0f;
-
-            BoardLogic.Input_MoveRight();
+            
+            if (BoardLogic) BoardLogic.Input_MoveRight(); else if (BoardLogic_Tut) BoardLogic_Tut.Input_MoveRight();
         }
         else if (Input.GetKeyUp(key_Right) || Input.GetKeyUp(key_Right_2))
         {
@@ -107,7 +123,7 @@ public class Cs_InputManager : MonoBehaviour
 
             if (f_KeyTimer >= f_KeyTimer_TimeToReactivate)
             {
-                BoardLogic.Input_MoveRight();
+                if (BoardLogic) BoardLogic.Input_MoveRight(); else if (BoardLogic_Tut) BoardLogic_Tut.Input_MoveRight();
 
                 f_KeyTimer -= f_KeyTimer_TimeToReduce;
             }
@@ -117,28 +133,28 @@ public class Cs_InputManager : MonoBehaviour
         #region Down Input
         if(Input.GetKeyDown(key_Down) || Input.GetKeyDown(key_Down_2))
         {
-            BoardLogic.Input_MoveDown();
+            if (BoardLogic) BoardLogic.Input_MoveDown(); else if (BoardLogic_Tut) BoardLogic_Tut.Input_MoveDown();
         }
         #endregion
 
         #region Drop Input
         if(Input.GetKeyDown(key_Drop))
         {
-            BoardLogic.Input_Drop();
+            if (BoardLogic) BoardLogic.Input_Drop(); else if (BoardLogic_Tut) BoardLogic_Tut.Input_Drop();
         }
         #endregion
 
         #region Clockwise
         if(Input.GetKeyDown(key_RotClock))
         {
-            BoardLogic.Input_RotateClockwise();
+            if (BoardLogic) BoardLogic.Input_RotateClockwise(); else if (BoardLogic_Tut) BoardLogic_Tut.Input_RotateClockwise();
         }
         #endregion
 
         #region CounterClockwise
         if(Input.GetKeyDown(key_RotCounter))
         {
-            BoardLogic.Input_RotateCounterclock();
+            if (BoardLogic) BoardLogic.Input_RotateCounterclock(); else if (BoardLogic_Tut) BoardLogic_Tut.Input_RotateCounterclock();
         }
         #endregion
     }
@@ -157,7 +173,7 @@ public class Cs_InputManager : MonoBehaviour
         {
             f_KeyTimer = 0.0f;
 
-            BoardLogic.Input_MoveLeft();
+            if (BoardLogic) BoardLogic.Input_MoveLeft(); else if (BoardLogic_Tut) BoardLogic_Tut.Input_MoveLeft();
 
             VibrateController( true );
         }
@@ -174,7 +190,7 @@ public class Cs_InputManager : MonoBehaviour
 
             if (f_KeyTimer >= f_KeyTimer_TimeToReactivate)
             {
-                BoardLogic.Input_MoveLeft();
+                if (BoardLogic) BoardLogic.Input_MoveLeft(); else if (BoardLogic_Tut) BoardLogic_Tut.Input_MoveLeft();
 
                 VibrateController(true);
 
@@ -189,7 +205,7 @@ public class Cs_InputManager : MonoBehaviour
         {
             f_KeyTimer = 0.0f;
 
-            BoardLogic.Input_MoveRight();
+            if (BoardLogic) BoardLogic.Input_MoveRight(); else if (BoardLogic_Tut) BoardLogic_Tut.Input_MoveRight();
 
             VibrateController(true);
         }
@@ -206,7 +222,7 @@ public class Cs_InputManager : MonoBehaviour
 
             if (f_KeyTimer >= f_KeyTimer_TimeToReactivate)
             {
-                BoardLogic.Input_MoveRight();
+                if (BoardLogic) BoardLogic.Input_MoveRight(); else if (BoardLogic_Tut) BoardLogic_Tut.Input_MoveRight();
 
                 VibrateController(true);
 
@@ -220,7 +236,7 @@ public class Cs_InputManager : MonoBehaviour
             (state_p1.ThumbSticks.Left.Y < -0.5f && prevState_p1.ThumbSticks.Left.Y > -0.5f) ||             // Left Analog Down Pressed
             (state_p1.DPad.Down == ButtonState.Pressed && prevState_p1.DPad.Down == ButtonState.Released) ) // DPad Down Pressed
         {
-            BoardLogic.Input_MoveDown();
+            if (BoardLogic) BoardLogic.Input_MoveDown(); else if (BoardLogic_Tut) BoardLogic_Tut.Input_MoveDown();
 
             VibrateController(true);
         }
@@ -229,7 +245,7 @@ public class Cs_InputManager : MonoBehaviour
         #region Drop Input
         if (state_p1.Buttons.A == ButtonState.Pressed && prevState_p1.Buttons.A == ButtonState.Released)      // Button 'A' Pressed
         {
-            BoardLogic.Input_Drop();
+            if (BoardLogic) BoardLogic.Input_Drop(); else if (BoardLogic_Tut) BoardLogic_Tut.Input_Drop();
 
             VibrateController(true);
         }
@@ -246,7 +262,7 @@ public class Cs_InputManager : MonoBehaviour
             // Ensures multiple presses are not performed
             if(f_ControllerInputTimer > 0.05f)
             {
-                BoardLogic.Input_RotateClockwise();
+                if (BoardLogic) BoardLogic.Input_RotateClockwise(); else if (BoardLogic_Tut) BoardLogic_Tut.Input_RotateClockwise();
 
                 VibrateController(true);
 
@@ -264,7 +280,7 @@ public class Cs_InputManager : MonoBehaviour
             // Ensures multiple presses are not performed
             if (f_ControllerInputTimer > 0.05f)
             {
-                BoardLogic.Input_RotateCounterclock();
+                if (BoardLogic) BoardLogic.Input_RotateCounterclock(); else if (BoardLogic_Tut) BoardLogic_Tut.Input_RotateCounterclock();
 
                 VibrateController(true);
 

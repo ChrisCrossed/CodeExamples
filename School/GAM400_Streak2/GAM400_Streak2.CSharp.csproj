@@ -92,6 +92,7 @@
     <Compile Include="Assets\Scripts\Cs_BlockOnBoardLogic.cs" />
     <Compile Include="Assets\Scripts\Cs_BoardDisplay.cs" />
     <Compile Include="Assets\Scripts\Cs_BoardLogic.cs" />
+    <Compile Include="Assets\Scripts\Cs_BoardLogic_Tutorial.cs" />
     <Compile Include="Assets\Scripts\Cs_CameraController.cs" />
     <Compile Include="Assets\Scripts\Cs_CanvasController.cs" />
     <Compile Include="Assets\Scripts\Cs_GridBlockLogic.cs" />
@@ -104,8 +105,6 @@
     <Compile Include="Assets\Scripts\Cs_MainMenuLogic.cs" />
     <Compile Include="Assets\Scripts\Cs_MainMenu_GameSettings.cs" />
     <Compile Include="Assets\Scripts\Cs_MenuButtonLogic.cs" />
-    <Compile Include="Assets\Scripts\MenuSystem.cs" />
-    <Compile Include="Assets\Scripts\NodeMap.cs" />
     <Compile Include="Assets\XInputDotNet\Examples\XInputTestCS.cs" />
     <Compile Include="Assets\XInputDotNetPure\GamePad.cs" />
     <Compile Include="Assets\XInputDotNetPure\Properties\AssemblyInfo.cs" />
