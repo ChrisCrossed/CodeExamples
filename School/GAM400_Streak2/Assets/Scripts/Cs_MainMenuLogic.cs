@@ -2,6 +2,7 @@
 using System.Collections;
 using UnityEngine.SceneManagement;
 using XInputDotNetPure;
+using UnityEngine.UI;
 
 enum MenuButtonSelected
 {
@@ -64,6 +65,10 @@ public class Cs_MainMenuLogic : MonoBehaviour
 
         go_MenuButtons_1 = GameObject.Find("MenuButtons_1");
         go_MenuButtons_2 = GameObject.Find("MenuButtons_2");
+        go_QuitMenuObjects = GameObject.Find("QuitMenuObjects");
+        go_CreditsMenuObjects = GameObject.Find("Credits");
+        v3_Position_OffScreen = GameObject.Find("QuitMenu_Pos_OffScreen").transform.position;
+        v3_Position_OnScreen = GameObject.Find("QuitMenu_Pos_OnScreen").transform.position;
 
         // Set button initial positions
         v3_MainMenu_PrevLoc = go_MenuButtons_1.transform.position;
@@ -71,6 +76,12 @@ public class Cs_MainMenuLogic : MonoBehaviour
         v3_NewGame_PrevLoc = go_MenuButtons_2.transform.position;
         v3_NewGame_CurrLoc = v3_MenuPosition_Below;
         f_LerpTimer = 0.0f;
+
+        // Set Quit Menu Objects Off Screen
+        QuitMenuActive = false;
+        f_QuitMenuLerpTimer = 1.0f;
+        CreditsActive = false;
+        f_CreditsLerpTimer = 0.0f;
     }
 
     void Set_ButtonHighlighed( bool b_OnNewGameMenu_, MenuButtonSelected e_ButtonSelected_ )
@@ -175,19 +186,33 @@ public class Cs_MainMenuLogic : MonoBehaviour
             #region Credits -> Reposition buttons
             else if ( enum_ButtonSelected == MenuButtonSelected.Button_Two )
             {
-                // The normal menu screen is sent off screen
-                SetButtonPosition(false, false);
+                if(!CreditsActive)
+                {
+                    // The normal menu screen is sent off screen
+                    SetButtonPosition(false, false);
+
+                    CreditsActive = true;
+
+                    f_QuitMenuLerpTimer = 1.0f;
+                }
             }
             #endregion
 
             #region Quit -> Confirm Quit
             else if (enum_ButtonSelected == MenuButtonSelected.Button_Three)
             {
-                // The normal menu screen is sent off screen
-                SetButtonPosition(false, false);
+                if(!QuitMenuActive)
+                {
+                    // The normal menu screen is sent off screen
+                    SetButtonPosition(false, false);
 
-                // TODO: Quit Confirm
-
+                    // TODO: Quit Confirm
+                    QuitMenuActive = true;
+                }
+                else
+                {
+                    Application.Quit();
+                }
             }
             #endregion
         }
@@ -285,11 +310,55 @@ public class Cs_MainMenuLogic : MonoBehaviour
         }
         else
         {
-            // Move the Main Menu onto the screen
-            SetButtonPosition(false, true);
+            if( QuitMenuActive || CreditsActive ) // Or Credits Menu Active
+            {
+                // Move the Main Menu onto the screen
+                SetButtonPosition(false, true);
+
+                // Move the New Game choices off screen
+                SetButtonPosition(true, false);
+
+                if (QuitMenuActive) QuitMenuActive = false;
+                if(CreditsActive) CreditsActive = false;
+
+                b_OnNewGameMenu = false;
+                enum_ButtonSelected = MenuButtonSelected.Button_One;
+
+                Set_ButtonHighlighed(b_OnNewGameMenu, enum_ButtonSelected);
+            }
         }
 
         b_PlayerInputAllowed = false;
+    }
+
+    bool b_QuitMenuActive;
+    float f_QuitMenuLerpTimer;
+    GameObject go_QuitMenuObjects;
+    Vector3 v3_Position_OffScreen;
+    Vector3 v3_Position_OnScreen;
+    bool QuitMenuActive
+    {
+        set
+        {
+            f_QuitMenuLerpTimer = 0f;
+
+            b_QuitMenuActive = value;
+        }
+        get { return b_QuitMenuActive; }
+    }
+
+    bool b_CreditsActive;
+    float f_CreditsLerpTimer;
+    GameObject go_CreditsMenuObjects;
+    bool CreditsActive
+    {
+        set
+        {
+            // f_CreditsLerpTimer = 0f;
+
+            b_CreditsActive = value;
+        }
+        get { return b_CreditsActive; }
     }
 
     Vector3 v3_MainMenu_PrevLoc;
@@ -345,6 +414,7 @@ public class Cs_MainMenuLogic : MonoBehaviour
         prevState = state;
         state = GamePad.GetState(pad_PlayerOne);
 
+        #region Player Input
         if(b_PlayerInputAllowed)
         {
             if( (state.ThumbSticks.Left.Y < -0.5f && prevState.ThumbSticks.Left.Y > -0.5f) ||
@@ -377,9 +447,11 @@ public class Cs_MainMenuLogic : MonoBehaviour
                 Menu_Deselect();
             }
         }
+        #endregion
 
+        #region Lerp Button Position
         // Lerp button positions
-        if(f_LerpTimer < f_LerpTimer_Max)
+        if (f_LerpTimer < f_LerpTimer_Max)
         {
             // Increment & Clamp
             f_LerpTimer += Time.deltaTime;
@@ -395,5 +467,88 @@ public class Cs_MainMenuLogic : MonoBehaviour
         {
             b_PlayerInputAllowed = true;
         }
-	}
+        #endregion
+
+        #region Lerp Quit Menu
+        if( QuitMenuActive )
+        {
+            if(f_QuitMenuLerpTimer < 1.0f)
+            {
+                b_PlayerInputAllowed = false;
+
+                f_QuitMenuLerpTimer += Time.deltaTime;
+                if (f_QuitMenuLerpTimer > 1.0f)
+                {
+                    f_QuitMenuLerpTimer = 1.0f;
+
+                    b_PlayerInputAllowed = true;
+                }
+            }
+
+            float f_Perc = animCurve.Evaluate(f_QuitMenuLerpTimer);
+
+            Vector3 v3_CurrPos = Vector3.LerpUnclamped(v3_Position_OffScreen, v3_Position_OnScreen, f_Perc);
+
+            go_QuitMenuObjects.transform.position = v3_CurrPos;
+        }
+        else
+        {
+            if (f_QuitMenuLerpTimer < 1.0f)
+            {
+                b_PlayerInputAllowed = false;
+
+                f_QuitMenuLerpTimer += Time.deltaTime;
+                if (f_QuitMenuLerpTimer > 1.0f)
+                {
+                    f_QuitMenuLerpTimer = 1.0f;
+
+                    b_PlayerInputAllowed = true;
+                }
+            }
+
+            float f_Perc = animCurve.Evaluate(f_QuitMenuLerpTimer);
+
+            Vector3 v3_CurrPos = Vector3.LerpUnclamped(v3_Position_OnScreen, v3_Position_OffScreen, f_Perc);
+
+            go_QuitMenuObjects.transform.position = v3_CurrPos;
+        }
+        #endregion
+
+        #region Lerp Credits
+        if( CreditsActive )
+        {
+            if (f_CreditsLerpTimer < 1.0f)
+            {
+                b_PlayerInputAllowed = false;
+
+                f_CreditsLerpTimer += Time.deltaTime;
+                if (f_CreditsLerpTimer > 1.0f)
+                {
+                    f_CreditsLerpTimer = 1.0f;
+
+                    b_PlayerInputAllowed = true;
+                }
+            }
+        }
+        else
+        {
+            if (f_CreditsLerpTimer > 0.0f)
+            {
+                b_PlayerInputAllowed = false;
+
+                f_CreditsLerpTimer -= Time.deltaTime;
+                if (f_CreditsLerpTimer < 0.0f)
+                {
+                    f_CreditsLerpTimer = 0.0f;
+
+                    b_PlayerInputAllowed = true;
+                }
+            }
+        }
+
+        Color clr_CurrAlpha = go_CreditsMenuObjects.GetComponent<Image>().color;
+        clr_CurrAlpha.a = f_CreditsLerpTimer;
+        go_CreditsMenuObjects.GetComponent<Image>().color = clr_CurrAlpha;
+        #endregion
+    }
 }

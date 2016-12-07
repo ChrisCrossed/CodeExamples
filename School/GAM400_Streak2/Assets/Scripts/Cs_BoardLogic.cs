@@ -123,8 +123,8 @@ public class Cs_BoardLogic : MonoBehaviour
     [SerializeField] bool b_3w_2h_Allowed = true;
     [SerializeField] bool b_3w_3h_Allowed = true;
     [SerializeField] bool b_ThreeBlockColors = false;
-    [SerializeField] [Range(10, 20)] int i_ArrayWidth;
-    [SerializeField] [Range(10, 20)] int i_ArrayHeight;
+    [SerializeField] [Range(5, 20)] int i_ArrayWidth;
+    [SerializeField] [Range(5, 20)] int i_ArrayHeight;
     [Range(-1, 5)] [SerializeField] int i_TimeToDrop_Max = 3;
     
     float f_StartGameTimer = 2.0f;
