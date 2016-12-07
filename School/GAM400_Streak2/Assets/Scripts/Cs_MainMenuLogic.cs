@@ -190,10 +190,19 @@ public class Cs_MainMenuLogic : MonoBehaviour
                 {
                     // The normal menu screen is sent off screen
                     SetButtonPosition(false, false);
+                    SetButtonPosition(true, false);
 
                     CreditsActive = true;
 
                     f_QuitMenuLerpTimer = 1.0f;
+                }
+                // We disable the credits screen and return to the previous menu
+                else
+                {
+                    CreditsActive = false;
+
+                    // Return the main menu to the screen
+                    SetButtonPosition(false, true);
                 }
             }
             #endregion
@@ -205,6 +214,7 @@ public class Cs_MainMenuLogic : MonoBehaviour
                 {
                     // The normal menu screen is sent off screen
                     SetButtonPosition(false, false);
+                    SetButtonPosition(true, false);
 
                     // TODO: Quit Confirm
                     QuitMenuActive = true;
@@ -310,21 +320,41 @@ public class Cs_MainMenuLogic : MonoBehaviour
         }
         else
         {
-            if( QuitMenuActive || CreditsActive ) // Or Credits Menu Active
+            if( CreditsActive ) // Or Credits Menu Active
             {
-                // Move the Main Menu onto the screen
+                // We disable the credits screen and return to the previous menu
+                CreditsActive = false;
+
+                // Return the main menu to the screen
                 SetButtonPosition(false, true);
-
-                // Move the New Game choices off screen
-                SetButtonPosition(true, false);
-
-                if (QuitMenuActive) QuitMenuActive = false;
-                if(CreditsActive) CreditsActive = false;
+                // SetButtonPosition(true, false);
 
                 b_OnNewGameMenu = false;
                 enum_ButtonSelected = MenuButtonSelected.Button_One;
 
                 Set_ButtonHighlighed(b_OnNewGameMenu, enum_ButtonSelected);
+            }
+            else if( QuitMenuActive )
+            {
+                QuitMenuActive = false;
+
+                // Move the Main Menu onto the screen
+                SetButtonPosition(false, true);
+                SetButtonPosition(true, false);
+
+                b_OnNewGameMenu = false;
+                enum_ButtonSelected = MenuButtonSelected.Button_One;
+
+                Set_ButtonHighlighed(b_OnNewGameMenu, enum_ButtonSelected);
+
+                // Move the New Game choices off screen
+                // SetButtonPosition(false, true);
+                // f_LerpTimer = f_LerpTimer_Max;
+
+                // b_OnNewGameMenu = false;
+                // enum_ButtonSelected = MenuButtonSelected.Button_One;
+
+                // Set_ButtonHighlighed(b_OnNewGameMenu, enum_ButtonSelected);
             }
         }
 
