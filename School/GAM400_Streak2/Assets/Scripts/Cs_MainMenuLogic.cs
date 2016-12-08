@@ -52,7 +52,10 @@ public class Cs_MainMenuLogic : MonoBehaviour
 	// Use this for initialization
 	void Start ()
     {
-        if(GameObject.Find("GameSettings"))
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
+        if (GameObject.Find("GameSettings"))
         {
             go_GameSettings = GameObject.Find("GameSettings").gameObject;
         }
@@ -285,7 +288,7 @@ public class Cs_MainMenuLogic : MonoBehaviour
                     b_2w_2h = true;
                     i_BoardWidth = 8;
                     i_BoardHeight = 10;
-                    i_DropTimer = -1;
+                    i_DropTimer = 3;
 
                     // Loads the tutorial instead
                     i_Scene = 4;
@@ -301,9 +304,9 @@ public class Cs_MainMenuLogic : MonoBehaviour
                 {
                     // 2x2 only, No 3rd block, 15x15 grid size, 2 second drop delay
                     b_2w_2h = true;
-                    i_BoardWidth = 15;
-                    i_BoardHeight = 15;
-                    i_DropTimer = 2;
+                    i_BoardWidth = 12;
+                    i_BoardHeight = 10;
+                    i_DropTimer = 1;
                 }
             }
             #endregion
@@ -319,7 +322,7 @@ public class Cs_MainMenuLogic : MonoBehaviour
                     b_2w_3h = true;
                     b_3w_2h = true;
 
-                    i_BoardWidth = 20;
+                    i_BoardWidth = 15;
                     i_BoardHeight = 15;
 
                     i_DropTimer = 1;
@@ -340,8 +343,8 @@ public class Cs_MainMenuLogic : MonoBehaviour
 
                     b_ThreeBlocks = true;
 
-                    i_BoardWidth = 20;
-                    i_BoardHeight = 20;
+                    i_BoardWidth = 15;
+                    i_BoardHeight = 15;
 
                     i_DropTimer = 1;
                 }
@@ -399,15 +402,6 @@ public class Cs_MainMenuLogic : MonoBehaviour
                 enum_ButtonSelected = MenuButtonSelected.Button_One;
 
                 Set_ButtonHighlighed(b_OnNewGameMenu, enum_ButtonSelected);
-
-                // Move the New Game choices off screen
-                // SetButtonPosition(false, true);
-                // f_LerpTimer = f_LerpTimer_Max;
-
-                // b_OnNewGameMenu = false;
-                // enum_ButtonSelected = MenuButtonSelected.Button_One;
-
-                // Set_ButtonHighlighed(b_OnNewGameMenu, enum_ButtonSelected);
             }
         }
 

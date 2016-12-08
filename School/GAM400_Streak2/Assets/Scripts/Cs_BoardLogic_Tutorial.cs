@@ -56,6 +56,7 @@ public class Cs_BoardLogic_Tutorial : MonoBehaviour
     GameObject go_Arrow_Red_4;
     GameObject go_Arrow_Red_5;
     GameObject go_Arrow_Red_6;
+    int i_TurnCounter;
 
     float f_StartGameTimer = 2.0f;
 
@@ -203,8 +204,6 @@ public class Cs_BoardLogic_Tutorial : MonoBehaviour
                 e_NextBlockList[(i_ * 4) + 1] = Enum_BlockType.Block_2_Active;
                 e_NextBlockList[(i_ * 4) + 2] = Enum_BlockType.Block_1_Active;
                 e_NextBlockList[(i_ * 4) + 3] = Enum_BlockType.Block_1_Active;
-
-                print("Setting four blocks: " + (int)(i_ * 4) + " through " + (int)((i_ * 4) + 3) );
             }
 
             for(int i_ = 3 * 4; i_ < e_NextBlockList.Length; ++i_)
@@ -212,7 +211,7 @@ public class Cs_BoardLogic_Tutorial : MonoBehaviour
                 e_NextBlockList[i_] = Enum_BlockType.Block_1_Active;
             }
 
-            b_IsTutorial = false;
+            // b_IsTutorial = false;
         }
         else
         {
@@ -1017,6 +1016,11 @@ public class Cs_BoardLogic_Tutorial : MonoBehaviour
     {
         b_RunAgain = false;
 
+        // Tutorial Use
+        ++i_TurnCounter;
+        print("Turns: " + i_TurnCounter);
+        SetNewTutorialArrowModels();
+
         #region Set Left & Right Walls to 'Empty' (Done BEFORE scoring)
         for (int y_ = 0; y_ < i_ArrayHeight; ++y_)
         {
@@ -1727,6 +1731,40 @@ public class Cs_BoardLogic_Tutorial : MonoBehaviour
         GameObject.Find("BoardDisplay").GetComponent<Cs_BoardDisplay>().Set_OneBlock(8, 3, Enum_BlockType.Block_1_Static);
     }
 
+    void Set_ArrowModel( bool b_IsBlock2_, int i_Number_, IntVector2 iv2_Pos_, bool b_IsEnabled = true )
+    {
+        // Set Arrow Position before passing info into overloaded method
+        iv2_Pos_.x *= 3;
+        iv2_Pos_.y *= 3;
+
+        GameObject go_ArrowModel = go_Arrow_Blue_1;
+
+        if (b_IsBlock2_)
+        {
+            if (i_Number_ == 1) go_ArrowModel = go_Arrow_Blue_1;
+            if (i_Number_ == 2) go_ArrowModel = go_Arrow_Blue_2;
+            if (i_Number_ == 3) go_ArrowModel = go_Arrow_Blue_3;
+            if (i_Number_ == 4) go_ArrowModel = go_Arrow_Blue_4;
+            if (i_Number_ == 5) go_ArrowModel = go_Arrow_Blue_5;
+            if (i_Number_ == 6) go_ArrowModel = go_Arrow_Blue_6;
+        }
+        else
+        {
+            if (i_Number_ == 1) go_ArrowModel = go_Arrow_Red_1;
+            if (i_Number_ == 2) go_ArrowModel = go_Arrow_Red_2;
+            if (i_Number_ == 3) go_ArrowModel = go_Arrow_Red_3;
+            if (i_Number_ == 4) go_ArrowModel = go_Arrow_Red_4;
+            if (i_Number_ == 5) go_ArrowModel = go_Arrow_Red_5;
+            if (i_Number_ == 6) go_ArrowModel = go_Arrow_Red_6;
+        }
+
+        Vector3 v3_NewPos = go_ArrowModel.transform.position;
+        v3_NewPos.x = iv2_Pos_.x;
+        v3_NewPos.y = iv2_Pos_.y;
+        go_ArrowModel.transform.position = v3_NewPos;
+
+        Set_ArrowModel( b_IsBlock2_, i_Number_, b_IsEnabled );
+    }
     void Set_ArrowModel( bool b_IsBlock2_, int i_Number_, bool b_IsEnabled_ )
     {
         GameObject go_ArrowModel = go_Arrow_Blue_1;
@@ -1755,6 +1793,216 @@ public class Cs_BoardLogic_Tutorial : MonoBehaviour
         go_ArrowModel.transform.Find("V").GetComponent<MeshRenderer>().enabled = b_IsEnabled_;
     }
 
+    void RemoveOldTutorialArrowModels()
+    {
+        if (i_TurnCounter - 1 < 3)
+        {
+            for (int i_Y = 0; i_Y < 2; ++i_Y)
+            {
+                for (int i_X = 1; i_X < 8; ++i_X)
+                {
+                    if (BlockArray[0, i_X] == Enum_BlockType.Block_2_Static || BlockArray[0, i_X] == Enum_BlockType.Block_2_Active)
+                    {
+                        if (i_X == 1) Set_ArrowModel(true, 1, false);
+                        if (i_X == 2) Set_ArrowModel(true, 2, false);
+                        if (i_X == 3) Set_ArrowModel(true, 3, false);
+                        if (i_X == 4) Set_ArrowModel(true, 4, false);
+                        if (i_X == 5) Set_ArrowModel(true, 5, false);
+                        if (i_X == 6) Set_ArrowModel(true, 6, false);
+                    }
+
+                    if (BlockArray[1, i_X] == Enum_BlockType.Block_1_Static || BlockArray[0, i_X] == Enum_BlockType.Block_1_Active)
+                    {
+                        if (i_X == 1) Set_ArrowModel(false, 1, false);
+                        if (i_X == 2) Set_ArrowModel(false, 2, false);
+                        if (i_X == 3) Set_ArrowModel(false, 3, false);
+                        if (i_X == 4) Set_ArrowModel(false, 4, false);
+                        if (i_X == 5) Set_ArrowModel(false, 5, false);
+                        if (i_X == 6) Set_ArrowModel(false, 6, false);
+                    }
+                }
+            }
+        }
+        else if(i_TurnCounter - 1 < 6)
+        {
+            // Score check. If they fail it, restart the tutorial
+            if(i_Score >= 12)
+            {
+                if (BlockArray[0, 1] == Enum_BlockType.Block_2_Static) Set_ArrowModel( true, 1, false );
+                if (BlockArray[0, 2] == Enum_BlockType.Block_2_Static) Set_ArrowModel(true,  2, false);
+                if (BlockArray[0, 3] == Enum_BlockType.Block_2_Static) Set_ArrowModel(true,  3, false);
+                if (BlockArray[0, 4] == Enum_BlockType.Block_2_Static) Set_ArrowModel(true,  4, false);
+                if (BlockArray[0, 5] == Enum_BlockType.Block_2_Static) Set_ArrowModel(true,  5, false);
+                if (BlockArray[0, 6] == Enum_BlockType.Block_1_Static) Set_ArrowModel(false, 1, false);
+
+                if (BlockArray[1, 1] == Enum_BlockType.Block_1_Static) Set_ArrowModel(false, 2, false);
+                if (BlockArray[1, 2] == Enum_BlockType.Block_1_Static) Set_ArrowModel(false, 3, false);
+                if (BlockArray[1, 3] == Enum_BlockType.Block_1_Static) Set_ArrowModel(false, 4, false);
+                if (BlockArray[1, 4] == Enum_BlockType.Block_1_Static) Set_ArrowModel(false, 5, false);
+                if (BlockArray[1, 5] == Enum_BlockType.Block_2_Static) Set_ArrowModel(true,  6, false);
+                if (BlockArray[1, 6] == Enum_BlockType.Block_1_Static) Set_ArrowModel(false, 6, false);
+            }
+            else
+            {
+                SceneManager.LoadScene(4);
+            }
+        }
+        else if( i_TurnCounter - 1 < 8 )
+        {
+            SetNewTutorialArrowModels();
+
+            if (BlockArray[2, 3] == Enum_BlockType.Block_2_Static) Set_ArrowModel(true, 1, false);
+            if (BlockArray[2, 4] == Enum_BlockType.Block_2_Static) Set_ArrowModel(true, 2, false);
+            if (BlockArray[2, 5] == Enum_BlockType.Block_2_Static) Set_ArrowModel(true, 3, false);
+            if (BlockArray[2, 6] == Enum_BlockType.Block_1_Static) Set_ArrowModel(false, 1, false);
+
+            if (BlockArray[3, 3] == Enum_BlockType.Block_2_Static) Set_ArrowModel(true, 4, false);
+            if (BlockArray[3, 4] == Enum_BlockType.Block_1_Static) Set_ArrowModel(false, 2, false);
+            if (BlockArray[3, 5] == Enum_BlockType.Block_1_Static) Set_ArrowModel(false, 3, false);
+            if (BlockArray[3, 6] == Enum_BlockType.Block_2_Static) Set_ArrowModel(true, 5, false);
+        }
+
+        else if( i_TurnCounter >= 8 )
+        {
+            if (BlockArray[4, 3] == Enum_BlockType.Block_2_Static) Set_ArrowModel(true, 1, false);
+            if (BlockArray[4, 4] == Enum_BlockType.Block_2_Static) Set_ArrowModel(true, 2, false);
+            if (BlockArray[4, 5] == Enum_BlockType.Block_2_Static) Set_ArrowModel(true, 3, false);
+            if (BlockArray[4, 6] == Enum_BlockType.Block_2_Static) Set_ArrowModel(true, 4, false);
+
+            if (BlockArray[5, 3] == Enum_BlockType.Block_1_Static) Set_ArrowModel(false, 1, false);
+            if (BlockArray[5, 4] == Enum_BlockType.Block_1_Static) Set_ArrowModel(false, 2, false);
+            if (BlockArray[5, 5] == Enum_BlockType.Block_1_Static) Set_ArrowModel(false, 3, false);
+            if (BlockArray[5, 6] == Enum_BlockType.Block_1_Static) Set_ArrowModel(false, 4, false);
+        }
+
+        // Restart tutorial check
+        if( i_TurnCounter == 6 )
+        {
+            for (int i_ = 1; i_ < 6; ++i_)
+            {
+                if (BlockArray[0, i_] != Enum_BlockType.Block_2_Static)
+                {
+                    SceneManager.LoadScene(4);
+                }
+            }
+        }
+
+        if( i_TurnCounter == 8 )
+        {
+            for(int i_ = 3; i_ < 6; ++i_)
+            {
+                if(BlockArray[2, i_] != Enum_BlockType.Block_2_Static)
+                {
+                    SceneManager.LoadScene(4);
+                }
+            }
+
+            if (BlockArray[2, 6] != Enum_BlockType.Block_1_Static) SceneManager.LoadScene(4);
+        }
+
+        if( i_TurnCounter == 10)
+        {
+            for( int i_ = 3; i_ < 7; ++i_ )
+            {
+                if(BlockArray[4, i_] == Enum_BlockType.Block_2_Static)
+                {
+                    return;
+                }
+            }
+
+            if( i_Score <= 13 ) SceneManager.LoadScene(4);
+        }
+    }
+
+    void SetNewTutorialArrowModels()
+    {
+        if( i_Score == 12 )
+        {
+            if( i_TurnCounter == 3 )
+            {
+                // Custom new positioning
+                Set_ArrowModel(true, 1, new IntVector2(1, 0), true);
+                Set_ArrowModel(true, 2, new IntVector2(2, 0), true);
+                Set_ArrowModel(true, 3, new IntVector2(3, 0), true);
+                Set_ArrowModel(true, 4, new IntVector2(4, 0), true);
+                Set_ArrowModel(true, 5, new IntVector2(5, 0), true);
+                Set_ArrowModel(false, 1, new IntVector2(6, 0), true);
+
+                Set_ArrowModel(false, 2, new IntVector2(1, 1), true);
+                Set_ArrowModel(false, 3, new IntVector2(2, 1), true);
+                Set_ArrowModel(false, 4, new IntVector2(3, 1), true);
+                Set_ArrowModel(false, 5, new IntVector2(4, 1), true);
+                Set_ArrowModel(true,  6, new IntVector2(5, 1), true);
+                Set_ArrowModel(false, 6, new IntVector2(6, 1), true);
+
+                GameObject.Find("Text_Tutorial").GetComponent<Text>().text = "Use Q/E or Controller Shoulder\nButtons to Rotate Blocks";
+
+                // Red, Red, Blue, Blue
+                for (int i_ = 0; i_ < 3; ++i_)
+                {
+                    e_NextBlockList[(i_ * 4) + 0] = Enum_BlockType.Block_2_Active;
+                    e_NextBlockList[(i_ * 4) + 1] = Enum_BlockType.Block_2_Active;
+                    e_NextBlockList[(i_ * 4) + 2] = Enum_BlockType.Block_1_Active;
+                    e_NextBlockList[(i_ * 4) + 3] = Enum_BlockType.Block_1_Active;
+                }
+            }
+            else if( i_TurnCounter == 6 ) // *************************************************************************************************
+            {
+                // Custom new positioning
+                Set_ArrowModel( true,  1, new IntVector2(3, 2), true );
+                Set_ArrowModel( true,  2, new IntVector2(4, 2), true );
+                Set_ArrowModel( true,  3, new IntVector2(5, 2), true );
+                Set_ArrowModel( false, 1, new IntVector2(6, 2), true );
+
+                Set_ArrowModel( true,  4, new IntVector2(3, 3), true );
+                Set_ArrowModel( false, 2, new IntVector2(4, 3), true );
+                Set_ArrowModel( false, 3, new IntVector2(5, 3), true );
+                Set_ArrowModel( true,  5, new IntVector2(6, 3), true );
+
+                e_NextBlockList[0] = Enum_BlockType.Block_2_Active;
+                e_NextBlockList[1] = Enum_BlockType.Block_2_Active;
+                e_NextBlockList[2] = Enum_BlockType.Block_2_Active;
+                e_NextBlockList[3] = Enum_BlockType.Block_1_Active;
+
+            }
+            else if( i_TurnCounter == 7 )
+            {
+                e_NextBlockList[0] = Enum_BlockType.Block_2_Active;
+                e_NextBlockList[1] = Enum_BlockType.Block_1_Active;
+                e_NextBlockList[2] = Enum_BlockType.Block_1_Active;
+                e_NextBlockList[3] = Enum_BlockType.Block_2_Active;
+            }
+            else if( i_TurnCounter == 8 || i_TurnCounter == 9 )
+            {
+                e_NextBlockList[0] = Enum_BlockType.Block_2_Active;
+                e_NextBlockList[1] = Enum_BlockType.Block_2_Active;
+                e_NextBlockList[2] = Enum_BlockType.Block_1_Active;
+                e_NextBlockList[3] = Enum_BlockType.Block_1_Active;
+            }
+            else if( i_TurnCounter > 9 )
+            {
+                e_NextBlockList[0] = Enum_BlockType.Block_1_Active;
+                e_NextBlockList[1] = Enum_BlockType.Block_1_Active;
+                e_NextBlockList[2] = Enum_BlockType.Block_2_Active;
+                e_NextBlockList[3] = Enum_BlockType.Block_2_Active;
+            }
+
+            if( i_TurnCounter == 8 )
+            {
+                // Custom new positioning
+                Set_ArrowModel(true, 1, new IntVector2(3, 4), true);
+                Set_ArrowModel(true, 2, new IntVector2(4, 4), true);
+                Set_ArrowModel(true, 3, new IntVector2(5, 4), true);
+                Set_ArrowModel(true, 4, new IntVector2(6, 4), true);
+
+                Set_ArrowModel(false, 1, new IntVector2(3, 5), true);
+                Set_ArrowModel(false, 2, new IntVector2(4, 5), true);
+                Set_ArrowModel(false, 3, new IntVector2(5, 5), true);
+                Set_ArrowModel(false, 4, new IntVector2(6, 5), true);
+            }
+        }
+    }
+
     // Update is called once per frame
     float f_ScoreLine_Timer;
     // static float f_ScoreLine_Timer_Max = 0.075f;
@@ -1773,7 +2021,12 @@ public class Cs_BoardLogic_Tutorial : MonoBehaviour
             Cheat_SetDoubleLine();
         }
 
-        if(e_PauseEffect == Enum_PauseEffect.Unpause)
+        if (i_TurnCounter == 11)
+        {
+            SceneManager.LoadScene(4);
+        }
+
+        if (e_PauseEffect == Enum_PauseEffect.Unpause)
         {
             if(b_DemoGame_InputReceived)
             {
@@ -1795,37 +2048,18 @@ public class Cs_BoardLogic_Tutorial : MonoBehaviour
             #endregion
             }
 
-            if(i_Score < 13)
-            {
-                for(int i_Y = 0; i_Y < 2; ++i_Y)
-                {
-                    for(int i_X = 1; i_X < 7; ++i_X)
-                    {
-                        if ( BlockArray[0, i_X] == Enum_BlockType.Block_2_Static || BlockArray[0, i_X] == Enum_BlockType.Block_2_Active )
-                        {
-                            if (i_X == 1) Set_ArrowModel(true, 1, false);
-                            if (i_X == 2) Set_ArrowModel(true, 2, false);
-                            if (i_X == 3) Set_ArrowModel(true, 3, false);
-                            if (i_X == 4) Set_ArrowModel(true, 4, false);
-                            if (i_X == 5) Set_ArrowModel(true, 5, false);
-                            if (i_X == 6) Set_ArrowModel(true, 6, false);
-                        }
+            // print(i_TurnCounter - 1);
 
-                        if( BlockArray[1, i_X] ==Enum_BlockType.Block_1_Static || BlockArray[0, i_X] == Enum_BlockType.Block_1_Active )
-                        {
-                            if (i_X == 1) Set_ArrowModel(false, 1, false);
-                            if (i_X == 2) Set_ArrowModel(false, 2, false);
-                            if (i_X == 3) Set_ArrowModel(false, 3, false);
-                            if (i_X == 4) Set_ArrowModel(false, 4, false);
-                            if (i_X == 5) Set_ArrowModel(false, 5, false);
-                            if (i_X == 6) Set_ArrowModel(false, 6, false);
-                        }
-                    }
-                }
-            }
+            RemoveOldTutorialArrowModels();
+
+            if (i_TurnCounter >= 6) SetNewTutorialArrowModels();
         }
         else if(e_PauseEffect == Enum_PauseEffect.ScoreLine)
         {
+            #region Remove Arrow Models First
+            RemoveOldTutorialArrowModels();
+            #endregion
+
             #region Scoreline Pause
             // Run through the Scoreline array and have them destroy themselves
             f_ScoreLine_Timer += Time.deltaTime;
@@ -1858,6 +2092,8 @@ public class Cs_BoardLogic_Tutorial : MonoBehaviour
 
                     // Increment i_ScoreLine_Counter
                     ++i_ScoreLine_Counter;
+
+                    ++i_Score;
                 }
                 // Scoreline is finished, reset and move on
                 else
@@ -1930,6 +2166,17 @@ public class Cs_BoardLogic_Tutorial : MonoBehaviour
                 f_ScoreLine_Timer = 0.0f;
             }
             #endregion
+
+            #region Set New Tutorial Arrows
+            SetNewTutorialArrowModels();
+            #endregion
+
+            if (i_TurnCounter == 10 && i_Score >= 32)
+            {
+                e_PauseEffect = Enum_PauseEffect.GameOver;
+
+                GameObject.Find("Text_Tutorial").GetComponent<Text>().text = "Good Job!\nNow Go Play Normal Mode!";
+            }
         }
         else if(e_PauseEffect == Enum_PauseEffect.StartGame)
         {

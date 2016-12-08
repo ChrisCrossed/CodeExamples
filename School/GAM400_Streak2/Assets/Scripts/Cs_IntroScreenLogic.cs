@@ -31,6 +31,9 @@ public class Cs_IntroScreenLogic : MonoBehaviour
     // Update is called once per frame
     void Update ()
     {
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
         #region Update Controller State
         prevState_p1 = state_p1;
         state_p1 = GamePad.GetState(pad_PlayerOne);

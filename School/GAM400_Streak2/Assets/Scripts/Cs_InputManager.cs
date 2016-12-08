@@ -74,7 +74,7 @@ public class Cs_InputManager : MonoBehaviour
 
     void KeyboardInput()
     {
-        if(Input.GetKey(key_Quit)) Application.Quit();
+        if(Input.GetKey(key_Quit)) SceneManager.LoadScene(2);
 
         #region Left Input
         if ( (Input.GetKeyDown(key_Left) || Input.GetKeyDown(key_Left_2)) &&
@@ -164,7 +164,7 @@ public class Cs_InputManager : MonoBehaviour
     {
         if(state_p1.Buttons.Start == ButtonState.Pressed && prevState_p1.Buttons.Start == ButtonState.Released)
         {
-            SceneManager.LoadScene(0);
+            SceneManager.LoadScene(2);
         }
 
         #region Move Left
