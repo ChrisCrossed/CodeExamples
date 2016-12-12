@@ -4,6 +4,8 @@ using UnityEngine.UI;
 
 public class Cs_ObjectiveManager : MonoBehaviour
 {
+    bool b_ClockedIn;
+
     int i_NumTasks = 2;
 
     Text txt_JobList_1_Text;
@@ -13,6 +15,7 @@ public class Cs_ObjectiveManager : MonoBehaviour
     Text txt_JobList_5_Text;
 
     string[] s_JobList = new string[15];
+    string s_TurnInJob = "[TURN IN]";
 
     #region Task - 'Boss Kick Me'
     bool b_Job_BossKickMe;          // 0
@@ -22,6 +25,11 @@ public class Cs_ObjectiveManager : MonoBehaviour
     #region Task - 'Change Radio Station'
     bool b_Job_ChangeRadioStation;  // 1
     [SerializeField] GameObject[] go_RadioList;
+    #endregion
+
+    #region Task - 'Punch In'
+    bool b_Job_PunchIn;
+    GameObject go_PunchInClock;
     #endregion
 
     // Use this for initialization
@@ -39,12 +47,17 @@ public class Cs_ObjectiveManager : MonoBehaviour
         go_BossSign = GameObject.Find("BackMessage");
         #endregion
 
+        #region Task - 'Punch In'
+        go_PunchInClock = GameObject.Find("PunchInClock");
+        #endregion
+
         // CreateNewJob();
+        Init_PunchIn();
 
         Set_TaskText();
     }
 
-    void CreateNewJob()
+    public void CreateNewJob()
     {
         bool b_JobFound = false;
 
@@ -74,6 +87,41 @@ public class Cs_ObjectiveManager : MonoBehaviour
         }
     }
 
+    public bool ClockIn
+    {
+        set { b_ClockedIn = value; }
+        get { return b_ClockedIn; }
+    }
+
+    #region Punch In
+    int i_PunchIn_Number = -1;
+    string s_PunchIn_Text = "Punch In Comrade!";
+    void Init_PunchIn()
+    {
+        if(!b_Job_PunchIn)
+        {
+            b_Job_PunchIn = true;
+
+            go_PunchInClock.GetComponent<Cs_Objective>().Set_State = Enum_ObjectiveState.InProgress;
+
+            Set_TaskText(s_PunchIn_Text);
+        }
+    }
+    public void Complete_PunchIn()
+    {
+        if (b_Job_PunchIn)
+        {
+            b_Job_PunchIn = false;
+            if (i_PunchIn_Number >= 0) s_JobList[ i_PunchIn_Number ] = s_TurnInJob;
+            Set_TaskText();
+            i_PunchIn_Number = -1;
+
+            ClockIn = true;
+        }
+    }
+    #endregion
+
+    #region 'Kick Me' On Boss
     int i_BossKickMe_Number = -1;
     string s_BossKickMe_Text = "Put Sign on Boss's Back";
     void Init_BossKickMe()
@@ -88,12 +136,14 @@ public class Cs_ObjectiveManager : MonoBehaviour
         if(b_Job_BossKickMe)
         {
             b_Job_BossKickMe = false;
-            if(i_BossKickMe_Number >= 0) s_JobList[ i_BossKickMe_Number ] = "";
+            if(i_BossKickMe_Number >= 0) s_JobList[ i_BossKickMe_Number ] = s_TurnInJob;
             Set_TaskText();
             i_BossKickMe_Number = -1;
         }
     }
+    #endregion
 
+    #region Change Radio Station
     int i_ChangeRadioStation_Number = -1;
     string s_ChangeRadioStation_Text = "Play Union\nAppropriate Music";
     void Init_ChangeRadioStation()
@@ -113,10 +163,24 @@ public class Cs_ObjectiveManager : MonoBehaviour
         if(b_Job_ChangeRadioStation)
         {
             b_Job_ChangeRadioStation = false;
-            if (i_ChangeRadioStation_Number >= 0) s_JobList[ i_ChangeRadioStation_Number ] = "";
+            if (i_ChangeRadioStation_Number >= 0) s_JobList[ i_ChangeRadioStation_Number ] = s_TurnInJob;
             Set_TaskText();
             i_ChangeRadioStation_Number = -1;
         }
+    }
+    #endregion
+
+    public void Set_TurnInTasks()
+    {
+        for(int i_ = 0; i_ < s_JobList.Length; ++i_)
+        {
+            if(s_JobList[i_] == s_TurnInJob)
+            {
+                s_JobList[i_] = "";
+            }
+        }
+
+        Set_TaskText();
     }
 
     void Set_TaskText( string s_Text_ = "")
@@ -154,9 +218,10 @@ public class Cs_ObjectiveManager : MonoBehaviour
         {
             if (s_JobList[i_] == s_BossKickMe_Text) i_BossKickMe_Number = i_;
             else if (s_JobList[i_] == s_ChangeRadioStation_Text) i_ChangeRadioStation_Number = i_;
+            else if (s_JobList[i_] == s_PunchIn_Text) i_PunchIn_Number = i_;
         }
 
-        print("Kick Me: " + i_BossKickMe_Number + ", Radio: " + i_ChangeRadioStation_Number);
+        // print("Kick Me: " + i_BossKickMe_Number + ", Radio: " + i_ChangeRadioStation_Number);
 
         // Set text on screen
         txt_JobList_1_Text.text = s_JobList[0];

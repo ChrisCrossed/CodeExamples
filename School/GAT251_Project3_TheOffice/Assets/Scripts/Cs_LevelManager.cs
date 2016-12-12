@@ -10,16 +10,18 @@ public class Cs_LevelManager : MonoBehaviour
     float f_Time_Seconds;
 
     Text txt_ClockText;
+    TextMesh txt_TimeClockText;
 
 	// Use this for initialization
 	void Start ()
     {
         // Connect items
         txt_ClockText = GameObject.Find("Text_Clock").GetComponent<Text>();
+        txt_TimeClockText = GameObject.Find("PunchClockText").GetComponent<TextMesh>();
 
         // 8 AM, start of work day
-        i_Time_Hours = 8;
-        i_Time_Minutes = 0;
+        i_Time_Hours = 7;
+        i_Time_Minutes = 45;
         b_Time_AM = true;
 	}
 	
@@ -27,7 +29,7 @@ public class Cs_LevelManager : MonoBehaviour
     {
         f_Time_Seconds += Time.deltaTime;
 
-        if(f_Time_Seconds > 1)
+        if(f_Time_Seconds > 1.5f)
         {
             ++i_Time_Minutes;
             f_Time_Seconds = 0f;
@@ -47,6 +49,7 @@ public class Cs_LevelManager : MonoBehaviour
             }
 
             txt_ClockText.text = string.Format("{0:0}:{1:00}", i_Time_Hours, i_Time_Minutes);
+            txt_TimeClockText.text = string.Format("{0:0}:{1:00}", i_Time_Hours, i_Time_Minutes);
         }
     }
 

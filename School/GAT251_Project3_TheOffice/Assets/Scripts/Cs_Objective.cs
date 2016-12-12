@@ -3,6 +3,7 @@ using System.Collections;
 
 enum Enum_TaskList
 {
+    TimeClock,
     BossKickMeSign,
     StaplePapers,
     WriteEmail,
@@ -80,13 +81,16 @@ public class Cs_Objective : MonoBehaviour
 
                 gameObject.GetComponent<MeshRenderer>().enabled = true;
             }
-            
-            if(ObjectiveType == Enum_TaskList.BossKickMeSign)
+
+            if (ObjectiveType == Enum_TaskList.TimeClock)
+            {
+                go_ObjectiveManager.Complete_PunchIn();
+            }
+            else if (ObjectiveType == Enum_TaskList.BossKickMeSign)
             {
                 go_ObjectiveManager.Complete_BossKickMe();
             }
-
-            if(ObjectiveType == Enum_TaskList.ChangeRadioStation)
+            else if(ObjectiveType == Enum_TaskList.ChangeRadioStation)
             {
                 go_ObjectiveManager.Complete_ChangeRadioStation();
             }
@@ -153,6 +157,10 @@ public class Cs_Objective : MonoBehaviour
     public void Use()
     {
         if(ObjectiveType == Enum_TaskList.BossKickMeSign)
+        {
+            Set_ObjectiveState(Enum_ObjectiveState.Completed);
+        }
+        else if(ObjectiveType == Enum_TaskList.TimeClock)
         {
             Set_ObjectiveState(Enum_ObjectiveState.Completed);
         }

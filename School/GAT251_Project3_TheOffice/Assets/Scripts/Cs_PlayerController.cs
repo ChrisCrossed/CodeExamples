@@ -226,7 +226,11 @@ public class Cs_PlayerController : MonoBehaviour
         if(go_UseObject != null)
         {
             // Check the object's scripts to see what type of object it is
-            if(go_UseObject.GetComponent<Cs_KeyboardLogic_Key>())
+            if(go_UseObject.GetComponent<Cs_Phone>())
+            {
+                go_UseObject.GetComponent<Cs_Phone>().Use();
+            }
+            else if(go_UseObject.GetComponent<Cs_KeyboardLogic_Key>())
             {
                 go_UseObject.GetComponent<Cs_KeyboardLogic_Key>().Use();
             }
