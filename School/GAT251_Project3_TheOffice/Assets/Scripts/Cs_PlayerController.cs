@@ -158,6 +158,10 @@ public class Cs_PlayerController : MonoBehaviour
             if(b_HasBook)
             {
                 go_Book.GetComponent<MeshRenderer>().enabled = true;
+
+                GameObject.Find("Book_Desk_1").GetComponent<Cs_BookLogic>().ArrowState = true;
+                GameObject.Find("Book_Desk_2").GetComponent<Cs_BookLogic>().ArrowState = true;
+                GameObject.Find("Book_Desk_3").GetComponent<Cs_BookLogic>().ArrowState = true;
             }
             else
             {
