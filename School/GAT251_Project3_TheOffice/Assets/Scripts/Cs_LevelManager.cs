@@ -12,6 +12,8 @@ public class Cs_LevelManager : MonoBehaviour
     Text txt_ClockText;
     TextMesh txt_TimeClockText;
 
+    Cs_ObjectiveManager ObjectiveManager;
+
 	// Use this for initialization
 	void Start ()
     {
@@ -23,7 +25,11 @@ public class Cs_LevelManager : MonoBehaviour
         i_Time_Hours = 7;
         i_Time_Minutes = 45;
         b_Time_AM = true;
-	}
+
+        // Objective Manager
+        ObjectiveManager = GameObject.Find("LevelManager").GetComponent<Cs_ObjectiveManager>();
+
+    }
 	
     void ManageClock()
     {
@@ -45,6 +51,15 @@ public class Cs_LevelManager : MonoBehaviour
                     i_Time_Hours = 1;
 
                     b_Time_AM = !b_Time_AM;
+                }
+            }
+
+            // On appropriate times, give the player a task
+            if (i_Time_Minutes == 0 || i_Time_Minutes == 15 || i_Time_Minutes == 30 || i_Time_Minutes == 45)
+            {
+                if(ObjectiveManager.ClockIn && !ObjectiveManager.b_JobTestEnvironment)
+                {
+                    ObjectiveManager.CreateNewJob();
                 }
             }
 

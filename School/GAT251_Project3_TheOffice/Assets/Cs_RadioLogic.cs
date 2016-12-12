@@ -45,7 +45,14 @@ public class Cs_RadioLogic : MonoBehaviour
         i_SongNum = Random.Range(0, 2);
         b_IsMusic = false;
 
-        if (b_ActivateObjective_) gameObject.GetComponent<Cs_Objective>().Set_State = Enum_ObjectiveState.InProgress;
+        if (b_ActivateObjective_)
+        {
+            gameObject.GetComponent<Cs_Objective>().Set_State = Enum_ObjectiveState.InProgress;
+            if(transform.Find("RotArrow"))
+            {
+                transform.Find("RotArrow").GetComponent<Cs_RotArrow>().IsEnabled = true;
+            }
+        }
     }
 
     float f_Timer;
@@ -118,6 +125,11 @@ public class Cs_RadioLogic : MonoBehaviour
                     if(gameObject.GetComponent<Cs_Objective>().Set_State == Enum_ObjectiveState.InProgress)
                     {
                         gameObject.GetComponent<Cs_Objective>().Set_State = Enum_ObjectiveState.Completed;
+
+                        if (transform.Find("RotArrow"))
+                        {
+                            transform.Find("RotArrow").GetComponent<Cs_RotArrow>().IsEnabled = false;
+                        }
                     }
                 }
                 

@@ -80,6 +80,7 @@
   <ItemGroup>
     <Compile Include="Assets\Cs_Phone.cs" />
     <Compile Include="Assets\Cs_RadioLogic.cs" />
+    <Compile Include="Assets\Cs_RotArrow.cs" />
     <Compile Include="Assets\ProCore\ProBuilder\API Examples\Icosphere FFT\Scripts\CameraControls.cs" />
     <Compile Include="Assets\ProCore\ProBuilder\API Examples\Icosphere FFT\Scripts\IcoBumpin.cs" />
     <Compile Include="Assets\ProCore\ProBuilder\API Examples\Misc\HueCube.cs" />

@@ -4,6 +4,8 @@ using UnityEngine.UI;
 
 public class Cs_ObjectiveManager : MonoBehaviour
 {
+    public bool b_JobTestEnvironment = false;
+
     bool b_ClockedIn;
 
     int i_NumTasks = 2;
@@ -16,6 +18,7 @@ public class Cs_ObjectiveManager : MonoBehaviour
 
     string[] s_JobList = new string[15];
     string s_TurnInJob = "[TURN IN]";
+    Cs_RotArrow PhoneArrow;
 
     #region Task - 'Boss Kick Me'
     bool b_Job_BossKickMe;          // 0
@@ -30,6 +33,7 @@ public class Cs_ObjectiveManager : MonoBehaviour
     #region Task - 'Punch In'
     bool b_Job_PunchIn;
     GameObject go_PunchInClock;
+    Text txt_TutorialText;
     #endregion
 
     // Use this for initialization
@@ -49,7 +53,10 @@ public class Cs_ObjectiveManager : MonoBehaviour
 
         #region Task - 'Punch In'
         go_PunchInClock = GameObject.Find("PunchInClock");
+        txt_TutorialText = GameObject.Find("TutorialText").GetComponent<Text>();
         #endregion
+
+        PhoneArrow = GameObject.Find("Phone").transform.Find("RotArrow").GetComponent<Cs_RotArrow>();
 
         // CreateNewJob();
         Init_PunchIn();
@@ -89,8 +96,14 @@ public class Cs_ObjectiveManager : MonoBehaviour
 
     public bool ClockIn
     {
-        set { b_ClockedIn = value; }
-        get { return b_ClockedIn; }
+        set
+        {
+            b_ClockedIn = value;
+        }
+        get
+        {
+            return b_ClockedIn;
+        }
     }
 
     #region Punch In
@@ -111,12 +124,13 @@ public class Cs_ObjectiveManager : MonoBehaviour
     {
         if (b_Job_PunchIn)
         {
-            b_Job_PunchIn = false;
+            // b_Job_PunchIn = false; (Handled within TurnInTasks)
             if (i_PunchIn_Number >= 0) s_JobList[ i_PunchIn_Number ] = s_TurnInJob;
             Set_TaskText();
             i_PunchIn_Number = -1;
+            PhoneArrow.IsEnabled = true;
 
-            ClockIn = true;
+            txt_TutorialText.text = "Return to your Red Phone\nand use it between tasks!";
         }
     }
     #endregion
@@ -139,6 +153,7 @@ public class Cs_ObjectiveManager : MonoBehaviour
             if(i_BossKickMe_Number >= 0) s_JobList[ i_BossKickMe_Number ] = s_TurnInJob;
             Set_TaskText();
             i_BossKickMe_Number = -1;
+            PhoneArrow.IsEnabled = true;
         }
     }
     #endregion
@@ -166,21 +181,47 @@ public class Cs_ObjectiveManager : MonoBehaviour
             if (i_ChangeRadioStation_Number >= 0) s_JobList[ i_ChangeRadioStation_Number ] = s_TurnInJob;
             Set_TaskText();
             i_ChangeRadioStation_Number = -1;
+            PhoneArrow.IsEnabled = true;
         }
     }
     #endregion
 
     public void Set_TurnInTasks()
     {
-        for(int i_ = 0; i_ < s_JobList.Length; ++i_)
+        print("Clock In: " + ClockIn);
+        if(ClockIn)
         {
-            if(s_JobList[i_] == s_TurnInJob)
+            for(int i_ = 0; i_ < s_JobList.Length; ++i_)
             {
-                s_JobList[i_] = "";
+                if(s_JobList[i_] == s_TurnInJob)
+                {
+                    s_JobList[i_] = "";
+                }
+            }
+
+            Set_TaskText();
+        }
+        else
+        {
+            if (b_Job_PunchIn)
+            {
+                b_Job_PunchIn = false;
+
+                ClockIn = true;
+
+                txt_TutorialText.text = "Now get to work!";
+
+                for (int i_ = 0; i_ < s_JobList.Length; ++i_)
+                {
+                    if (s_JobList[i_] == s_TurnInJob)
+                    {
+                        s_JobList[i_] = "";
+                    }
+                }
+
+                Set_TaskText();
             }
         }
-
-        Set_TaskText();
     }
 
     void Set_TaskText( string s_Text_ = "")
@@ -230,10 +271,21 @@ public class Cs_ObjectiveManager : MonoBehaviour
         txt_JobList_4_Text.text = s_JobList[3];
         txt_JobList_5_Text.text = s_JobList[4];
     }
-	
-	// Update is called once per frame
+
+    // Update is called once per frame
+    float f_PunchInText_Timer;
 	void Update ()
     {
+        if(f_PunchInText_Timer < 15f)
+        {
+            if (ClockIn)
+            {
+                f_PunchInText_Timer += Time.deltaTime;
+
+                if (f_PunchInText_Timer > 15f) txt_TutorialText.text = "";
+            }
+        }
+
 	    if(Input.GetKeyDown(KeyCode.U))
         {
             go_BossSign.GetComponent<Cs_Objective>().Set_State = Enum_ObjectiveState.Disabled;

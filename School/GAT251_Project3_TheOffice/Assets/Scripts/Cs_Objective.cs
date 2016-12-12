@@ -58,6 +58,11 @@ public class Cs_Objective : MonoBehaviour
 
                 gameObject.GetComponent<MeshRenderer>().enabled = false;
             }
+
+            if(transform.root.Find("RotArrow"))
+            {
+                transform.root.Find("RotArrow").gameObject.GetComponent<Cs_RotArrow>().IsEnabled = false;
+            }
         }
         else if(e_State_ == Enum_ObjectiveState.InProgress)
         {
@@ -69,7 +74,12 @@ public class Cs_Objective : MonoBehaviour
 
                 gameObject.GetComponent<MeshRenderer>().enabled = true;
             }
-            
+
+            if (transform.root.Find("RotArrow"))
+            {
+                // transform.Find("RotArrow").gameObject.GetComponent<Cs_RotArrow>().IsEnabled = true;
+                transform.root.Find("RotArrow").gameObject.GetComponent<Cs_RotArrow>().IsEnabled = true;
+            }
         }
         else if(e_State_ == Enum_ObjectiveState.Completed)
         {
@@ -80,6 +90,11 @@ public class Cs_Objective : MonoBehaviour
                 Set_Opaque();
 
                 gameObject.GetComponent<MeshRenderer>().enabled = true;
+            }
+
+            if (transform.root.Find("RotArrow"))
+            {
+                transform.root.Find("RotArrow").gameObject.GetComponent<Cs_RotArrow>().IsEnabled = false;
             }
 
             if (ObjectiveType == Enum_TaskList.TimeClock)
