@@ -36,6 +36,12 @@ public class Cs_ObjectiveManager : MonoBehaviour
     Text txt_TutorialText;
     #endregion
 
+    #region Task - 'Fire People'
+    bool b_Job_FirePeople;
+    int i_PeopleFired;
+    [SerializeField] GameObject[] go_Employees = new GameObject[6];
+    #endregion
+
     // Use this for initialization
     void Start ()
     {
@@ -48,12 +54,16 @@ public class Cs_ObjectiveManager : MonoBehaviour
         #endregion
 
         #region Task - 'Boss Kick Me'
-        go_BossSign = GameObject.Find("BackMessage");
+        go_BossSign = GameObject.Find("Boss").transform.Find("BackMessage").gameObject;
         #endregion
 
         #region Task - 'Punch In'
         go_PunchInClock = GameObject.Find("PunchInClock");
         txt_TutorialText = GameObject.Find("TutorialText").GetComponent<Text>();
+        #endregion
+
+        #region Task - 'Fire People'
+        i_PeopleFired = 0;
         #endregion
 
         PhoneArrow = GameObject.Find("Phone").transform.Find("RotArrow").GetComponent<Cs_RotArrow>();
@@ -62,6 +72,18 @@ public class Cs_ObjectiveManager : MonoBehaviour
         Init_PunchIn();
 
         Set_TaskText();
+    }
+
+    public void Set_IncrementPeopleFired()
+    {
+        ++i_PeopleFired;
+
+        print("Got Here: " + i_PeopleFired);
+
+        if(i_PeopleFired >= 5)
+        {
+            Complete_FirePeople();
+        }
     }
 
     public void CreateNewJob()
@@ -131,6 +153,8 @@ public class Cs_ObjectiveManager : MonoBehaviour
             PhoneArrow.IsEnabled = true;
 
             txt_TutorialText.text = "Return to your Red Phone\nand use it between tasks!";
+
+            // go_PunchInClock.GetComponent<Cs_Objective>().Set_State = Enum_ObjectiveState.Completed;
         }
     }
     #endregion
@@ -154,6 +178,8 @@ public class Cs_ObjectiveManager : MonoBehaviour
             Set_TaskText();
             i_BossKickMe_Number = -1;
             PhoneArrow.IsEnabled = true;
+
+            go_BossSign.GetComponent<Cs_Objective>().Set_State = Enum_ObjectiveState.Completed;
         }
     }
     #endregion
@@ -182,6 +208,46 @@ public class Cs_ObjectiveManager : MonoBehaviour
             Set_TaskText();
             i_ChangeRadioStation_Number = -1;
             PhoneArrow.IsEnabled = true;
+        }
+    }
+    #endregion
+
+    #region Fire People
+    int i_FirePeople_Number = -1;
+    string s_FirePeople_Text = "Fire 5 People";
+    void Init_FirePeople()
+    {
+        b_Job_FirePeople = true;
+        
+        for(int i_ = 0; i_ < go_Employees.Length; ++i_)
+        {
+            if(go_Employees[i_] != null)
+            {
+                go_Employees[i_].GetComponent<Cs_Objective>().Set_State = Enum_ObjectiveState.InProgress;
+            }
+        }
+
+        Set_TaskText(s_FirePeople_Text);
+    }
+    public void Complete_FirePeople()
+    {
+        if(b_Job_FirePeople)
+        {
+            b_Job_FirePeople = false;
+            if (i_FirePeople_Number >= 0) s_JobList[ i_FirePeople_Number ] = s_TurnInJob;
+            Set_TaskText();
+            i_FirePeople_Number = -1;
+            PhoneArrow.IsEnabled = true;
+
+            for (int i_ = 0; i_ < go_Employees.Length; ++i_)
+            {
+                if(go_Employees[i_])
+                {
+                    go_Employees[i_].GetComponent<Cs_Objective>().Set_State = Enum_ObjectiveState.Disabled;
+                }
+            }
+
+            i_PeopleFired = 0;
         }
     }
     #endregion
@@ -257,9 +323,10 @@ public class Cs_ObjectiveManager : MonoBehaviour
         // Store new text positions for reference
         for(int i_ = 0; i_ < s_JobList.Length; ++i_)
         {
-            if (s_JobList[i_] == s_BossKickMe_Text) i_BossKickMe_Number = i_;
-            else if (s_JobList[i_] == s_ChangeRadioStation_Text) i_ChangeRadioStation_Number = i_;
-            else if (s_JobList[i_] == s_PunchIn_Text) i_PunchIn_Number = i_;
+            if      (s_JobList[i_] == s_BossKickMe_Text)            i_BossKickMe_Number = i_;
+            else if (s_JobList[i_] == s_ChangeRadioStation_Text)    i_ChangeRadioStation_Number = i_;
+            else if (s_JobList[i_] == s_PunchIn_Text)               i_PunchIn_Number = i_;
+            else if (s_JobList[i_] == s_FirePeople_Text)            i_FirePeople_Number = i_;
         }
 
         // print("Kick Me: " + i_BossKickMe_Number + ", Radio: " + i_ChangeRadioStation_Number);
@@ -288,12 +355,12 @@ public class Cs_ObjectiveManager : MonoBehaviour
 
 	    if(Input.GetKeyDown(KeyCode.U))
         {
-            go_BossSign.GetComponent<Cs_Objective>().Set_State = Enum_ObjectiveState.Disabled;
+            Set_TurnInTasks();
         }
 
         if (Input.GetKeyDown(KeyCode.O))
         {
-            Init_ChangeRadioStation();
+            Init_FirePeople();
         }
 
         if (Input.GetKeyDown(KeyCode.P))

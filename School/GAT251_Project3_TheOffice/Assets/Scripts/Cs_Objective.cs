@@ -66,7 +66,7 @@ public class Cs_Objective : MonoBehaviour
         }
         else if(e_State_ == Enum_ObjectiveState.InProgress)
         {
-            if (ObjectiveType == Enum_TaskList.BossKickMeSign)
+            if (ObjectiveType == Enum_TaskList.BossKickMeSign || ObjectiveType == Enum_TaskList.FirePeople)
             {
                 gameObject.GetComponent<MeshRenderer>().material = mat_UseThis;
 
@@ -83,7 +83,7 @@ public class Cs_Objective : MonoBehaviour
         }
         else if(e_State_ == Enum_ObjectiveState.Completed)
         {
-            if( mat_CompletedMaterial )
+            if( mat_CompletedMaterial != null)
             {
                 gameObject.GetComponent<MeshRenderer>().material = mat_CompletedMaterial;
 
@@ -104,6 +104,12 @@ public class Cs_Objective : MonoBehaviour
             else if (ObjectiveType == Enum_TaskList.BossKickMeSign)
             {
                 go_ObjectiveManager.Complete_BossKickMe();
+
+                gameObject.GetComponent<MeshRenderer>().enabled = false;
+            }
+            else if( ObjectiveType == Enum_TaskList.FirePeople)
+            {
+                go_ObjectiveManager.Set_IncrementPeopleFired();
             }
             else if(ObjectiveType == Enum_TaskList.ChangeRadioStation)
             {
@@ -171,7 +177,7 @@ public class Cs_Objective : MonoBehaviour
 
     public void Use()
     {
-        if(ObjectiveType == Enum_TaskList.BossKickMeSign)
+        if(ObjectiveType == Enum_TaskList.BossKickMeSign || ObjectiveType == Enum_TaskList.FirePeople)
         {
             Set_ObjectiveState(Enum_ObjectiveState.Completed);
         }
