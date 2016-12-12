@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
 
 public class Cs_LevelManager : MonoBehaviour
 {
@@ -8,9 +9,14 @@ public class Cs_LevelManager : MonoBehaviour
     int i_Time_Minutes;
     float f_Time_Seconds;
 
+    Text txt_ClockText;
+
 	// Use this for initialization
 	void Start ()
     {
+        // Connect items
+        txt_ClockText = GameObject.Find("Text_Clock").GetComponent<Text>();
+
         // 8 AM, start of work day
         i_Time_Hours = 8;
         i_Time_Minutes = 0;
@@ -21,9 +27,10 @@ public class Cs_LevelManager : MonoBehaviour
     {
         f_Time_Seconds += Time.deltaTime;
 
-        if(f_Time_Seconds > 1f)
+        if(f_Time_Seconds > 1)
         {
             ++i_Time_Minutes;
+            f_Time_Seconds = 0f;
 
             if(i_Time_Minutes >= 60)
             {
@@ -38,6 +45,8 @@ public class Cs_LevelManager : MonoBehaviour
                     b_Time_AM = !b_Time_AM;
                 }
             }
+
+            txt_ClockText.text = string.Format("{0:0}:{1:00}", i_Time_Hours, i_Time_Minutes);
         }
     }
 

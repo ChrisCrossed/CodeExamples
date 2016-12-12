@@ -78,7 +78,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Cs_WarningTileLogic.cs" />
     <Compile Include="Assets\ProCore\ProBuilder\API Examples\Icosphere FFT\Scripts\CameraControls.cs" />
     <Compile Include="Assets\ProCore\ProBuilder\API Examples\Icosphere FFT\Scripts\IcoBumpin.cs" />
     <Compile Include="Assets\ProCore\ProBuilder\API Examples\Misc\HueCube.cs" />
@@ -90,7 +89,10 @@
     <Compile Include="Assets\Scripts\Cs_KeyboardLogic.cs" />
     <Compile Include="Assets\Scripts\Cs_KeyboardLogic_Key.cs" />
     <Compile Include="Assets\Scripts\Cs_LevelManager.cs" />
+    <Compile Include="Assets\Scripts\Cs_Objective.cs" />
+    <Compile Include="Assets\Scripts\Cs_ObjectiveManager.cs" />
     <Compile Include="Assets\Scripts\Cs_PlayerController.cs" />
+    <Compile Include="Assets\Scripts\Cs_WarningTileLogic.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\ProCore\ProBuilder\API Examples\Icosphere FFT\README.txt" />

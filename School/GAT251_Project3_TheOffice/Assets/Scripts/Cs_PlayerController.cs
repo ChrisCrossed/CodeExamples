@@ -22,6 +22,9 @@ public class Cs_PlayerController : MonoBehaviour
 	// Use this for initialization
 	void Start ()
     {
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
         go_Camera = gameObject.transform.Find("Main Camera").gameObject;
         ui_Reticle = GameObject.Find("UI_Raycast").gameObject;
 
@@ -226,6 +229,11 @@ public class Cs_PlayerController : MonoBehaviour
             if(go_UseObject.GetComponent<Cs_KeyboardLogic_Key>())
             {
                 go_UseObject.GetComponent<Cs_KeyboardLogic_Key>().Use();
+            }
+
+            if(go_UseObject.GetComponent<Cs_Objective>())
+            {
+                go_UseObject.GetComponent<Cs_Objective>().Use();
             }
         }
     }
