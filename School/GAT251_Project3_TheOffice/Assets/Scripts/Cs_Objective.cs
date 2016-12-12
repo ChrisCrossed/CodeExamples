@@ -104,8 +104,6 @@ public class Cs_Objective : MonoBehaviour
             else if (ObjectiveType == Enum_TaskList.BossKickMeSign)
             {
                 go_ObjectiveManager.Complete_BossKickMe();
-
-                gameObject.GetComponent<MeshRenderer>().enabled = false;
             }
             else if( ObjectiveType == Enum_TaskList.FirePeople)
             {
@@ -114,6 +112,10 @@ public class Cs_Objective : MonoBehaviour
             else if(ObjectiveType == Enum_TaskList.ChangeRadioStation)
             {
                 go_ObjectiveManager.Complete_ChangeRadioStation();
+            }
+            else if(ObjectiveType == Enum_TaskList.GiveCommunistManifesto)
+            {
+                go_ObjectiveManager.Complete_Book();
             }
         }
     }

@@ -8,7 +8,7 @@ public class Cs_ObjectiveManager : MonoBehaviour
 
     bool b_ClockedIn;
 
-    int i_NumTasks = 2;
+    int i_NumTasks = 3;
 
     Text txt_JobList_1_Text;
     Text txt_JobList_2_Text;
@@ -40,6 +40,11 @@ public class Cs_ObjectiveManager : MonoBehaviour
     bool b_Job_FirePeople;
     int i_PeopleFired;
     [SerializeField] GameObject[] go_Employees = new GameObject[6];
+    #endregion
+
+    #region Task - 'Give Communist Manifesto'
+    bool b_Job_GiveManifesto;
+    [SerializeField] GameObject[] go_Books = new GameObject[4];
     #endregion
 
     // Use this for initialization
@@ -105,10 +110,20 @@ public class Cs_ObjectiveManager : MonoBehaviour
                     }
                     break;
 
+                // Change Radio Station
                 case 1:
                     if (!b_Job_ChangeRadioStation)
                     {
                         Init_ChangeRadioStation();
+                        b_JobFound = true;
+                    }
+                    break;
+
+                // Fire 5 people
+                case 2:
+                    if (!b_Job_FirePeople)
+                    {
+                        Init_FirePeople();
                         b_JobFound = true;
                     }
                     break;
@@ -252,9 +267,67 @@ public class Cs_ObjectiveManager : MonoBehaviour
     }
     #endregion
 
+    #region Communist Manifesto
+    int i_Book_Number = -1;
+    string s_Book_Text = "Disperse Truth\nfrom Desk";
+    void Init_Book()
+    {
+        b_Job_GiveManifesto = true;
+
+        for(int i_ = 0; i_ < go_Books.Length; ++i_)
+        {
+            if(go_Books[i_].GetComponent<Cs_BookLogic>())
+            {
+                // If the main book, activate it fully.
+                if(go_Books[i_].GetComponent<Cs_BookLogic>().IsMainBook())
+                {
+                    go_Books[i_].GetComponent<Cs_BookLogic>().BookEnabled(true);
+                    go_Books[i_].GetComponent<Cs_BookLogic>().ArrowState = true;
+                }
+                // Otherwise, keep transparent & keep arrows off for now until player picks up book
+                else
+                {
+                    go_Books[i_].GetComponent<Cs_BookLogic>().BookEnabled(true, true);
+                    go_Books[i_].GetComponent<Cs_BookLogic>().ArrowState = false;
+                }
+            }
+        }
+
+        Set_TaskText(s_Book_Text);
+    }
+    public void Complete_Book()
+    {
+        if(b_Job_GiveManifesto)
+        {
+            b_Job_GiveManifesto = false;
+            if (i_Book_Number >= 0) s_JobList[i_Book_Number] = s_TurnInJob;
+            Set_TaskText();
+            i_Book_Number = -1;
+            PhoneArrow.IsEnabled = true;
+
+            for(int i_ = 0; i_ < go_Books.Length; ++i_)
+            {
+                if(go_Books[i_])
+                {
+                    if(go_Books[i_].GetComponent<Cs_Objective>())
+                    {
+                        if(go_Books[i_].GetComponent<Cs_Objective>().Set_State != Enum_ObjectiveState.Completed)
+                        {
+                            go_Books[i_].GetComponent<Cs_BookLogic>().BookEnabled(false);
+                        }
+                    }
+                    else
+                    {
+                        go_Books[i_].GetComponent<Cs_Objective>().Set_State = Enum_ObjectiveState.Completed;
+                    }
+                }
+            }
+        }
+    }
+    #endregion
+
     public void Set_TurnInTasks()
     {
-        print("Clock In: " + ClockIn);
         if(ClockIn)
         {
             for(int i_ = 0; i_ < s_JobList.Length; ++i_)
@@ -284,6 +357,8 @@ public class Cs_ObjectiveManager : MonoBehaviour
                         s_JobList[i_] = "";
                     }
                 }
+
+                CreateNewJob();
 
                 Set_TaskText();
             }
@@ -327,6 +402,7 @@ public class Cs_ObjectiveManager : MonoBehaviour
             else if (s_JobList[i_] == s_ChangeRadioStation_Text)    i_ChangeRadioStation_Number = i_;
             else if (s_JobList[i_] == s_PunchIn_Text)               i_PunchIn_Number = i_;
             else if (s_JobList[i_] == s_FirePeople_Text)            i_FirePeople_Number = i_;
+            else if (s_JobList[i_] == s_Book_Text)                  i_Book_Number = i_;
         }
 
         // print("Kick Me: " + i_BossKickMe_Number + ", Radio: " + i_ChangeRadioStation_Number);
@@ -360,7 +436,7 @@ public class Cs_ObjectiveManager : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.O))
         {
-            Init_FirePeople();
+            Init_Book();
         }
 
         if (Input.GetKeyDown(KeyCode.P))

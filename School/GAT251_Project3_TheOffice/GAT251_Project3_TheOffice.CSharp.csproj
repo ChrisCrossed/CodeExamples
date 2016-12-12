@@ -78,9 +78,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Cs_Phone.cs" />
-    <Compile Include="Assets\Cs_RadioLogic.cs" />
-    <Compile Include="Assets\Cs_RotArrow.cs" />
+    <Compile Include="Assets\Cs_BookLogic.cs" />
+    <Compile Include="Assets\Cs_LogoLogic.cs" />
     <Compile Include="Assets\ProCore\ProBuilder\API Examples\Icosphere FFT\Scripts\CameraControls.cs" />
     <Compile Include="Assets\ProCore\ProBuilder\API Examples\Icosphere FFT\Scripts\IcoBumpin.cs" />
     <Compile Include="Assets\ProCore\ProBuilder\API Examples\Misc\HueCube.cs" />
@@ -94,7 +93,10 @@
     <Compile Include="Assets\Scripts\Cs_LevelManager.cs" />
     <Compile Include="Assets\Scripts\Cs_Objective.cs" />
     <Compile Include="Assets\Scripts\Cs_ObjectiveManager.cs" />
+    <Compile Include="Assets\Scripts\Cs_Phone.cs" />
     <Compile Include="Assets\Scripts\Cs_PlayerController.cs" />
+    <Compile Include="Assets\Scripts\Cs_RadioLogic.cs" />
+    <Compile Include="Assets\Scripts\Cs_RotArrow.cs" />
     <Compile Include="Assets\Scripts\Cs_WarningTileLogic.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -16,8 +16,8 @@ public class Cs_RadioLogic : MonoBehaviour
     int i_SongNum;
 
     GameObject go_Player;
-    float f_VolumeFade_DistMin = 6f;
-    float f_VolumeFade_DistMax = 13f;
+    float f_VolumeFade_DistMin = 5f;
+    float f_VolumeFade_DistMax = 11f;
 
     float f_Volume_Min = 0f;
     float f_Volume_Max = 0.75f;

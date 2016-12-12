@@ -19,6 +19,9 @@ public class Cs_PlayerController : MonoBehaviour
     float f_yPos_Ground;
     float f_yPos_Jump;
 
+    bool b_HasBook;
+    GameObject go_Book;
+
 	// Use this for initialization
 	void Start ()
     {
@@ -30,6 +33,9 @@ public class Cs_PlayerController : MonoBehaviour
 
         f_yPos_Ground = gameObject.transform.position.y;
         f_yPos_Jump = f_yPos_Ground + f_JumpHeight;
+
+        go_Book = transform.Find("Main Camera").Find("BookPos").Find("Book").gameObject;
+        BookState = false;
 	}
 
     float f_AngleVert;
@@ -143,6 +149,24 @@ public class Cs_PlayerController : MonoBehaviour
         }
     }
 
+    public bool BookState
+    {
+        set
+        {
+            b_HasBook = value;
+
+            if(b_HasBook)
+            {
+                go_Book.GetComponent<MeshRenderer>().enabled = true;
+            }
+            else
+            {
+                go_Book.GetComponent<MeshRenderer>().enabled = false;
+            }
+        }
+        get { return b_HasBook; }
+    }
+
     #region Jump abilities
     float f_LerpTimer;
     bool b_PrevJumpState;
@@ -238,6 +262,29 @@ public class Cs_PlayerController : MonoBehaviour
             {
                 go_UseObject.GetComponent<Cs_RadioLogic>().Use();
             }
+            else if(go_UseObject.GetComponent<Cs_BookLogic>())
+            {
+                // Disable only the main desk book when we do not have a book
+                if(!BookState)
+                {
+                    if( go_UseObject.GetComponent<Cs_BookLogic>().IsMainBook() )
+                    {
+                        go_UseObject.GetComponent<Cs_BookLogic>().BookEnabled(false);
+
+                        BookState = true;
+                    }
+                }
+                // If this desk book is not the main and we have a book, place it and remove the model from our hands
+                else
+                {
+                    if( !go_UseObject.GetComponent<Cs_BookLogic>().IsMainBook() )
+                    {
+                        go_UseObject.GetComponent<Cs_BookLogic>().BookEnabled(true, false);
+
+                        BookState = false;
+                    }
+                }
+            }
             else if(go_UseObject.GetComponent<Cs_Objective>())
             {
                 go_UseObject.GetComponent<Cs_Objective>().Use();
@@ -252,6 +299,11 @@ public class Cs_PlayerController : MonoBehaviour
         PlayerInput();
 
         RaycastThroughCanvas();
+
+        if(Input.GetKeyDown(KeyCode.L))
+        {
+            BookState = !BookState;
+        }
     }
 
     void LateUpdate()

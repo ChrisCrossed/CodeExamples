@@ -35,7 +35,7 @@ public class Cs_LevelManager : MonoBehaviour
     {
         f_Time_Seconds += Time.deltaTime;
 
-        if(f_Time_Seconds > 1.5f)
+        if(f_Time_Seconds > 1.0f)
         {
             ++i_Time_Minutes;
             f_Time_Seconds = 0f;
