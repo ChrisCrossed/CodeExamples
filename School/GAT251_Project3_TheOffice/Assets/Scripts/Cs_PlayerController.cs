@@ -230,11 +230,15 @@ public class Cs_PlayerController : MonoBehaviour
             {
                 go_UseObject.GetComponent<Cs_KeyboardLogic_Key>().Use();
             }
-
-            if(go_UseObject.GetComponent<Cs_Objective>())
+            else if(go_UseObject.GetComponent<Cs_RadioLogic>())
+            {
+                go_UseObject.GetComponent<Cs_RadioLogic>().Use();
+            }
+            else if(go_UseObject.GetComponent<Cs_Objective>())
             {
                 go_UseObject.GetComponent<Cs_Objective>().Use();
             }
+
         }
     }
 

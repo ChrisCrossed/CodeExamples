@@ -71,12 +71,14 @@ public class Cs_ObjectiveManager : MonoBehaviour
     }
 
     int i_BossKickMe_Number;
+    string s_BossKickMe_String;
     void Init_BossKickMe()
     {
         b_Job_BossKickMe = true;
         go_BossSign.GetComponent<Cs_Objective>().Set_State = Enum_ObjectiveState.InProgress;
 
-        i_BossKickMe_Number = Set_TaskText("Put Sign on Boss's Back");
+        s_BossKickMe_String = "Put Sign on Boss's Back";
+        Set_TaskText(s_BossKickMe_String);
     }
     public void Complete_BossKickMe()
     {
@@ -88,7 +90,7 @@ public class Cs_ObjectiveManager : MonoBehaviour
         }
     }
 
-    int Set_TaskText( string s_Text_ = "")
+    void Set_TaskText( string s_Text_ = "")
     {
         // Bubble sort text
         for(int i_ = 0; i_ < s_JobList.Length; ++i_)
@@ -107,26 +109,29 @@ public class Cs_ObjectiveManager : MonoBehaviour
                 }
             }
         }
-
-        int i_Position = -1;
+        
         // Run through the text list to find the first open position. Assign text there.
         for(int i_ = 0; i_ < s_JobList.Length; ++i_)
         {
             if (s_JobList[i_] == "")
             {
                 s_JobList[i_] = s_Text_;
-                i_Position = i_;
                 break;
             }
         }
 
+        // Store new text positions for reference
+        for(int i_ = 0; i_ < s_JobList.Length; ++i_)
+        {
+            if (s_JobList[i_] == s_BossKickMe_String) i_BossKickMe_Number = i_;
+        }
+
+        // Set text on screen
         txt_JobList_1_Text.text = s_JobList[0];
         txt_JobList_2_Text.text = s_JobList[1];
         txt_JobList_3_Text.text = s_JobList[2];
         txt_JobList_4_Text.text = s_JobList[3];
         txt_JobList_5_Text.text = s_JobList[4];
-
-        return i_Position;
     }
 	
 	// Update is called once per frame

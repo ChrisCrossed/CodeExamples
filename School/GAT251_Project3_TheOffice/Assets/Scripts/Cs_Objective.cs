@@ -71,15 +71,21 @@ public class Cs_Objective : MonoBehaviour
             if( mat_CompletedMaterial )
             {
                 gameObject.GetComponent<MeshRenderer>().material = mat_CompletedMaterial;
+
+                Set_Opaque();
+
+                gameObject.GetComponent<MeshRenderer>().enabled = true;
             }
 
-            Set_Opaque();
-
-            gameObject.GetComponent<MeshRenderer>().enabled = true;
 
             if(ObjectiveType == Enum_TaskList.BossKickMeSign)
             {
                 go_ObjectiveManager.Complete_BossKickMe();
+            }
+
+            if(ObjectiveType == Enum_TaskList.ChangeRadioStation)
+            {
+                // go_ObjectiveManager.Complete_ChangeRadioStation();
             }
         }
     }
