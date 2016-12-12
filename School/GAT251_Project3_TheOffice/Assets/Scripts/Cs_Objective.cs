@@ -60,11 +60,15 @@ public class Cs_Objective : MonoBehaviour
         }
         else if(e_State_ == Enum_ObjectiveState.InProgress)
         {
-            gameObject.GetComponent<MeshRenderer>().material = mat_UseThis;
+            if (ObjectiveType == Enum_TaskList.BossKickMeSign)
+            {
+                gameObject.GetComponent<MeshRenderer>().material = mat_UseThis;
 
-            Set_Transparent();
+                Set_Transparent();
 
-            gameObject.GetComponent<MeshRenderer>().enabled = true;
+                gameObject.GetComponent<MeshRenderer>().enabled = true;
+            }
+            
         }
         else if(e_State_ == Enum_ObjectiveState.Completed)
         {
@@ -76,8 +80,7 @@ public class Cs_Objective : MonoBehaviour
 
                 gameObject.GetComponent<MeshRenderer>().enabled = true;
             }
-
-
+            
             if(ObjectiveType == Enum_TaskList.BossKickMeSign)
             {
                 go_ObjectiveManager.Complete_BossKickMe();
@@ -85,7 +88,7 @@ public class Cs_Objective : MonoBehaviour
 
             if(ObjectiveType == Enum_TaskList.ChangeRadioStation)
             {
-                // go_ObjectiveManager.Complete_ChangeRadioStation();
+                go_ObjectiveManager.Complete_ChangeRadioStation();
             }
         }
     }

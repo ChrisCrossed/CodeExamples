@@ -15,6 +15,13 @@ public class Cs_RadioLogic : MonoBehaviour
 
     int i_SongNum;
 
+    GameObject go_Player;
+    float f_VolumeFade_DistMin = 6f;
+    float f_VolumeFade_DistMax = 13f;
+
+    float f_Volume_Min = 0f;
+    float f_Volume_Max = 0.75f;
+
     // Use this for initialization
     void Start ()
     {
@@ -28,12 +35,17 @@ public class Cs_RadioLogic : MonoBehaviour
 
         as_Source = gameObject.GetComponent<AudioSource>();
 
+        go_Player = GameObject.Find("Player");
+
         Set_ResetRadio();
     }
 
-    public void Set_ResetRadio()
+    public void Set_ResetRadio( bool b_ActivateObjective_ = false )
     {
-        i_SongNum = Random.Range(0, 3);
+        i_SongNum = Random.Range(0, 2);
+        b_IsMusic = false;
+
+        if (b_ActivateObjective_) gameObject.GetComponent<Cs_Objective>().Set_State = Enum_ObjectiveState.InProgress;
     }
 
     float f_Timer;
@@ -41,16 +53,31 @@ public class Cs_RadioLogic : MonoBehaviour
     bool b_StaticPlaying;
     public void Use()
     {
-        f_Timer = 0f;
-        b_IsMusic = false;
-        b_StaticPlaying = false;
-        if(i_SongNum < 5) ++i_SongNum;
+        if(i_SongNum < 5)
+        {
+            f_Timer = 0f;
+            b_IsMusic = false;
+            b_StaticPlaying = false;
+            ++i_SongNum;
+        }
     }
 
 	// Update is called once per frame
 	void Update ()
     {
-        if(f_Timer < 0.25f)
+        #region Reduce volume linearly if between/greater/less than these distances
+        float f_DistToPlayer = Vector3.Distance( gameObject.transform.position, go_Player.transform.position );
+        if (f_DistToPlayer > f_VolumeFade_DistMax) as_Source.volume = f_Volume_Min;
+        else if (f_DistToPlayer < f_VolumeFade_DistMin) as_Source.volume = f_Volume_Max;
+        else
+        {
+            float f_Perc = 1 - (f_DistToPlayer - f_VolumeFade_DistMin) / (f_VolumeFade_DistMax - f_VolumeFade_DistMin);
+            as_Source.volume = f_Perc * f_Volume_Max;
+        }
+        #endregion
+
+        #region Plays static sfx before moving into the music clip
+        if (f_Timer < 0.25f)
         {
             f_Timer += Time.deltaTime;
 
@@ -67,6 +94,12 @@ public class Cs_RadioLogic : MonoBehaviour
             {
                 b_IsMusic = true;
 
+                as_Source.time = Random.Range(0f, 30f);
+
+                Color clr_CurrAlpha = transform.Find("ParticleSystem").GetComponent<ParticleSystemRenderer>().material.color;
+                clr_CurrAlpha = Color.black;
+                clr_CurrAlpha.a = 0.5f;
+
                 // Find random song to play that isn't this one
                 if (i_SongNum == 0) as_Source.clip = ac_Mus_1;
                 else if (i_SongNum == 1) as_Source.clip = ac_Mus_2;
@@ -76,13 +109,23 @@ public class Cs_RadioLogic : MonoBehaviour
                 else if (i_SongNum == 5)
                 {
                     as_Source.clip = ac_Russia;
+                    as_Source.time = 2f;
+
+                    clr_CurrAlpha = Color.red;
+                    clr_CurrAlpha.a = 1f;
 
                     // Connect to Objective and tell it we're done
-                    // gameObject.GetComponent<Cs_Objective>().
+                    if(gameObject.GetComponent<Cs_Objective>().Set_State == Enum_ObjectiveState.InProgress)
+                    {
+                        gameObject.GetComponent<Cs_Objective>().Set_State = Enum_ObjectiveState.Completed;
+                    }
                 }
+                
+                transform.Find("ParticleSystem").GetComponent<ParticleSystemRenderer>().material.color = clr_CurrAlpha;
 
                 as_Source.Play();
             }
         }
-	}
+        #endregion
+    }
 }
