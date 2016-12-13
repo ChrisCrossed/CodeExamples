@@ -20,7 +20,7 @@ public class Cs_RadioLogic : MonoBehaviour
     float f_VolumeFade_DistMax = 11f;
 
     float f_Volume_Min = 0f;
-    float f_Volume_Max = 0.75f;
+    float f_Volume_Max = 0.5f;
 
     // Use this for initialization
     void Start ()

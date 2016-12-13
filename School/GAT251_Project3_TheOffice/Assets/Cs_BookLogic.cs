@@ -24,6 +24,11 @@ public class Cs_BookLogic : MonoBehaviour
         get { return transform.Find("RotArrow").GetComponent<Cs_RotArrow>().IsEnabled; }
     }
 
+    public bool Get_Enabled()
+    {
+        return b_IsEnabled;
+    }
+
     public void BookEnabled( bool b_IsActive_, bool b_IsTransparent_ = false )
     {
         b_IsEnabled = b_IsActive_;

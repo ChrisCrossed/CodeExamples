@@ -99,7 +99,18 @@ public class Cs_Objective : MonoBehaviour
 
             if (ObjectiveType == Enum_TaskList.TimeClock)
             {
-                go_ObjectiveManager.Complete_PunchIn();
+                if(go_ObjectiveManager.ClockOutStatus)
+                {
+                    // Game Over
+                    if(go_ObjectiveManager.CheckForGameOver())
+                    {
+                        GameObject.Find("Player").GetComponent<Cs_PlayerController>().GameOverState = true;
+                    }
+                }
+                else
+                {
+                    go_ObjectiveManager.Complete_PunchIn();
+                }
             }
             else if (ObjectiveType == Enum_TaskList.BossKickMeSign)
             {
@@ -116,6 +127,13 @@ public class Cs_Objective : MonoBehaviour
             else if(ObjectiveType == Enum_TaskList.GiveCommunistManifesto)
             {
                 go_ObjectiveManager.Complete_Book();
+            }
+            else if(ObjectiveType == Enum_TaskList.SendFax)
+            {
+                AudioClip ac_PrinterUse = Resources.Load("SFX_Printer_Use") as AudioClip;
+                gameObject.GetComponent<AudioSource>().PlayOneShot(ac_PrinterUse);
+
+                go_ObjectiveManager.Complete_SendFax();
             }
         }
     }
@@ -184,6 +202,10 @@ public class Cs_Objective : MonoBehaviour
             Set_ObjectiveState(Enum_ObjectiveState.Completed);
         }
         else if(ObjectiveType == Enum_TaskList.TimeClock)
+        {
+            Set_ObjectiveState(Enum_ObjectiveState.Completed);
+        }
+        else if(ObjectiveType == Enum_TaskList.SendFax)
         {
             Set_ObjectiveState(Enum_ObjectiveState.Completed);
         }

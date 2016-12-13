@@ -8,7 +8,7 @@ public class Cs_ObjectiveManager : MonoBehaviour
 
     bool b_ClockedIn;
 
-    int i_NumTasks = 3;
+    int i_NumTasks = 5;
 
     Text txt_JobList_1_Text;
     Text txt_JobList_2_Text;
@@ -47,6 +47,11 @@ public class Cs_ObjectiveManager : MonoBehaviour
     [SerializeField] GameObject[] go_Books = new GameObject[4];
     #endregion
 
+    #region Task - 'Send Fax'
+    bool b_Job_SendFax;
+    GameObject go_FaxMachine;
+    #endregion
+
     // Use this for initialization
     void Start ()
     {
@@ -71,6 +76,10 @@ public class Cs_ObjectiveManager : MonoBehaviour
         i_PeopleFired = 0;
         #endregion
 
+        #region Task - 'Send Fax'
+        go_FaxMachine = GameObject.Find("FaxMachine");
+        #endregion
+
         PhoneArrow = GameObject.Find("Phone").transform.Find("RotArrow").GetComponent<Cs_RotArrow>();
 
         // CreateNewJob();
@@ -83,17 +92,33 @@ public class Cs_ObjectiveManager : MonoBehaviour
     {
         ++i_PeopleFired;
 
-        print("Got Here: " + i_PeopleFired);
-
         if(i_PeopleFired >= 5)
         {
             Complete_FirePeople();
         }
     }
 
+    int i_NumAttempts;
+    bool b_DayComplete = false;
     public void CreateNewJob()
     {
+        int i_Hours = gameObject.GetComponent<Cs_LevelManager>().GetTime_Hours;
+        if( i_Hours < 8 && i_Hours > 3)
+        {
+            if(i_Hours == 4 && !b_DayComplete)
+            {
+                txt_TutorialText.text = "Finish your work and\nclock out!";
+
+                b_DayComplete = true;
+
+                return;
+            }
+        }
+
+        if (b_DayComplete) return;
+
         bool b_JobFound = false;
+        i_NumAttempts = 0;
 
         while(!b_JobFound)
         {
@@ -127,7 +152,29 @@ public class Cs_ObjectiveManager : MonoBehaviour
                         b_JobFound = true;
                     }
                     break;
+
+                // Communist Manifesto
+                case 3:
+                    if (!b_Job_GiveManifesto)
+                    {
+                        Init_Book();
+                        b_JobFound = true;
+                    }
+                    break;
+
+                // Communist Manifesto
+                case 4:
+                    if (!b_Job_SendFax)
+                    {
+                        Init_SendFax();
+                        b_JobFound = true;
+                    }
+                    break;
             }
+
+            ++i_NumAttempts;
+
+            if (i_NumAttempts >= i_NumTasks) break;
         }
     }
 
@@ -143,24 +190,40 @@ public class Cs_ObjectiveManager : MonoBehaviour
         }
     }
 
+    public bool ClockOutStatus
+    {
+        get { return b_DayComplete; }
+    }
+
+    public bool CheckForGameOver()
+    {
+        for(int i_ = 0; i_ < s_JobList.Length; ++i_)
+        {
+            if(s_JobList[i_] != "")
+            {
+                txt_TutorialText.text = "Comrade! Work must be done!";
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     #region Punch In
     int i_PunchIn_Number = -1;
     string s_PunchIn_Text = "Punch In Comrade!";
     void Init_PunchIn()
     {
-        if(!b_Job_PunchIn)
-        {
-            b_Job_PunchIn = true;
+        go_PunchInClock.GetComponent<Cs_Objective>().Set_State = Enum_ObjectiveState.InProgress;
 
-            go_PunchInClock.GetComponent<Cs_Objective>().Set_State = Enum_ObjectiveState.InProgress;
-
-            Set_TaskText(s_PunchIn_Text);
-        }
+        Set_TaskText(s_PunchIn_Text);
     }
     public void Complete_PunchIn()
     {
-        if (b_Job_PunchIn)
+        if (!b_Job_PunchIn)
         {
+            b_Job_PunchIn = true;
+
             // b_Job_PunchIn = false; (Handled within TurnInTasks)
             if (i_PunchIn_Number >= 0) s_JobList[ i_PunchIn_Number ] = s_TurnInJob;
             Set_TaskText();
@@ -267,12 +330,39 @@ public class Cs_ObjectiveManager : MonoBehaviour
     }
     #endregion
 
+    #region Use Printer
+    int i_SendFax_Number = -1;
+    string s_SendFax_Text = "Send Very Legal Fax";
+    void Init_SendFax()
+    {
+        b_Job_SendFax = true;
+
+        go_FaxMachine.GetComponent<Cs_Objective>().Set_State = Enum_ObjectiveState.InProgress;
+
+        Set_TaskText(s_SendFax_Text);
+    }
+    public void Complete_SendFax()
+    {
+        if(b_Job_SendFax)
+        {
+            b_Job_SendFax = false;
+            if (i_SendFax_Number >= 0) s_JobList[i_SendFax_Number] = s_TurnInJob;
+            Set_TaskText();
+            i_SendFax_Number = -1;
+            PhoneArrow.IsEnabled = true;
+
+            go_FaxMachine.GetComponent<Cs_Objective>().Set_State = Enum_ObjectiveState.Disabled;
+        }
+    }
+    #endregion
+
     #region Communist Manifesto
     int i_Book_Number = -1;
     string s_Book_Text = "Disperse Truth\nfrom Desk";
     void Init_Book()
     {
         b_Job_GiveManifesto = true;
+        int i_RandomBookLocation = Random.Range(1, 4);
 
         for(int i_ = 0; i_ < go_Books.Length; ++i_)
         {
@@ -287,8 +377,16 @@ public class Cs_ObjectiveManager : MonoBehaviour
                 // Otherwise, keep transparent & keep arrows off for now until player picks up book
                 else
                 {
-                    go_Books[i_].GetComponent<Cs_BookLogic>().BookEnabled(true, true);
-                    go_Books[i_].GetComponent<Cs_BookLogic>().ArrowState = false;
+                    if(i_RandomBookLocation == i_)
+                    {
+                        go_Books[i_].GetComponent<Cs_BookLogic>().BookEnabled(true, true);
+                        go_Books[i_].GetComponent<Cs_BookLogic>().ArrowState = false;
+                    }
+                    else
+                    {
+                        go_Books[i_].GetComponent<Cs_BookLogic>().BookEnabled( false );
+                        go_Books[i_].GetComponent<Cs_BookLogic>().ArrowState = false;
+                    }
                 }
             }
         }
@@ -403,6 +501,7 @@ public class Cs_ObjectiveManager : MonoBehaviour
             else if (s_JobList[i_] == s_PunchIn_Text)               i_PunchIn_Number = i_;
             else if (s_JobList[i_] == s_FirePeople_Text)            i_FirePeople_Number = i_;
             else if (s_JobList[i_] == s_Book_Text)                  i_Book_Number = i_;
+            else if (s_JobList[i_] == s_SendFax_Text)               i_SendFax_Number = i_;
         }
 
         // print("Kick Me: " + i_BossKickMe_Number + ", Radio: " + i_ChangeRadioStation_Number);
@@ -429,19 +528,18 @@ public class Cs_ObjectiveManager : MonoBehaviour
             }
         }
 
-	    if(Input.GetKeyDown(KeyCode.U))
+	    if(Input.GetKeyDown(KeyCode.I))
+        {
+            Complete_Book();
+            Complete_BossKickMe();
+            Complete_ChangeRadioStation();
+            Complete_FirePeople();
+            Complete_SendFax();
+        }
+
+        if(Input.GetKeyDown(KeyCode.O))
         {
             Set_TurnInTasks();
-        }
-
-        if (Input.GetKeyDown(KeyCode.O))
-        {
-            Init_Book();
-        }
-
-        if (Input.GetKeyDown(KeyCode.P))
-        {
-            Init_BossKickMe();
         }
 	}
 }

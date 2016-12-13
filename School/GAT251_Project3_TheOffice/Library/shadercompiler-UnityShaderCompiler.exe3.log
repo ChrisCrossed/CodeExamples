@@ -1,6 +1,4 @@
 Base path: D:/Unity3D/Editor/Data
 Cmd: getPlatforms
-Cmd: compileSnippet
-  api=1 type=0 insize=970 outsize=448 kw= pd=UNITY_ENABLE_REFLECTION_BUFFERS UNITY_PBS_USE_BRDF1 UNITY_SPECCUBE_BOX_PROJECTION UNITY_SPECCUBE_BLENDING UNITY_HARDWARE_TIER3 ok=1
-Cmd: disassembleShader
-  api=9 insize=448 outsize=722 ok=1
+
+Quitting shader compiler process

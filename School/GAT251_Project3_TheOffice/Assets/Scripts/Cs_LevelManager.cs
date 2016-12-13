@@ -9,6 +9,8 @@ public class Cs_LevelManager : MonoBehaviour
     int i_Time_Minutes;
     float f_Time_Seconds;
 
+    float f_DecrementingTimer = 0.85f;
+
     Text txt_ClockText;
     TextMesh txt_TimeClockText;
 
@@ -35,7 +37,7 @@ public class Cs_LevelManager : MonoBehaviour
     {
         f_Time_Seconds += Time.deltaTime;
 
-        if(f_Time_Seconds > 1.0f)
+        if(f_Time_Seconds > f_DecrementingTimer)
         {
             ++i_Time_Minutes;
             f_Time_Seconds = 0f;
@@ -52,6 +54,12 @@ public class Cs_LevelManager : MonoBehaviour
 
                     b_Time_AM = !b_Time_AM;
                 }
+
+                if(!gameObject.GetComponent<Cs_ObjectiveManager>().ClockOutStatus)
+                {
+                    AudioClip ac_Beep = Resources.Load("sfx_Beep") as AudioClip;
+                    GameObject.Find("Player").GetComponent<AudioSource>().PlayOneShot(ac_Beep);
+                }
             }
 
             // On appropriate times, give the player a task
@@ -60,6 +68,19 @@ public class Cs_LevelManager : MonoBehaviour
                 if(ObjectiveManager.ClockIn && !ObjectiveManager.b_JobTestEnvironment)
                 {
                     ObjectiveManager.CreateNewJob();
+                }
+            }
+
+            if(i_Time_Minutes % 5 == 0)
+            {
+                if(gameObject.GetComponent<Cs_ObjectiveManager>().ClockOutStatus)
+                {
+                    f_DecrementingTimer = 0.65f;
+                }
+                else
+                {
+                    f_DecrementingTimer -= 0.025f;
+                    if (f_DecrementingTimer < .25f) f_DecrementingTimer = 0.25f;
                 }
             }
 
@@ -82,5 +103,12 @@ public class Cs_LevelManager : MonoBehaviour
 	void Update ()
     {
         ManageClock();
+
+        if(Input.GetKeyDown(KeyCode.P))
+        {
+            i_Time_Hours = 3;
+            i_Time_Minutes = 50;
+            b_Time_AM = false;
+        }
 	}
 }

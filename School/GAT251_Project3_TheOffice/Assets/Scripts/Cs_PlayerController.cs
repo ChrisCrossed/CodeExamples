@@ -1,9 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class Cs_PlayerController : MonoBehaviour
 {
+    bool b_IsGameOver;
+    float f_GameOverTimer;
+
     GameObject go_Camera;
     [SerializeField] GameObject go_RaycastObj_Use;
     GameObject go_UseObject;
@@ -67,13 +71,11 @@ public class Cs_PlayerController : MonoBehaviour
 
         float f_SpeedTemp = f_Speed_Max;
 
-        // Creeping. Walk slow.
-        if(Input.GetKey(KeyCode.LeftShift) && !Input.GetKey(KeyCode.LeftControl))
-        {
-            f_SpeedTemp /= 2f;
-        }
+        // Quit to Menu
+        if (Input.GetKeyDown(KeyCode.Escape)) SceneManager.LoadScene(1);
+        
         // Sprint. Move fast.
-        else if(Input.GetKey(KeyCode.LeftControl) && !Input.GetKey(KeyCode.LeftShift))
+        if(Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.LeftShift))
         {
             f_SpeedTemp *= 2f;
         }
@@ -159,9 +161,18 @@ public class Cs_PlayerController : MonoBehaviour
             {
                 go_Book.GetComponent<MeshRenderer>().enabled = true;
 
-                GameObject.Find("Book_Desk_1").GetComponent<Cs_BookLogic>().ArrowState = true;
-                GameObject.Find("Book_Desk_2").GetComponent<Cs_BookLogic>().ArrowState = true;
-                GameObject.Find("Book_Desk_3").GetComponent<Cs_BookLogic>().ArrowState = true;
+                if(GameObject.Find("Book_Desk_1").GetComponent<Cs_BookLogic>().Get_Enabled())
+                {
+                    GameObject.Find("Book_Desk_1").GetComponent<Cs_BookLogic>().ArrowState = true;
+                }
+                else if (GameObject.Find("Book_Desk_2").GetComponent<Cs_BookLogic>().Get_Enabled())
+                {
+                    GameObject.Find("Book_Desk_2").GetComponent<Cs_BookLogic>().ArrowState = true;
+                }
+                else if(GameObject.Find("Book_Desk_3").GetComponent<Cs_BookLogic>().Get_Enabled())
+                {
+                    GameObject.Find("Book_Desk_3").GetComponent<Cs_BookLogic>().ArrowState = true;
+                }
             }
             else
             {
@@ -169,6 +180,12 @@ public class Cs_PlayerController : MonoBehaviour
             }
         }
         get { return b_HasBook; }
+    }
+
+    public bool GameOverState
+    {
+        set { b_IsGameOver = value; }
+        get { return b_IsGameOver; }
     }
 
     #region Jump abilities
@@ -300,18 +317,55 @@ public class Cs_PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update ()
     {
-        PlayerInput();
-
-        RaycastThroughCanvas();
-
-        if(Input.GetKeyDown(KeyCode.L))
+        if(!GameOverState)
         {
-            BookState = !BookState;
+            PlayerInput();
+
+            RaycastThroughCanvas();
+
+            if(Input.GetKeyDown(KeyCode.L))
+            {
+                BookState = !BookState;
+            }
         }
     }
 
+    bool b_MusicPlayedYet;
     void LateUpdate()
     {
-        MouseInput();
+        if(!GameOverState) MouseInput();
+        else
+        {
+            GameObject.Find("FaxMachine").GetComponent<AudioSource>().volume = 0f;
+
+            f_GameOverTimer += Time.deltaTime;
+
+            gameObject.GetComponent<Rigidbody>().velocity = new Vector3();
+
+            Color clr_CurrAlpha = GameObject.Find("FadeInOut").GetComponent<Image>().color;
+            clr_CurrAlpha.a += Time.deltaTime / 4f;
+            if (clr_CurrAlpha.a > 0.75f)
+            {
+                clr_CurrAlpha.r += Time.deltaTime / 2f;
+
+                Color clr_HammerAlpha = GameObject.Find("Img_HammerSickle").GetComponent<Image>().color;
+                clr_HammerAlpha.a += Time.deltaTime / 2;
+                GameObject.Find("Img_HammerSickle").GetComponent<Image>().color = clr_HammerAlpha;
+
+                if (!b_MusicPlayedYet)
+                {
+                    gameObject.GetComponent<AudioSource>().PlayOneShot(Resources.Load("mus_Anthem") as AudioClip);
+                    b_MusicPlayedYet = true;
+                }
+            }
+            GameObject.Find("FadeInOut").GetComponent<Image>().color = clr_CurrAlpha;
+
+            if (f_GameOverTimer > 30f) GameObject.Find("GameOverText").GetComponent<Text>().enabled = true;
+
+            if (f_GameOverTimer > 45f) GameObject.Find("GameOverText").GetComponent<Text>().text = "Press Escape.";
+            if (f_GameOverTimer > 60f) GameObject.Find("GameOverText").GetComponent<Text>().text = "OK. We'll just sit here.";
+            if (f_GameOverTimer > 75f) GameObject.Find("GameOverText").GetComponent<Text>().text = "All Glory to the Motherland.";
+            if (f_GameOverTimer > 75f) GameObject.Find("GameOverText").GetComponent<Text>().text = "All Glory to the Motherland. Comrade.";
+        }
     }
 }

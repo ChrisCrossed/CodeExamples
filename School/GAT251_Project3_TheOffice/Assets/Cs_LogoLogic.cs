@@ -12,6 +12,8 @@ public class Cs_LogoLogic : MonoBehaviour
     // Update is called once per frame
 	void Update ()
     {
+        if (Input.GetKeyDown(KeyCode.Escape)) Application.Quit();
+
         if(!b_IsMainMenu)
         {
             f_Timer += Time.deltaTime;
@@ -22,7 +24,7 @@ public class Cs_LogoLogic : MonoBehaviour
             f_Timer = f_Timer_Max;
         }
 
-        if(f_Timer > f_Timer_Max)
+        if(f_Timer >= f_Timer_Max)
         {
             SceneManager.LoadScene(i_NextScene);
         }
