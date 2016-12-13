@@ -31,7 +31,7 @@ public class Cs_ObjectiveManager : MonoBehaviour
     #endregion
 
     #region Task - 'Punch In'
-    bool b_Job_PunchIn;
+    public bool b_Job_PunchIn;
     GameObject go_PunchInClock;
     Text txt_TutorialText;
     #endregion
@@ -183,6 +183,8 @@ public class Cs_ObjectiveManager : MonoBehaviour
         set
         {
             b_ClockedIn = value;
+
+            if (b_ClockedIn) gameObject.GetComponent<Cs_LevelManager>().Set_AllowedToContinue();
         }
         get
         {
@@ -231,8 +233,6 @@ public class Cs_ObjectiveManager : MonoBehaviour
             PhoneArrow.IsEnabled = true;
 
             txt_TutorialText.text = "Return to your Red Phone\nand use it between tasks!";
-
-            // go_PunchInClock.GetComponent<Cs_Objective>().Set_State = Enum_ObjectiveState.Completed;
         }
     }
     #endregion
@@ -264,7 +264,7 @@ public class Cs_ObjectiveManager : MonoBehaviour
 
     #region Change Radio Station
     int i_ChangeRadioStation_Number = -1;
-    string s_ChangeRadioStation_Text = "Play Union\nAppropriate Music";
+    string s_ChangeRadioStation_Text = "Play Soviet\nAppropriate Music";
     void Init_ChangeRadioStation()
     {
         b_Job_ChangeRadioStation = true;
@@ -489,6 +489,7 @@ public class Cs_ObjectiveManager : MonoBehaviour
             if (s_JobList[i_] == "")
             {
                 s_JobList[i_] = s_Text_;
+
                 break;
             }
         }
@@ -512,6 +513,21 @@ public class Cs_ObjectiveManager : MonoBehaviour
         txt_JobList_3_Text.text = s_JobList[2];
         txt_JobList_4_Text.text = s_JobList[3];
         txt_JobList_5_Text.text = s_JobList[4];
+
+        if (s_JobList[0] == s_TurnInJob) txt_JobList_1_Text.color = Color.red;
+        else txt_JobList_1_Text.color = Color.black;
+
+        if (s_JobList[1] == s_TurnInJob) txt_JobList_2_Text.color = Color.red;
+        else txt_JobList_2_Text.color = Color.black;
+
+        if (s_JobList[2] == s_TurnInJob) txt_JobList_3_Text.color = Color.red;
+        else txt_JobList_3_Text.color = Color.black;
+
+        if (s_JobList[3] == s_TurnInJob) txt_JobList_4_Text.color = Color.red;
+        else txt_JobList_4_Text.color = Color.black;
+
+        if (s_JobList[4] == s_TurnInJob) txt_JobList_5_Text.color = Color.red;
+        else txt_JobList_5_Text.color = Color.black;
     }
 
     // Update is called once per frame

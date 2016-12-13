@@ -42,7 +42,7 @@ public class Cs_RadioLogic : MonoBehaviour
 
     public void Set_ResetRadio( bool b_ActivateObjective_ = false )
     {
-        i_SongNum = Random.Range(0, 2);
+        i_SongNum = Random.Range(0, 5);
         b_IsMusic = false;
 
         if (b_ActivateObjective_)

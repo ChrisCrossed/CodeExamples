@@ -70,9 +70,6 @@ public class Cs_PlayerController : MonoBehaviour
         Vector3 v3_InputVector = new Vector3();
 
         float f_SpeedTemp = f_Speed_Max;
-
-        // Quit to Menu
-        if (Input.GetKeyDown(KeyCode.Escape)) SceneManager.LoadScene(1);
         
         // Sprint. Move fast.
         if(Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.LeftShift))
@@ -236,7 +233,7 @@ public class Cs_PlayerController : MonoBehaviour
         RaycastHit hit;
         int i_LayerMask = LayerMask.GetMask("Wall", "Boss", "Interact", "Default");
 
-        Physics.Raycast(go_Camera.transform.position, go_Camera.transform.forward, out hit, float.PositiveInfinity, i_LayerMask);
+        Physics.Raycast(go_Camera.transform.position, go_Camera.transform.forward, out hit, 5f, i_LayerMask);
 
         if(hit.collider)
         {
@@ -317,7 +314,10 @@ public class Cs_PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update ()
     {
-        if(!GameOverState)
+        // Quit to Menu
+        if (Input.GetKeyDown(KeyCode.Escape)) SceneManager.LoadScene(1);
+
+        if (!GameOverState)
         {
             PlayerInput();
 
@@ -333,7 +333,16 @@ public class Cs_PlayerController : MonoBehaviour
     bool b_MusicPlayedYet;
     void LateUpdate()
     {
-        if(!GameOverState) MouseInput();
+        if (!GameOverState)
+        {
+            MouseInput();
+
+            // Fade In the screen if need-be
+            Color clr_CurrAlpha = GameObject.Find("FadeInOut").GetComponent<Image>().color;
+            clr_CurrAlpha.a -= Time.deltaTime / 4f;
+            if (clr_CurrAlpha.a < 0.0f) clr_CurrAlpha.a = 0.0f;
+            GameObject.Find("FadeInOut").GetComponent<Image>().color = clr_CurrAlpha;
+        }
         else
         {
             GameObject.Find("FaxMachine").GetComponent<AudioSource>().volume = 0f;
@@ -358,6 +367,7 @@ public class Cs_PlayerController : MonoBehaviour
                     b_MusicPlayedYet = true;
                 }
             }
+
             GameObject.Find("FadeInOut").GetComponent<Image>().color = clr_CurrAlpha;
 
             if (f_GameOverTimer > 30f) GameObject.Find("GameOverText").GetComponent<Text>().enabled = true;

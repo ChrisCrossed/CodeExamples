@@ -16,6 +16,8 @@ public class Cs_LevelManager : MonoBehaviour
 
     Cs_ObjectiveManager ObjectiveManager;
 
+    public bool b_AllowedToContinue;
+
 	// Use this for initialization
 	void Start ()
     {
@@ -30,12 +32,19 @@ public class Cs_LevelManager : MonoBehaviour
 
         // Objective Manager
         ObjectiveManager = GameObject.Find("LevelManager").GetComponent<Cs_ObjectiveManager>();
+    }
 
+    public void Set_AllowedToContinue()
+    {
+        b_AllowedToContinue = true;
     }
 	
     void ManageClock()
     {
-        f_Time_Seconds += Time.deltaTime;
+        if(b_AllowedToContinue || i_Time_Minutes < 59)
+        {
+            f_Time_Seconds += Time.deltaTime;
+        }
 
         if(f_Time_Seconds > f_DecrementingTimer)
         {
@@ -71,16 +80,28 @@ public class Cs_LevelManager : MonoBehaviour
                 }
             }
 
-            if(i_Time_Minutes % 5 == 0)
+            if (gameObject.GetComponent<Cs_ObjectiveManager>().ClockOutStatus)
+            {
+                if ((i_Time_Hours == 5 && i_Time_Minutes >= 14) || (i_Time_Hours > 5))
+                {
+                    if (i_Time_Minutes % 15 == 0)
+                    {
+                        GameObject.Find("TutorialText").GetComponent<Text>().text = "America does not pay overtime, Comrade!";
+                    }
+                }
+            }
+
+            if(i_Time_Minutes % 10 == 0)
             {
                 if(gameObject.GetComponent<Cs_ObjectiveManager>().ClockOutStatus)
                 {
                     f_DecrementingTimer = 0.65f;
+
                 }
                 else
                 {
                     f_DecrementingTimer -= 0.025f;
-                    if (f_DecrementingTimer < .25f) f_DecrementingTimer = 0.25f;
+                    if (f_DecrementingTimer < .4f) f_DecrementingTimer = 0.4f;
                 }
             }
 
