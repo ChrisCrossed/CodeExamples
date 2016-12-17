@@ -8,6 +8,8 @@ public struct PlayerInput
     // Game Settings
     private float _f_zDir; // Forward or Backward
     private float _f_xDir; // Strafe Left or Right
+    private float _f_MouseHoriz;
+    private float _f_MouseVert;
     private bool _b_IsJumping;
     private bool _b_JumpPressed;
 
@@ -50,6 +52,23 @@ public struct PlayerInput
         {
             return _f_xDir;
         }
+    }
+
+    public float mouseHoriz
+    {
+        set
+        {
+            _f_MouseHoriz = value;
+        }
+        get { return _f_MouseHoriz; }
+    }
+    public float mouseVert
+    {
+        set
+        {
+            _f_MouseVert = value;
+        }
+        get { return _f_MouseVert; }
     }
 }
 
@@ -98,6 +117,16 @@ public class Cs_InputManager : MonoBehaviour
     KeyCode kc_Reload;
 
     // Use this for initialization
+    void Start()
+    {
+        PlayerCont_Infantry = gameObject.GetComponent<Cs_PlayerController_Infantry>();
+
+        // Initialization
+        playerInput = new PlayerInput();
+        Init_ResetControls();
+
+        PlayerCont_Infantry.Initialize();
+    }
 
     #region Controls Initialization
     protected void Init_InputControls( KeyCodeChoices kc_Choice_ )
@@ -175,7 +204,7 @@ public class Cs_InputManager : MonoBehaviour
     protected bool KeyboardCheck()
     {
         #region Keyboard Input
-        if( Input.GetKey(kc_Forward) ||
+        if ( Input.GetKey(kc_Forward) ||
             Input.GetKey(kc_Backward) ||
             Input.GetKey(kc_StrafeLeft) ||
             Input.GetKey(kc_StrafeRight) ||
@@ -209,7 +238,6 @@ public class Cs_InputManager : MonoBehaviour
     protected void KeyboardInput()
     {
         #region Forward & Backward
-        playerInput.zDir = 0.0f;
         if (Input.GetKey(kc_Forward) && !Input.GetKey(kc_Backward))
         {
             playerInput.zDir = 1.0f;
@@ -219,6 +247,34 @@ public class Cs_InputManager : MonoBehaviour
             playerInput.zDir = -1.0f;
         }
         #endregion
+
+        #region Strafing
+        if(Input.GetKey(kc_StrafeLeft) && !Input.GetKey(kc_StrafeRight))
+        {
+            playerInput.xDir = -1.0f;
+        }
+        else if(Input.GetKey(kc_StrafeRight) && !Input.GetKey(kc_StrafeLeft))
+        {
+            playerInput.xDir = 1.0f;
+        }
+        #endregion
+
+        #region Mouse Input
+        playerInput.mouseHoriz = Input.GetAxis("Mouse X");
+        playerInput.mouseVert = Input.GetAxis("Mouse Y");
+        #endregion
+    }
+
+    internal void InputUpdate()
+    {
+        // Reset input values
+        playerInput.xDir = 0;
+        playerInput.zDir = 0;
+        playerInput.mouseHoriz = 0f;
+        playerInput.mouseVert = 0f;
+
+        // If the player has used the keyboard or mouse this frame, switch to Keyboard input. Otherwise, Controller.
+        if (KeyboardCheck()) KeyboardInput(); else ControllerInput();
     }
     
 }
