@@ -10,8 +10,8 @@ public struct PlayerInput
     private float _f_xDir; // Strafe Left or Right
     private float _f_MouseHoriz;
     private float _f_MouseVert;
-    private bool _b_IsJumping;
     private bool _b_JumpPressed;
+    private bool _b_JumpHeld;
 
     public float zDir
     {
@@ -70,6 +70,17 @@ public struct PlayerInput
         }
         get { return _f_MouseVert; }
     }
+    
+    public bool JumpPressed
+    {
+        set { _b_JumpPressed = value; }
+        get { return _b_JumpPressed; }
+    }
+    public bool JumpHeld
+    {
+        set { _b_JumpHeld = value; }
+        get { return _b_JumpHeld; }
+    }
 }
 
 public enum KeyCodeChoices
@@ -126,6 +137,8 @@ public class Cs_InputManager : MonoBehaviour
         Init_ResetControls();
 
         PlayerCont_Infantry.Initialize();
+
+        gameObject.GetComponent<Cs_FPS_Take2>().Start();
     }
 
     #region Controls Initialization
@@ -188,8 +201,6 @@ public class Cs_InputManager : MonoBehaviour
         Init_InputControls(KeyCodeChoices.WeaponTwo);
         Init_InputControls(KeyCodeChoices.Grenade);
         Init_InputControls(KeyCodeChoices.Reload);
-
-        print("Set");
     }
     #endregion
 
@@ -205,17 +216,17 @@ public class Cs_InputManager : MonoBehaviour
     {
         #region Keyboard Input
         if ( Input.GetKey(kc_Forward) ||
-            Input.GetKey(kc_Backward) ||
-            Input.GetKey(kc_StrafeLeft) ||
-            Input.GetKey(kc_StrafeRight) ||
-            Input.GetKey(kc_Jump) ||
-            Input.GetKey(kc_Sprint) ||
-            Input.GetKey(kc_Crouch) ||
-            Input.GetKey(kc_Use) ||
-            Input.GetKey(kc_WeaponOne) ||
-            Input.GetKey(kc_WeaponTwo) ||
-            Input.GetKey(kc_Grenade) ||
-            Input.GetKey(kc_Reload))
+             Input.GetKey(kc_Backward) ||
+             Input.GetKey(kc_StrafeLeft) ||
+             Input.GetKey(kc_StrafeRight) ||
+             Input.GetKey(kc_Jump) ||
+             Input.GetKey(kc_Sprint) ||
+             Input.GetKey(kc_Crouch) ||
+             Input.GetKey(kc_Use) ||
+             Input.GetKey(kc_WeaponOne) ||
+             Input.GetKey(kc_WeaponTwo) ||
+             Input.GetKey(kc_Grenade) ||
+             Input.GetKey(kc_Reload))
         {
             return true;
         }
@@ -240,6 +251,7 @@ public class Cs_InputManager : MonoBehaviour
         #region Forward & Backward
         if (Input.GetKey(kc_Forward) && !Input.GetKey(kc_Backward))
         {
+            print("Set");
             playerInput.zDir = 1.0f;
         }
         else if(Input.GetKey(kc_Backward) && !Input.GetKey(kc_Forward))
@@ -262,6 +274,11 @@ public class Cs_InputManager : MonoBehaviour
         #region Mouse Input
         playerInput.mouseHoriz = Input.GetAxis("Mouse X");
         playerInput.mouseVert = Input.GetAxis("Mouse Y");
+        #endregion
+
+        #region Jumping
+        playerInput.JumpPressed = Input.GetKeyDown(kc_Jump);
+        playerInput.JumpHeld = Input.GetKey(kc_Jump);
         #endregion
     }
 
