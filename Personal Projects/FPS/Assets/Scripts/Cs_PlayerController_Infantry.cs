@@ -35,11 +35,13 @@ public class Cs_PlayerController_Infantry : Cs_InputManager
         go_Raycast_Left = transform.Find("RaycastObjects").Find("Raycast_Left").gameObject;
         go_Raycast_Right = transform.Find("RaycastObjects").Find("Raycast_Right").gameObject;
     }
-
+    
     GameObject go_Platform;
     Vector3 v3_PlatformPreviousPos;
+    // Finds the object the player is standing on, checks to see if it is moving, and applies that velocity to the player
     void ReceiveExternalVelocities()
     {
+        #region Khan, here's the 'new' code: Applies the difference the object has moved. Both formats have been removed by latest verion.
         // Capture the gameobject we're standing on.
         RaycastHit hit = CheckRaycasts( LayerMask.GetMask("MovingPlatform") );
 
@@ -74,7 +76,9 @@ public class Cs_PlayerController_Infantry : Cs_InputManager
             go_Platform = null;
             v3_PlatformPreviousPos = new Vector3();
         }
-        
+        #endregion
+
+        #region Khan, here's the old code. In various formats, the code would remain the same: Find the velocity of the touching object and add to player's velocity
         /*
         // Raycast downward to find the velocity of whatever we're standing on. Apply that velocity to the player.
         RaycastHit hit = CheckRaycasts();
@@ -94,6 +98,7 @@ public class Cs_PlayerController_Infantry : Cs_InputManager
 
         return new Vector3();
         */
+        #endregion
     }
 
     void Movement()
@@ -103,42 +108,15 @@ public class Cs_PlayerController_Infantry : Cs_InputManager
         Vector3 v3_RampDirection = new Vector3();
 
         // Find directional vector
-        if(playerInput.xDir != 0f || playerInput.zDir != 0f)
-        {
-            gameObject.GetComponent<Rigidbody>().mass = 0f;
+        Vector3 v3_Vector = new Vector3(playerInput.xDir, 0, playerInput.zDir);
+        v3_Vector.Normalize();
 
-            Vector3 v3_Vector = new Vector3(playerInput.xDir, 0, playerInput.zDir);
-            v3_Vector.Normalize();
-        
-            // Combine (not multiply) the player's current rotation (Quat) into the input vector (Vec3)
-            Vector3 v3_FinalRotation = gameObject.transform.rotation * v3_Vector;
-        
-            Vector3 v3_NewVelocity = Vector3.Lerp(v3_OldVelocity, v3_FinalRotation * 55, 1f / 4f);
+        // Combine (not multiply) the player's current rotation (Quat) into the input vector (Vec3)
+        Vector3 v3_FinalRotation = gameObject.transform.rotation * v3_Vector;
 
-            if(playerInput.JumpPressed)
-            {
-                v3_NewVelocity.y = 7.5f;
-            }
-            else
-            {
-                v3_NewVelocity.y = v3_OldVelocity.y;
-            }
+        Vector3 v3_NewVelocity = Vector3.Lerp(v3_OldVelocity, v3_FinalRotation * 10, 1f / 10f);
 
-            // gameObject.GetComponent<Rigidbody>().velocity = v3_NewVelocity;
-            float f_MaxAcceleration = 20f;
-            print(v3_NewVelocity.magnitude);
-
-            if(v3_NewVelocity.magnitude < f_MaxAcceleration)
-            {
-                gameObject.GetComponent<Rigidbody>().AddForce(v3_NewVelocity, ForceMode.Acceleration);
-            }
-        }
-        else
-        {
-            gameObject.GetComponent<Rigidbody>().mass = 10f;
-        }
-
-        // ReceiveExternalVelocities();
+        gameObject.GetComponent<Rigidbody>().velocity = v3_NewVelocity;
     }
 
     float f_CamRot;
@@ -164,6 +142,7 @@ public class Cs_PlayerController_Infantry : Cs_InputManager
         #endregion
     }
     
+    // Raycasts down through four points on the player, finds the closes distance, and returns that RaycastHit.
     RaycastHit CheckRaycasts( int i_LayerMask_ = -1)
     {
         // outHit is what we'll be sending out from the function
@@ -213,9 +192,10 @@ public class Cs_PlayerController_Infantry : Cs_InputManager
         
         MouseRotations();
         Movement();
-        // ReceiveExternalVelocities();
+        ReceiveExternalVelocities();
     }
 
+    #region Not Used
     void OnCollisionEnter(Collision collider_)
     {
         /*
@@ -248,4 +228,5 @@ public class Cs_PlayerController_Infantry : Cs_InputManager
         }
         */
     }
+    #endregion
 }

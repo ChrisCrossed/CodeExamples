@@ -137,8 +137,6 @@ public class Cs_InputManager : MonoBehaviour
         Init_ResetControls();
 
         PlayerCont_Infantry.Initialize();
-
-        gameObject.GetComponent<Cs_FPS_Take2>().Start();
     }
 
     #region Controls Initialization
