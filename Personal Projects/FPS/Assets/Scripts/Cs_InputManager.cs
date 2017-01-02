@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using XInputDotNetPure;
+using UnityEngine.UI;
 
 public struct PlayerInput
 {
@@ -127,6 +128,12 @@ public class Cs_InputManager : MonoBehaviour
     KeyCode kc_Grenade;
     KeyCode kc_Reload;
 
+    // Twitch Keyboard Viewing
+    Image img_But_W;
+    Image img_But_A;
+    Image img_But_S;
+    Image img_But_D;
+
     // Use this for initialization
     void Start()
     {
@@ -137,6 +144,12 @@ public class Cs_InputManager : MonoBehaviour
         Init_ResetControls();
 
         PlayerCont_Infantry.Initialize();
+
+        // Twitch Keyboard Viewing
+        img_But_W = GameObject.Find("But_W").GetComponent<Image>();
+        img_But_A = GameObject.Find("But_A").GetComponent<Image>();
+        img_But_S = GameObject.Find("But_S").GetComponent<Image>();
+        img_But_D = GameObject.Find("But_D").GetComponent<Image>();
     }
 
     #region Controls Initialization
@@ -206,6 +219,21 @@ public class Cs_InputManager : MonoBehaviour
     {
         p1_PrevState = p1_State;
         p1_State = GamePad.GetState(p1);
+
+        #region Left Analog Stick
+        playerInput.xDir = p1_State.ThumbSticks.Left.X;
+        playerInput.zDir = p1_State.ThumbSticks.Left.Y;
+        #endregion
+
+        #region Right Analog Stick
+        playerInput.mouseHoriz = p1_State.ThumbSticks.Right.X;
+        playerInput.mouseVert = -p1_State.ThumbSticks.Right.Y;
+        #endregion
+
+        #region Jumping
+        if (p1_State.Buttons.A == ButtonState.Pressed && p1_PrevState.Buttons.A == ButtonState.Released) playerInput.JumpPressed = true;
+        else if (p1_PrevState.Buttons.A == ButtonState.Pressed) playerInput.JumpHeld = true;
+        #endregion
     }
 
     float f_yRot;
@@ -290,6 +318,12 @@ public class Cs_InputManager : MonoBehaviour
 
         // If the player has used the keyboard or mouse this frame, switch to Keyboard input. Otherwise, Controller.
         if (KeyboardCheck()) KeyboardInput(); else ControllerInput();
+
+        // Twitch Keyboard viewing
+        if (playerInput.zDir > 0) img_But_W.color = Color.grey; else img_But_W.color = Color.white;
+        if (playerInput.zDir < 0) img_But_S.color = Color.grey; else img_But_S.color = Color.white;
+        if (playerInput.xDir < 0) img_But_A.color = Color.grey; else img_But_A.color = Color.white;
+        if (playerInput.xDir > 0) img_But_D.color = Color.grey; else img_But_D.color = Color.white;
     }
     
 }
