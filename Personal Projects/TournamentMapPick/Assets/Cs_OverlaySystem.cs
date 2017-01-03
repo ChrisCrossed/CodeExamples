@@ -42,8 +42,10 @@ public class Cs_OverlaySystem : MonoBehaviour
     // Game Object Connections
     RectTransform go_BanPos_Team1_1;
     RectTransform go_BanPos_Team1_2;
+    RectTransform go_BanPos_Team1_3;
     RectTransform go_BanPos_Team2_1;
     RectTransform go_BanPos_Team2_2;
+    RectTransform go_BanPos_Team2_3;
     RectTransform go_BO5_Left;
     RectTransform go_BO3_Left;
     RectTransform go_BO3_Center;
@@ -68,13 +70,23 @@ public class Cs_OverlaySystem : MonoBehaviour
         // Set RectTransform positions
         go_BanPos_Team1_1 = GameObject.Find("BanPos_Team1_1").GetComponent<RectTransform>();
         go_BanPos_Team1_2 = GameObject.Find("BanPos_Team1_2").GetComponent<RectTransform>();
+        go_BanPos_Team1_3 = GameObject.Find("BanPos_Team1_3").GetComponent<RectTransform>();
         go_BanPos_Team2_1 = GameObject.Find("BanPos_Team2_1").GetComponent<RectTransform>();
         go_BanPos_Team2_2 = GameObject.Find("BanPos_Team2_2").GetComponent<RectTransform>();
+        go_BanPos_Team2_3 = GameObject.Find("BanPos_Team2_3").GetComponent<RectTransform>();
         go_BO5_Left     = GameObject.Find("BO5_Left").GetComponent<RectTransform>();
         go_BO3_Left     = GameObject.Find("BO3_Left").GetComponent<RectTransform>();
-        go_BO3_Center   = GameObject.Find("BO3_Center").GetComponent<RectTransform>();
+        go_BO3_Center   = GameObject.Find("BO3_Mid").GetComponent<RectTransform>();
         go_BO3_Right    = GameObject.Find("BO3_Right").GetComponent<RectTransform>();
         go_BO5_Right    = GameObject.Find("BO5_Right").GetComponent<RectTransform>();
+
+        if(b_BestOf3)
+        {
+            GameObject.Find("BO5_Left").SetActive(false);
+            GameObject.Find("BO5_Right").SetActive(false);
+            GameObject.Find("Bar_BO5_Left").SetActive(false);
+            GameObject.Find("Bar_BO5_Right").SetActive(false);
+        }
     }
     
     public void MapClicked( GameObject go_Button_ )
@@ -88,15 +100,20 @@ public class Cs_OverlaySystem : MonoBehaviour
         go_Button_.GetComponent<Button>().interactable = false;
 
         // Tell map to move to proper position
+        PositionButton( go_Button_ );
 
         // Update PickBan
     }
 
     int i_TurnCounter = -1;
+    static bool b_BANNED = true;
+    static bool b_PICKED = false;
     void PositionButton( GameObject go_Button_ )
     {
         // Increment turn counter
         ++i_TurnCounter;
+
+        Cs_Button_Map this_Button = go_Button_.GetComponent<Cs_Button_Map>();
 
         if( b_BestOf3 )
         {
@@ -105,6 +122,44 @@ public class Cs_OverlaySystem : MonoBehaviour
             switch (i_TurnCounter)
             {
                 case 0:
+                    // Ban map, Team A, Position 1
+                    this_Button.Set_MapState = b_BANNED;
+                    this_Button.GoToPosition( go_BanPos_Team1_1 );
+                    break;
+                case 1:
+                    // Ban map, Team B, Position 1
+                    this_Button.Set_MapState = b_BANNED;
+                    this_Button.GoToPosition( go_BanPos_Team2_1 );
+                    break;
+                case 2:
+                    // Ban map, Team A, Position 2
+                    this_Button.Set_MapState = b_BANNED;
+                    this_Button.GoToPosition( go_BanPos_Team1_2 );
+                    break;
+                case 3:
+                    // Ban map, Team B, Position 2
+                    this_Button.Set_MapState = b_BANNED;
+                    this_Button.GoToPosition( go_BanPos_Team2_2 );
+                    break;
+                case 4:
+                    // Pick map, Position 1
+                    this_Button.Set_MapState = b_PICKED;
+                    this_Button.GoToPosition( go_BO3_Left );
+                    break;
+                case 5:
+                    // Pick map, Position 2
+                    this_Button.Set_MapState = b_PICKED;
+                    this_Button.GoToPosition( go_BO3_Center );
+                    break;
+                case 6:
+                    // Ban map, Team A, Position 3
+                    this_Button.Set_MapState = b_BANNED;
+                    this_Button.GoToPosition( go_BanPos_Team1_3 );
+                    break;
+                case 7:
+                    // Ban map, Team B, Position 3
+                    this_Button.Set_MapState = b_BANNED;
+                    this_Button.GoToPosition( go_BanPos_Team2_3 );
                     break;
                 default:
                     break;
@@ -119,6 +174,8 @@ public class Cs_OverlaySystem : MonoBehaviour
             #endregion
         }
     }
+
+
 	
 	// Update is called once per frame
 	void Update ()
