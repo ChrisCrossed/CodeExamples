@@ -1,0 +1,29 @@
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2008
+
+Project("{4962B762-4ED3-A760-A969-377A6E8B92E9}") = "TournamentMapPick", "Assembly-CSharp.csproj", "{9B927DE6-73AC-0F48-AF73-A4EB7FD52415}"
+EndProject
+Project("{4962B762-4ED3-A760-A969-377A6E8B92E9}") = "TournamentMapPick", "Assembly-CSharp-Editor.csproj", "{86A59F7A-69F6-69B0-0C5B-C9B43DBBAF40}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9B927DE6-73AC-0F48-AF73-A4EB7FD52415}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B927DE6-73AC-0F48-AF73-A4EB7FD52415}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B927DE6-73AC-0F48-AF73-A4EB7FD52415}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B927DE6-73AC-0F48-AF73-A4EB7FD52415}.Release|Any CPU.Build.0 = Release|Any CPU
+		{86A59F7A-69F6-69B0-0C5B-C9B43DBBAF40}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{86A59F7A-69F6-69B0-0C5B-C9B43DBBAF40}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{86A59F7A-69F6-69B0-0C5B-C9B43DBBAF40}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{86A59F7A-69F6-69B0-0C5B-C9B43DBBAF40}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = Assembly-CSharp.csproj
+	EndGlobalSection
+EndGlobal
