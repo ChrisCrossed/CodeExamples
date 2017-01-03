@@ -34,30 +34,90 @@ public enum Enum_MapState
 
 public class Cs_OverlaySystem : MonoBehaviour
 {
-    Camera this_Camera;
+    // Variables
+    int i_NumMaps;
+    bool[] b_MapActive;
+    [SerializeField] bool b_BestOf3 = true;
 
-    bool[] b_MapActive = new bool[14];
+    // Game Object Connections
+    RectTransform go_BanPos_Team1_1;
+    RectTransform go_BanPos_Team1_2;
+    RectTransform go_BanPos_Team2_1;
+    RectTransform go_BanPos_Team2_2;
+    RectTransform go_BO5_Left;
+    RectTransform go_BO3_Left;
+    RectTransform go_BO3_Center;
+    RectTransform go_BO3_Right;
+    RectTransform go_BO5_Right;
 
-	// Use this for initialization
-	void Start ()
+    // Use this for initialization
+    void Start ()
     {
-        // this_Camera = GameObject.Find("Main Camera").GetComponent<Camera>();
-	}
+        // Sets number of maps in use
+        i_NumMaps = 14;
+
+        // Activates the number of maps to use
+        b_MapActive = new bool[ i_NumMaps ];
+
+        // Sets all maps to be considered active
+        for(int i_ = 0; i_ < i_NumMaps; ++i_ )
+        {
+            b_MapActive[i_] = true;
+        }
+
+        // Set RectTransform positions
+        go_BanPos_Team1_1 = GameObject.Find("BanPos_Team1_1").GetComponent<RectTransform>();
+        go_BanPos_Team1_2 = GameObject.Find("BanPos_Team1_2").GetComponent<RectTransform>();
+        go_BanPos_Team2_1 = GameObject.Find("BanPos_Team2_1").GetComponent<RectTransform>();
+        go_BanPos_Team2_2 = GameObject.Find("BanPos_Team2_2").GetComponent<RectTransform>();
+        go_BO5_Left     = GameObject.Find("BO5_Left").GetComponent<RectTransform>();
+        go_BO3_Left     = GameObject.Find("BO3_Left").GetComponent<RectTransform>();
+        go_BO3_Center   = GameObject.Find("BO3_Center").GetComponent<RectTransform>();
+        go_BO3_Right    = GameObject.Find("BO3_Right").GetComponent<RectTransform>();
+        go_BO5_Right    = GameObject.Find("BO5_Right").GetComponent<RectTransform>();
+    }
     
-    public void MapClicked( Enum_MapList e_MapList_ )
+    public void MapClicked( GameObject go_Button_ )
     {
-        print("Connected");
+        int i_MapType = (int)go_Button_.GetComponent<Cs_Button_Map>().MapType;
 
         // Disable map from list
+        b_MapActive[ i_MapType ] = false;
+
+        // Tell button it cannot be clicked anymore
+        go_Button_.GetComponent<Button>().interactable = false;
 
         // Tell map to move to proper position
 
         // Update PickBan
     }
 
-    void SetMapState( Enum_MapList e_MapList_, bool b_IsActive_ = false )
+    int i_TurnCounter = -1;
+    void PositionButton( GameObject go_Button_ )
     {
+        // Increment turn counter
+        ++i_TurnCounter;
 
+        if( b_BestOf3 )
+        {
+            // Ban (A), Ban (B), Ban (A), Ban (B), PICK (A), PICK (B), Ban (A), Ban (B), Random 1
+            #region Best of 3 Format
+            switch (i_TurnCounter)
+            {
+                case 0:
+                    break;
+                default:
+                    break;
+            }
+            #endregion
+        }
+        else
+        {
+            // Ban (A), Ban (B), Ban (A), Ban (B), PICK (A), PICK (B), PICK (B), PICK (A), Ban (A), Ban (B), Random 1
+            #region Best of 5 Format
+
+            #endregion
+        }
     }
 	
 	// Update is called once per frame

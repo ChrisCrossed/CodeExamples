@@ -15,12 +15,30 @@ public class Cs_Button_Map : MonoBehaviour
 
     public void ClickButton()
     {
-        overlaySystem.MapClicked( e_MapType );
+        overlaySystem.MapClicked( gameObject );
+    }
+
+    public Enum_MapList MapType
+    {
+        get { return e_MapType; }
+    }
+
+    bool b_IsActivated;
+    float f_MoveTimer;
+    RectTransform FinalPosition;
+    public void GoToPosition( RectTransform pos_ )
+    {
+        FinalPosition = pos_;
+        b_IsActivated = true;
     }
 	
 	// Update is called once per frame
 	void Update ()
     {
-		
+		// If button was pressed, then begin lerping to the final position
+        if( b_IsActivated )
+        {
+
+        }
 	}
 }
