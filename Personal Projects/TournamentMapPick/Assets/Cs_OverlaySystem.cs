@@ -62,6 +62,10 @@ public class Cs_OverlaySystem : MonoBehaviour
     // Use this for initialization
     void Start ()
     {
+        #if !UNITY_EDITOR
+        Cursor.visible = false;
+        #endif
+
         // Sets number of maps in use
         i_NumMaps = 13;
 
@@ -226,7 +230,102 @@ public class Cs_OverlaySystem : MonoBehaviour
         {
             // Ban (A), Ban (B), Ban (A), Ban (B), PICK (A), PICK (B), PICK (B), PICK (A), Ban (A), Ban (B), Random 1
             #region Best of 5 Format
+            switch (i_TurnCounter)
+            {
+                case 0:
+                    // Ban map, Team A, Position 1
+                    this_Button.Set_MapState = b_BANNED;
+                    this_Button.GoToPosition(go_BanPos_Team1_1);
+                    break;
+                case 1:
+                    // Ban map, Team B, Position 1
+                    this_Button.Set_MapState = b_BANNED;
+                    this_Button.GoToPosition(go_BanPos_Team2_1);
+                    break;
+                case 2:
+                    // Ban map, Team A, Position 2
+                    this_Button.Set_MapState = b_BANNED;
+                    this_Button.GoToPosition(go_BanPos_Team1_2);
+                    break;
+                case 3:
+                    // Ban map, Team B, Position 2
+                    this_Button.Set_MapState = b_BANNED;
+                    this_Button.GoToPosition(go_BanPos_Team2_2);
+                    break;
+                case 4:
+                    // Pick map, Position 1
+                    this_Button.Set_MapState = b_PICKED;
+                    this_Button.GoToPosition(go_BO5_Left);
+                    break;
+                case 5:
+                    // Pick map, Position 2
+                    this_Button.Set_MapState = b_PICKED;
+                    this_Button.GoToPosition(go_BO3_Left);
+                    break;
+                case 6:
+                    // Pick map, Position 2
+                    this_Button.Set_MapState = b_PICKED;
+                    this_Button.GoToPosition(go_BO3_Center);
+                    break;
+                case 7:
+                    // Pick map, Position 1
+                    this_Button.Set_MapState = b_PICKED;
+                    this_Button.GoToPosition(go_BO3_Right);
+                    break;
+                case 8:
+                    // Ban map, Team A, Position 3
+                    this_Button.Set_MapState = b_BANNED;
+                    this_Button.GoToPosition(go_BanPos_Team1_3);
+                    break;
+                case 9:
+                    // Ban map, Team B, Position 3
+                    this_Button.Set_MapState = b_BANNED;
+                    this_Button.GoToPosition(go_BanPos_Team2_3);
 
+                    // Begin rolling the die for the last random map
+                    b_DieActive = true;
+                    break;
+                case 10:
+                    this_Button.Set_MapState = b_PICKED;
+                    this_Button.GoToPosition(go_BO5_Right);
+
+                    // Run through remaining maps and disable them
+                    for (int i_ = 0; i_ < i_NumMaps; ++i_)
+                    {
+                        if (b_MapActive[i_])
+                        {
+                            if (i_ == 0) button_Hanamura.GetComponent<Cs_Button_Map>().Set_MapState = b_BANNED;
+                            else
+                            if (i_ == 1) button_Anubis.GetComponent<Cs_Button_Map>().Set_MapState = b_BANNED;
+                            else
+                            if (i_ == 2) button_Volskaya.GetComponent<Cs_Button_Map>().Set_MapState = b_BANNED;
+                            else
+                            if (i_ == 3) button_Ilios.GetComponent<Cs_Button_Map>().Set_MapState = b_BANNED;
+                            else
+                            if (i_ == 4) button_Lijang.GetComponent<Cs_Button_Map>().Set_MapState = b_BANNED;
+                            else
+                            if (i_ == 5) button_Nepal.GetComponent<Cs_Button_Map>().Set_MapState = b_BANNED;
+                            else
+                            if (i_ == 6) button_Hollywood.GetComponent<Cs_Button_Map>().Set_MapState = b_BANNED;
+                            else
+                            if (i_ == 7) button_KingsRow.GetComponent<Cs_Button_Map>().Set_MapState = b_BANNED;
+                            else
+                            if (i_ == 8) button_Numbani.GetComponent<Cs_Button_Map>().Set_MapState = b_BANNED;
+                            else
+                            if (i_ == 9) button_Eichenwalde.GetComponent<Cs_Button_Map>().Set_MapState = b_BANNED;
+                            else
+                            if (i_ == 10) button_Dorado.GetComponent<Cs_Button_Map>().Set_MapState = b_BANNED;
+                            else
+                            if (i_ == 11) button_Gibraltar.GetComponent<Cs_Button_Map>().Set_MapState = b_BANNED;
+                            else
+                            if (i_ == 12) button_Route66.GetComponent<Cs_Button_Map>().Set_MapState = b_BANNED;
+                        }
+                    }
+                    break;
+
+                default:
+                    break;
+            }
             #endregion
         }
     }
@@ -411,8 +510,6 @@ public class Cs_OverlaySystem : MonoBehaviour
     bool b_DieActive;
     void Update ()
     {
-        if (Input.GetKeyDown(KeyCode.P)) b_DieActive = !b_DieActive;
-
         RollDie( b_DieActive );
     }
 }
