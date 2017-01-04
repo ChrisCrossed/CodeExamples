@@ -29,6 +29,10 @@ public class Cs_Button_Map : MonoBehaviour
 
     public void ClickButton()
     {
+        // Disable the mouse cursor input
+        GameObject.Find("Canvas").GetComponent<GraphicRaycaster>().enabled = false;
+
+        // Tell the overlay this button was pressed
         overlaySystem.MapClicked( gameObject );
     }
 
@@ -97,6 +101,9 @@ public class Cs_Button_Map : MonoBehaviour
 
                 // Finalize object scale
                 gameObject.transform.localScale = new Vector3(1, 1, 1);
+
+                // Enable the mouse cursor input
+                GameObject.Find("Canvas").GetComponent<GraphicRaycaster>().enabled = true;
 
                 // Disable button
                 b_IsActivated = false;

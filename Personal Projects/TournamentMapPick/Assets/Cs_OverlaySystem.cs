@@ -24,12 +24,25 @@ public enum Enum_MapList
     Escort_Route66 = 12,
 }
 
+public enum Enum_TeamList
+{
+    DigiPen,
+    UW,
+    CWU,
+    WWU
+}
+
 public class Cs_OverlaySystem : MonoBehaviour
 {
     // Variables
     int i_NumMaps;
     bool[] b_MapActive;
     [SerializeField] bool b_BestOf3 = true;
+
+    // Team Logos
+    [SerializeField] Enum_TeamList e_TeamOne;
+    [SerializeField] Enum_TeamList e_TeamTwo;
+    [SerializeField] Sprite[] TeamLogos;
 
     // Game Object Connections
     RectTransform go_BanPos_Team1_1;
@@ -63,7 +76,7 @@ public class Cs_OverlaySystem : MonoBehaviour
     void Start ()
     {
         #if !UNITY_EDITOR
-        Cursor.visible = false;
+        // Cursor.visible = false;
         #endif
 
         // Sets number of maps in use
@@ -113,10 +126,103 @@ public class Cs_OverlaySystem : MonoBehaviour
         button_Dorado = GameObject.Find("Button_Dorado");
         button_Gibraltar = GameObject.Find("Button_Gibraltar");
         button_Route66 = GameObject.Find("Button_Route66");
-
+        
         dieGraphic = GameObject.Find("DieGraphic");
     }
-    
+
+    void LoadTeamGraphics()
+    {
+        #region Set icons based on team
+        if (b_BestOf3)
+        {
+            // Remove left & right side icons
+            GameObject.Find("Logo_BO5_Left").SetActive(false);
+            GameObject.Find("Logo_BO5_Right").SetActive(false);
+
+            Image Logo_One = GameObject.Find("Logo_BO3_Left").GetComponent<Image>();
+            Image Logo_Two = GameObject.Find("Logo_BO3_Mid").GetComponent<Image>();
+            Image Logo_Three = GameObject.Find("Logo_BO3_Right").GetComponent<Image>();
+
+            // Set icons based on team
+            if (e_TeamOne == Enum_TeamList.CWU) Logo_One.sprite = TeamLogos[0];
+            else if (e_TeamOne == Enum_TeamList.DigiPen) Logo_One.sprite = TeamLogos[1];
+            else if (e_TeamOne == Enum_TeamList.UW) Logo_One.sprite = TeamLogos[2];
+            else Logo_One.sprite = TeamLogos[3];
+
+            if (e_TeamTwo == Enum_TeamList.CWU) Logo_Two.sprite = TeamLogos[0];
+            else if (e_TeamTwo == Enum_TeamList.DigiPen) Logo_Two.sprite = TeamLogos[1];
+            else if (e_TeamTwo == Enum_TeamList.UW) Logo_Two.sprite = TeamLogos[2];
+            else Logo_Two.sprite = TeamLogos[3];
+
+            Logo_Three.sprite = spr_Dice[5];
+        }
+        else
+        {
+            Image Logo_One = GameObject.Find("Logo_BO5_Left").GetComponent<Image>();
+            Image Logo_Two = GameObject.Find("Logo_BO3_Left").GetComponent<Image>();
+            Image Logo_Three = GameObject.Find("Logo_BO3_Mid").GetComponent<Image>();
+            Image Logo_Four = GameObject.Find("Logo_BO3_Right").GetComponent<Image>();
+            Image Logo_Five = GameObject.Find("Logo_BO5_Right").GetComponent<Image>();
+
+            // Set icons based on team
+            if (e_TeamOne == Enum_TeamList.CWU)
+            {
+                Logo_One.sprite = TeamLogos[0];
+                Logo_Three.sprite = TeamLogos[0];
+            }
+            else if (e_TeamOne == Enum_TeamList.DigiPen)
+            {
+                Logo_One.sprite = TeamLogos[1];
+                Logo_Three.sprite = TeamLogos[1];
+            }
+            else if (e_TeamOne == Enum_TeamList.UW)
+            {
+                Logo_One.sprite = TeamLogos[2];
+                Logo_Three.sprite = TeamLogos[2];
+            }
+            else
+            {
+                Logo_One.sprite = TeamLogos[3];
+                Logo_Three.sprite = TeamLogos[3];
+            }
+
+            if (e_TeamTwo == Enum_TeamList.CWU)
+            {
+                Logo_Two.sprite = TeamLogos[0];
+                Logo_Four.sprite = TeamLogos[0];
+            }
+            else if (e_TeamTwo == Enum_TeamList.DigiPen)
+            {
+                Logo_Two.sprite = TeamLogos[1];
+                Logo_Four.sprite = TeamLogos[1];
+            }
+            else if (e_TeamTwo == Enum_TeamList.UW)
+            {
+                Logo_Two.sprite = TeamLogos[2];
+                Logo_Four.sprite = TeamLogos[2];
+            }
+            else
+            {
+                Logo_Two.sprite = TeamLogos[3];
+                Logo_Four.sprite = TeamLogos[3];
+            }
+
+            Logo_Five.sprite = spr_Dice[5];
+        }
+        #endregion
+
+        if (e_TeamOne == Enum_TeamList.CWU) GameObject.Find("TeamLogo_Left").GetComponent<Image>().sprite = TeamLogos[0];
+        else if (e_TeamOne == Enum_TeamList.DigiPen) GameObject.Find("TeamLogo_Left").GetComponent<Image>().sprite = TeamLogos[1];
+        else if (e_TeamOne == Enum_TeamList.UW) GameObject.Find("TeamLogo_Left").GetComponent<Image>().sprite = TeamLogos[2];
+        else GameObject.Find("TeamLogo_Left").GetComponent<Image>().sprite = TeamLogos[3];
+
+        if (e_TeamTwo == Enum_TeamList.CWU) GameObject.Find("TeamLogo_Right").GetComponent<Image>().sprite = TeamLogos[0];
+        else if (e_TeamTwo == Enum_TeamList.DigiPen) GameObject.Find("TeamLogo_Right").GetComponent<Image>().sprite = TeamLogos[1];
+        else if (e_TeamTwo == Enum_TeamList.UW) GameObject.Find("TeamLogo_Right").GetComponent<Image>().sprite = TeamLogos[2];
+        else GameObject.Find("TeamLogo_Right").GetComponent<Image>().sprite = TeamLogos[3];
+        
+    }
+
     public void MapClicked( GameObject go_Button_ )
     {
         int i_MapType = (int)go_Button_.GetComponent<Cs_Button_Map>().MapType;
@@ -129,8 +235,6 @@ public class Cs_OverlaySystem : MonoBehaviour
 
         // Tell map to move to proper position
         PositionButton( go_Button_ );
-
-        // Update PickBan
     }
 
     int i_TEST;
@@ -194,6 +298,10 @@ public class Cs_OverlaySystem : MonoBehaviour
 
                     // Begin rolling the die for the last random map
                     b_DieActive = true;
+
+                    // Disable the mouse cursor input
+                    GameObject.Find("Canvas").GetComponent<GraphicRaycaster>().enabled = false;
+
                     break;
                 case 8:
                     this_Button.Set_MapState = b_PICKED;
@@ -284,6 +392,10 @@ public class Cs_OverlaySystem : MonoBehaviour
 
                     // Begin rolling the die for the last random map
                     b_DieActive = true;
+
+                    // Disable the mouse cursor input
+                    GameObject.Find("Canvas").GetComponent<GraphicRaycaster>().enabled = false;
+
                     break;
                 case 10:
                     this_Button.Set_MapState = b_PICKED;
@@ -341,6 +453,9 @@ public class Cs_OverlaySystem : MonoBehaviour
     {
         if( b_IsActive_ )
         {
+            // Disable the mouse cursor input
+            GameObject.Find("Canvas").GetComponent<GraphicRaycaster>().enabled = false;
+
             // Enable graphic
             dieGraphic.SetActive(true);
 
@@ -434,8 +549,7 @@ public class Cs_OverlaySystem : MonoBehaviour
             dieGraphic.GetComponent<Image>().color = clr_Alpha;
         }
     }
-
-    GameObject go_MapOut;
+    
     IEnumerator PickRandomMap()
     {
         yield return new WaitForSeconds(0.5f);
@@ -499,17 +613,40 @@ public class Cs_OverlaySystem : MonoBehaviour
         }
         #endregion
 
-        go_MapOut = go_CurrMap;
-
         b_MapActive[i_RandomMap] = false;
 
         go_CurrMap.GetComponent<Cs_Button_Map>().ClickButton();
     }
 
     // Update is called once per frame
+    bool b_WaitOneFrame;
     bool b_DieActive;
+    float f_QuitTimer;
     void Update ()
     {
+        if(!b_WaitOneFrame)
+        {
+            LoadTeamGraphics();
+
+            b_WaitOneFrame = true;
+        }
+
         RollDie( b_DieActive );
+
+        #region Quit if Escape is double-tapped
+        if(f_QuitTimer > 0f)
+        {
+            if (f_QuitTimer >= 0.5f) f_QuitTimer = -Time.deltaTime;
+
+            if (Input.GetKeyDown(KeyCode.Escape)) { Application.Quit(); print("WE QUIT"); }
+
+            f_QuitTimer += Time.deltaTime;
+        }
+
+        if(Input.GetKeyDown(KeyCode.Escape) && f_QuitTimer == 0f)
+        {
+            f_QuitTimer += Time.deltaTime;
+        }
+        #endregion
     }
 }
