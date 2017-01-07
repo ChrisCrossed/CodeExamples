@@ -16,8 +16,7 @@ public class cs_TestRotation : MonoBehaviour
 	void Update ()
     {
         Vector3 v3_CurrRot = gameObject.transform.eulerAngles;
-
-        v3_CurrRot.x = Mathf.LerpAngle(v3_CurrRot.x, v3_CurrRot.x + Time.deltaTime * 360f * f_RotationsPerSecond, Time.deltaTime);
+        
         v3_CurrRot.y = Mathf.LerpAngle(v3_CurrRot.y, v3_CurrRot.y + Time.deltaTime * 360f * f_RotationsPerSecond, Time.deltaTime);
 
         gameObject.transform.rotation = Quaternion.Euler(v3_CurrRot);

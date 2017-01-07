@@ -128,6 +128,9 @@ public class Cs_OverlaySystem : MonoBehaviour
         button_Route66 = GameObject.Find("Button_Route66");
         
         dieGraphic = GameObject.Find("DieGraphic");
+        ui_Text = GameObject.Find("Text_Timer").GetComponent<Text>();
+
+        GameClock( true );
     }
 
     void LoadTeamGraphics()
@@ -297,7 +300,7 @@ public class Cs_OverlaySystem : MonoBehaviour
                     this_Button.GoToPosition( go_BanPos_Team2_3 );
 
                     // Begin rolling the die for the last random map
-                    b_DieActive = true;
+                    Run_RollForRandomMap();
 
                     // Disable the mouse cursor input
                     GameObject.Find("Canvas").GetComponent<GraphicRaycaster>().enabled = false;
@@ -391,7 +394,7 @@ public class Cs_OverlaySystem : MonoBehaviour
                     this_Button.GoToPosition(go_BanPos_Team2_3);
 
                     // Begin rolling the die for the last random map
-                    b_DieActive = true;
+                    Run_RollForRandomMap();
 
                     // Disable the mouse cursor input
                     GameObject.Find("Canvas").GetComponent<GraphicRaycaster>().enabled = false;
@@ -549,7 +552,6 @@ public class Cs_OverlaySystem : MonoBehaviour
             dieGraphic.GetComponent<Image>().color = clr_Alpha;
         }
     }
-    
     IEnumerator PickRandomMap()
     {
         yield return new WaitForSeconds(0.5f);
@@ -617,13 +619,85 @@ public class Cs_OverlaySystem : MonoBehaviour
 
         go_CurrMap.GetComponent<Cs_Button_Map>().ClickButton();
     }
+    public void Run_RollForRandomMap()
+    {
+        f_AnticipationTimer = 0f;
+        f_DieTimer = 1.0f;
+        f_DieTimer_Max = 0.5f;
+        f_DieTimer_Min = 0.1f;
+        i_DieSide = 0;
 
+        b_DieActive = true;
+    }
+
+    float f_Timer;
+    int i_GameClock;
+    int i_GameClock_Max = 5;
+    Text ui_Text;
+    void GameClock( bool b_Reset_ = false )
+    {
+        // If we aren't resetting, then continue the count
+        if( !b_Reset_ )
+        {
+            // Increment timer
+            f_Timer += Time.deltaTime;
+
+            if(f_Timer >= 1.0f)
+            {
+                i_GameClock -= 1;
+
+                if( i_GameClock == 1)
+                {
+                    if( f_Timer >= 1.0f ) // Broken, fix this
+                    {
+                        ui_Text.text = "0.00";
+
+                        Run_RollForRandomMap();
+
+                        f_Timer = 0f;
+                        i_GameClock = i_GameClock_Max;
+                    }
+                    else
+                    {
+                        ui_Text.text = string.Format( "{0:0.00}", (1.0f - f_Timer).ToString() );
+                    }
+
+                }
+                else
+                {
+                    f_Timer = 0f;
+
+                    ui_Text.text = string.Format( "{0:00}", i_GameClock );
+                }
+            }
+        }
+        else
+        {
+            i_GameClock = i_GameClock_Max;
+            f_Timer = 0f;
+            ui_Text.text = string.Format( "{0:00}", i_GameClock );
+        }
+    }
+    
     // Update is called once per frame
     bool b_WaitOneFrame;
     bool b_DieActive;
     float f_QuitTimer;
     void Update ()
     {
+        GameClock();
+
+        if(Input.GetKeyDown(KeyCode.P))
+        {
+            f_AnticipationTimer = 0f;
+            f_DieTimer = 1.0f;
+            f_DieTimer_Max = 0.5f;
+            f_DieTimer_Min = 0.1f;
+            i_DieSide = 0;
+
+            b_DieActive = true;
+        }
+
         if(!b_WaitOneFrame)
         {
             LoadTeamGraphics();

@@ -88,7 +88,12 @@ public class Cs_Button_Map : MonoBehaviour
             if (b_Banned) clr_CurrAlpha = img_Banned.color; else clr_CurrAlpha = img_Picked.color;
             clr_CurrAlpha.a = f_MoveTimer * 2.0f;
             if (clr_CurrAlpha.a > 1.0f) clr_CurrAlpha.a = 1.0f;
-            if (b_Banned) img_Banned.color = clr_CurrAlpha; else img_Picked.color = clr_CurrAlpha;
+            if (b_Banned)
+            {
+                clr_CurrAlpha.a = f_MoveTimer / 2f;
+                img_Banned.color = clr_CurrAlpha;
+            }
+            else img_Picked.color = clr_CurrAlpha;
 
             // End
             if (f_MoveTimer >= 1.0f)
