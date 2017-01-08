@@ -174,20 +174,14 @@ public class Cs_OverlaySystem : MonoBehaviour
         v3_FinalPos_BO3_3 = GameObject.Find("EndButtonPos_BO3_3").transform.position;
         v3_FinalPos_BO5_1 = GameObject.Find("EndButtonPos_BO5_1").transform.position;
         v3_FinalPos_BO5_3 = GameObject.Find("EndButtonPos_BO5_3").transform.position;
-
-        if( b_BestOf3)
+        
+        if (!b_BestOf3)
         {
-            v3_FinalPos_BO3_1 = new Vector3(-480, 300, 0);
-            v3_FinalPos_BO3_2 = new Vector3(0, 0, 0);
-            v3_FinalPos_BO3_3 = new Vector3(480, -300, 0);
-        }
-        else
-        {
-            v3_FinalPos_BO3_1 = new Vector3(-600, 400, 0);
-            v3_FinalPos_BO3_2 = new Vector3(0, 0, 0);
-            v3_FinalPos_BO3_3 = new Vector3(600, -400, 0);
-            v3_FinalPos_BO5_1 = new Vector3(300, -200, 0);
-            v3_FinalPos_BO5_3 = new Vector3(-300, 200, 0);
+            GameObject.Find("EndButtonPos_BO3_1").GetComponent<RectTransform>().position = new Vector3(-600, 400, 0);
+            GameObject.Find("EndButtonPos_BO5_1").GetComponent<RectTransform>().position = new Vector3(-300, 200, 0);
+            GameObject.Find("EndButtonPos_BO3_2").GetComponent<RectTransform>().position = new Vector3(0, 0, 0);
+            GameObject.Find("EndButtonPos_BO5_3").GetComponent<RectTransform>().position = new Vector3(300, -200, 0);
+            GameObject.Find("EndButtonPos_BO3_3").GetComponent<RectTransform>().position = new Vector3(600, -200, 0);
         }
     }
     
@@ -905,24 +899,24 @@ public class Cs_OverlaySystem : MonoBehaviour
 
             #region Set new positions
             Vector3 v3_Map1 = v3_FinalPos_BO3_1;
-            v3_Map1.x += 1750f;
+            v3_Map1.x += 2000f;
             map_Button1.transform.position = v3_Map1;
 
             Vector3 v3_Map2 = v3_FinalPos_BO5_1;
-            v3_Map2.x += 1750f;
+            v3_Map2.x += 2000f;
             map_Button2.transform.position = v3_Map2;
 
             Vector3 v3_Map3 = v3_FinalPos_BO3_2;
-            v3_Map3.x += 1750f;
+            v3_Map3.x += 2000f;
             map_Button3.transform.position = v3_Map3;
 
             Vector3 v3_Map4 = v3_FinalPos_BO5_3;
-            v3_Map4.x += 1750f;
+            v3_Map4.x += 2000f;
             map_Button4.transform.position = v3_Map4;
 
             Vector3 v3_Map5 = v3_FinalPos_BO3_3;
-            v3_Map3.x += 1750f;
-            map_Button5.transform.position = v3_Map3;
+            v3_Map5.x += 2000f;
+            map_Button5.transform.position = v3_Map5;
             #endregion
 
             #region Set new sizes
@@ -990,6 +984,7 @@ public class Cs_OverlaySystem : MonoBehaviour
                 GameObject.Find("Ban Positions").transform.position = v3_BannedMapsLoc;
             }
 
+            // Init
             if( f_PickBanOver_Timer >= f_PickBanOver_Threshold && !b_BeginFinalMapAnimations )
             {
                 Set_ConfirmedMapFinalPositions( b_BestOf3 );
@@ -997,17 +992,17 @@ public class Cs_OverlaySystem : MonoBehaviour
             }
 
             #region Lerp in buttons to show final map picks
+            
+            // Button 1
             if ( f_PickBanOver_Timer >= f_PickBanOver_Threshold + 1 && b_BeginFinalMapAnimations )
             {
-                if(b_BestOf3)
-                {
-                    // Begin lerping to final positions
-                    Vector3 v3_LerpPos = map_Button1.transform.position;
-                    v3_LerpPos = Vector3.Lerp(v3_LerpPos, v3_FinalPos_BO3_1, 0.05f);
-                    map_Button1.transform.position = v3_LerpPos;
-                }
+                // Begin lerping to final positions
+                Vector3 v3_LerpPos = map_Button1.transform.position;
+                v3_LerpPos = Vector3.Lerp(v3_LerpPos, v3_FinalPos_BO3_1, 0.05f);
+                map_Button1.transform.position = v3_LerpPos;
             }
 
+            // Button 2
             if (f_PickBanOver_Timer >= f_PickBanOver_Threshold + 1.5f && b_BeginFinalMapAnimations)
             {
                 if (b_BestOf3)
@@ -1026,6 +1021,7 @@ public class Cs_OverlaySystem : MonoBehaviour
                 }
             }
 
+            // Button 3
             if (f_PickBanOver_Timer >= f_PickBanOver_Threshold + 2f && b_BeginFinalMapAnimations)
             {
                 if (b_BestOf3)
@@ -1035,8 +1031,16 @@ public class Cs_OverlaySystem : MonoBehaviour
                     v3_LerpPos = Vector3.Lerp(v3_LerpPos, v3_FinalPos_BO3_3, 0.05f);
                     map_Button3.transform.position = v3_LerpPos;
                 }
+                else
+                {
+                    // Begin lerping to final positions
+                    Vector3 v3_LerpPos = map_Button3.transform.position;
+                    v3_LerpPos = Vector3.Lerp(v3_LerpPos, v3_FinalPos_BO3_2, 0.05f);
+                    map_Button3.transform.position = v3_LerpPos;
+                }
             }
 
+            // Button 4
             if( f_PickBanOver_Timer >= f_PickBanOver_Threshold + 2.5f && b_BeginFinalMapAnimations )
             {
                 if (!b_BestOf3)
@@ -1048,6 +1052,7 @@ public class Cs_OverlaySystem : MonoBehaviour
                 }
             }
 
+            // Button 5
             if (f_PickBanOver_Timer >= f_PickBanOver_Threshold + 3f && b_BeginFinalMapAnimations)
             {
                 if (!b_BestOf3)
