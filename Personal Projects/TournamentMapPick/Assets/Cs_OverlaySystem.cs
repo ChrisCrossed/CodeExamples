@@ -162,6 +162,10 @@ public class Cs_OverlaySystem : MonoBehaviour
         img_GameClock_Backdrop = GameObject.Find("Img_GameClock_Backdrop").GetComponent<Image>();
 
         v3_OffScreenPos = GameObject.Find("OffScreenPosition").transform.position;
+
+        v3_FinalPos_BO3_1 = GameObject.Find("EndButtonPos_BO3_1").transform.position;
+        v3_FinalPos_BO3_2 = GameObject.Find("EndButtonPos_BO3_2").transform.position;
+        v3_FinalPos_BO3_3 = GameObject.Find("EndButtonPos_BO3_3").transform.position;
     }
     
     void LoadTeamGraphics()
@@ -338,6 +342,10 @@ public class Cs_OverlaySystem : MonoBehaviour
                     this_Button.GoToPosition( go_BO3_Left, tr_Pick);
                     e_TeamTurn = Enum_TeamTurn.Team_B;
                     b_SetToSwitch_Left = true;
+
+                    // Set button for ending manipulation
+                    map_Button1 = go_Button_;
+
                     break;
                 case 5:
                     // Pick map, Position 2
@@ -348,6 +356,10 @@ public class Cs_OverlaySystem : MonoBehaviour
                     ui_Text_PickBan.text = "BAN";
                     ui_Text_PickBan.color = new Color(0.5f, 0f, 0, 1.0f);
                     ui_Text.color = new Color(0.5f, 0f, 0, 1.0f);
+
+                    // Set button for ending manipulation
+                    map_Button2 = go_Button_;
+
                     break;
                 case 6:
                     // Ban map, Team A, Position 3
@@ -376,7 +388,10 @@ public class Cs_OverlaySystem : MonoBehaviour
                 case 8:
                     this_Button.Set_MapState = b_PICKED;
                     this_Button.GoToPosition( go_BO3_Right, tr_Pick );
-
+                    
+                    // Set button for ending manipulation
+                    map_Button3 = go_Button_;
+                    
                     b_PickBanActive = false;
 
                     // Run through remaining maps and disable them
@@ -802,8 +817,63 @@ public class Cs_OverlaySystem : MonoBehaviour
             img_GameClock_Backdrop.color = clr_Backdrop_Alpha;
         }
     }
-    
+
+    GameObject map_Button1;
+    GameObject map_Button2;
+    GameObject map_Button3;
+    GameObject map_Button4;
+    GameObject map_Button5;
+    Vector3 v3_FinalPos_BO5_1;
+    Vector3 v3_FinalPos_BO3_1;
+    Vector3 v3_FinalPos_BO3_2;
+    Vector3 v3_FinalPos_BO3_3;
+    Vector3 v3_FinalPos_BO5_3;
+    void Set_ConfirmedMapFinalPositions( bool b_IsBO3_ )
+    {
+        if( b_IsBO3_ )
+        {
+            // Release transforms
+            map_Button1.transform.SetParent( GameObject.Find("Canvas").transform );
+            map_Button2.transform.SetParent( GameObject.Find("Canvas").transform );
+            map_Button3.transform.SetParent( GameObject.Find("Canvas").transform );
+
+            #region Set new positions
+            Vector3 v3_Map1 = v3_FinalPos_BO3_1;
+            v3_Map1.x += 1750f;
+            map_Button1.transform.position = v3_Map1;
+
+            Vector3 v3_Map2 = v3_FinalPos_BO3_2;
+            v3_Map2.x += 1750f;
+            map_Button2.transform.position = v3_Map2;
+
+            Vector3 v3_Map3 = v3_FinalPos_BO3_3;
+            v3_Map3.x += 1750f;
+            map_Button3.transform.position = v3_Map3;
+            #endregion
+
+            #region Set new sizes
+            GameObject go_Temp;
+            for(int i_ = 0; i_ < 3; ++i_)
+            {
+                if (i_ == 0) go_Temp = map_Button1;
+                else if (i_ == 1) go_Temp = map_Button2;
+                else go_Temp = map_Button3;
+                
+                go_Temp.GetComponent<RectTransform>().sizeDelta = new Vector2(775, 200);
+                go_Temp.transform.FindChild("Img_Picked").GetComponent<RectTransform>().sizeDelta = new Vector2(775, 200);
+                go_Temp.transform.FindChild("Text").GetComponent<Text>().fontSize = 135;
+                go_Temp.transform.FindChild("Trail").GetComponent<Image>().enabled = true;
+            }
+            #endregion
+        }
+        else
+        {
+
+        }
+    }
+
     // Update is called once per frame
+    bool b_BeginFinalMapAnimations;
     bool b_PickBanActive = true;
     bool b_SetToSwitch_Left;
     bool b_SetToSwitch_Right;
@@ -845,6 +915,46 @@ public class Cs_OverlaySystem : MonoBehaviour
                 Vector3 v3_BannedMapsLoc = GameObject.Find("Ban Positions").transform.position;
                 v3_BannedMapsLoc = Vector3.Lerp(v3_BannedMapsLoc, v3_OffScreenPos, ac_.Evaluate( f_LerpTimer_Banned / 15.0f ) );
                 GameObject.Find("Ban Positions").transform.position = v3_BannedMapsLoc;
+            }
+
+            if( f_PickBanOver_Timer >= 5f && !b_BeginFinalMapAnimations )
+            {
+                Set_ConfirmedMapFinalPositions( b_BestOf3 );
+                b_BeginFinalMapAnimations = true;
+            }
+            if ( f_PickBanOver_Timer >= 6f && b_BeginFinalMapAnimations )
+            {
+                print("HERE");
+
+                if(b_BestOf3)
+                {
+                    // Begin lerping to final positions
+                    Vector3 v3_LerpPos = map_Button1.transform.position;
+                    v3_LerpPos = Vector3.Lerp(v3_LerpPos, v3_FinalPos_BO3_1, 0.05f);
+                    map_Button1.transform.position = v3_LerpPos;
+                }
+            }
+
+            if (f_PickBanOver_Timer >= 6.5f && b_BeginFinalMapAnimations)
+            {
+                if (b_BestOf3)
+                {
+                    // Begin lerping to final positions
+                    Vector3 v3_LerpPos = map_Button2.transform.position;
+                    v3_LerpPos = Vector3.Lerp(v3_LerpPos, v3_FinalPos_BO3_2, 0.05f);
+                    map_Button2.transform.position = v3_LerpPos;
+                }
+            }
+
+            if (f_PickBanOver_Timer >= 7f && b_BeginFinalMapAnimations)
+            {
+                if (b_BestOf3)
+                {
+                    // Begin lerping to final positions
+                    Vector3 v3_LerpPos = map_Button3.transform.position;
+                    v3_LerpPos = Vector3.Lerp(v3_LerpPos, v3_FinalPos_BO3_3, 0.05f);
+                    map_Button3.transform.position = v3_LerpPos;
+                }
             }
         }
         // If the first five seconds have passed
