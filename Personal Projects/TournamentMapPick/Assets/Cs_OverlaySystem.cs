@@ -128,6 +128,12 @@ public class Cs_OverlaySystem : MonoBehaviour
             GameObject.Find("BO5_Right").SetActive(false);
             GameObject.Find("Bar_BO5_Left").SetActive(false);
             GameObject.Find("Bar_BO5_Right").SetActive(false);
+
+            f_PickBanOver_Threshold = 5.0f;
+        }
+        else
+        {
+            f_PickBanOver_Threshold = 6.0f;
         }
 
         // Button connections
@@ -166,6 +172,23 @@ public class Cs_OverlaySystem : MonoBehaviour
         v3_FinalPos_BO3_1 = GameObject.Find("EndButtonPos_BO3_1").transform.position;
         v3_FinalPos_BO3_2 = GameObject.Find("EndButtonPos_BO3_2").transform.position;
         v3_FinalPos_BO3_3 = GameObject.Find("EndButtonPos_BO3_3").transform.position;
+        v3_FinalPos_BO5_1 = GameObject.Find("EndButtonPos_BO5_1").transform.position;
+        v3_FinalPos_BO5_3 = GameObject.Find("EndButtonPos_BO5_3").transform.position;
+
+        if( b_BestOf3)
+        {
+            v3_FinalPos_BO3_1 = new Vector3(-480, 300, 0);
+            v3_FinalPos_BO3_2 = new Vector3(0, 0, 0);
+            v3_FinalPos_BO3_3 = new Vector3(480, -300, 0);
+        }
+        else
+        {
+            v3_FinalPos_BO3_1 = new Vector3(-600, 400, 0);
+            v3_FinalPos_BO3_2 = new Vector3(0, 0, 0);
+            v3_FinalPos_BO3_3 = new Vector3(600, -400, 0);
+            v3_FinalPos_BO5_1 = new Vector3(300, -200, 0);
+            v3_FinalPos_BO5_3 = new Vector3(-300, 200, 0);
+        }
     }
     
     void LoadTeamGraphics()
@@ -461,12 +484,14 @@ public class Cs_OverlaySystem : MonoBehaviour
                     this_Button.Set_MapState = b_PICKED;
                     this_Button.GoToPosition(go_BO5_Left, tr_Pick );
                     e_TeamTurn = Enum_TeamTurn.Team_B;
+                    map_Button1 = go_Button_;
                     break;
                 case 5:
                     // Pick map, Position 2
                     this_Button.Set_MapState = b_PICKED;
                     this_Button.GoToPosition(go_BO3_Left, tr_Pick );
                     e_TeamTurn = Enum_TeamTurn.Team_A;
+                    map_Button2 = go_Button_;
                     break;
                 case 6:
                     // Pick map, Position 2
@@ -474,6 +499,7 @@ public class Cs_OverlaySystem : MonoBehaviour
                     this_Button.GoToPosition(go_BO3_Center, tr_Pick );
                     e_TeamTurn = Enum_TeamTurn.Team_B;
                     b_SetToSwitch_Left = true;
+                    map_Button3 = go_Button_;
                     break;
                 case 7:
                     // Pick map, Position 1
@@ -484,6 +510,7 @@ public class Cs_OverlaySystem : MonoBehaviour
                     ui_Text_PickBan.text = "BAN";
                     ui_Text_PickBan.color = new Color(0.5f, 0f, 0, 1.0f);
                     ui_Text.color = new Color(0.5f, 0f, 0, 1.0f);
+                    map_Button4 = go_Button_;
                     break;
                 case 8:
                     // Ban map, Team A, Position 3
@@ -511,6 +538,7 @@ public class Cs_OverlaySystem : MonoBehaviour
                 case 10:
                     this_Button.Set_MapState = b_PICKED;
                     this_Button.GoToPosition(go_BO5_Right, tr_Pick );
+                    map_Button5 = go_Button_;
 
                     b_PickBanActive = false;
 
@@ -868,7 +896,51 @@ public class Cs_OverlaySystem : MonoBehaviour
         }
         else
         {
+            // Release transforms
+            map_Button1.transform.SetParent(GameObject.Find("Canvas").transform);
+            map_Button2.transform.SetParent(GameObject.Find("Canvas").transform);
+            map_Button3.transform.SetParent(GameObject.Find("Canvas").transform);
+            map_Button4.transform.SetParent(GameObject.Find("Canvas").transform);
+            map_Button5.transform.SetParent(GameObject.Find("Canvas").transform);
 
+            #region Set new positions
+            Vector3 v3_Map1 = v3_FinalPos_BO3_1;
+            v3_Map1.x += 1750f;
+            map_Button1.transform.position = v3_Map1;
+
+            Vector3 v3_Map2 = v3_FinalPos_BO5_1;
+            v3_Map2.x += 1750f;
+            map_Button2.transform.position = v3_Map2;
+
+            Vector3 v3_Map3 = v3_FinalPos_BO3_2;
+            v3_Map3.x += 1750f;
+            map_Button3.transform.position = v3_Map3;
+
+            Vector3 v3_Map4 = v3_FinalPos_BO5_3;
+            v3_Map4.x += 1750f;
+            map_Button4.transform.position = v3_Map4;
+
+            Vector3 v3_Map5 = v3_FinalPos_BO3_3;
+            v3_Map3.x += 1750f;
+            map_Button5.transform.position = v3_Map3;
+            #endregion
+
+            #region Set new sizes
+            GameObject go_Temp;
+            for (int i_ = 0; i_ < 5; ++i_)
+            {
+                if (i_ == 0) go_Temp = map_Button1;
+                else if (i_ == 1) go_Temp = map_Button2;
+                else if (i_ == 2) go_Temp = map_Button3;
+                else if (i_ == 3) go_Temp = map_Button4;
+                else go_Temp = map_Button5;
+
+                go_Temp.GetComponent<RectTransform>().sizeDelta = new Vector2(600, 200);
+                go_Temp.transform.FindChild("Img_Picked").GetComponent<RectTransform>().sizeDelta = new Vector2(600, 200);
+                go_Temp.transform.FindChild("Text").GetComponent<Text>().fontSize = 135;
+                go_Temp.transform.FindChild("Trail").GetComponent<Image>().enabled = true;
+            }
+            #endregion
         }
     }
 
@@ -884,6 +956,7 @@ public class Cs_OverlaySystem : MonoBehaviour
     float f_LerpSpeed = 0.06f;
     Vector3 v3_OffScreenPos;
     float f_PickBanOver_Timer;
+    float f_PickBanOver_Threshold;
     float f_LerpTimer_Picked;
     float f_LerpTimer_Banned;
     [SerializeField] AnimationCurve ac_;
@@ -917,15 +990,15 @@ public class Cs_OverlaySystem : MonoBehaviour
                 GameObject.Find("Ban Positions").transform.position = v3_BannedMapsLoc;
             }
 
-            if( f_PickBanOver_Timer >= 5f && !b_BeginFinalMapAnimations )
+            if( f_PickBanOver_Timer >= f_PickBanOver_Threshold && !b_BeginFinalMapAnimations )
             {
                 Set_ConfirmedMapFinalPositions( b_BestOf3 );
                 b_BeginFinalMapAnimations = true;
             }
-            if ( f_PickBanOver_Timer >= 6f && b_BeginFinalMapAnimations )
-            {
-                print("HERE");
 
+            #region Lerp in buttons to show final map picks
+            if ( f_PickBanOver_Timer >= f_PickBanOver_Threshold + 1 && b_BeginFinalMapAnimations )
+            {
                 if(b_BestOf3)
                 {
                     // Begin lerping to final positions
@@ -935,7 +1008,7 @@ public class Cs_OverlaySystem : MonoBehaviour
                 }
             }
 
-            if (f_PickBanOver_Timer >= 6.5f && b_BeginFinalMapAnimations)
+            if (f_PickBanOver_Timer >= f_PickBanOver_Threshold + 1.5f && b_BeginFinalMapAnimations)
             {
                 if (b_BestOf3)
                 {
@@ -944,9 +1017,16 @@ public class Cs_OverlaySystem : MonoBehaviour
                     v3_LerpPos = Vector3.Lerp(v3_LerpPos, v3_FinalPos_BO3_2, 0.05f);
                     map_Button2.transform.position = v3_LerpPos;
                 }
+                else
+                {
+                    // Begin lerping to final positions
+                    Vector3 v3_LerpPos = map_Button2.transform.position;
+                    v3_LerpPos = Vector3.Lerp(v3_LerpPos, v3_FinalPos_BO5_1, 0.05f);
+                    map_Button2.transform.position = v3_LerpPos;
+                }
             }
 
-            if (f_PickBanOver_Timer >= 7f && b_BeginFinalMapAnimations)
+            if (f_PickBanOver_Timer >= f_PickBanOver_Threshold + 2f && b_BeginFinalMapAnimations)
             {
                 if (b_BestOf3)
                 {
@@ -956,6 +1036,29 @@ public class Cs_OverlaySystem : MonoBehaviour
                     map_Button3.transform.position = v3_LerpPos;
                 }
             }
+
+            if( f_PickBanOver_Timer >= f_PickBanOver_Threshold + 2.5f && b_BeginFinalMapAnimations )
+            {
+                if (!b_BestOf3)
+                {
+                    // Begin lerping to final positions
+                    Vector3 v3_LerpPos = map_Button4.transform.position;
+                    v3_LerpPos = Vector3.Lerp(v3_LerpPos, v3_FinalPos_BO5_3, 0.05f);
+                    map_Button4.transform.position = v3_LerpPos;
+                }
+            }
+
+            if (f_PickBanOver_Timer >= f_PickBanOver_Threshold + 3f && b_BeginFinalMapAnimations)
+            {
+                if (!b_BestOf3)
+                {
+                    // Begin lerping to final positions
+                    Vector3 v3_LerpPos = map_Button5.transform.position;
+                    v3_LerpPos = Vector3.Lerp(v3_LerpPos, v3_FinalPos_BO3_3, 0.05f);
+                    map_Button5.transform.position = v3_LerpPos;
+                }
+            }
+            #endregion
         }
         // If the first five seconds have passed
         else if( f_ProcessBeginTimer < 0f && b_PickBanActive )
