@@ -71,6 +71,8 @@ public class Cs_Button_Map : MonoBehaviour
 		// If button was pressed, then begin lerping to the final position
         if( b_IsActivated )
         {
+            overlaySystem.GameClock( true );
+
             // Increment timer over the course of 2 seconds
             f_MoveTimer += Time.deltaTime / 2.0f;
             

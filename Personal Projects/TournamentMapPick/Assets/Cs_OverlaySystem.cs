@@ -32,17 +32,29 @@ public enum Enum_TeamList
     WWU
 }
 
+enum Enum_TeamTurn
+{
+    Neither = 0,
+    Team_A = 1,
+    Team_B = 2
+}
+
 public class Cs_OverlaySystem : MonoBehaviour
 {
     // Variables
     int i_NumMaps;
     bool[] b_MapActive;
     [SerializeField] bool b_BestOf3 = true;
+    Enum_TeamTurn e_TeamTurn;
 
     // Team Logos
     [SerializeField] Enum_TeamList e_TeamOne;
     [SerializeField] Enum_TeamList e_TeamTwo;
     [SerializeField] Sprite[] TeamLogos;
+    Image img_Backdrop_Left;
+    Image img_Backdrop_Right;
+    [SerializeField] Sprite img_TeamBackdrop_Ban;
+    [SerializeField] Sprite img_TeamBackdrop_Pick;
 
     // Game Object Connections
     RectTransform go_BanPos_Team1_1;
@@ -71,6 +83,12 @@ public class Cs_OverlaySystem : MonoBehaviour
     GameObject button_Dorado;
     GameObject button_Gibraltar;
     GameObject button_Route66;
+
+    // Trophy Positions Based on Team Turn
+    GameObject go_Trophy;
+    Vector3 v3_TrophyPos_Left;
+    Vector3 v3_TrophyPos_Center;
+    Vector3 v3_TrophyPos_Right;
 
     // Use this for initialization
     void Start ()
@@ -129,10 +147,16 @@ public class Cs_OverlaySystem : MonoBehaviour
         
         dieGraphic = GameObject.Find("DieGraphic");
         ui_Text = GameObject.Find("Text_Timer").GetComponent<Text>();
+        ui_Text_PickBan = GameObject.Find("Text_PickBan").GetComponent<Text>();
 
         GameClock( true );
-    }
 
+        go_Trophy = GameObject.Find("trophy");
+        v3_TrophyPos_Left = GameObject.Find("TrophyPos_Left").transform.position;
+        v3_TrophyPos_Center = GameObject.Find("TrophyPos_Center").transform.position;
+        v3_TrophyPos_Right = GameObject.Find("TrophyPos_Right").transform.position;
+    }
+    
     void LoadTeamGraphics()
     {
         #region Set icons based on team
@@ -145,6 +169,9 @@ public class Cs_OverlaySystem : MonoBehaviour
             Image Logo_One = GameObject.Find("Logo_BO3_Left").GetComponent<Image>();
             Image Logo_Two = GameObject.Find("Logo_BO3_Mid").GetComponent<Image>();
             Image Logo_Three = GameObject.Find("Logo_BO3_Right").GetComponent<Image>();
+
+            img_Backdrop_Left = GameObject.Find("TeamLogo_Left_Back").GetComponent<Image>();
+            img_Backdrop_Right = GameObject.Find("TeamLogo_Right_Back").GetComponent<Image>();
 
             // Set icons based on team
             if (e_TeamOne == Enum_TeamList.CWU) Logo_One.sprite = TeamLogos[0];
@@ -223,7 +250,9 @@ public class Cs_OverlaySystem : MonoBehaviour
         else if (e_TeamTwo == Enum_TeamList.DigiPen) GameObject.Find("TeamLogo_Right").GetComponent<Image>().sprite = TeamLogos[1];
         else if (e_TeamTwo == Enum_TeamList.UW) GameObject.Find("TeamLogo_Right").GetComponent<Image>().sprite = TeamLogos[2];
         else GameObject.Find("TeamLogo_Right").GetComponent<Image>().sprite = TeamLogos[3];
-        
+
+        img_Backdrop_Left.sprite = img_TeamBackdrop_Ban;
+        img_Backdrop_Right.sprite = img_TeamBackdrop_Ban;
     }
 
     public void MapClicked( GameObject go_Button_ )
@@ -238,6 +267,8 @@ public class Cs_OverlaySystem : MonoBehaviour
 
         // Tell map to move to proper position
         PositionButton( go_Button_ );
+
+        ui_Text_PickBan.enabled = false;
     }
 
     int i_TEST;
@@ -263,41 +294,60 @@ public class Cs_OverlaySystem : MonoBehaviour
                     // Ban map, Team A, Position 1
                     this_Button.Set_MapState = b_BANNED;
                     this_Button.GoToPosition( go_BanPos_Team1_1 );
+                    e_TeamTurn = Enum_TeamTurn.Team_B;
                     break;
                 case 1:
                     // Ban map, Team B, Position 1
                     this_Button.Set_MapState = b_BANNED;
                     this_Button.GoToPosition( go_BanPos_Team2_1 );
+                    e_TeamTurn = Enum_TeamTurn.Team_A;
                     break;
                 case 2:
                     // Ban map, Team A, Position 2
                     this_Button.Set_MapState = b_BANNED;
                     this_Button.GoToPosition( go_BanPos_Team1_2 );
+                    e_TeamTurn = Enum_TeamTurn.Team_B;
+
+                    b_SetToSwitch_Left = true;
                     break;
                 case 3:
                     // Ban map, Team B, Position 2
                     this_Button.Set_MapState = b_BANNED;
                     this_Button.GoToPosition( go_BanPos_Team2_2 );
+                    e_TeamTurn = Enum_TeamTurn.Team_A;
+                    b_SetToSwitch_Right = true;
+                    ui_Text_PickBan.text = "PICK";
+                    ui_Text_PickBan.color = new Color(0, 0.5f, 0, 1.0f);
+                    ui_Text.color = new Color(0, 0.5f, 0, 1.0f);
                     break;
                 case 4:
                     // Pick map, Position 1
                     this_Button.Set_MapState = b_PICKED;
                     this_Button.GoToPosition( go_BO3_Left );
+                    e_TeamTurn = Enum_TeamTurn.Team_B;
+                    b_SetToSwitch_Left = true;
                     break;
                 case 5:
                     // Pick map, Position 2
                     this_Button.Set_MapState = b_PICKED;
                     this_Button.GoToPosition( go_BO3_Center );
+                    e_TeamTurn = Enum_TeamTurn.Team_A;
+                    b_SetToSwitch_Right = true;
+                    ui_Text_PickBan.text = "BAN";
+                    ui_Text_PickBan.color = new Color(0.5f, 0f, 0, 1.0f);
+                    ui_Text.color = new Color(0.5f, 0f, 0, 1.0f);
                     break;
                 case 6:
                     // Ban map, Team A, Position 3
                     this_Button.Set_MapState = b_BANNED;
                     this_Button.GoToPosition( go_BanPos_Team1_3 );
+                    e_TeamTurn = Enum_TeamTurn.Team_B;
                     break;
                 case 7:
                     // Ban map, Team B, Position 3
                     this_Button.Set_MapState = b_BANNED;
                     this_Button.GoToPosition( go_BanPos_Team2_3 );
+                    e_TeamTurn = Enum_TeamTurn.Neither;
 
                     // Begin rolling the die for the last random map
                     Run_RollForRandomMap();
@@ -310,8 +360,10 @@ public class Cs_OverlaySystem : MonoBehaviour
                     this_Button.Set_MapState = b_PICKED;
                     this_Button.GoToPosition( go_BO3_Right );
 
+                    b_PickBanActive = false;
+
                     // Run through remaining maps and disable them
-                    for(int i_ = 0; i_ < i_NumMaps; ++i_)
+                    for (int i_ = 0; i_ < i_NumMaps; ++i_)
                     {
                         if(b_MapActive[i_])
                         {
@@ -456,6 +508,8 @@ public class Cs_OverlaySystem : MonoBehaviour
     {
         if( b_IsActive_ )
         {
+            GameClock( true );
+
             // Disable the mouse cursor input
             GameObject.Find("Canvas").GetComponent<GraphicRaycaster>().enabled = false;
 
@@ -632,9 +686,10 @@ public class Cs_OverlaySystem : MonoBehaviour
 
     float f_Timer;
     int i_GameClock;
-    int i_GameClock_Max = 5;
+    [SerializeField] int i_GameClock_Max = 31;
     Text ui_Text;
-    void GameClock( bool b_Reset_ = false )
+    Text ui_Text_PickBan;
+    public void GameClock( bool b_Reset_ = false )
     {
         // If we aren't resetting, then continue the count
         if( !b_Reset_ )
@@ -642,32 +697,31 @@ public class Cs_OverlaySystem : MonoBehaviour
             // Increment timer
             f_Timer += Time.deltaTime;
 
-            if(f_Timer >= 1.0f)
+            if ( i_GameClock > 1 )
             {
-                i_GameClock -= 1;
+                // Enable Pick/Ban text
+                ui_Text_PickBan.enabled = true;
 
-                if( i_GameClock == 1)
+                if (f_Timer >= 1.0f)
                 {
-                    if( f_Timer >= 1.0f ) // Broken, fix this
-                    {
-                        ui_Text.text = "0.00";
+                    i_GameClock -= 1;
 
-                        Run_RollForRandomMap();
-
-                        f_Timer = 0f;
-                        i_GameClock = i_GameClock_Max;
-                    }
-                    else
-                    {
-                        ui_Text.text = string.Format( "{0:0.00}", (1.0f - f_Timer).ToString() );
-                    }
-
-                }
-                else
-                {
                     f_Timer = 0f;
 
-                    ui_Text.text = string.Format( "{0:00}", i_GameClock );
+                    ui_Text.text = string.Format("{0:00}", i_GameClock);
+                }
+            }
+            else
+            {
+                ui_Text.text = string.Format("{0:0.0}", (1.0f - f_Timer));
+
+                if( 1.0f - f_Timer <= 0f )
+                {
+                    i_GameClock = i_GameClock_Max;
+                    f_Timer = 0f;
+                    ui_Text.text = string.Format("0.0", i_GameClock);
+
+                    Run_RollForRandomMap();
                 }
             }
         }
@@ -675,52 +729,194 @@ public class Cs_OverlaySystem : MonoBehaviour
         {
             i_GameClock = i_GameClock_Max;
             f_Timer = 0f;
-            ui_Text.text = string.Format( "{0:00}", i_GameClock );
+            ui_Text.text = "";
+            ui_Text_PickBan.enabled = false;
         }
     }
+
     
     // Update is called once per frame
+    bool b_PickBanActive = true;
+    bool b_SetToSwitch_Left;
+    bool b_SetToSwitch_Right;
     bool b_WaitOneFrame;
     bool b_DieActive;
     float f_QuitTimer;
+    float f_ProcessBeginTimer = 5.0f;
+    float f_LerpSpeed = 0.06f;
     void Update ()
     {
-        GameClock();
-
-        if(Input.GetKeyDown(KeyCode.P))
+        RollDie( b_DieActive );
+        
+        // If the first five seconds have passed
+        if( f_ProcessBeginTimer < 0f && b_PickBanActive )
         {
-            f_AnticipationTimer = 0f;
-            f_DieTimer = 1.0f;
-            f_DieTimer_Max = 0.5f;
-            f_DieTimer_Min = 0.1f;
-            i_DieSide = 0;
+            #region Lerp the trophy models position
+            Vector3 v3_Lerp = go_Trophy.transform.position;
+            if(e_TeamTurn == Enum_TeamTurn.Team_A)
+            {
+                v3_Lerp = Vector3.Lerp(v3_Lerp, v3_TrophyPos_Left, f_LerpSpeed);
 
-            b_DieActive = true;
+                #region Lerp backdrops
+                Color clr_Alpha = img_Backdrop_Left.color;
+                if(clr_Alpha.a < 1.0f)
+                {
+                    clr_Alpha.a += Time.deltaTime;
+
+                    if (clr_Alpha.a >= 1.0f) clr_Alpha.a = 1.0f;
+                }
+                img_Backdrop_Left.color = clr_Alpha;
+
+                clr_Alpha = img_Backdrop_Right.color;
+                if(clr_Alpha.a > 0f)
+                {
+                    clr_Alpha.a -= Time.deltaTime;
+
+                    if(clr_Alpha.a < 0f)
+                    {
+                        clr_Alpha.a = 0f;
+
+                        if(b_SetToSwitch_Right)
+                        {
+                            if( img_Backdrop_Right.sprite == img_TeamBackdrop_Ban )
+                            {
+                                img_Backdrop_Right.sprite = img_TeamBackdrop_Pick;
+                            }
+                            else
+                            {
+                                img_Backdrop_Right.sprite = img_TeamBackdrop_Ban;
+                            }
+
+                            b_SetToSwitch_Right = false;
+                        }
+                    }
+                }
+                img_Backdrop_Right.color = clr_Alpha;
+                #endregion
+            }
+            else if( e_TeamTurn == Enum_TeamTurn.Team_B)
+            {
+                v3_Lerp = Vector3.Lerp(v3_Lerp, v3_TrophyPos_Right, f_LerpSpeed);
+
+                #region Lerp backdrops
+                Color clr_Alpha = img_Backdrop_Right.color;
+                if (clr_Alpha.a < 1.0f)
+                {
+                    clr_Alpha.a += Time.deltaTime;
+
+                    if (clr_Alpha.a >= 1.0f) clr_Alpha.a = 1.0f;
+                }
+                img_Backdrop_Right.color = clr_Alpha;
+
+                clr_Alpha = img_Backdrop_Left.color;
+                if (clr_Alpha.a > 0f)
+                {
+                    clr_Alpha.a -= Time.deltaTime;
+
+                    if (clr_Alpha.a < 0f)
+                    {
+                        clr_Alpha.a = 0f;
+
+                        if (b_SetToSwitch_Left)
+                        {
+                            if (img_Backdrop_Left.sprite == img_TeamBackdrop_Ban)
+                            {
+                                img_Backdrop_Left.sprite = img_TeamBackdrop_Pick;
+                            }
+                            else
+                            {
+                                img_Backdrop_Left.sprite = img_TeamBackdrop_Ban;
+                            }
+
+                            b_SetToSwitch_Left = false;
+                        }
+                    }
+                }
+                img_Backdrop_Left.color = clr_Alpha;
+                #endregion
+            }
+            else
+            {
+                v3_Lerp = Vector3.Lerp(v3_Lerp, v3_TrophyPos_Center, f_LerpSpeed);
+
+                #region Lerp backdrops
+                Color clr_Alpha = img_Backdrop_Right.color;
+                if (clr_Alpha.a > 0f)
+                {
+                    clr_Alpha.a -= Time.deltaTime;
+
+                    if (clr_Alpha.a < 0f) clr_Alpha.a = 0f;
+                }
+                img_Backdrop_Right.color = clr_Alpha;
+
+                clr_Alpha = img_Backdrop_Left.color;
+                if (clr_Alpha.a > 0f)
+                {
+                    clr_Alpha.a -= Time.deltaTime;
+
+                    if (clr_Alpha.a < 0f)
+                    {
+                        clr_Alpha.a = 0f;
+                    }
+                }
+                img_Backdrop_Left.color = clr_Alpha;
+                #endregion
+            }
+            go_Trophy.transform.position = v3_Lerp;
+            #endregion
+
+            GameClock();
+
+            if(Input.GetKeyDown(KeyCode.P))
+            {
+                Run_RollForRandomMap();
+            }
+            
+            #region Quit if Escape is double-tapped
+            if(f_QuitTimer > 0f)
+            {
+                if (f_QuitTimer >= 0.5f) f_QuitTimer = -Time.deltaTime;
+
+                if (Input.GetKeyDown(KeyCode.Escape)) { Application.Quit(); print("WE QUIT"); }
+
+                f_QuitTimer += Time.deltaTime;
+            }
+
+            if(Input.GetKeyDown(KeyCode.Escape) && f_QuitTimer == 0f)
+            {
+                f_QuitTimer += Time.deltaTime;
+            }
+            #endregion
+        }
+        else
+        {
+            f_ProcessBeginTimer -= Time.deltaTime;
+
+            // Disable the mouse cursor input
+            GameObject.Find("Canvas").GetComponent<GraphicRaycaster>().enabled = false;
+            ui_Text_PickBan.enabled = false;
+
+            // Begin the Team Visual process
+            if (f_ProcessBeginTimer <= 0f)
+            {
+                e_TeamTurn = Enum_TeamTurn.Team_A;
+
+                f_LerpSpeed /= 2f;
+                
+                if(b_PickBanActive)
+                {
+                    // Disable the mouse cursor input
+                    GameObject.Find("Canvas").GetComponent<GraphicRaycaster>().enabled = true;
+                    ui_Text_PickBan.enabled = true;
+                }
+            }
         }
 
-        if(!b_WaitOneFrame)
+        if (!b_WaitOneFrame)
         {
             LoadTeamGraphics();
 
             b_WaitOneFrame = true;
         }
-
-        RollDie( b_DieActive );
-
-        #region Quit if Escape is double-tapped
-        if(f_QuitTimer > 0f)
-        {
-            if (f_QuitTimer >= 0.5f) f_QuitTimer = -Time.deltaTime;
-
-            if (Input.GetKeyDown(KeyCode.Escape)) { Application.Quit(); print("WE QUIT"); }
-
-            f_QuitTimer += Time.deltaTime;
-        }
-
-        if(Input.GetKeyDown(KeyCode.Escape) && f_QuitTimer == 0f)
-        {
-            f_QuitTimer += Time.deltaTime;
-        }
-        #endregion
     }
 }
