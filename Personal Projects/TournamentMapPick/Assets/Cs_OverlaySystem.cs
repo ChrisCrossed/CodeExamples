@@ -177,11 +177,13 @@ public class Cs_OverlaySystem : MonoBehaviour
         
         if (!b_BestOf3)
         {
+            /*
             GameObject.Find("EndButtonPos_BO3_1").GetComponent<RectTransform>().position = new Vector3(-600, 400, 0);
             GameObject.Find("EndButtonPos_BO5_1").GetComponent<RectTransform>().position = new Vector3(-300, 200, 0);
             GameObject.Find("EndButtonPos_BO3_2").GetComponent<RectTransform>().position = new Vector3(0, 0, 0);
             GameObject.Find("EndButtonPos_BO5_3").GetComponent<RectTransform>().position = new Vector3(300, -200, 0);
             GameObject.Find("EndButtonPos_BO3_3").GetComponent<RectTransform>().position = new Vector3(600, -200, 0);
+            */
         }
     }
     
@@ -861,15 +863,15 @@ public class Cs_OverlaySystem : MonoBehaviour
 
             #region Set new positions
             Vector3 v3_Map1 = v3_FinalPos_BO3_1;
-            v3_Map1.x += 1750f;
+            v3_Map1.x += 2000;
             map_Button1.transform.position = v3_Map1;
 
             Vector3 v3_Map2 = v3_FinalPos_BO3_2;
-            v3_Map2.x += 1750f;
+            v3_Map2.x += 2000;
             map_Button2.transform.position = v3_Map2;
 
             Vector3 v3_Map3 = v3_FinalPos_BO3_3;
-            v3_Map3.x += 1750f;
+            v3_Map3.x += 2000;
             map_Button3.transform.position = v3_Map3;
             #endregion
 
@@ -885,6 +887,10 @@ public class Cs_OverlaySystem : MonoBehaviour
                 go_Temp.transform.FindChild("Img_Picked").GetComponent<RectTransform>().sizeDelta = new Vector2(775, 200);
                 go_Temp.transform.FindChild("Text").GetComponent<Text>().fontSize = 135;
                 go_Temp.transform.FindChild("Trail").GetComponent<Image>().enabled = true;
+
+                Vector3 v3_Pos = go_Temp.transform.FindChild("Trail").GetComponent<RectTransform>().localPosition;
+                v3_Pos.x = 885;
+                go_Temp.transform.FindChild("Trail").GetComponent<RectTransform>().localPosition = v3_Pos;
             }
             #endregion
         }
@@ -933,6 +939,10 @@ public class Cs_OverlaySystem : MonoBehaviour
                 go_Temp.transform.FindChild("Img_Picked").GetComponent<RectTransform>().sizeDelta = new Vector2(600, 200);
                 go_Temp.transform.FindChild("Text").GetComponent<Text>().fontSize = 135;
                 go_Temp.transform.FindChild("Trail").GetComponent<Image>().enabled = true;
+
+                Vector3 v3_Pos = go_Temp.transform.FindChild("Trail").GetComponent<RectTransform>().localPosition;
+                v3_Pos.x = 799;
+                go_Temp.transform.FindChild("Trail").GetComponent<RectTransform>().localPosition = v3_Pos;
             }
             #endregion
         }
@@ -959,8 +969,24 @@ public class Cs_OverlaySystem : MonoBehaviour
         RollDie( b_DieActive );
         GameClockVisible();
 
+        #region Quit if Escape is double-tapped
+        if (f_QuitTimer > 0f)
+        {
+            if (f_QuitTimer >= 0.5f) f_QuitTimer = -Time.deltaTime;
+
+            if (Input.GetKeyDown(KeyCode.Escape)) { Application.Quit(); print("WE QUIT"); }
+
+            f_QuitTimer += Time.deltaTime;
+        }
+
+        if (Input.GetKeyDown(KeyCode.Escape) && f_QuitTimer == 0f)
+        {
+            f_QuitTimer += Time.deltaTime;
+        }
+        #endregion
+
         // If the PickBan phase is complete
-        if( !b_PickBanActive )
+        if ( !b_PickBanActive )
         {
             f_PickBanOver_Timer += Time.deltaTime;
 
@@ -1183,22 +1209,6 @@ public class Cs_OverlaySystem : MonoBehaviour
             #endregion
 
             GameClock();
-            
-            #region Quit if Escape is double-tapped
-            if(f_QuitTimer > 0f)
-            {
-                if (f_QuitTimer >= 0.5f) f_QuitTimer = -Time.deltaTime;
-
-                if (Input.GetKeyDown(KeyCode.Escape)) { Application.Quit(); print("WE QUIT"); }
-
-                f_QuitTimer += Time.deltaTime;
-            }
-
-            if(Input.GetKeyDown(KeyCode.Escape) && f_QuitTimer == 0f)
-            {
-                f_QuitTimer += Time.deltaTime;
-            }
-            #endregion
         }
         else
         {
