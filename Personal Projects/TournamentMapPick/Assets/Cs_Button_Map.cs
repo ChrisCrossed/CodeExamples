@@ -44,16 +44,28 @@ public class Cs_Button_Map : MonoBehaviour
     bool b_Banned;
     public bool Set_MapState
     {
-        set { b_Banned = value; }
+        set
+        {
+            b_Banned = value;
+
+            if(b_Banned)
+            {
+                gameObject.transform.SetParent( GameObject.Find("Ban Positions").transform );
+            }
+        }
     }
 
     bool b_IsActivated;
     float f_MoveTimer;
     RectTransform FinalPosition;
-    public void GoToPosition( RectTransform pos_ )
+    Transform FinalParent;
+    public void GoToPosition( RectTransform pos_, Transform finalParent_ )
     {
         // Set transform to "MovingObjects" so it renders over everything else
         gameObject.transform.SetParent(GameObject.Find("Moving Objects").transform);
+
+        // Set the final parent object to go to
+        FinalParent = finalParent_;
 
         // Set position to move to
         FinalPosition = pos_;
@@ -101,7 +113,7 @@ public class Cs_Button_Map : MonoBehaviour
             if (f_MoveTimer >= 1.0f)
             {
                 // Return object to proper parent
-                gameObject.transform.SetParent(GameObject.Find("Map Buttons").transform);
+                gameObject.transform.SetParent( FinalParent );
 
                 // Finalize object position
                 gameObject.transform.position = FinalPosition.transform.position;

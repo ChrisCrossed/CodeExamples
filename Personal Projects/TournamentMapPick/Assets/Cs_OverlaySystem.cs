@@ -155,6 +155,13 @@ public class Cs_OverlaySystem : MonoBehaviour
         v3_TrophyPos_Left = GameObject.Find("TrophyPos_Left").transform.position;
         v3_TrophyPos_Center = GameObject.Find("TrophyPos_Center").transform.position;
         v3_TrophyPos_Right = GameObject.Find("TrophyPos_Right").transform.position;
+
+        tr_Ban = GameObject.Find("Ban Positions").transform;
+        tr_Pick = GameObject.Find("Selected Maps").transform;
+        img_GameClock = GameObject.Find("Img_GameClock").GetComponent<Image>();
+        img_GameClock_Backdrop = GameObject.Find("Img_GameClock_Backdrop").GetComponent<Image>();
+
+        v3_OffScreenPos = GameObject.Find("OffScreenPosition").transform.position;
     }
     
     void LoadTeamGraphics()
@@ -193,6 +200,9 @@ public class Cs_OverlaySystem : MonoBehaviour
             Image Logo_Three = GameObject.Find("Logo_BO3_Mid").GetComponent<Image>();
             Image Logo_Four = GameObject.Find("Logo_BO3_Right").GetComponent<Image>();
             Image Logo_Five = GameObject.Find("Logo_BO5_Right").GetComponent<Image>();
+
+            img_Backdrop_Left = GameObject.Find("TeamLogo_Left_Back").GetComponent<Image>();
+            img_Backdrop_Right = GameObject.Find("TeamLogo_Right_Back").GetComponent<Image>();
 
             // Set icons based on team
             if (e_TeamOne == Enum_TeamList.CWU)
@@ -277,6 +287,8 @@ public class Cs_OverlaySystem : MonoBehaviour
     static bool b_PICKED = false;
     int i_RandomMap;
     GameObject go_CurrMap;
+    Transform tr_Ban;
+    Transform tr_Pick;
     void PositionButton( GameObject go_Button_ )
     {
         // Increment turn counter
@@ -293,19 +305,19 @@ public class Cs_OverlaySystem : MonoBehaviour
                 case 0:
                     // Ban map, Team A, Position 1
                     this_Button.Set_MapState = b_BANNED;
-                    this_Button.GoToPosition( go_BanPos_Team1_1 );
+                    this_Button.GoToPosition( go_BanPos_Team1_1, tr_Ban );
                     e_TeamTurn = Enum_TeamTurn.Team_B;
                     break;
                 case 1:
                     // Ban map, Team B, Position 1
                     this_Button.Set_MapState = b_BANNED;
-                    this_Button.GoToPosition( go_BanPos_Team2_1 );
+                    this_Button.GoToPosition( go_BanPos_Team2_1, tr_Ban );
                     e_TeamTurn = Enum_TeamTurn.Team_A;
                     break;
                 case 2:
                     // Ban map, Team A, Position 2
                     this_Button.Set_MapState = b_BANNED;
-                    this_Button.GoToPosition( go_BanPos_Team1_2 );
+                    this_Button.GoToPosition( go_BanPos_Team1_2, tr_Ban );
                     e_TeamTurn = Enum_TeamTurn.Team_B;
 
                     b_SetToSwitch_Left = true;
@@ -313,7 +325,7 @@ public class Cs_OverlaySystem : MonoBehaviour
                 case 3:
                     // Ban map, Team B, Position 2
                     this_Button.Set_MapState = b_BANNED;
-                    this_Button.GoToPosition( go_BanPos_Team2_2 );
+                    this_Button.GoToPosition( go_BanPos_Team2_2, tr_Ban );
                     e_TeamTurn = Enum_TeamTurn.Team_A;
                     b_SetToSwitch_Right = true;
                     ui_Text_PickBan.text = "PICK";
@@ -323,14 +335,14 @@ public class Cs_OverlaySystem : MonoBehaviour
                 case 4:
                     // Pick map, Position 1
                     this_Button.Set_MapState = b_PICKED;
-                    this_Button.GoToPosition( go_BO3_Left );
+                    this_Button.GoToPosition( go_BO3_Left, tr_Pick);
                     e_TeamTurn = Enum_TeamTurn.Team_B;
                     b_SetToSwitch_Left = true;
                     break;
                 case 5:
                     // Pick map, Position 2
                     this_Button.Set_MapState = b_PICKED;
-                    this_Button.GoToPosition( go_BO3_Center );
+                    this_Button.GoToPosition( go_BO3_Center, tr_Pick);
                     e_TeamTurn = Enum_TeamTurn.Team_A;
                     b_SetToSwitch_Right = true;
                     ui_Text_PickBan.text = "BAN";
@@ -340,13 +352,13 @@ public class Cs_OverlaySystem : MonoBehaviour
                 case 6:
                     // Ban map, Team A, Position 3
                     this_Button.Set_MapState = b_BANNED;
-                    this_Button.GoToPosition( go_BanPos_Team1_3 );
+                    this_Button.GoToPosition( go_BanPos_Team1_3, tr_Ban );
                     e_TeamTurn = Enum_TeamTurn.Team_B;
                     break;
                 case 7:
                     // Ban map, Team B, Position 3
                     this_Button.Set_MapState = b_BANNED;
-                    this_Button.GoToPosition( go_BanPos_Team2_3 );
+                    this_Button.GoToPosition( go_BanPos_Team2_3, tr_Ban );
                     e_TeamTurn = Enum_TeamTurn.Neither;
 
                     // Begin rolling the die for the last random map
@@ -355,10 +367,15 @@ public class Cs_OverlaySystem : MonoBehaviour
                     // Disable the mouse cursor input
                     GameObject.Find("Canvas").GetComponent<GraphicRaycaster>().enabled = false;
 
+                    // Turn off the Game Clock object
+                    GameClockVisible( false );
+
+                    ui_Text_PickBan.text = "";
+
                     break;
                 case 8:
                     this_Button.Set_MapState = b_PICKED;
-                    this_Button.GoToPosition( go_BO3_Right );
+                    this_Button.GoToPosition( go_BO3_Right, tr_Pick );
 
                     b_PickBanActive = false;
 
@@ -391,70 +408,96 @@ public class Cs_OverlaySystem : MonoBehaviour
         }
         else
         {
-            // Ban (A), Ban (B), Ban (A), Ban (B), PICK (A), PICK (B), PICK (B), PICK (A), Ban (A), Ban (B), Random 1
+            // Ban (A), Ban (B), Ban (A), Ban (B), PICK (A), PICK (B), PICK (A), PICK (B), Ban (A), Ban (B), Random 1
             #region Best of 5 Format
             switch (i_TurnCounter)
             {
                 case 0:
                     // Ban map, Team A, Position 1
                     this_Button.Set_MapState = b_BANNED;
-                    this_Button.GoToPosition(go_BanPos_Team1_1);
+                    this_Button.GoToPosition( go_BanPos_Team1_1, tr_Ban );
+                    e_TeamTurn = Enum_TeamTurn.Team_B;
                     break;
                 case 1:
                     // Ban map, Team B, Position 1
                     this_Button.Set_MapState = b_BANNED;
-                    this_Button.GoToPosition(go_BanPos_Team2_1);
+                    this_Button.GoToPosition(go_BanPos_Team2_1, tr_Ban );
+                    e_TeamTurn = Enum_TeamTurn.Team_A;
                     break;
                 case 2:
                     // Ban map, Team A, Position 2
                     this_Button.Set_MapState = b_BANNED;
-                    this_Button.GoToPosition(go_BanPos_Team1_2);
+                    this_Button.GoToPosition(go_BanPos_Team1_2, tr_Ban );
+                    e_TeamTurn = Enum_TeamTurn.Team_B;
+                    b_SetToSwitch_Left = true;
                     break;
                 case 3:
                     // Ban map, Team B, Position 2
+                    this_Button.GoToPosition(go_BanPos_Team2_2, tr_Ban );
                     this_Button.Set_MapState = b_BANNED;
-                    this_Button.GoToPosition(go_BanPos_Team2_2);
+                    e_TeamTurn = Enum_TeamTurn.Team_A;
+                    b_SetToSwitch_Right = true;
+                    ui_Text_PickBan.text = "PICK";
+                    ui_Text_PickBan.color = new Color(0, 0.5f, 0, 1.0f);
+                    ui_Text.color = new Color(0, 0.5f, 0, 1.0f);
                     break;
                 case 4:
                     // Pick map, Position 1
                     this_Button.Set_MapState = b_PICKED;
-                    this_Button.GoToPosition(go_BO5_Left);
+                    this_Button.GoToPosition(go_BO5_Left, tr_Pick );
+                    e_TeamTurn = Enum_TeamTurn.Team_B;
                     break;
                 case 5:
                     // Pick map, Position 2
                     this_Button.Set_MapState = b_PICKED;
-                    this_Button.GoToPosition(go_BO3_Left);
+                    this_Button.GoToPosition(go_BO3_Left, tr_Pick );
+                    e_TeamTurn = Enum_TeamTurn.Team_A;
                     break;
                 case 6:
                     // Pick map, Position 2
                     this_Button.Set_MapState = b_PICKED;
-                    this_Button.GoToPosition(go_BO3_Center);
+                    this_Button.GoToPosition(go_BO3_Center, tr_Pick );
+                    e_TeamTurn = Enum_TeamTurn.Team_B;
+                    b_SetToSwitch_Left = true;
                     break;
                 case 7:
                     // Pick map, Position 1
                     this_Button.Set_MapState = b_PICKED;
-                    this_Button.GoToPosition(go_BO3_Right);
+                    this_Button.GoToPosition(go_BO3_Right, tr_Pick );
+                    e_TeamTurn = Enum_TeamTurn.Team_A;
+                    b_SetToSwitch_Right = true;
+                    ui_Text_PickBan.text = "BAN";
+                    ui_Text_PickBan.color = new Color(0.5f, 0f, 0, 1.0f);
+                    ui_Text.color = new Color(0.5f, 0f, 0, 1.0f);
                     break;
                 case 8:
                     // Ban map, Team A, Position 3
                     this_Button.Set_MapState = b_BANNED;
-                    this_Button.GoToPosition(go_BanPos_Team1_3);
+                    this_Button.GoToPosition(go_BanPos_Team1_3, tr_Ban );
+                    e_TeamTurn = Enum_TeamTurn.Team_B;
                     break;
                 case 9:
                     // Ban map, Team B, Position 3
                     this_Button.Set_MapState = b_BANNED;
-                    this_Button.GoToPosition(go_BanPos_Team2_3);
+                    this_Button.GoToPosition(go_BanPos_Team2_3, tr_Ban );
+                    e_TeamTurn = Enum_TeamTurn.Neither;
+                    ui_Text_PickBan.text = "";
 
                     // Begin rolling the die for the last random map
                     Run_RollForRandomMap();
 
                     // Disable the mouse cursor input
                     GameObject.Find("Canvas").GetComponent<GraphicRaycaster>().enabled = false;
+                    
+                    // Turn off the Game Clock object
+                    GameClockVisible(false);
 
                     break;
                 case 10:
                     this_Button.Set_MapState = b_PICKED;
-                    this_Button.GoToPosition(go_BO5_Right);
+                    this_Button.GoToPosition(go_BO5_Right, tr_Pick );
+
+                    b_PickBanActive = false;
 
                     // Run through remaining maps and disable them
                     for (int i_ = 0; i_ < i_NumMaps; ++i_)
@@ -734,6 +777,31 @@ public class Cs_OverlaySystem : MonoBehaviour
         }
     }
 
+    bool b_GameClockVisible = true;
+    Image img_GameClock;
+    Image img_GameClock_Backdrop;
+    void GameClockVisible( bool b_IsVisible_ = true )
+    {
+        if ( !b_IsVisible_ ) b_GameClockVisible = b_IsVisible_;
+
+        if( !b_GameClockVisible )
+        {
+            Color clr_GameClock_Alpha = img_GameClock.color;
+            Color clr_Backdrop_Alpha = img_GameClock_Backdrop.color;
+
+            if (clr_Backdrop_Alpha.a > 0f || clr_GameClock_Alpha.a > 0f)
+            {
+                clr_Backdrop_Alpha.a -= Time.deltaTime;
+                clr_GameClock_Alpha.a -= Time.deltaTime;
+
+                if (clr_Backdrop_Alpha.a < 0f) clr_Backdrop_Alpha.a = 0f;
+                if (clr_GameClock_Alpha.a < 0f) clr_GameClock_Alpha.a = 0f;
+            }
+
+            img_GameClock.color = clr_GameClock_Alpha;
+            img_GameClock_Backdrop.color = clr_Backdrop_Alpha;
+        }
+    }
     
     // Update is called once per frame
     bool b_PickBanActive = true;
@@ -744,12 +812,43 @@ public class Cs_OverlaySystem : MonoBehaviour
     float f_QuitTimer;
     float f_ProcessBeginTimer = 5.0f;
     float f_LerpSpeed = 0.06f;
+    Vector3 v3_OffScreenPos;
+    float f_PickBanOver_Timer;
+    float f_LerpTimer_Picked;
+    float f_LerpTimer_Banned;
+    [SerializeField] AnimationCurve ac_;
     void Update ()
     {
         RollDie( b_DieActive );
-        
+        GameClockVisible();
+
+        // If the PickBan phase is complete
+        if( !b_PickBanActive )
+        {
+            f_PickBanOver_Timer += Time.deltaTime;
+
+            if( f_PickBanOver_Timer >= 3.0f)
+            {
+                f_LerpTimer_Picked += Time.deltaTime;
+
+                // Begin Lerping the Selected Maps objects
+                Vector3 v3_PickedMapsLoc = GameObject.Find("Selected Maps").transform.position;
+                v3_PickedMapsLoc = Vector3.Lerp(v3_PickedMapsLoc, v3_OffScreenPos, ac_.Evaluate( f_LerpTimer_Picked / 15.0f ) );
+                GameObject.Find("Selected Maps").transform.position = v3_PickedMapsLoc;
+            }
+            
+            if( f_PickBanOver_Timer >= 4.0f)
+            {
+                f_LerpTimer_Banned += Time.deltaTime;
+
+                // Begin Lerping the Selected Maps objects
+                Vector3 v3_BannedMapsLoc = GameObject.Find("Ban Positions").transform.position;
+                v3_BannedMapsLoc = Vector3.Lerp(v3_BannedMapsLoc, v3_OffScreenPos, ac_.Evaluate( f_LerpTimer_Banned / 15.0f ) );
+                GameObject.Find("Ban Positions").transform.position = v3_BannedMapsLoc;
+            }
+        }
         // If the first five seconds have passed
-        if( f_ProcessBeginTimer < 0f && b_PickBanActive )
+        else if( f_ProcessBeginTimer < 0f && b_PickBanActive )
         {
             #region Lerp the trophy models position
             Vector3 v3_Lerp = go_Trophy.transform.position;
@@ -866,11 +965,6 @@ public class Cs_OverlaySystem : MonoBehaviour
             #endregion
 
             GameClock();
-
-            if(Input.GetKeyDown(KeyCode.P))
-            {
-                Run_RollForRandomMap();
-            }
             
             #region Quit if Escape is double-tapped
             if(f_QuitTimer > 0f)
