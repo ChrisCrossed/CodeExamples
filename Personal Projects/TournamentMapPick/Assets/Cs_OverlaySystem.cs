@@ -165,7 +165,6 @@ public class Cs_OverlaySystem : MonoBehaviour
         tr_Ban = GameObject.Find("Ban Positions").transform;
         tr_Pick = GameObject.Find("Selected Maps").transform;
         img_GameClock = GameObject.Find("Img_GameClock").GetComponent<Image>();
-        img_GameClock_Backdrop = GameObject.Find("Img_GameClock_Backdrop").GetComponent<Image>();
 
         v3_OffScreenPos = GameObject.Find("OffScreenPosition").transform.position;
 
@@ -818,7 +817,6 @@ public class Cs_OverlaySystem : MonoBehaviour
 
     bool b_GameClockVisible = true;
     Image img_GameClock;
-    Image img_GameClock_Backdrop;
     void GameClockVisible( bool b_IsVisible_ = true )
     {
         if ( !b_IsVisible_ ) b_GameClockVisible = b_IsVisible_;
@@ -826,19 +824,15 @@ public class Cs_OverlaySystem : MonoBehaviour
         if( !b_GameClockVisible )
         {
             Color clr_GameClock_Alpha = img_GameClock.color;
-            Color clr_Backdrop_Alpha = img_GameClock_Backdrop.color;
 
-            if (clr_Backdrop_Alpha.a > 0f || clr_GameClock_Alpha.a > 0f)
+            if (clr_GameClock_Alpha.a > 0f)
             {
-                clr_Backdrop_Alpha.a -= Time.deltaTime;
                 clr_GameClock_Alpha.a -= Time.deltaTime;
-
-                if (clr_Backdrop_Alpha.a < 0f) clr_Backdrop_Alpha.a = 0f;
+                
                 if (clr_GameClock_Alpha.a < 0f) clr_GameClock_Alpha.a = 0f;
             }
 
             img_GameClock.color = clr_GameClock_Alpha;
-            img_GameClock_Backdrop.color = clr_Backdrop_Alpha;
         }
     }
 
