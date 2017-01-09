@@ -44,12 +44,13 @@ public class Cs_OverlaySystem : MonoBehaviour
     // Variables
     int i_NumMaps;
     bool[] b_MapActive;
-    [SerializeField] bool b_BestOf3 = true;
+    bool b_BestOf3;
     Enum_TeamTurn e_TeamTurn;
+    bool b_IsBackground;
 
     // Team Logos
-    [SerializeField] Enum_TeamList e_TeamOne;
-    [SerializeField] Enum_TeamList e_TeamTwo;
+    Enum_TeamList e_TeamOne;
+    Enum_TeamList e_TeamTwo;
     [SerializeField] Sprite[] TeamLogos;
     Image img_Backdrop_Left;
     Image img_Backdrop_Right;
@@ -90,13 +91,36 @@ public class Cs_OverlaySystem : MonoBehaviour
     Vector3 v3_TrophyPos_Center;
     Vector3 v3_TrophyPos_Right;
 
+    // Data from Menu
+    Cs_Data menuData;
+
+    void Awake()
+    {
+        if (GameObject.Find("Data"))
+        {
+            menuData = GameObject.Find("Data").GetComponent<Cs_Data>();
+
+            e_TeamOne = menuData.TeamOne;
+            e_TeamTwo = menuData.TeamTwo;
+
+            print(menuData.FormatType.ToString());
+
+            if (menuData.FormatType == Enum_FormatType.BestOf_3) b_BestOf3 = true;
+            else if (menuData.FormatType == Enum_FormatType.BestOf_5) b_BestOf3 = false;
+            else if (menuData.FormatType == Enum_FormatType.Background)
+            {
+                GameObject.Find("Canvas").GetComponent<Canvas>().enabled = false;
+                b_IsBackground = true;
+            }
+        }
+    }
+
     // Use this for initialization
     void Start ()
     {
-        #if !UNITY_EDITOR
+#if !UNITY_EDITOR
         // Cursor.visible = false;
-        #endif
-
+#endif
         // Sets number of maps in use
         i_NumMaps = 13;
 
@@ -173,17 +197,6 @@ public class Cs_OverlaySystem : MonoBehaviour
         v3_FinalPos_BO3_3 = GameObject.Find("EndButtonPos_BO3_3").transform.position;
         v3_FinalPos_BO5_1 = GameObject.Find("EndButtonPos_BO5_1").transform.position;
         v3_FinalPos_BO5_3 = GameObject.Find("EndButtonPos_BO5_3").transform.position;
-        
-        if (!b_BestOf3)
-        {
-            /*
-            GameObject.Find("EndButtonPos_BO3_1").GetComponent<RectTransform>().position = new Vector3(-600, 400, 0);
-            GameObject.Find("EndButtonPos_BO5_1").GetComponent<RectTransform>().position = new Vector3(-300, 200, 0);
-            GameObject.Find("EndButtonPos_BO3_2").GetComponent<RectTransform>().position = new Vector3(0, 0, 0);
-            GameObject.Find("EndButtonPos_BO5_3").GetComponent<RectTransform>().position = new Vector3(300, -200, 0);
-            GameObject.Find("EndButtonPos_BO3_3").GetComponent<RectTransform>().position = new Vector3(600, -200, 0);
-            */
-        }
     }
     
     void LoadTeamGraphics()
@@ -960,279 +973,282 @@ public class Cs_OverlaySystem : MonoBehaviour
     [SerializeField] AnimationCurve ac_;
     void Update ()
     {
-        RollDie( b_DieActive );
-        GameClockVisible();
-
-        #region Quit if Escape is double-tapped
-        if (f_QuitTimer > 0f)
+        if( !b_IsBackground )
         {
-            if (f_QuitTimer >= 0.5f) f_QuitTimer = -Time.deltaTime;
+            RollDie(b_DieActive);
+            GameClockVisible();
 
-            if (Input.GetKeyDown(KeyCode.Escape)) { Application.Quit(); print("WE QUIT"); }
-
-            f_QuitTimer += Time.deltaTime;
-        }
-
-        if (Input.GetKeyDown(KeyCode.Escape) && f_QuitTimer == 0f)
-        {
-            f_QuitTimer += Time.deltaTime;
-        }
-        #endregion
-
-        // If the PickBan phase is complete
-        if ( !b_PickBanActive )
-        {
-            f_PickBanOver_Timer += Time.deltaTime;
-
-            if( f_PickBanOver_Timer >= 3.0f)
+            #region Quit if Escape is double-tapped
+            if (f_QuitTimer > 0f)
             {
-                f_LerpTimer_Picked += Time.deltaTime;
+                if (f_QuitTimer >= 0.5f) f_QuitTimer = -Time.deltaTime;
 
-                // Begin Lerping the Selected Maps objects
-                Vector3 v3_PickedMapsLoc = GameObject.Find("Selected Maps").transform.position;
-                v3_PickedMapsLoc = Vector3.Lerp(v3_PickedMapsLoc, v3_OffScreenPos, ac_.Evaluate( f_LerpTimer_Picked / 15.0f ) );
-                GameObject.Find("Selected Maps").transform.position = v3_PickedMapsLoc;
-            }
-            
-            if( f_PickBanOver_Timer >= 4.0f)
-            {
-                f_LerpTimer_Banned += Time.deltaTime;
+                if (Input.GetKeyDown(KeyCode.Escape)) { Application.Quit(); print("WE QUIT"); }
 
-                // Begin Lerping the Selected Maps objects
-                Vector3 v3_BannedMapsLoc = GameObject.Find("Ban Positions").transform.position;
-                v3_BannedMapsLoc = Vector3.Lerp(v3_BannedMapsLoc, v3_OffScreenPos, ac_.Evaluate( f_LerpTimer_Banned / 15.0f ) );
-                GameObject.Find("Ban Positions").transform.position = v3_BannedMapsLoc;
+                f_QuitTimer += Time.deltaTime;
             }
 
-            // Init
-            if( f_PickBanOver_Timer >= f_PickBanOver_Threshold && !b_BeginFinalMapAnimations )
+            if (Input.GetKeyDown(KeyCode.Escape) && f_QuitTimer == 0f)
             {
-                Set_ConfirmedMapFinalPositions( b_BestOf3 );
-                b_BeginFinalMapAnimations = true;
-            }
-
-            #region Lerp in buttons to show final map picks
-            
-            // Button 1
-            if ( f_PickBanOver_Timer >= f_PickBanOver_Threshold + 1 && b_BeginFinalMapAnimations )
-            {
-                // Begin lerping to final positions
-                Vector3 v3_LerpPos = map_Button1.transform.position;
-                v3_LerpPos = Vector3.Lerp(v3_LerpPos, v3_FinalPos_BO3_1, 0.05f);
-                map_Button1.transform.position = v3_LerpPos;
-            }
-
-            // Button 2
-            if (f_PickBanOver_Timer >= f_PickBanOver_Threshold + 1.5f && b_BeginFinalMapAnimations)
-            {
-                if (b_BestOf3)
-                {
-                    // Begin lerping to final positions
-                    Vector3 v3_LerpPos = map_Button2.transform.position;
-                    v3_LerpPos = Vector3.Lerp(v3_LerpPos, v3_FinalPos_BO3_2, 0.05f);
-                    map_Button2.transform.position = v3_LerpPos;
-                }
-                else
-                {
-                    // Begin lerping to final positions
-                    Vector3 v3_LerpPos = map_Button2.transform.position;
-                    v3_LerpPos = Vector3.Lerp(v3_LerpPos, v3_FinalPos_BO5_1, 0.05f);
-                    map_Button2.transform.position = v3_LerpPos;
-                }
-            }
-
-            // Button 3
-            if (f_PickBanOver_Timer >= f_PickBanOver_Threshold + 2f && b_BeginFinalMapAnimations)
-            {
-                if (b_BestOf3)
-                {
-                    // Begin lerping to final positions
-                    Vector3 v3_LerpPos = map_Button3.transform.position;
-                    v3_LerpPos = Vector3.Lerp(v3_LerpPos, v3_FinalPos_BO3_3, 0.05f);
-                    map_Button3.transform.position = v3_LerpPos;
-                }
-                else
-                {
-                    // Begin lerping to final positions
-                    Vector3 v3_LerpPos = map_Button3.transform.position;
-                    v3_LerpPos = Vector3.Lerp(v3_LerpPos, v3_FinalPos_BO3_2, 0.05f);
-                    map_Button3.transform.position = v3_LerpPos;
-                }
-            }
-
-            // Button 4
-            if( f_PickBanOver_Timer >= f_PickBanOver_Threshold + 2.5f && b_BeginFinalMapAnimations )
-            {
-                if (!b_BestOf3)
-                {
-                    // Begin lerping to final positions
-                    Vector3 v3_LerpPos = map_Button4.transform.position;
-                    v3_LerpPos = Vector3.Lerp(v3_LerpPos, v3_FinalPos_BO5_3, 0.05f);
-                    map_Button4.transform.position = v3_LerpPos;
-                }
-            }
-
-            // Button 5
-            if (f_PickBanOver_Timer >= f_PickBanOver_Threshold + 3f && b_BeginFinalMapAnimations)
-            {
-                if (!b_BestOf3)
-                {
-                    // Begin lerping to final positions
-                    Vector3 v3_LerpPos = map_Button5.transform.position;
-                    v3_LerpPos = Vector3.Lerp(v3_LerpPos, v3_FinalPos_BO3_3, 0.05f);
-                    map_Button5.transform.position = v3_LerpPos;
-                }
+                f_QuitTimer += Time.deltaTime;
             }
             #endregion
-        }
-        // If the first five seconds have passed
-        else if( f_ProcessBeginTimer < 0f && b_PickBanActive )
-        {
-            #region Lerp the trophy models position
-            Vector3 v3_Lerp = go_Trophy.transform.position;
-            if(e_TeamTurn == Enum_TeamTurn.Team_A)
+
+            // If the PickBan phase is complete
+            if (!b_PickBanActive)
             {
-                v3_Lerp = Vector3.Lerp(v3_Lerp, v3_TrophyPos_Left, f_LerpSpeed);
+                f_PickBanOver_Timer += Time.deltaTime;
 
-                #region Lerp backdrops
-                Color clr_Alpha = img_Backdrop_Left.color;
-                if(clr_Alpha.a < 1.0f)
+                if (f_PickBanOver_Timer >= 3.0f)
                 {
-                    clr_Alpha.a += Time.deltaTime;
+                    f_LerpTimer_Picked += Time.deltaTime;
 
-                    if (clr_Alpha.a >= 1.0f) clr_Alpha.a = 1.0f;
+                    // Begin Lerping the Selected Maps objects
+                    Vector3 v3_PickedMapsLoc = GameObject.Find("Selected Maps").transform.position;
+                    v3_PickedMapsLoc = Vector3.Lerp(v3_PickedMapsLoc, v3_OffScreenPos, ac_.Evaluate(f_LerpTimer_Picked / 15.0f));
+                    GameObject.Find("Selected Maps").transform.position = v3_PickedMapsLoc;
                 }
-                img_Backdrop_Left.color = clr_Alpha;
 
-                clr_Alpha = img_Backdrop_Right.color;
-                if(clr_Alpha.a > 0f)
+                if (f_PickBanOver_Timer >= 4.0f)
                 {
-                    clr_Alpha.a -= Time.deltaTime;
+                    f_LerpTimer_Banned += Time.deltaTime;
 
-                    if(clr_Alpha.a < 0f)
+                    // Begin Lerping the Selected Maps objects
+                    Vector3 v3_BannedMapsLoc = GameObject.Find("Ban Positions").transform.position;
+                    v3_BannedMapsLoc = Vector3.Lerp(v3_BannedMapsLoc, v3_OffScreenPos, ac_.Evaluate(f_LerpTimer_Banned / 15.0f));
+                    GameObject.Find("Ban Positions").transform.position = v3_BannedMapsLoc;
+                }
+
+                // Init
+                if (f_PickBanOver_Timer >= f_PickBanOver_Threshold && !b_BeginFinalMapAnimations)
+                {
+                    Set_ConfirmedMapFinalPositions(b_BestOf3);
+                    b_BeginFinalMapAnimations = true;
+                }
+
+                #region Lerp in buttons to show final map picks
+
+                // Button 1
+                if (f_PickBanOver_Timer >= f_PickBanOver_Threshold + 1 && b_BeginFinalMapAnimations)
+                {
+                    // Begin lerping to final positions
+                    Vector3 v3_LerpPos = map_Button1.transform.position;
+                    v3_LerpPos = Vector3.Lerp(v3_LerpPos, v3_FinalPos_BO3_1, 0.05f);
+                    map_Button1.transform.position = v3_LerpPos;
+                }
+
+                // Button 2
+                if (f_PickBanOver_Timer >= f_PickBanOver_Threshold + 1.5f && b_BeginFinalMapAnimations)
+                {
+                    if (b_BestOf3)
                     {
-                        clr_Alpha.a = 0f;
-
-                        if(b_SetToSwitch_Right)
-                        {
-                            if( img_Backdrop_Right.sprite == img_TeamBackdrop_Ban )
-                            {
-                                img_Backdrop_Right.sprite = img_TeamBackdrop_Pick;
-                            }
-                            else
-                            {
-                                img_Backdrop_Right.sprite = img_TeamBackdrop_Ban;
-                            }
-
-                            b_SetToSwitch_Right = false;
-                        }
+                        // Begin lerping to final positions
+                        Vector3 v3_LerpPos = map_Button2.transform.position;
+                        v3_LerpPos = Vector3.Lerp(v3_LerpPos, v3_FinalPos_BO3_2, 0.05f);
+                        map_Button2.transform.position = v3_LerpPos;
+                    }
+                    else
+                    {
+                        // Begin lerping to final positions
+                        Vector3 v3_LerpPos = map_Button2.transform.position;
+                        v3_LerpPos = Vector3.Lerp(v3_LerpPos, v3_FinalPos_BO5_1, 0.05f);
+                        map_Button2.transform.position = v3_LerpPos;
                     }
                 }
-                img_Backdrop_Right.color = clr_Alpha;
+
+                // Button 3
+                if (f_PickBanOver_Timer >= f_PickBanOver_Threshold + 2f && b_BeginFinalMapAnimations)
+                {
+                    if (b_BestOf3)
+                    {
+                        // Begin lerping to final positions
+                        Vector3 v3_LerpPos = map_Button3.transform.position;
+                        v3_LerpPos = Vector3.Lerp(v3_LerpPos, v3_FinalPos_BO3_3, 0.05f);
+                        map_Button3.transform.position = v3_LerpPos;
+                    }
+                    else
+                    {
+                        // Begin lerping to final positions
+                        Vector3 v3_LerpPos = map_Button3.transform.position;
+                        v3_LerpPos = Vector3.Lerp(v3_LerpPos, v3_FinalPos_BO3_2, 0.05f);
+                        map_Button3.transform.position = v3_LerpPos;
+                    }
+                }
+
+                // Button 4
+                if (f_PickBanOver_Timer >= f_PickBanOver_Threshold + 2.5f && b_BeginFinalMapAnimations)
+                {
+                    if (!b_BestOf3)
+                    {
+                        // Begin lerping to final positions
+                        Vector3 v3_LerpPos = map_Button4.transform.position;
+                        v3_LerpPos = Vector3.Lerp(v3_LerpPos, v3_FinalPos_BO5_3, 0.05f);
+                        map_Button4.transform.position = v3_LerpPos;
+                    }
+                }
+
+                // Button 5
+                if (f_PickBanOver_Timer >= f_PickBanOver_Threshold + 3f && b_BeginFinalMapAnimations)
+                {
+                    if (!b_BestOf3)
+                    {
+                        // Begin lerping to final positions
+                        Vector3 v3_LerpPos = map_Button5.transform.position;
+                        v3_LerpPos = Vector3.Lerp(v3_LerpPos, v3_FinalPos_BO3_3, 0.05f);
+                        map_Button5.transform.position = v3_LerpPos;
+                    }
+                }
                 #endregion
             }
-            else if( e_TeamTurn == Enum_TeamTurn.Team_B)
+            // If the first five seconds have passed
+            else if (f_ProcessBeginTimer < 0f && b_PickBanActive)
             {
-                v3_Lerp = Vector3.Lerp(v3_Lerp, v3_TrophyPos_Right, f_LerpSpeed);
-
-                #region Lerp backdrops
-                Color clr_Alpha = img_Backdrop_Right.color;
-                if (clr_Alpha.a < 1.0f)
+                #region Lerp the trophy models position
+                Vector3 v3_Lerp = go_Trophy.transform.position;
+                if (e_TeamTurn == Enum_TeamTurn.Team_A)
                 {
-                    clr_Alpha.a += Time.deltaTime;
+                    v3_Lerp = Vector3.Lerp(v3_Lerp, v3_TrophyPos_Left, f_LerpSpeed);
 
-                    if (clr_Alpha.a >= 1.0f) clr_Alpha.a = 1.0f;
-                }
-                img_Backdrop_Right.color = clr_Alpha;
-
-                clr_Alpha = img_Backdrop_Left.color;
-                if (clr_Alpha.a > 0f)
-                {
-                    clr_Alpha.a -= Time.deltaTime;
-
-                    if (clr_Alpha.a < 0f)
+                    #region Lerp backdrops
+                    Color clr_Alpha = img_Backdrop_Left.color;
+                    if (clr_Alpha.a < 1.0f)
                     {
-                        clr_Alpha.a = 0f;
+                        clr_Alpha.a += Time.deltaTime;
 
-                        if (b_SetToSwitch_Left)
+                        if (clr_Alpha.a >= 1.0f) clr_Alpha.a = 1.0f;
+                    }
+                    img_Backdrop_Left.color = clr_Alpha;
+
+                    clr_Alpha = img_Backdrop_Right.color;
+                    if (clr_Alpha.a > 0f)
+                    {
+                        clr_Alpha.a -= Time.deltaTime;
+
+                        if (clr_Alpha.a < 0f)
                         {
-                            if (img_Backdrop_Left.sprite == img_TeamBackdrop_Ban)
-                            {
-                                img_Backdrop_Left.sprite = img_TeamBackdrop_Pick;
-                            }
-                            else
-                            {
-                                img_Backdrop_Left.sprite = img_TeamBackdrop_Ban;
-                            }
+                            clr_Alpha.a = 0f;
 
-                            b_SetToSwitch_Left = false;
+                            if (b_SetToSwitch_Right)
+                            {
+                                if (img_Backdrop_Right.sprite == img_TeamBackdrop_Ban)
+                                {
+                                    img_Backdrop_Right.sprite = img_TeamBackdrop_Pick;
+                                }
+                                else
+                                {
+                                    img_Backdrop_Right.sprite = img_TeamBackdrop_Ban;
+                                }
+
+                                b_SetToSwitch_Right = false;
+                            }
                         }
                     }
+                    img_Backdrop_Right.color = clr_Alpha;
+                    #endregion
                 }
-                img_Backdrop_Left.color = clr_Alpha;
+                else if (e_TeamTurn == Enum_TeamTurn.Team_B)
+                {
+                    v3_Lerp = Vector3.Lerp(v3_Lerp, v3_TrophyPos_Right, f_LerpSpeed);
+
+                    #region Lerp backdrops
+                    Color clr_Alpha = img_Backdrop_Right.color;
+                    if (clr_Alpha.a < 1.0f)
+                    {
+                        clr_Alpha.a += Time.deltaTime;
+
+                        if (clr_Alpha.a >= 1.0f) clr_Alpha.a = 1.0f;
+                    }
+                    img_Backdrop_Right.color = clr_Alpha;
+
+                    clr_Alpha = img_Backdrop_Left.color;
+                    if (clr_Alpha.a > 0f)
+                    {
+                        clr_Alpha.a -= Time.deltaTime;
+
+                        if (clr_Alpha.a < 0f)
+                        {
+                            clr_Alpha.a = 0f;
+
+                            if (b_SetToSwitch_Left)
+                            {
+                                if (img_Backdrop_Left.sprite == img_TeamBackdrop_Ban)
+                                {
+                                    img_Backdrop_Left.sprite = img_TeamBackdrop_Pick;
+                                }
+                                else
+                                {
+                                    img_Backdrop_Left.sprite = img_TeamBackdrop_Ban;
+                                }
+
+                                b_SetToSwitch_Left = false;
+                            }
+                        }
+                    }
+                    img_Backdrop_Left.color = clr_Alpha;
+                    #endregion
+                }
+                else
+                {
+                    v3_Lerp = Vector3.Lerp(v3_Lerp, v3_TrophyPos_Center, f_LerpSpeed);
+
+                    #region Lerp backdrops
+                    Color clr_Alpha = img_Backdrop_Right.color;
+                    if (clr_Alpha.a > 0f)
+                    {
+                        clr_Alpha.a -= Time.deltaTime;
+
+                        if (clr_Alpha.a < 0f) clr_Alpha.a = 0f;
+                    }
+                    img_Backdrop_Right.color = clr_Alpha;
+
+                    clr_Alpha = img_Backdrop_Left.color;
+                    if (clr_Alpha.a > 0f)
+                    {
+                        clr_Alpha.a -= Time.deltaTime;
+
+                        if (clr_Alpha.a < 0f)
+                        {
+                            clr_Alpha.a = 0f;
+                        }
+                    }
+                    img_Backdrop_Left.color = clr_Alpha;
+                    #endregion
+                }
+                go_Trophy.transform.position = v3_Lerp;
                 #endregion
+
+                GameClock();
             }
             else
             {
-                v3_Lerp = Vector3.Lerp(v3_Lerp, v3_TrophyPos_Center, f_LerpSpeed);
+                f_ProcessBeginTimer -= Time.deltaTime;
 
-                #region Lerp backdrops
-                Color clr_Alpha = img_Backdrop_Right.color;
-                if (clr_Alpha.a > 0f)
+                // Disable the mouse cursor input
+                GameObject.Find("Canvas").GetComponent<GraphicRaycaster>().enabled = false;
+                ui_Text_PickBan.enabled = false;
+
+                // Begin the Team Visual process
+                if (f_ProcessBeginTimer <= 0f)
                 {
-                    clr_Alpha.a -= Time.deltaTime;
+                    e_TeamTurn = Enum_TeamTurn.Team_A;
 
-                    if (clr_Alpha.a < 0f) clr_Alpha.a = 0f;
-                }
-                img_Backdrop_Right.color = clr_Alpha;
+                    f_LerpSpeed /= 2f;
 
-                clr_Alpha = img_Backdrop_Left.color;
-                if (clr_Alpha.a > 0f)
-                {
-                    clr_Alpha.a -= Time.deltaTime;
-
-                    if (clr_Alpha.a < 0f)
+                    if (b_PickBanActive)
                     {
-                        clr_Alpha.a = 0f;
+                        // Disable the mouse cursor input
+                        GameObject.Find("Canvas").GetComponent<GraphicRaycaster>().enabled = true;
+                        ui_Text_PickBan.enabled = true;
                     }
                 }
-                img_Backdrop_Left.color = clr_Alpha;
-                #endregion
             }
-            go_Trophy.transform.position = v3_Lerp;
-            #endregion
 
-            GameClock();
-        }
-        else
-        {
-            f_ProcessBeginTimer -= Time.deltaTime;
-
-            // Disable the mouse cursor input
-            GameObject.Find("Canvas").GetComponent<GraphicRaycaster>().enabled = false;
-            ui_Text_PickBan.enabled = false;
-
-            // Begin the Team Visual process
-            if (f_ProcessBeginTimer <= 0f)
+            if (!b_WaitOneFrame)
             {
-                e_TeamTurn = Enum_TeamTurn.Team_A;
+                LoadTeamGraphics();
 
-                f_LerpSpeed /= 2f;
-                
-                if(b_PickBanActive)
-                {
-                    // Disable the mouse cursor input
-                    GameObject.Find("Canvas").GetComponent<GraphicRaycaster>().enabled = true;
-                    ui_Text_PickBan.enabled = true;
-                }
+                b_WaitOneFrame = true;
             }
-        }
-
-        if (!b_WaitOneFrame)
-        {
-            LoadTeamGraphics();
-
-            b_WaitOneFrame = true;
         }
     }
 }
