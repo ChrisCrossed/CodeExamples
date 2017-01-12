@@ -105,4 +105,24 @@ public class Cs_Menu : MonoBehaviour
     {
         SceneManager.LoadScene(1);
     }
+
+    float f_QuitTimer;
+    void Update()
+    {
+        #region Return to menu if Escape is double-tapped
+        if (f_QuitTimer > 0f)
+        {
+            if (f_QuitTimer >= 0.5f) f_QuitTimer = -Time.deltaTime;
+
+            if (Input.GetKeyDown(KeyCode.Escape)) { Application.Quit(); print("WE QUIT"); }
+
+            f_QuitTimer += Time.deltaTime;
+        }
+
+        if (Input.GetKeyDown(KeyCode.Escape) && f_QuitTimer == 0f)
+        {
+            f_QuitTimer += Time.deltaTime;
+        }
+        #endregion
+    }
 }

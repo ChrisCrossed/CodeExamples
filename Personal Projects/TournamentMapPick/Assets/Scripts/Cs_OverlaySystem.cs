@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 
 public enum Enum_MapList
 {
@@ -96,6 +97,23 @@ public class Cs_OverlaySystem : MonoBehaviour
 
     void Awake()
     {
+        
+
+        /*
+        TeamLogos[0] = Resources.Load("Logo_CWU") as Sprite;
+        TeamLogos[1] = Resources.Load("Logo_DigiPen") as Sprite;
+        TeamLogos[2] = Resources.Load("Logo_UW") as Sprite;
+        TeamLogos[3] = Resources.Load("Logo_WWU") as Sprite;
+        */
+    }
+
+    // Use this for initialization
+    void Start ()
+    {
+#if !UNITY_EDITOR
+        // Cursor.visible = false;
+#endif
+
         if (GameObject.Find("Data"))
         {
             menuData = GameObject.Find("Data").GetComponent<Cs_Data>();
@@ -113,14 +131,7 @@ public class Cs_OverlaySystem : MonoBehaviour
                 b_IsBackground = true;
             }
         }
-    }
 
-    // Use this for initialization
-    void Start ()
-    {
-#if !UNITY_EDITOR
-        Cursor.visible = false;
-#endif
         // Sets number of maps in use
         i_NumMaps = 13;
 
@@ -1260,12 +1271,12 @@ public class Cs_OverlaySystem : MonoBehaviour
             LeftPixels();
             RightPixels();
 
-            #region Quit if Escape is double-tapped
+            #region Return to menu if Escape is double-tapped
             if (f_QuitTimer > 0f)
             {
                 if (f_QuitTimer >= 0.5f) f_QuitTimer = -Time.deltaTime;
 
-                if (Input.GetKeyDown(KeyCode.Escape)) { Application.Quit(); print("WE QUIT"); }
+                if (Input.GetKeyDown(KeyCode.Escape)) { SceneManager.LoadScene(0); }
 
                 f_QuitTimer += Time.deltaTime;
             }
