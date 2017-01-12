@@ -119,7 +119,7 @@ public class Cs_OverlaySystem : MonoBehaviour
     void Start ()
     {
 #if !UNITY_EDITOR
-        // Cursor.visible = false;
+        Cursor.visible = false;
 #endif
         // Sets number of maps in use
         i_NumMaps = 13;
@@ -197,6 +197,22 @@ public class Cs_OverlaySystem : MonoBehaviour
         v3_FinalPos_BO3_3 = GameObject.Find("EndButtonPos_BO3_3").transform.position;
         v3_FinalPos_BO5_1 = GameObject.Find("EndButtonPos_BO5_1").transform.position;
         v3_FinalPos_BO5_3 = GameObject.Find("EndButtonPos_BO5_3").transform.position;
+
+        go_LeftPixels_Off = new List<GameObject>();
+
+        go_LeftPixels = new GameObject[32];
+        for( int i_ = 0; i_ < go_LeftPixels.Length; ++i_ )
+        {
+            go_LeftPixels[i_] = GameObject.Find("LeftPixel_" + i_);
+        }
+
+        /*
+        go_RightPixels = new GameObject[0];
+        for (int i_ = 0; i_ < go_RightPixels.Length; ++i_)
+        {
+            go_RightPixels[i_] = GameObject.Find("RightPixel_" + i_);
+        }
+        */
     }
     
     void LoadTeamGraphics()
@@ -463,18 +479,21 @@ public class Cs_OverlaySystem : MonoBehaviour
                     this_Button.Set_MapState = b_BANNED;
                     this_Button.GoToPosition( go_BanPos_Team1_1, tr_Ban );
                     e_TeamTurn = Enum_TeamTurn.Team_B;
+                    Set_Pixels = Enum_PixelsState.Right;
                     break;
                 case 1:
                     // Ban map, Team B, Position 1
                     this_Button.Set_MapState = b_BANNED;
                     this_Button.GoToPosition(go_BanPos_Team2_1, tr_Ban );
                     e_TeamTurn = Enum_TeamTurn.Team_A;
+                    Set_Pixels = Enum_PixelsState.Left;
                     break;
                 case 2:
                     // Ban map, Team A, Position 2
                     this_Button.Set_MapState = b_BANNED;
                     this_Button.GoToPosition(go_BanPos_Team1_2, tr_Ban );
                     e_TeamTurn = Enum_TeamTurn.Team_B;
+                    Set_Pixels = Enum_PixelsState.Right;
                     b_SetToSwitch_Left = true;
                     break;
                 case 3:
@@ -486,6 +505,7 @@ public class Cs_OverlaySystem : MonoBehaviour
                     ui_Text_PickBan.text = "PICK";
                     ui_Text_PickBan.color = new Color(0, 0.5f, 0, 1.0f);
                     ui_Text.color = new Color(0, 0.5f, 0, 1.0f);
+                    Set_Pixels = Enum_PixelsState.Left;
                     break;
                 case 4:
                     // Pick map, Position 1
@@ -493,6 +513,7 @@ public class Cs_OverlaySystem : MonoBehaviour
                     this_Button.GoToPosition(go_BO5_Left, tr_Pick );
                     e_TeamTurn = Enum_TeamTurn.Team_B;
                     map_Button1 = go_Button_;
+                    Set_Pixels = Enum_PixelsState.Right;
                     break;
                 case 5:
                     // Pick map, Position 2
@@ -500,6 +521,7 @@ public class Cs_OverlaySystem : MonoBehaviour
                     this_Button.GoToPosition(go_BO3_Left, tr_Pick );
                     e_TeamTurn = Enum_TeamTurn.Team_A;
                     map_Button2 = go_Button_;
+                    Set_Pixels = Enum_PixelsState.Left;
                     break;
                 case 6:
                     // Pick map, Position 2
@@ -508,6 +530,7 @@ public class Cs_OverlaySystem : MonoBehaviour
                     e_TeamTurn = Enum_TeamTurn.Team_B;
                     b_SetToSwitch_Left = true;
                     map_Button3 = go_Button_;
+                    Set_Pixels = Enum_PixelsState.Right;
                     break;
                 case 7:
                     // Pick map, Position 1
@@ -519,6 +542,7 @@ public class Cs_OverlaySystem : MonoBehaviour
                     ui_Text_PickBan.color = new Color(0.5f, 0f, 0, 1.0f);
                     ui_Text.color = new Color(0.5f, 0f, 0, 1.0f);
                     map_Button4 = go_Button_;
+                    Set_Pixels = Enum_PixelsState.Left;
                     break;
                 case 8:
                     // Ban map, Team A, Position 3
@@ -532,6 +556,7 @@ public class Cs_OverlaySystem : MonoBehaviour
                     this_Button.GoToPosition(go_BanPos_Team2_3, tr_Ban );
                     e_TeamTurn = Enum_TeamTurn.Neither;
                     ui_Text_PickBan.text = "";
+                    Set_Pixels = Enum_PixelsState.Neither;
 
                     // Begin rolling the die for the last random map
                     Run_RollForRandomMap();
@@ -836,6 +861,7 @@ public class Cs_OverlaySystem : MonoBehaviour
 
         if( !b_GameClockVisible )
         {
+            #region GameClock
             Color clr_GameClock_Alpha = img_GameClock.color;
 
             if (clr_GameClock_Alpha.a > 0f)
@@ -846,6 +872,25 @@ public class Cs_OverlaySystem : MonoBehaviour
             }
 
             img_GameClock.color = clr_GameClock_Alpha;
+            #endregion
+
+            #region Advertisements
+            Color clr_Ad_1_Alpha = GameObject.Find("Ad_1").GetComponent<Image>().color;
+            if( clr_Ad_1_Alpha.a > 0f )
+            {
+                clr_Ad_1_Alpha.a -= Time.deltaTime;
+                if (clr_Ad_1_Alpha.a < 0f) clr_Ad_1_Alpha.a = 0f;
+            }
+            GameObject.Find("Ad_1").GetComponent<Image>().color = clr_Ad_1_Alpha;
+
+            Color clr_Ad_2_Alpha = GameObject.Find("Ad_2").GetComponent<Image>().color;
+            if (clr_Ad_2_Alpha.a > 0f)
+            {
+                clr_Ad_2_Alpha.a -= Time.deltaTime;
+                if (clr_Ad_2_Alpha.a < 0f) clr_Ad_2_Alpha.a = 0f;
+            }
+            GameObject.Find("Ad_2").GetComponent<Image>().color = clr_Ad_2_Alpha;
+            #endregion
         }
     }
 
@@ -955,6 +1000,139 @@ public class Cs_OverlaySystem : MonoBehaviour
         }
     }
 
+    enum Enum_PixelsState { Left = 1, Right = 2, Neither = 0};
+    Enum_PixelsState e_PixelsState;
+    bool b_LeftPixels_On = false;
+    bool b_RightPixels_On = false;
+    float f_LeftPixels_Timer;
+    float f_RightPixels_Timer;
+    static float f_Pixels_Rate = 0.5f;
+    GameObject[] go_LeftPixels;
+    GameObject[] go_RightPixels;
+    Enum_PixelsState Set_Pixels
+    {
+        set
+        {
+            if(e_PixelsState != value)
+            {
+                f_LeftPixels_Timer = 0f;
+                f_RightPixels_Timer = 0f;
+                i_TimerIncrement = 0;
+                f_Timer_Stall = f_Timer_Stall_Max;
+            }
+
+            e_PixelsState = value;
+
+            if( e_PixelsState == Enum_PixelsState.Left )
+            {
+                b_LeftPixels_On = true;
+                b_RightPixels_On = false;
+            }
+            else if( e_PixelsState == Enum_PixelsState.Right )
+            {
+                b_LeftPixels_On = false;
+                b_RightPixels_On = true;
+            }
+            else
+            {
+                b_LeftPixels_On = false;
+                b_RightPixels_On = false;
+            }
+        }
+    }
+
+    List<GameObject> go_LeftPixels_Off;
+    List<GameObject> go_LeftPixels_On;
+    float f_Rate = f_Pixels_Rate * 10f;
+    int i_TimerIncrement;
+    float f_TimerIncrement_Timer;
+    static float f_TimerIncrement_Rate = 0.2f;
+    float f_Timer_Stall;
+    static float f_Timer_Stall_Max = 1.0f;
+    void LeftPixels()
+    {
+        // Reset pixels and put them in the 'Off' array
+        ResetPixels_Left();
+        
+        // If 'LeftPixels' is on, increment the timer & add pixels to the 'On' list based on that timer. Grow those pixels.
+        if( b_LeftPixels_On )
+        {
+            if(f_Timer_Stall < f_Timer_Stall_Max)
+            {
+                f_Timer_Stall += Time.fixedDeltaTime;
+                return;
+            }
+
+            // Increment the timer
+            f_LeftPixels_Timer += Time.fixedDeltaTime;
+
+            f_TimerIncrement_Timer += Time.fixedDeltaTime;
+            if(f_TimerIncrement_Timer > f_TimerIncrement_Rate)
+            {
+                ++i_TimerIncrement;
+                f_TimerIncrement_Timer = 0f;
+            }
+
+            // print(i_TimerIncrement * f_Rate);
+            #region Add pixels to the 'On' list based on that timer.
+            if(i_TimerIncrement == 0)
+            {
+                MovePixels_Left(go_LeftPixels[0]);
+            }
+            else if(i_TimerIncrement < 17)
+            {
+                MovePixels_Left( go_LeftPixels[ i_TimerIncrement ] );
+                if( i_TimerIncrement + 16 < 16 * 2 )
+                {
+                    MovePixels_Left( go_LeftPixels[ i_TimerIncrement + 16] );
+                }
+            }
+            else
+            {
+                i_TimerIncrement = 0;
+                f_Timer_Stall = 0f;
+            }
+
+            // Run through all 'On' pixels and increase their size
+            for (int i_ = 0; i_ < go_LeftPixels_On.Count; ++i_)
+            {
+                Vector2 v3_SizeDelta = go_LeftPixels_On[i_].GetComponent<RectTransform>().sizeDelta;
+                v3_SizeDelta.x += Time.fixedDeltaTime * 100;
+                v3_SizeDelta.y += Time.fixedDeltaTime * 100;
+                go_LeftPixels_On[i_].GetComponent<RectTransform>().sizeDelta = v3_SizeDelta;
+            }
+            #endregion
+        }
+
+        // Regardless, find all other pixels (the 'Off' pixels) and shrink them
+        for (int i_ = 0; i_ < go_LeftPixels_Off.Count; ++i_)
+        {
+            Vector2 v3_SizeDelta = go_LeftPixels_Off[i_].GetComponent<RectTransform>().sizeDelta;
+            if(v3_SizeDelta.x > 0f) v3_SizeDelta.x -= Time.fixedDeltaTime * 100;
+            if (v3_SizeDelta.x < 0f) v3_SizeDelta.x = 0f;
+            if(v3_SizeDelta.y > 0f) v3_SizeDelta.y -= Time.fixedDeltaTime * 100;
+            if (v3_SizeDelta.y < 0f) v3_SizeDelta.y = 0f;
+            go_LeftPixels_Off[i_].GetComponent<RectTransform>().sizeDelta = v3_SizeDelta;
+        }
+    }
+    void MovePixels_Left( GameObject go_Pixel_ )
+    {
+        go_LeftPixels_Off.Remove( go_Pixel_ );
+        go_LeftPixels_On.Add( go_Pixel_ );
+    }
+    void ResetPixels_Left()
+    {
+        // Reset 'Off' list
+        go_LeftPixels_Off.Clear();
+        for (int i_ = 0; i_ < go_LeftPixels.Length; ++i_)
+        {
+            go_LeftPixels_Off.Add(go_LeftPixels[i_]);
+        }
+
+        // Reset 'On' list
+        go_LeftPixels_On = new List<GameObject>();
+    }
+
     // Update is called once per frame
     bool b_BeginFinalMapAnimations;
     bool b_PickBanActive = true;
@@ -977,6 +1155,7 @@ public class Cs_OverlaySystem : MonoBehaviour
         {
             RollDie(b_DieActive);
             GameClockVisible();
+            LeftPixels();
 
             #region Quit if Escape is double-tapped
             if (f_QuitTimer > 0f)
@@ -1239,6 +1418,7 @@ public class Cs_OverlaySystem : MonoBehaviour
                         // Disable the mouse cursor input
                         GameObject.Find("Canvas").GetComponent<GraphicRaycaster>().enabled = true;
                         ui_Text_PickBan.enabled = true;
+                        Set_Pixels = Enum_PixelsState.Left;
                     }
                 }
             }
