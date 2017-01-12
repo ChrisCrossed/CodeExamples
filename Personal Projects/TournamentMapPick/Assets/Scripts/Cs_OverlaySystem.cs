@@ -95,18 +95,6 @@ public class Cs_OverlaySystem : MonoBehaviour
     // Data from Menu
     Cs_Data menuData;
 
-    void Awake()
-    {
-        
-
-        /*
-        TeamLogos[0] = Resources.Load("Logo_CWU") as Sprite;
-        TeamLogos[1] = Resources.Load("Logo_DigiPen") as Sprite;
-        TeamLogos[2] = Resources.Load("Logo_UW") as Sprite;
-        TeamLogos[3] = Resources.Load("Logo_WWU") as Sprite;
-        */
-    }
-
     // Use this for initialization
     void Start ()
     {
@@ -814,6 +802,9 @@ public class Cs_OverlaySystem : MonoBehaviour
     }
     public void Run_RollForRandomMap()
     {
+        // Disable the Team Icon Pixels for both teams
+        Set_Pixels = Enum_PixelsState.Neither;
+
         f_AnticipationTimer = 0f;
         f_DieTimer = 1.0f;
         f_DieTimer_Max = 0.5f;
@@ -1028,6 +1019,7 @@ public class Cs_OverlaySystem : MonoBehaviour
     static float f_Pixels_Rate = 0.5f;
     float f_Timer_Stall;
     static float f_Timer_Stall_Max = 1.0f;
+    static int i_PixelScale_Max = 125;
     Enum_PixelsState Set_Pixels
     {
         set
@@ -1116,8 +1108,8 @@ public class Cs_OverlaySystem : MonoBehaviour
             for (int i_ = 0; i_ < go_LeftPixels_On.Count; ++i_)
             {
                 Vector2 v3_SizeDelta = go_LeftPixels_On[i_].GetComponent<RectTransform>().sizeDelta;
-                v3_SizeDelta.x += Time.fixedDeltaTime * 100;
-                v3_SizeDelta.y += Time.fixedDeltaTime * 100;
+                v3_SizeDelta.x += Time.fixedDeltaTime * i_PixelScale_Max;
+                v3_SizeDelta.y += Time.fixedDeltaTime * i_PixelScale_Max;
                 go_LeftPixels_On[i_].GetComponent<RectTransform>().sizeDelta = v3_SizeDelta;
             }
             #endregion
@@ -1127,9 +1119,9 @@ public class Cs_OverlaySystem : MonoBehaviour
         for (int i_ = 0; i_ < go_LeftPixels_Off.Count; ++i_)
         {
             Vector2 v3_SizeDelta = go_LeftPixels_Off[i_].GetComponent<RectTransform>().sizeDelta;
-            if(v3_SizeDelta.x > 0f) v3_SizeDelta.x -= Time.fixedDeltaTime * 100;
+            if(v3_SizeDelta.x > 0f) v3_SizeDelta.x -= Time.fixedDeltaTime * i_PixelScale_Max;
             if (v3_SizeDelta.x < 0f) v3_SizeDelta.x = 0f;
-            if(v3_SizeDelta.y > 0f) v3_SizeDelta.y -= Time.fixedDeltaTime * 100;
+            if(v3_SizeDelta.y > 0f) v3_SizeDelta.y -= Time.fixedDeltaTime * i_PixelScale_Max;
             if (v3_SizeDelta.y < 0f) v3_SizeDelta.y = 0f;
             go_LeftPixels_Off[i_].GetComponent<RectTransform>().sizeDelta = v3_SizeDelta;
         }
@@ -1208,8 +1200,8 @@ public class Cs_OverlaySystem : MonoBehaviour
             for (int i_ = 0; i_ < go_RightPixels_On.Count; ++i_)
             {
                 Vector2 v3_SizeDelta = go_RightPixels_On[i_].GetComponent<RectTransform>().sizeDelta;
-                v3_SizeDelta.x += Time.fixedDeltaTime * 100;
-                v3_SizeDelta.y += Time.fixedDeltaTime * 100;
+                v3_SizeDelta.x += Time.fixedDeltaTime * i_PixelScale_Max;
+                v3_SizeDelta.y += Time.fixedDeltaTime * i_PixelScale_Max;
                 go_RightPixels_On[i_].GetComponent<RectTransform>().sizeDelta = v3_SizeDelta;
             }
             #endregion
@@ -1219,9 +1211,9 @@ public class Cs_OverlaySystem : MonoBehaviour
         for (int i_ = 0; i_ < go_RightPixels_Off.Count; ++i_)
         {
             Vector2 v3_SizeDelta = go_RightPixels_Off[i_].GetComponent<RectTransform>().sizeDelta;
-            if (v3_SizeDelta.x > 0f) v3_SizeDelta.x -= Time.fixedDeltaTime * 100;
+            if (v3_SizeDelta.x > 0f) v3_SizeDelta.x -= Time.fixedDeltaTime * i_PixelScale_Max;
             if (v3_SizeDelta.x < 0f) v3_SizeDelta.x = 0f;
-            if (v3_SizeDelta.y > 0f) v3_SizeDelta.y -= Time.fixedDeltaTime * 100;
+            if (v3_SizeDelta.y > 0f) v3_SizeDelta.y -= Time.fixedDeltaTime * i_PixelScale_Max;
             if (v3_SizeDelta.y < 0f) v3_SizeDelta.y = 0f;
             go_RightPixels_Off[i_].GetComponent<RectTransform>().sizeDelta = v3_SizeDelta;
         }
