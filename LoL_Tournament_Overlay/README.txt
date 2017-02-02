@@ -1,0 +1,1 @@
+Windows 7/8/10 Application. Run the application in Admin mode.
